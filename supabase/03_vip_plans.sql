@@ -92,3 +92,19 @@ end $$;
 drop trigger if exists vip_order_paid_activate on public.vip_orders;
 create trigger vip_order_paid_activate before update of status on public.vip_orders
 for each row execute function public.activate_vip_after_paid();
+
+
+
+INSERT INTO public.profiles (id, full_name, role)
+SELECT
+  id,
+  COALESCE(raw_user_meta_data->>'full_name', 'BoxCellink Admin'),
+  'admin'::public.user_role
+FROM auth.users
+WHERE LOWER(email) = LOWER('Saputrarevolution2@gmail.com')
+ON CONFLICT (id)
+DO UPDATE SET
+  role = 'admin',
+  updated_at = NOW()
+RETURNING id, full_name, role;
+
