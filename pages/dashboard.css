@@ -1,0 +1,5 @@
+/* Penyesuaian layout khusus dashboard. */
+body > [data-site-navbar] { position: relative; z-index: 5; }
+.sidebar { top: 72px; height: calc(100vh - 72px); }
+.dash { min-height: calc(100vh - 72px); }
+@media (max-width: 800px) { .sidebar { display: none; } .dash { margin-left: 0; } }

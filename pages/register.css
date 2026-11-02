@@ -1,0 +1,2 @@
+/* Styling khusus halaman daftar. */
+.auth-page { min-height: calc(100vh - 72px); }
