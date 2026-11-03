@@ -1,0 +1,8 @@
+[functions.create-payment]
+verify_jwt = true
+[functions.cashi-webhook]
+verify_jwt = false
+[functions.download-link]
+verify_jwt = true
+[functions.payment-status]
+verify_jwt = true
