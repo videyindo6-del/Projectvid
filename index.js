@@ -1,7 +1,0 @@
-import { sb } from './js/config.js';
-import { mountNavbar } from './components/navbar.js';
-mountNavbar('home');
-let allVideos=[];let filter='all';const grid=document.getElementById('videoGrid');
-async function loadVideos(){const {data,error}=await sb.from('videos').select('id,title,provider,embed_url,access,download_enabled,categories(name)').eq('status','published').order('created_at',{ascending:false});if(error){grid.innerHTML='<div class="empty">Database belum dikonfigurasi. Isi js/config.js.</div>';return}allVideos=data||[];render()}
-function render(){const rows=allVideos.filter(v=>filter==='all'||v.access===filter);grid.innerHTML=rows.length?rows.map(v=>`<article class="media-card"><div class="media-thumb">▶<small>${v.provider}</small></div><div class="media-body"><h3>${escapeHtml(v.title)}</h3><p>${escapeHtml(v.categories?.name||'Tanpa kategori')}</p><div class="row"><span class="pill ${v.access==='vip'?'purple':'green'}">${v.access==='vip'?'VIP':'PUBLIC'}</span><a class="btn primary" href="pages/watch.html?id=${v.id}">Nonton</a></div></div></article>`).join(''):'<div class="empty">Belum ada video.</div>'}
-document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.filter;render()});function escapeHtml(s=''){return s.replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}loadVideos();
