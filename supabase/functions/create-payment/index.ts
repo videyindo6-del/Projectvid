@@ -9,13 +9,19 @@ Deno.serve(async req=>{
   const userClient=createClient(url,anon,{global:{headers:{Authorization:auth}}});
   const {data:{user}}=await userClient.auth.getUser(); if(!user) return reply({error:'Sesi tidak valid'},401);
   const admin=createClient(url,service); const apiKey=Deno.env.get('CASHI_API_KEY'); if(!apiKey) throw new Error('CASHI_API_KEY belum disetel'); const body=await req.json(); const purpose=body.purpose;
-  if(!['vip','review_download'].includes(purpose)) return reply({error:'Jenis transaksi tidak valid'},400);
-  let baseAmount=0,plan_id=null,review_id=null,discountPercent=0,couponCode:string|null=null;
+  if(!['vip','review_download','vip_group'].includes(purpose)) return reply({error:'Jenis transaksi tidak valid'},400);
+  let baseAmount=0,plan_id=null,review_id=null,vip_group_id=null,discountPercent=0,couponCode:string|null=null;
   const order_id=`BC${Date.now()}${crypto.randomUUID().replaceAll('-','').slice(0,8).toUpperCase()}`;
   if(purpose==='vip') {
    const {data,error}=await admin.from('vip_plans').select('id,price,status').eq('id',body.plan_id).single();
    if(error||!data||data.status!=='published') return reply({error:'Paket VIP tidak ditemukan'},404);
    baseAmount=Number(data.price); plan_id=data.id;
+  } else if(purpose==='vip_group') {
+   const {data,error}=await admin.from('vip_groups').select('id,price,status').eq('id',body.group_id).single();
+   if(error||!data||data.status!=='published') return reply({error:'Group VIP tidak ditemukan'},404);
+   const {data:owned}=await admin.from('vip_group_entitlements').select('id').eq('user_id',user.id).eq('group_id',data.id).maybeSingle();
+   if(owned) return reply({error:'Group ini sudah dibeli'},409);
+   baseAmount=Number(data.price); vip_group_id=data.id;
   } else {
    const {data,error}=await admin.from('review_items').select('id,price,access,status').eq('id',body.review_id).single();
    if(error||!data||data.status!=='published') return reply({error:'Konten review tidak ditemukan'},404);
@@ -39,7 +45,7 @@ Deno.serve(async req=>{
    return reply({error:'Nominal setelah diskon harus minimal Rp2.000'},400);
   }
   const {error:ins}=await admin.from('cashi_orders').insert({
-   order_id,user_id:user.id,purpose,plan_id,review_id,amount,base_amount:baseAmount,
+   order_id,user_id:user.id,purpose,plan_id,review_id,vip_group_id,amount,base_amount:baseAmount,
    discount_percent:discountPercent,coupon_code:couponCode
   });
   if(ins) {
