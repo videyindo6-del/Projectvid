@@ -1,8 +1,8 @@
 create extension if not exists pgcrypto;
-create type public.user_role as enum ('user','admin');
-create type public.content_access as enum ('public','vip');
-create type public.publish_status as enum ('draft','published','archived');
-create type public.telegram_type as enum ('free','paid');
+do $$ begin create type public.user_role as enum ('user','admin'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.content_access as enum ('public','vip'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.publish_status as enum ('draft','published','archived'); exception when duplicate_object then null; end $$;
+do $$ begin create type public.telegram_type as enum ('free','paid'); exception when duplicate_object then null; end $$;
 create table public.profiles(id uuid primary key references auth.users(id) on delete cascade,full_name text,role public.user_role not null default 'user',vip_expires_at timestamptz,created_at timestamptz not null default now());
 create table public.categories(id uuid primary key default gen_random_uuid(),name text not null unique,status public.publish_status not null default 'published',created_at timestamptz not null default now());
 create table public.servers(id uuid primary key default gen_random_uuid(),name text not null unique,type text not null default 'storage',folder_endpoint text,status public.publish_status not null default 'published',created_at timestamptz not null default now());
@@ -14,19 +14,33 @@ create or replace function public.handle_new_user() returns trigger language plp
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users for each row execute procedure public.handle_new_user();
 alter table public.profiles enable row level security; alter table public.categories enable row level security; alter table public.servers enable row level security; alter table public.videos enable row level security; alter table public.telegram_items enable row level security; alter table public.vip_plans enable row level security;
+drop policy if exists "profiles own" on public.profiles;
 create policy "profiles own" on public.profiles for select using(auth.uid()=id or public.is_admin());
+drop policy if exists "public categories" on public.categories;
 create policy "public categories" on public.categories for select using(status='published' or public.is_admin());
+drop policy if exists "admin categories" on public.categories;
 create policy "admin categories" on public.categories for all using(public.is_admin()) with check(public.is_admin());
+drop policy if exists "public servers" on public.servers;
 create policy "public servers" on public.servers for select using(status='published' or public.is_admin());
+drop policy if exists "admin servers" on public.servers;
 create policy "admin servers" on public.servers for all using(public.is_admin()) with check(public.is_admin());
 create policy "published videos" on public.videos for select using(status='published' and (access='public' or (auth.uid() is not null and exists(select 1 from public.profiles p where p.id=auth.uid() and p.vip_expires_at>now()))) or public.is_admin());
+drop policy if exists "admin videos" on public.videos;
 create policy "admin videos" on public.videos for all using(public.is_admin()) with check(public.is_admin());
+drop policy if exists "published telegram" on public.telegram_items;
 create policy "published telegram" on public.telegram_items for select using(status='published' or public.is_admin());
+drop policy if exists "admin telegram" on public.telegram_items;
 create policy "admin telegram" on public.telegram_items for all using(public.is_admin()) with check(public.is_admin());
+drop policy if exists "published plans" on public.vip_plans;
 create policy "published plans" on public.vip_plans for select using(status='published' or public.is_admin());
+drop policy if exists "admin plans" on public.vip_plans;
 create policy "admin plans" on public.vip_plans for all using(public.is_admin()) with check(public.is_admin());
 -- Setelah membuat akun pertama, jadikan admin dengan SQL ini:
 -- update public.profiles set role='admin' where id='UUID_USER_ANDA';
 insert into public.categories(name) values('Entertainment'),('Premium') on conflict do nothing;
 insert into public.servers(name,type) values('Server 01','storage'),('Telegram A','telegram') on conflict do nothing;
-insert into public.vip_plans(name,duration_days,price) values('VIP 1 Hari',1,5000),('VIP 2 Hari',2,8000),('VIP 5 Hari',5,15000),('VIP 7 Hari',7,20000),('VIP 15 Hari',15,32000),('VIP 1 Bulan',30,50000);
+create unique index if not exists vip_plans_duration_days_uidx on public.vip_plans(duration_days);
+insert into public.vip_plans(name,duration_days,price) values
+ ('VIP 1 Hari',1,15000),('VIP 2 Hari',2,25000),('VIP 5 Hari',5,30000),
+ ('VIP 7 Hari',7,35000),('VIP 15 Hari',15,50000),('VIP 30 Hari',30,100000)
+on conflict (duration_days) do update set name=excluded.name,price=excluded.price,status='published';
