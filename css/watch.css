@@ -1,3 +1,43 @@
 /* BoxCellink watch pages — premium ivory & blue */
 :root{color-scheme:light;--bg:#f5f3ec;--surface:#fffefa;--text:#17263b;--muted:#718096;--line:#e4e1d7;--primary:#2563b9;--dark:#142b49;--shadow:0 14px 38px rgba(28,45,66,.07)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}.container,.watch{width:min(1120px,92%);margin:28px auto}.site-head{min-height:68px;padding:0 max(4%,calc((100% - 1120px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px;background:rgba(255,254,250,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;backdrop-filter:blur(16px);box-shadow:0 5px 20px rgba(30,48,70,.04)}.brand{font-weight:900;letter-spacing:1px;color:var(--dark);text-decoration:none}.nav-menu,.nav-plain{background:transparent;color:var(--dark);border:0;font-size:18px;cursor:pointer}.head-actions{display:flex;gap:18px;align-items:center}.head-actions a{color:var(--dark);text-decoration:none;font-weight:650}.nav-shade{display:none;position:fixed;inset:0;background:rgba(13,28,47,.42);z-index:29}.nav-shade.show{display:block}.nav-drawer{position:fixed;z-index:30;left:0;top:0;bottom:0;width:min(330px,85vw);padding:28px;background:#fffefa;border-right:1px solid var(--line);box-shadow:16px 0 45px rgba(17,39,64,.13);transform:translateX(-110%);transition:.25s;display:flex;flex-direction:column;gap:18px}.nav-drawer.open{transform:none}.nav-drawer a,.nav-drawer button{color:var(--text);text-decoration:none;background:transparent;border:0;text-align:left;font:inherit;padding:8px 0}.drawer-close{align-self:flex-end;font-size:28px!important}.drawer-brand{font-size:22px;margin-bottom:20px;color:var(--dark)}.watch-card,.media-card{background:var(--surface);border:1px solid var(--line);border-radius:17px;padding:18px;margin:18px 0;box-shadow:var(--shadow)}.watch-player{width:100%;aspect-ratio:16/9;background:#101a27;border-radius:13px;overflow:hidden}.watch-player iframe,.watch-player video{width:100%;height:100%;border:0}.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border:1px solid #d9e0e8;border-radius:10px;color:var(--text);text-decoration:none;background:#fffefa;cursor:pointer;font-weight:750;transition:.18s}.btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(28,45,66,.09)}.primary{background:linear-gradient(135deg,#245b99,#4384c7);border-color:#245b99;color:#fff}.watch-meta,.watch-actions,.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.watch h1,.watch-card h1{color:var(--dark)}.watch p,.muted{color:var(--muted)}.empty{padding:35px;text-align:center;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:14px}footer{background:var(--dark);color:#fff}button:focus-visible,a:focus-visible{outline:3px solid rgba(57,120,183,.3);outline-offset:2px}@media(max-width:650px){.site-head{padding:12px 4%;min-height:60px}.head-actions{gap:12px}.watch{width:92%;margin:18px auto}.watch-card{padding:15px}.watch-actions{flex-wrap:wrap}}
+
+/* Shared navigation and footer — BoxCellink premium ivory/blue */
+.site-head{
+  width:100%; min-height:72px; height:auto; margin:0; padding:12px max(4%,calc((100% - 1120px)/2));
+  display:flex; flex-direction:row; align-items:center; justify-content:space-between; gap:16px;
+  background:rgba(255,254,250,.97); border-bottom:1px solid #e4e1d7;
+  position:sticky; top:0; z-index:40; box-shadow:0 6px 22px rgba(28,45,66,.06);
+}
+.site-head .nav-menu{
+  flex:0 0 42px; width:42px; height:42px; display:grid; place-items:center;
+  border:1px solid #dce5ef; border-radius:12px; background:#edf3fa; color:#245b99;
+  font-size:21px; line-height:1;
+}
+.site-head .brand{flex:1; display:flex; align-items:center; min-width:0; color:#142b49; font-size:18px; font-weight:900; letter-spacing:1.15px; white-space:nowrap}
+.site-head .head-actions{display:flex; align-items:center; justify-content:flex-end; gap:12px; flex:0 0 auto}
+.site-head .nav-plain{min-height:40px; padding:0 12px; border:1px solid #dce5ef; border-radius:11px; background:#fffefa; color:#245b99; font-size:13px; font-weight:750}
+.site-head .head-actions a{display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:0 15px; border-radius:11px; background:#245b99; color:#fff; font-size:13px; font-weight:750; white-space:nowrap}
+.nav-shade{z-index:90}
+.nav-drawer{z-index:100; overflow-y:auto; gap:10px; color:#17263b}
+.nav-drawer .drawer-brand{padding:4px 0 15px; border-bottom:1px solid #e4eaf1; color:#142b49; letter-spacing:.6px}
+.nav-drawer a,.nav-drawer button{width:100%; display:block; padding:11px 12px; border-radius:10px; color:#263c56; font-size:14px; font-weight:650}
+.nav-drawer a:hover,.nav-drawer button:hover{background:#edf3fa; color:#245b99}
+.nav-drawer .drawer-close{width:38px; height:38px; padding:0; border:1px solid #dce5ef; text-align:center; font-size:24px!important}
+.nav-submenu{margin:0 0 6px 8px; padding:5px 8px 5px 12px; border-left:2px solid #8db2d9; display:flex; flex-direction:column; gap:3px}
+.nav-submenu a{font-size:13px; font-weight:550}
+.site-footer{margin-top:48px; padding:0; background:#eeeae0; color:#263c56; border-top:1px solid #ded9ce}
+.site-footer>span{display:block; max-width:1120px; margin:0 auto; padding:24px 24px 8px; color:#53657a; font-size:13px; font-weight:650}
+.site-footer nav{max-width:1120px; margin:0 auto; padding:4px 24px 25px; display:flex; align-items:center; flex-wrap:wrap; gap:10px 22px}
+.site-footer nav a{color:#245b99; font-size:13px; font-weight:750; text-decoration:none}
+.site-footer nav a:hover{color:#173e6b; text-decoration:underline}
+@media(max-width:650px){
+  .site-head{min-height:64px; padding:10px 14px; flex-direction:row; align-items:center; gap:10px}
+  .site-head .nav-menu{width:38px;height:38px;flex-basis:38px}
+  .site-head .brand{font-size:15px;letter-spacing:.7px}
+  .site-head .head-actions{gap:7px}
+  .site-head .nav-plain{min-height:37px;padding:0 8px;font-size:12px}
+  .site-head .head-actions a{min-height:37px;padding:0 10px;font-size:12px}
+  .site-footer>span{padding:22px 17px 8px}
+  .site-footer nav{padding:4px 17px 23px;gap:10px 17px}
+}
