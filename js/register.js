@@ -1,10 +1,1 @@
-const msg=document.getElementById('message');const form=document.getElementById('loginForm')||document.getElementById('registerForm');
-if(form&&form.id==='loginForm')form.onsubmit=async e=>{e.preventDefault();const {data,error}=await sb.auth.signInWithPassword({email:email.value,password:password.value});if(error){msg.textContent=error.message;return}const {data:p}=await sb.from('profiles').select('role').eq('id',data.user.id).single();location.href=p?.role==='admin'?'dashboard.html':'../index.html'};
-if(form&&form.id==='registerForm')form.onsubmit=async e=>{
- e.preventDefault();
- const params=new URLSearchParams(location.search);
- const referralCode=(params.get('ref')||'').trim().toUpperCase();
- const {data,error}=await sb.auth.signUp({email:email.value,password:password.value,options:{data:{full_name:name.value,referral_code:referralCode||null}}});
- if(error){msg.textContent=error.message;return}
- msg.textContent='Akun dibuat. Jika email confirmation aktif, cek inbox lalu login.';
-};
+(() => { const form=document.getElementById('registerForm'); if(!form)return; const msg=document.getElementById('message'); form.addEventListener('submit',async e=>{e.preventDefault();const submit=form.querySelector('[type="submit"],button:not([type])');if(submit){submit.disabled=true;submit.textContent='Membuat akun…';}msg.textContent='';try{const referralCode=(new URLSearchParams(location.search).get('ref')||'').trim().toUpperCase();const {error}=await window.sb.auth.signUp({email:form.elements.email.value.trim(),password:form.elements.password.value,options:{data:{full_name:form.elements.name.value.trim(),referral_code:referralCode||null}}});if(error)throw error;msg.textContent='Akun berhasil dibuat. Jika konfirmasi email aktif, cek inbox lalu masuk.';msg.style.color='var(--success,#16764a)';form.reset();}catch(err){msg.textContent=err.message||'Pendaftaran gagal. Coba kembali.';}finally{if(submit){submit.disabled=false;submit.textContent='Daftar';}}});})();
