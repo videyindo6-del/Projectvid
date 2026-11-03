@@ -50,3 +50,14 @@ Adsterra memerlukan kode publisher/zone milik pemilik website. Tempelkan script 
 
 ### Catatan gambar review
 Form menerima URL gambar publik (HTTPS). Untuk mengunggah file gambar langsung, siapkan Supabase Storage bucket dan kebijakan upload admin terlebih dahulu.
+
+
+## Update VIP, Referral, dan Diskon (November 2026)
+
+1. Jalankan `supabase/referral_vip_migration.sql` di Supabase SQL Editor setelah `schema.sql` dan `supabase/migrations.sql`.
+2. Deploy ulang Edge Functions `create-payment`, `payment-status`, dan `cashi-webhook` dari folder `supabase/functions`.
+3. Pastikan Secrets Supabase yang sudah dipakai project tetap tersedia: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `CASHI_API_KEY`, dan `CASHI_SECRET_KEY`.
+4. Email `saputrarevolution2@gmail.com` otomatis diberi role admin jika akun sudah ada. Jika akun belum ada, role admin diberikan saat email tersebut mendaftar.
+5. Harga VIP baru: 1 hari Rp15.000, 2 hari Rp25.000, 5 hari Rp30.000, 7 hari Rp35.000, 15 hari Rp50.000, 30 hari Rp100.000.
+6. Diskon VIP 20% berlaku untuk pembelian item berbayar di Review. Diskon referral 20% (2 pemakaian) atau 50% (4 pemakaian) tidak ditumpuk; sistem menggunakan diskon terbesar.
+7. Link referral dapat dibuka melalui menu akun > Referral & Hadiah. Referral dihitung saat akun baru dibuat melalui URL `register.html?ref=KODE`.
