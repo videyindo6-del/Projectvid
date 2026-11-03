@@ -1,4 +1,5 @@
-// Isi dua nilai ini dari Supabase Project Settings → API.
-window.BOXCELLINK_SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-window.BOXCELLINK_SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-window.sb = supabase.createClient(window.BOXCELLINK_SUPABASE_URL, window.BOXCELLINK_SUPABASE_ANON_KEY);
+// Isi dua nilai ini dari Supabase Project Settings -> API.
+window.BOXCELLINK_SUPABASE_URL = window.BOXCELLINK_SUPABASE_URL || 'https://YOUR_PROJECT.supabase.co';
+window.BOXCELLINK_SUPABASE_ANON_KEY = window.BOXCELLINK_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+window.BOXCELLINK_SUPABASE_CONFIGURED = !window.BOXCELLINK_SUPABASE_URL.includes('YOUR_PROJECT') && !window.BOXCELLINK_SUPABASE_ANON_KEY.includes('YOUR_SUPABASE');
+if(window.supabase && window.BOXCELLINK_SUPABASE_CONFIGURED) window.sb=window.supabase.createClient(window.BOXCELLINK_SUPABASE_URL,window.BOXCELLINK_SUPABASE_ANON_KEY);
