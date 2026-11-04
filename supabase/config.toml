@@ -6,3 +6,6 @@ verify_jwt = false
 verify_jwt = true
 [functions.payment-status]
 verify_jwt = true
+
+[functions.admin-user]
+verify_jwt = true
