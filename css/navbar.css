@@ -7,3 +7,6 @@
 #navGuest,#navMember{display:grid;gap:5px}
 #navGuest[hidden],#navMember[hidden]{display:none!important}
 @media(max-width:760px){.bc-menu-btn{display:inline-flex!important}}
+
+/* Fixed global navigation */
+.bc-navbar{position:fixed!important;top:0;left:0;right:0;width:100%;z-index:4000}.bc-navbar+.bc-nav-shade{z-index:4090}.bc-drawer{z-index:4100}body:has(.bc-navbar){padding-top:72px}@media(max-width:760px){body:has(.bc-navbar){padding-top:66px}}
