@@ -1,11 +1,43 @@
 (()=>{
-const root=document.getElementById('groups'),modal=document.getElementById('groupModal');let selectedGroup=null;
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
-async function loadGroups(){root.innerHTML='<div class="empty-state"><i class="fa-solid fa-circle-notch fa-spin"></i> Memuat daftar Group VIP…</div>';const {data,error}=await sb.from('vip_groups').select('id,name,description,member_count,price,status').eq('status','published').order('created_at',{ascending:false});if(error){root.innerHTML=`<div class="empty-state error-state">${esc(error.message)}<br>Pastikan migrasi VIP Group sudah dijalankan.</div>`;return}
- root.innerHTML=(data||[]).map(g=>`<article class="group-card premium-group"><div class="group-card-top"><div class="group-icon"><i class="fa-brands fa-telegram"></i></div><span class="group-pill"><i class="fa-solid fa-shield-halved"></i> VERIFIED ACCESS</span></div><div class="group-info"><span class="status">TELEGRAM MEMBERSHIP</span><h2>${esc(g.name)}</h2><p>${esc(g.description||'Akses komunitas Telegram eksklusif.')}</p><div class="member-count"><i class="fa-solid fa-users"></i> ${Number(g.member_count||0).toLocaleString('id-ID')} member</div><b class="group-price">${rp(g.price)}</b></div><button class="btn primary" data-group="${esc(g.id)}"><i class="fa-solid fa-arrow-right"></i> Lihat detail</button></article>`).join('')||'<div class="empty-state">Belum ada Group VIP tersedia.</div>';
- root.querySelectorAll('[data-group]').forEach(b=>b.onclick=()=>showGroup((data||[]).find(g=>g.id===b.dataset.group)));}
-function showGroup(g){if(!g)return;selectedGroup=g;document.getElementById('groupDetail').innerHTML=`<span class="eyebrow"><i class="fa-brands fa-telegram"></i> TELEGRAM MEMBERSHIP</span><h2>${esc(g.name)}</h2><p>${esc(g.description||'Akses Telegram khusus member.')}</p><div class="modal-price">${rp(g.price)}</div><ul><li>Akses khusus untuk group yang dipilih.</li><li>Link undangan diberikan setelah pembayaran berhasil diverifikasi.</li><li>Status pembelian tersimpan di halaman Akun Saya.</li></ul>`;document.getElementById('groupJoin').hidden=true;document.getElementById('groupPay').hidden=false;modal.hidden=false;}
-document.getElementById('modalClose').onclick=()=>modal.hidden=true;modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true});
-document.getElementById('groupPay').onclick=async()=>{if(!selectedGroup)return;const btn=document.getElementById('groupPay');btn.disabled=true;btn.textContent='Memproses…';try{const {data:{user}}=await sb.auth.getUser();if(!user){location.href='login.html?next='+encodeURIComponent('/vip-groups.html');return}const {data:owned,error:ownedError}=await sb.from('vip_group_entitlements').select('id,telegram_url').eq('user_id',user.id).eq('group_id',selectedGroup.id).maybeSingle();if(ownedError)throw ownedError;if(owned){document.getElementById('groupJoin').hidden=false;document.getElementById('groupPay').hidden=true;document.getElementById('groupJoin').onclick=()=>location.href=owned.telegram_url;return}const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip_group',group_id:selectedGroup.id}});if(error)throw error;if(!data?.checkout_url)throw new Error(data?.error||'Checkout gagal');location.href=data.checkout_url}catch(e){alert(e.message||'Tidak dapat membuat pembayaran. Jalankan migrasi SQL terbaru.')}finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-lock"></i> Bayar Sekarang'}};
-loadGroups();
+ const root=document.getElementById('groups'),modal=document.getElementById('groupModal');let selected=null,busy=false;
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
+ const features=['Koleksi media pilihan yang dapat ditonton langsung','Media yang tersedia dapat disimpan','Konten viral dan terbaru sesuai tema group','Akses permanen setelah pembayaran berhasil'];
+ function card(g,i){return `<article class="vip-group-card"><div class="vip-card-top"><span class="vip-card-icon"><i class="fa-brands fa-telegram"></i></span><span class="vip-card-label">${i===0?'PREMIUM ACCESS':'LIFETIME MEMBERSHIP'}</span></div><h3>${esc(g.name)}</h3><p>${esc(g.description||'Group Telegram eksklusif dengan koleksi media pilihan dan pembaruan rutin.')}</p><ul class="vip-card-features">${features.map(x=>`<li><i class="fa-solid fa-circle-check"></i>${x}</li>`).join('')}</ul><div class="vip-card-bottom"><div class="vip-price"><small>SEKALI BAYAR · PERMANEN</small><strong>${rp(g.price)}</strong></div><button class="vip-buy" type="button" data-group="${esc(g.id)}">Pilih Group <i class="fa-solid fa-arrow-right"></i></button></div></article>`}
+ async function loadGroups(){
+  if(!window.sb){root.innerHTML='<div class="vip-empty">Layanan pembayaran belum tersedia.</div>';return}
+  root.innerHTML='<div class="vip-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Memuat pilihan group...</div>';
+  const {data,error}=await sb.from('vip_groups').select('id,name,description,price,status').eq('status','published').order('price',{ascending:false});
+  if(error){root.innerHTML=`<div class="vip-empty">${esc(error.message)}<br><small>Pastikan migrasi Group VIP terbaru sudah dijalankan.</small></div>`;return}
+  root.innerHTML=(data||[]).map(card).join('')||'<div class="vip-empty">Belum ada Group VIP yang tersedia. Silakan hubungi admin.</div>';
+  root.querySelectorAll('[data-group]').forEach(b=>b.addEventListener('click',()=>show((data||[]).find(g=>g.id===b.dataset.group))));
+ }
+ function show(g){
+  if(!g)return;selected=g;
+  document.getElementById('groupDetail').innerHTML=`<h2 id="groupModalTitle">${esc(g.name)}</h2><p>${esc(g.description||'Akses permanen ke koleksi media Telegram pilihan.')}</p><div class="vip-modal-price">${rp(g.price)}</div><ul><li>Pembayaran satu kali, akses permanen.</li><li>Link group tersedia di halaman Akun Saya selama 12 jam setelah pembayaran berhasil.</li><li>Pastikan akun Telegram kamu aktif sebelum bergabung.</li></ul>`;
+  document.getElementById('groupPay').hidden=false;document.getElementById('groupJoin').hidden=true;modal.hidden=false;
+ }
+ async function pay(){
+  if(!selected||busy)return;busy=true;const btn=document.getElementById('groupPay');btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i> Menyiapkan pembayaran...';
+  try{
+   const {data:{user},error:authError}=await sb.auth.getUser();if(authError)throw authError;
+   if(!user){location.href='/login.html?next='+encodeURIComponent('/vip-groups.html');return}
+   const {data:owned,error:ownedError}=await sb.from('vip_group_entitlements').select('id,invite_expires_at').eq('user_id',user.id).eq('group_id',selected.id).maybeSingle();
+   if(ownedError)throw ownedError;
+   if(owned){
+    const expiry=owned.invite_expires_at?new Date(owned.invite_expires_at):null;
+    if(expiry&&expiry>Date.now())throw new Error('Group ini sudah kamu beli. Link undangan tersedia di halaman Akun Saya.');
+    throw new Error('Group ini sudah pernah dibeli. Link undangan telah berakhir; hubungi admin untuk bantuan akses.');
+   }
+   const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip_group',group_id:selected.id}});
+   if(error)throw error;if(!data?.checkout_url)throw new Error(data?.error||'Cashi belum mengembalikan link pembayaran.');
+   sessionStorage.setItem('boxcellink_pending_group_order',data.order_id||'');
+   location.href=data.checkout_url;
+  }catch(e){alert(e.message||'Tidak dapat membuat pembayaran.');}
+  finally{busy=false;btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-lock"></i> Lanjut ke pembayaran'}
+ }
+ document.getElementById('modalClose').addEventListener('click',()=>modal.hidden=true);
+ modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true});
+ document.getElementById('groupPay').addEventListener('click',pay);
+ loadGroups();
 })();

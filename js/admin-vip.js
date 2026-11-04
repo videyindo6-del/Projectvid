@@ -48,6 +48,17 @@ function openForm(type,x=null){
 async function remove(table,id,type){
  const label={vip_plans:'paket VIP',vip_groups:'Group VIP',admin_discount_codes:'kode diskon'}[table]||'data';
  if(!confirm(`Hapus ${label} ini? Jika sudah terkait transaksi, sistem akan mengarsipkannya agar riwayat pembayaran tetap aman.`))return;
+ // Preserve historical purchases and paid access: a group with entitlements
+ // is archived instead of hard-deleted (the entitlement FK cascades).
+ if(type==='group'){
+  const {count,error:countError}=await sb.from('vip_group_entitlements').select('id',{count:'exact',head:true}).eq('group_id',id);
+  if(countError){notify('Tidak dapat memeriksa riwayat pembelian: '+countError.message);return}
+  if((count||0)>0){
+   const {error:archiveError}=await sb.from(table).update({status:'archived'}).eq('id',id);
+   if(archiveError){notify('Gagal mengarsipkan group: '+archiveError.message);return}
+   notify('Group diarsipkan karena sudah memiliki pembeli. Riwayat akses tetap aman.');await refresh();return;
+  }
+ }
  const {error}=await sb.from(table).delete().eq('id',id);
  if(error){
   if((type==='plan'||type==='group')&&(/foreign key|violates.*constraint|23503|constraint/i.test(error.message))){

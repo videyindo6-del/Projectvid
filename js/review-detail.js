@@ -408,7 +408,7 @@ async function setupReviewSocial(reviewId,title){
   document.getElementById('reviewCommentJump')?.addEventListener('click',()=>document.getElementById('reviewCommentInput')?.focus());
   document.getElementById('reviewShare')?.addEventListener('click',async()=>{
     const shareData={title,url:location.href,text:title};
-    try{if(navigator.share)await navigator.share(shareData);else{await navigator.clipboard.writeText(location.href);const b=document.getElementById('reviewShare');b.querySelector('span').textContent='Link tersalin';setTimeout(()=>b.querySelector('span').textContent='Bagikan',1800);}}catch(e){if(e.name!=='AbortError')alert('Tidak dapat membagikan link.');}
+    try{if(navigator.share){await navigator.share(shareData);await sb.rpc('increment_review_share',{p_review_id:reviewId})}else{await navigator.clipboard.writeText(location.href);await sb.rpc('increment_review_share',{p_review_id:reviewId});const b=document.getElementById('reviewShare');b.querySelector('span').textContent='Link tersalin';setTimeout(()=>b.querySelector('span').textContent='Bagikan',1800);}}catch(e){if(e.name!=='AbortError')alert('Tidak dapat membagikan link.');}
   });
   commentForm?.addEventListener('submit',async e=>{
     e.preventDefault();const input=document.getElementById('reviewCommentInput'),button=commentForm.querySelector('button'),content=input.value.trim();if(!content)return;

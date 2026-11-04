@@ -106,8 +106,9 @@
       const { data, error } = await sb.from('review_items')
         .select('id,slug,title,description,thumbnail_url,gallery_urls,price,access,view_count,created_at')
         .eq('status', 'published').order('created_at', { ascending: false });
+      const categoryId = new URLSearchParams(location.search).get('category');
+      if (categoryId) { const filtered = await sb.from('review_items').select('id,slug,title,description,thumbnail_url,gallery_urls,price,access,view_count,created_at').eq('status','published').eq('category_id',categoryId).order('created_at',{ascending:false}); if (filtered.error) throw filtered.error; allItems = filtered.data || []; } else { allItems = data || []; }
       if (error) throw error;
-      allItems = data || [];
       currentPage = 1;
       stats = new Map();
       if (allItems.length) {
