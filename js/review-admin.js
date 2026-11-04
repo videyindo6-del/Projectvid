@@ -358,12 +358,25 @@ async function load() {
   list.textContent = 'Memuat review...';
 
   try {
+    // Ambil data review dan URL tujuan secara terpisah agar tidak bergantung
+    // pada relasi nested PostgREST yang bisa tidak terdeteksi di project lama.
     const { data, error } = await sb
       .from('review_items')
-      .select('id,slug,title,price,access,status,review_download_secrets(download_url)')
+      .select('id,slug,title,price,access,status')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
+
+    const reviewIds = (data || []).map(item => item.id);
+    let secretsByReview = new Map();
+    if (reviewIds.length) {
+      const { data: secrets, error: secretsError } = await sb
+        .from('review_download_secrets')
+        .select('review_id,download_url')
+        .in('review_id', reviewIds);
+      if (secretsError) throw new Error('Gagal membaca URL tujuan download: ' + secretsError.message);
+      secretsByReview = new Map((secrets || []).map(row => [row.review_id, row.download_url]));
+    }
 
     list.innerHTML = `
       <table class="table review-admin-table">
@@ -373,7 +386,7 @@ async function load() {
         </tr></thead>
         <tbody>${(data || []).map(x => {
           const reviewUrl = `${location.origin}/r/${encodeURIComponent(x.slug)}`;
-          const downloadUrl = x.review_download_secrets?.[0]?.download_url || '';
+          const downloadUrl = secretsByReview.get(x.id) || '';
           return `<tr>
             <td class="review-title-cell"><strong>${esc(x.title)}</strong><small>${esc(x.slug)}</small></td>
             <td><div class="review-link-cell"><a href="${esc(reviewUrl)}" target="_blank" rel="noopener">${esc(reviewUrl)}</a><button type="button" class="copy-link-btn" data-copy="${esc(reviewUrl)}" title="Salin link review"><i class="fa-regular fa-copy"></i> Copy</button></div></td>
@@ -424,7 +437,7 @@ async function editReview(id) {
 
     const { data: x, error } = await sb
       .from('review_items')
-      .select('*,review_download_secrets(download_url),review_content_secrets(content_after_payment)')
+      .select('*,review_content_secrets(content_after_payment)')
       .eq('id', id)
       .single();
 
@@ -437,8 +450,13 @@ async function editReview(id) {
     form.elements.thumbnail_url.value = x.thumbnail_url || '';
     form.elements.content_after_payment.value =
       x.review_content_secrets?.[0]?.content_after_payment || '';
-    form.elements.download_url.value =
-      x.review_download_secrets?.[0]?.download_url || '';
+    const { data: downloadSecret, error: downloadSecretError } = await sb
+      .from('review_download_secrets')
+      .select('download_url')
+      .eq('review_id', id)
+      .maybeSingle();
+    if (downloadSecretError) throw downloadSecretError;
+    form.elements.download_url.value = downloadSecret?.download_url || '';
     form.elements.price.value = x.price ?? 0;
     form.elements.access.value = x.access || 'free';
     form.elements.status.value = x.status || 'draft';
@@ -527,6 +545,13 @@ form?.addEventListener('submit', async e => {
       throw new Error('Ada URL gambar atau embed yang tidak valid.');
     }
 
+    const downloadUrl = String(v.download_url || '').trim();
+    let parsedDownloadUrl;
+    try { parsedDownloadUrl = new URL(downloadUrl); } catch { throw new Error('Link Paste Review / URL download tujuan wajib berupa URL lengkap, misalnya https://paste.example.com/abc'); }
+    if (!['http:', 'https:'].includes(parsedDownloadUrl.protocol)) {
+      throw new Error('URL tujuan harus menggunakan HTTP atau HTTPS.');
+    }
+
     const price = v.access === 'free' ? 0 : Number(v.price);
 
     if (v.access === 'paid' &&
@@ -574,7 +599,7 @@ form?.addEventListener('submit', async e => {
       const [downloadResult, contentResult] = await Promise.all([
         sb.from('review_download_secrets').upsert({
           review_id: reviewId,
-          download_url: v.download_url || ''
+          download_url: downloadUrl
         }, { onConflict: 'review_id' }),
 
         sb.from('review_content_secrets').upsert({
@@ -604,10 +629,10 @@ form?.addEventListener('submit', async e => {
       reviewId = data.id;
 
       const [downloadResult, contentResult] = await Promise.all([
-        sb.from('review_download_secrets').insert({
+        sb.from('review_download_secrets').upsert({
           review_id: reviewId,
-          download_url: v.download_url || ''
-        }),
+          download_url: downloadUrl
+        }, { onConflict: 'review_id' }),
 
         sb.from('review_content_secrets').insert({
           review_id: reviewId,
@@ -632,7 +657,7 @@ form?.addEventListener('submit', async e => {
     const pasteUrl = `${location.origin}/paste/${encodeURIComponent(slug)}`;
     msg.className = 'review-save-result';
     msg.innerHTML = `<strong><i class="fa-solid fa-circle-check"></i> Berhasil disimpan!</strong>
-      ${[['Link Review',reviewUrl],['Link Checkout',checkoutUrl],['Halaman Paste',pasteUrl]].map(([label,url]) => `<div class="saved-url-row"><span>${label}</span><a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a><button type="button" class="copy-link-btn" data-copy="${esc(url)}"><i class="fa-regular fa-copy"></i> Copy</button></div>`).join('')}`;
+      ${[['Link Review',reviewUrl],['Link Checkout',checkoutUrl],['Halaman Paste',pasteUrl],['Link Tujuan Download',downloadUrl]].map(([label,url]) => `<div class="saved-url-row"><span>${label}</span><a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a><button type="button" class="copy-link-btn" data-copy="${esc(url)}"><i class="fa-regular fa-copy"></i> Copy</button></div>`).join('')}`;
     msg.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', async () => {
       try { await navigator.clipboard.writeText(button.dataset.copy); button.innerHTML = '<i class="fa-solid fa-check"></i> Tersalin'; }
       catch { window.prompt('Salin link berikut:', button.dataset.copy); }
