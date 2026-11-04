@@ -14,8 +14,12 @@ Deno.serve(async req=>{
   const d=payload.data||{}; if(d.status!=='SETTLED'||!d.order_id) return new Response('Ignored',{status:200});
   if(String(d.order_id).startsWith('TEST-')) return new Response('Test connection successful',{status:200});
   const admin=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-  const amount=Number(d.amount??payload.amount??0); if(!Number.isFinite(amount)) return new Response('Invalid amount',{status:400});
-  const {data,error}=await admin.rpc('settle_cashi_order',{p_order_id:String(d.order_id),p_amount:Math.round(amount),p_payload:payload});
+  const paid=Number(d.amount??payload.amount??0); if(!Number.isFinite(paid)) return new Response('Invalid amount',{status:400});
+  const {data:order,error:orderError}=await admin.from('cashi_orders').select('amount').eq('order_id',String(d.order_id)).maybeSingle();
+  if(orderError||!order) return new Response('Order not found',{status:404});
+  const expected=Number(order.amount), maxAllowed=expected+Math.ceil(expected*0.03)+100;
+  if(paid<expected||paid>maxAllowed) return new Response('Amount mismatch',{status:400});
+  const {data,error}=await admin.rpc('settle_cashi_order',{p_order_id:String(d.order_id),p_amount:expected,p_payload:payload});
   if(error){console.error(error);return new Response('Settlement failed',{status:500})}
   if(!data?.ok) return new Response(data?.reason||'Rejected',{status:400});
   return new Response('OK',{status:200});
