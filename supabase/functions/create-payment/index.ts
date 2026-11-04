@@ -10,18 +10,19 @@ Deno.serve(async req=>{
   const {data:{user}}=await userClient.auth.getUser(); if(!user) return reply({error:'Sesi tidak valid'},401);
   const admin=createClient(url,service); const apiKey=Deno.env.get('CASHI_API_KEY'); if(!apiKey) throw new Error('CASHI_API_KEY belum disetel'); const body=await req.json(); const purpose=body.purpose;
   if(!['vip','review_download','vip_group'].includes(purpose)) return reply({error:'Jenis transaksi tidak valid'},400);
-  let baseAmount=0,plan_id=null,review_id=null,vip_group_id=null,discountPercent=0,couponCode:string|null=null;
+  let baseAmount=0,plan_id=null,review_id=null,vip_group_id=null,vip_group_invite_url:string|null=null,discountPercent=0,couponCode:string|null=null;
   const order_id=`BC${Date.now()}${crypto.randomUUID().replaceAll('-','').slice(0,8).toUpperCase()}`;
   if(purpose==='vip') {
    const {data,error}=await admin.from('vip_plans').select('id,price,status').eq('id',body.plan_id).single();
    if(error||!data||data.status!=='published') return reply({error:'Paket VIP tidak ditemukan'},404);
    baseAmount=Number(data.price); plan_id=data.id;
   } else if(purpose==='vip_group') {
-   const {data,error}=await admin.from('vip_groups').select('id,price,status').eq('id',body.group_id).single();
+   const {data,error}=await admin.from('vip_groups').select('id,price,status,telegram_url').eq('id',body.group_id).single();
    if(error||!data||data.status!=='published') return reply({error:'Group VIP tidak ditemukan'},404);
+   if(!data.telegram_url||!/^https:\/\/(t\.me|telegram\.me)\//i.test(data.telegram_url)) return reply({error:'Link undangan Telegram belum dikonfigurasi admin'},409);
    const {data:owned}=await admin.from('vip_group_entitlements').select('id').eq('user_id',user.id).eq('group_id',data.id).maybeSingle();
    if(owned) return reply({error:'Group ini sudah dibeli'},409);
-   baseAmount=Number(data.price); vip_group_id=data.id;
+   baseAmount=Number(data.price); vip_group_id=data.id; vip_group_invite_url=data.telegram_url;
   } else {
    const {data,error}=await admin.from('review_items').select('id,price,access,status').eq('id',body.review_id).single();
    if(error||!data||data.status!=='published') return reply({error:'Konten review tidak ditemukan'},404);
@@ -45,7 +46,7 @@ Deno.serve(async req=>{
    return reply({error:'Nominal setelah diskon harus minimal Rp2.000'},400);
   }
   const {error:ins}=await admin.from('cashi_orders').insert({
-   order_id,user_id:user.id,purpose,plan_id,review_id,vip_group_id,amount,base_amount:baseAmount,
+   order_id,user_id:user.id,purpose,plan_id,review_id,vip_group_id,vip_group_invite_url,amount,base_amount:baseAmount,
    discount_percent:discountPercent,coupon_code:couponCode
   });
   if(ins) {
@@ -53,19 +54,27 @@ Deno.serve(async req=>{
    throw ins;
   }
   let response:Response;
-  try { response=await fetch('https://cashi.id/api/create-order',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({amount,order_id})}); }
-  catch(fetchError) {
+  let result:any;
+  try {
+   response=await fetch('https://cashi.id/api/create-order',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({amount,order_id}),signal:AbortSignal.timeout(20000)});
+   const raw=await response.text();
+   try { result=raw ? JSON.parse(raw) : {}; } catch { throw new Error('Respons Cashi bukan JSON yang valid'); }
+  } catch(gatewayError) {
+   await admin.from('cashi_orders').update({status:'FAILED',gateway_payload:{error:String(gatewayError)}}).eq('order_id',order_id);
+   if(couponCode) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
+   throw gatewayError;
+  }
+  if(!response.ok||!result?.success||!result?.checkout_url){
+   await admin.from('cashi_orders').update({status:'FAILED',gateway_payload:result||{}}).eq('order_id',order_id);
+   if(couponCode) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
+   return reply({error:result?.message||'Cashi gagal membuat pembayaran'},502);
+  }
+  const {error:updateError}=await admin.from('cashi_orders').update({checkout_url:result.checkout_url,gateway_payload:result}).eq('order_id',order_id);
+  if(updateError){
    await admin.from('cashi_orders').update({status:'FAILED'}).eq('order_id',order_id);
    if(couponCode) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
-   throw fetchError;
+   throw updateError;
   }
-  const result=await response.json();
-  if(!response.ok||!result.success||!result.checkout_url){
-   await admin.from('cashi_orders').update({status:'FAILED',gateway_payload:result}).eq('order_id',order_id);
-   if(couponCode) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
-   return reply({error:result.message||'Cashi gagal membuat pembayaran',detail:result},502);
-  }
-  await admin.from('cashi_orders').update({checkout_url:result.checkout_url,gateway_payload:result}).eq('order_id',order_id);
   return reply({success:true,order_id,amount,base_amount:baseAmount,discount_percent:discountPercent,checkout_url:result.checkout_url,qrUrl:result.qrUrl||null,expires_at:result.expires_at||null});
  } catch(e) { console.error(e); return reply({error:e.message||'Internal error'},500); }
 });
