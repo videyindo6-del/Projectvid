@@ -96,7 +96,7 @@ async function checkStatus(manual=false){
  else {msg.textContent=t('processing')}
  try{
   const {data,error}=await sb.functions.invoke('payment-status',{body:{order_id:order}});
-  if(error||!data?.success)throw new Error(data?.error||error?.message||'Status check failed');
+  if(error||!data?.success)throw new Error(data?.detail?.message||data?.error||error?.message||'Status check failed');
   const state=String(data.status||'PENDING').toUpperCase();
   const stateEl=document.getElementById('payState');if(stateEl)stateEl.textContent=state;
   if(['SETTLED','PAID','SUCCESS','COMPLETED'].includes(state)){
