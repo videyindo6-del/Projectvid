@@ -91,3 +91,27 @@ body:has(.review-shell) main.container{width:min(1180px,94%);max-width:1180px;ma
 }
 
 #reviewDetail.watch-card{margin:0;padding:0;border:0;background:transparent;box-shadow:none}
+
+/* =========================================================
+   Review detail polish: loading, full media gallery, comments
+   ========================================================= */
+.review-loading{max-width:860px;margin:42px auto;padding:28px;background:#fff;border:1px solid #e3eaf2;border-radius:22px;box-shadow:0 18px 48px rgba(25,54,87,.07)}
+.loading-brand{display:flex;align-items:center;gap:12px;color:#183451}.loading-brand b,.loading-brand small{display:block}.loading-brand b{font-size:15px}.loading-brand small{font-size:11px;color:#8392a4;margin-top:3px}
+.loading-mark{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#edf5ff;color:#3974b4;font-size:18px}
+.loading-track{height:7px;margin:22px 0 12px;border-radius:99px;overflow:hidden;background:#eaf0f7}.loading-track span{display:block;width:38%;height:100%;border-radius:99px;background:linear-gradient(90deg,#245b99,#38bdf8,#245b99);background-size:200% 100%;animation:reviewProgress 1.35s ease-in-out infinite}
+@keyframes reviewProgress{0%{transform:translateX(-110%);background-position:0 0}100%{transform:translateX(290%);background-position:100% 0}}
+.review-loading>p{margin:0 0 18px;color:#71849b;font-size:12px}.review-loading>p i{margin-right:6px;color:#3974b4}
+.loading-skeleton{border-radius:14px;background:linear-gradient(100deg,#edf2f7 25%,#f8fafc 42%,#edf2f7 65%);background-size:200% 100%;animation:reviewShimmer 1.4s ease infinite}.loading-skeleton-media{height:260px}.loading-skeleton-line{height:13px;width:70%;margin-top:16px}.loading-skeleton-line.short{width:42%;margin-top:9px}
+@keyframes reviewShimmer{to{background-position-x:-200%}}
+.review-gallery-track{display:grid!important;grid-template-columns:minmax(0,1fr);gap:18px;overflow:visible!important;scroll-snap-type:none!important}
+.review-gallery-track>.review-gallery-item{width:100%;min-height:0;height:auto;display:block;overflow:hidden;border:1px solid #e1e9f2;background:#0d1c2d;border-radius:18px}
+.review-gallery-item>img{display:block;width:100%;height:auto;max-height:820px;min-height:220px;object-fit:contain;background:#0d1c2d;cursor:zoom-in}
+.review-gallery-embed{min-height:0!important}.review-gallery-embed iframe{display:block;width:100%;height:min(78vh,760px);min-height:360px;border:0;background:#0d1c2d}
+.media-item-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 14px;background:#13253a;color:#c6d5e5;font-size:11px}.media-item-head>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.media-index{flex:0 0 auto;color:#8ec5ff;font-size:10px;font-weight:900;letter-spacing:.12em}
+.review-open-original{display:flex;align-items:center;gap:8px;padding:11px 14px;color:#b9d7f5;background:#13253a;text-decoration:none;font-size:12px}.review-open-original:hover{text-decoration:underline}
+.review-gallery-empty{min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:28px;text-align:center;border:1px dashed #cbd8e6;border-radius:16px;background:#f8fbff;color:#7e91a7}.review-gallery-empty i{font-size:30px;color:#7aa3ce}.review-gallery-empty b{color:#2b4969}.review-gallery-empty span{font-size:12px}
+.product-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:14px}.product-stats-grid>div{min-width:0;padding:12px;border:1px solid #edf1f5;border-radius:14px;background:#fbfdff}.product-stats-grid>div>i{flex:0 0 38px}.purchase-note{display:block;margin-top:5px;color:#8594a6;font-size:11px}
+.guest-comment-fields{display:grid;gap:7px;margin-bottom:10px}.guest-comment-fields[hidden]{display:none!important}.guest-comment-fields label{font-size:12px;font-weight:800;color:#47617d}.guest-comment-fields input{width:100%;height:44px;padding:0 13px;border:1px solid #dce5ef;border-radius:12px;background:#fbfdff;color:#203b59;outline:none}.guest-comment-fields input:focus{border-color:#78a7d7;box-shadow:0 0 0 4px #3974b414}
+.comment-submit{align-items:flex-start}.comment-submit small{max-width:65%;line-height:1.6}.comment-body{min-width:0;flex:1}.review-comment p a{color:#2471b8;text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}.review-comment p a:hover{color:#14518c}.comment-delete{margin-left:auto;width:30px;height:30px;border:1px solid #f2d5d9;border-radius:9px;background:#fff7f8;color:#c34b5c;cursor:pointer}.comment-delete:hover{background:#ffecef}.comment-delete:disabled{opacity:.5;cursor:wait}
+@media(max-width:700px){.review-loading{margin:22px 0;padding:18px;border-radius:17px}.loading-skeleton-media{height:190px}.review-gallery-track{gap:13px}.review-gallery-item>img{min-height:180px;max-height:600px}.review-gallery-embed iframe{height:68vh;min-height:300px}.media-item-head{padding:10px;font-size:10px}.product-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.comment-submit small{max-width:100%}}
+.review-gallery-item video{display:block;width:100%;max-height:820px;min-height:220px;background:#0d1c2d}.review-gallery-audio{padding-bottom:18px}.review-gallery-audio audio{display:block;width:calc(100% - 28px);margin:22px 14px}
