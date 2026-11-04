@@ -5,13 +5,23 @@ function applyLocal(l=getLang()){const d=translations[l]||translations.id;docume
 async function load(selector,url){const el=document.querySelector(selector);if(!el)return;try{const r=await fetch(url,{credentials:'same-origin',cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);el.innerHTML=await r.text();}catch(e){console.error('Component load failed',url,e);el.innerHTML='';}}
 function setGoogleLanguage(lang){localStorage.setItem('boxcellink_lang',lang);applyLocal(lang);document.cookie=`googtrans=/id/${lang};path=/`;document.cookie=`googtrans=/id/${lang};path=/;SameSite=Lax`;const apply=()=>{const combo=document.querySelector('.goog-te-combo');if(combo){combo.value=lang;combo.dispatchEvent(new Event('change'));return true;}return false;};if(apply())return;if(!window.googleTranslateLoading){window.googleTranslateLoading=true;window.googleTranslateElementInit=()=>{new google.translate.TranslateElement({pageLanguage:'id',includedLanguages:'id,en',autoDisplay:false,layout:google.translate.TranslateElement.InlineLayout.SIMPLE},'google_translate_element');let n=0;const timer=setInterval(()=>{if(apply()||++n>30)clearInterval(timer);},250);};const s=document.createElement('script');s.src='https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';s.async=true;s.onerror=()=>{window.googleTranslateLoading=false;};document.head.appendChild(s);}}
 function initTranslate(){const btn=document.getElementById('translateBtn');if(!btn)return;btn.addEventListener('click',()=>setGoogleLanguage(getLang()==='id'?'en':'id'));applyLocal();if(getLang()==='en')setGoogleLanguage('en');}
-function isPublicRoute(){const path=location.pathname.toLowerCase();const p=path.split('/').pop()||'index.html';return ['index.html','login.html','register.html','forgot-password.html','watch.html','review.html','review-detail.html'].includes(p)||path.startsWith('/v/')||path.startsWith('/r/');}
+function isPublicRoute(){
+// Cloudflare Pages can serve /login as /login.html (pretty URL).
+// Compare both extensionless and .html forms so the login page never
+// redirects to itself and creates an endlessly nested ?next= parameter.
+const path=(location.pathname||'/').toLowerCase().replace(/\/+$/,'')||'/';
+const page=(path.split('/').pop()||'index').replace(/\.html$/,'');
+const publicPages=new Set([
+  'index','login','register','forgot-password','watch','review','review-detail'
+]);
+return publicPages.has(page)||path.startsWith('/v/')||path.startsWith('/r/');
+}
 async function initNavbar(){const drawer=document.getElementById('navDrawer'),shade=document.getElementById('navShade'),open=document.getElementById('navOpen');const toggle=v=>{drawer?.classList.toggle('open',v);shade?.classList.toggle('show',v);open?.setAttribute('aria-expanded',String(v));};open?.addEventListener('click',()=>toggle(true));document.getElementById('navClose')?.addEventListener('click',()=>toggle(false));shade?.addEventListener('click',()=>toggle(false));document.addEventListener('keydown',e=>{if(e.key==='Escape')toggle(false)});
 let user=null;try{if(window.sb){const {data}=await sb.auth.getUser();user=data?.user||null;}}catch(e){console.warn('Auth check failed',e)}
 const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');if(guest)guest.hidden=!!user;if(member)member.hidden=!user;
 if(user){document.getElementById('navLogout')?.addEventListener('click',async()=>{await sb.auth.signOut();location.href='/index.html';});}
 // Public access: homepage, authentication, video watch and Telegram review pages. Other pages require login.
-if(!user&&!isPublicRoute()){location.replace('/login.html?next='+encodeURIComponent(location.pathname+location.search));return;}
+if(!user&&!isPublicRoute()){const current=location.pathname+location.search;const next=current.startsWith('/')&&!current.startsWith('//')&&!/^\/(login|register|forgot-password)(\.html)?([/?]|$)/i.test(current)?current:'/dashboard.html';location.replace('/login.html?next='+encodeURIComponent(next));return;}
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 if(user&&window.sb){try{const {data:cats,error}=await sb.from('categories').select('id,name').eq('status','published').order('name');if(!error){const target=document.getElementById('memberCategoryLinks');if(target)target.innerHTML=(cats||[]).map(c=>`<a href="/index.html?category=${encodeURIComponent(c.id)}">${esc(c.name)}</a>`).join('');}}catch(e){console.warn(e)}}
 }
