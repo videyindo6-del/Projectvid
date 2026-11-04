@@ -17,12 +17,16 @@ Deno.serve(async req=>{
    if(error||!data||data.status!=='published') return reply({error:'Paket VIP tidak ditemukan'},404);
    baseAmount=Number(data.price); plan_id=data.id;
   } else if(purpose==='vip_group') {
-   const {data,error}=await admin.from('vip_groups').select('id,price,status,telegram_url').eq('id',body.group_id).single();
+   const {data,error}=await admin.from('vip_groups').select('id,price,status').eq('id',body.group_id).single();
    if(error||!data||data.status!=='published') return reply({error:'Group VIP tidak ditemukan'},404);
-   if(!data.telegram_url||!/^https:\/\/(t\.me|telegram\.me)\//i.test(data.telegram_url)) return reply({error:'Link undangan Telegram belum dikonfigurasi admin'},409);
+   // Invite links live in the private table after vip_group_secret_hardening.sql.
+   const {data:secret,error:secretError}=await admin.from('vip_group_secrets').select('telegram_url').eq('group_id',data.id).maybeSingle();
+   if(secretError) throw secretError;
+   const inviteUrl=secret?.telegram_url;
+   if(!inviteUrl||!/^https:\/\/(t\.me|telegram\.me)\//i.test(inviteUrl)) return reply({error:'Link undangan Telegram belum dikonfigurasi admin'},409);
    const {data:owned}=await admin.from('vip_group_entitlements').select('id').eq('user_id',user.id).eq('group_id',data.id).maybeSingle();
    if(owned) return reply({error:'Group ini sudah dibeli'},409);
-   baseAmount=Number(data.price); vip_group_id=data.id; vip_group_invite_url=data.telegram_url;
+   baseAmount=Number(data.price); vip_group_id=data.id; vip_group_invite_url=inviteUrl;
   } else {
    const {data,error}=await admin.from('review_items').select('id,price,access,status').eq('id',body.review_id).single();
    if(error||!data||data.status!=='published') return reply({error:'Konten review tidak ditemukan'},404);
