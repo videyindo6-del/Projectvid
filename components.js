@@ -69,12 +69,26 @@ async function initNavbar(){
  }
 
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- if(user&&window.sb){
+ // BoxVidey categories are nested under one compact accordion, not a separate
+ // top-level navigation destination. Public categories are safe for guests too.
+ if(window.sb?.from){
    try{
      const {data:cats,error}=await window.sb.from('categories').select('id,name').eq('status','published').order('name');
-     if(!error){const target=document.getElementById('memberCategoryLinks');if(target)target.innerHTML=(cats||[]).map(c=>`<a href="/index.html?category=${encodeURIComponent(c.id)}">${esc(c.name)}</a>`).join('');}
-   }catch(e){console.warn('Category navigation load failed',e);}
+     if(!error){
+       document.querySelectorAll('.bc-submenu[id^="boxCategorySubmenu"]').forEach(target=>{
+         target.innerHTML='<a href="/index.html">Semua BoxVidey</a>'+(cats||[]).map(c=>`<a href="/index.html?category=${encodeURIComponent(c.id)}">${esc(c.name)}</a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>';
+       });
+     }
+   }catch(e){console.warn('BoxVidey categories unavailable:',e);}
  }
+ document.querySelectorAll('.bc-submenu-toggle[id^="boxMenuToggle"]').forEach(boxToggle=>{
+   const boxSub=document.getElementById(boxToggle.getAttribute('aria-controls'));
+   boxToggle.addEventListener('click',()=>{
+     const expanded=boxToggle.getAttribute('aria-expanded')==='true';
+     boxToggle.setAttribute('aria-expanded',String(!expanded));
+     if(boxSub)boxSub.hidden=expanded;
+   });
+ });
 }
 document.addEventListener('DOMContentLoaded',async()=>{await Promise.all([load('[data-component="navbar"]','/components/navbar.html'),load('[data-component="footer"]','/components/footer.html')]);const y=document.getElementById('footerYear');if(y)y.textContent=new Date().getFullYear();const ca=document.getElementById('cookieAccept'),cn=document.getElementById('cookieNotice');if(ca)ca.onclick=()=>{localStorage.setItem('boxcellink_cookie_ok','1');cn?.classList.add('is-hidden')};if(localStorage.getItem('boxcellink_cookie_ok')==='1')cn?.classList.add('is-hidden');if(isAuthRoute()){const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');if(guest)guest.hidden=false;if(member)member.hidden=true;}else{await initNavbar();}});
 })();
