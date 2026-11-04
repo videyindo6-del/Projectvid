@@ -73,3 +73,22 @@ body:has(.checkout-shell) main.container{width:min(1120px,94%);max-width:1120px;
 
 .payment-head-actions{display:flex;align-items:center;gap:9px}
 @media(max-width:520px){.payment-head-actions{gap:5px}.payment-secure-label{font-size:9px;padding:7px}}
+
+/* Premium payment experience */
+.payment-shell{max-width:1080px;padding-bottom:28px}
+.payment-layout{align-items:start;gap:22px}
+.payment-card{position:relative;overflow:hidden;border-color:#dce7f3;box-shadow:0 22px 60px rgba(17,49,83,.09)}
+.payment-card:before{content:"";position:absolute;inset:0 0 auto;height:4px;background:linear-gradient(90deg,#183e68,#4e91d0,#91b9df)}
+.payment-heading .checkout-eyebrow{letter-spacing:.12em}
+.payment-amount{max-width:390px;border-color:#d5e5f5;background:linear-gradient(145deg,#edf5ff,#fff 75%);box-shadow:inset 0 1px #fff}
+.qr-stage{max-width:390px;min-height:290px;margin:0 auto;background:radial-gradient(circle at 50% 40%,#fff 0,#f7faff 72%);border:1px solid #dce7f2;box-shadow:inset 0 0 0 6px #fff}
+.cashi-qr{width:min(280px,100%);padding:8px;border:1px solid #e6edf5;box-shadow:0 12px 32px rgba(27,61,96,.08)}
+.qr-fallback{padding:20px;text-align:center;line-height:1.7}
+.payment-state{border-radius:14px;padding:14px 15px;background:#fff9ec;border-color:#f1e3c6}
+.payment-state small{line-height:1.55}
+.check-payment{min-height:53px;background:linear-gradient(135deg,#173d64,#28659a);box-shadow:0 10px 24px rgba(25,69,111,.16)}
+.check-payment:hover{background:linear-gradient(135deg,#102f50,#225986)}
+.order-reference{background:#f8fafd;border-color:#e1eaf3}
+.payment-info-card{border-color:#e0e9f2;box-shadow:0 12px 35px rgba(25,54,87,.045)}
+.payment-info-card ol{line-height:1.85}
+@media(max-width:760px){.payment-card{box-shadow:0 12px 35px rgba(17,49,83,.07)}.qr-stage{min-height:245px}.payment-info-card{padding:17px}}
