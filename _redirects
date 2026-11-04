@@ -2,11 +2,11 @@
 /r/* /review-detail.html?slug=:splat 200
 /d/* /download.html?slug=:splat 200
 
-/login /login.html 200
-/register /register.html 200
-/forgot-password /forgot-password.html 200
-/dashboard /dashboard.html 200
-/vip /vip.html 200
-/vip-groups /vip-groups.html 200
-/referral /referral.html 200
-/account /account.html 200
+/login /login.html 302
+/register /register.html 302
+/forgot-password /forgot-password.html 302
+/dashboard /dashboard.html 302
+/vip /vip.html 302
+/vip-groups /vip-groups.html 302
+/referral /referral.html 302
+/account /account.html 302
