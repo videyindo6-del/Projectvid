@@ -16,18 +16,55 @@ function isPublicRoute(){
   const page=currentPage();
   const path=(location.pathname||'/').toLowerCase();
   const publicPages=new Set([
-    'index','login','register','forgot-password','watch','review','review-detail'
+    'index','login','register','forgot-password','watch','review','review-detail','vip','vip-groups'
   ]);
   return publicPages.has(page)||path.startsWith('/v/')||path.startsWith('/r/');
 }
-async function initNavbar(){const drawer=document.getElementById('navDrawer'),shade=document.getElementById('navShade'),open=document.getElementById('navOpen');const toggle=v=>{drawer?.classList.toggle('open',v);shade?.classList.toggle('show',v);open?.setAttribute('aria-expanded',String(v));};open?.addEventListener('click',()=>toggle(true));document.getElementById('navClose')?.addEventListener('click',()=>toggle(false));shade?.addEventListener('click',()=>toggle(false));document.addEventListener('keydown',e=>{if(e.key==='Escape')toggle(false)});
-let user=null;try{if(window.sb){const {data}=await sb.auth.getUser();user=data?.user||null;}}catch(e){console.warn('Auth check failed',e)}
-const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');if(guest)guest.hidden=!!user;if(member)member.hidden=!user;
-if(user){document.getElementById('navLogout')?.addEventListener('click',async()=>{await sb.auth.signOut();location.href='/index.html';});}
-// Public access: homepage, authentication, video watch and Telegram review pages. Other pages require login.
-if(!user&&!isPublicRoute()){const current=location.pathname+location.search;const next=current.startsWith('/')&&!current.startsWith('//')&&!/^\/(login|register|forgot-password)(\.html)?([/?]|$)/i.test(current)?current:'/dashboard.html';location.replace('/login.html?next='+encodeURIComponent(next));return;}
-const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-if(user&&window.sb){try{const {data:cats,error}=await sb.from('categories').select('id,name').eq('status','published').order('name');if(!error){const target=document.getElementById('memberCategoryLinks');if(target)target.innerHTML=(cats||[]).map(c=>`<a href="/index.html?category=${encodeURIComponent(c.id)}">${esc(c.name)}</a>`).join('');}}catch(e){console.warn(e)}}
+async function initNavbar(){
+ const drawer=document.getElementById('navDrawer'),shade=document.getElementById('navShade'),open=document.getElementById('navOpen');
+ const toggle=v=>{drawer?.classList.toggle('open',v);shade?.classList.toggle('show',v);open?.setAttribute('aria-expanded',String(v));};
+ open?.addEventListener('click',()=>toggle(true));
+ document.getElementById('navClose')?.addEventListener('click',()=>toggle(false));
+ shade?.addEventListener('click',()=>toggle(false));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')toggle(false)});
+
+ // Never treat an unavailable Supabase client or a transient network error as a
+ // confirmed signed-out state. This avoids redirecting users during SDK startup/outages.
+ let user=null,authVerified=false;
+ try{
+   if(window.sb?.auth?.getUser){
+     const {data,error}=await window.sb.auth.getUser();
+     if(!error){user=data?.user||null;authVerified=true;}
+     else console.warn('Auth check unavailable; navigation guard skipped:',error.message);
+   }
+ }catch(e){console.warn('Auth check unavailable; navigation guard skipped:',e);}
+
+ const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');
+ if(guest)guest.hidden=!!user;
+ if(member)member.hidden=!user;
+ if(user){
+   document.getElementById('navLogout')?.addEventListener('click',async()=>{
+     try{await window.sb.auth.signOut();}finally{location.replace('/index.html');}
+   });
+ }
+
+ // Route-level guard only runs after Supabase positively confirms there is no user.
+ // Login/register/reset and public VIP pages must remain accessible to guests.
+ if(authVerified&&!user&&!isPublicRoute()){
+   const current=location.pathname+location.search;
+   const safeCurrent=current.startsWith('/')&&!current.startsWith('//')&&!/^\/(login|register|forgot-password)(\.html)?([/?]|$)/i.test(current);
+   const next=safeCurrent?current:'/dashboard.html';
+   location.replace('/login.html?next='+encodeURIComponent(next));
+   return;
+ }
+
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ if(user&&window.sb){
+   try{
+     const {data:cats,error}=await window.sb.from('categories').select('id,name').eq('status','published').order('name');
+     if(!error){const target=document.getElementById('memberCategoryLinks');if(target)target.innerHTML=(cats||[]).map(c=>`<a href="/index.html?category=${encodeURIComponent(c.id)}">${esc(c.name)}</a>`).join('');}
+   }catch(e){console.warn('Category navigation load failed',e);}
+ }
 }
 document.addEventListener('DOMContentLoaded',async()=>{await Promise.all([load('[data-component="navbar"]','/components/navbar.html'),load('[data-component="footer"]','/components/footer.html')]);const y=document.getElementById('footerYear');if(y)y.textContent=new Date().getFullYear();const ca=document.getElementById('cookieAccept'),cn=document.getElementById('cookieNotice');if(ca)ca.onclick=()=>{localStorage.setItem('boxcellink_cookie_ok','1');cn?.classList.add('is-hidden')};if(localStorage.getItem('boxcellink_cookie_ok')==='1')cn?.classList.add('is-hidden');if(isAuthRoute()){const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');if(guest)guest.hidden=false;if(member)member.hidden=true;}else{await initNavbar();}initTranslate();});
 })();
