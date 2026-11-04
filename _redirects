@@ -1,6 +1,4 @@
-# Cloudflare Pages proxy rewrites: keep the public URL path intact.
-# The browser scripts read the final path segment as the record slug.
-/v/* /watch.html 200
-/r/* /review-detail.html 200
-/d/* /download.html 200
-/paste/* /paste.html 200
+# Video route tetap menggunakan proxy rewrite lama.
+# Review/download/paste ditangani Pages Functions: functions/r/[slug].js,
+# functions/d/[slug].js, dan functions/paste/[slug].js.
+/v/*      /watch          200
