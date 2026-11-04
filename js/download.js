@@ -8,7 +8,7 @@ function getRouteCode(prefix){
  if(prefixIndex<0||!parts[prefixIndex+1])return '';
  try{return decodeURIComponent(parts[prefixIndex+1]).trim()}catch{return parts[prefixIndex+1].trim()}
 }
-const slug=getRouteCode('d'),rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID'),esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let item,order=null,couponOptions=[],vipActive=false;
+const slug=getRouteCode('d'),rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID'),esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let item,order=null,couponOptions=[],vipActive=false,guestCheckout=false;
 async function init(){
  if(!slug){root.innerHTML='<h1>Kode download tidak terbaca</h1><p>Pastikan URL berbentuk /d/KODE_REVIEW dan file _redirects terbaru sudah terpasang.</p>';return}
  let {data,error:queryError}=await sb.from('review_items').select('id,slug,title,description,price,access,status').eq('slug',slug).maybeSingle();
@@ -16,19 +16,32 @@ async function init(){
  if(queryError){root.innerHTML=`<h1>Gagal memuat konten</h1><p>${esc(queryError.message)}</p><p>Pastikan migration <b>review_public_access_fix.sql</b> sudah dijalankan di Supabase.</p>`;return}item=data;
  if(!item){const r=await sb.from('review_items').select('id,slug,title,description,price,access,status').eq('id',slug).maybeSingle();item=r.data}
  if(!item||item.status!=='published'){root.textContent='Konten tidak ditemukan';return}
- const {data:{user}}=await sb.auth.getUser();
+ let {data:{user}}=await sb.auth.getUser();
  if(item.access==='free'){await unlock();return}
- if(!user){root.innerHTML=`<h1>${esc(item.title)}</h1><p>Login diperlukan untuk membeli konten berbayar.</p><a class="btn primary" href="/login.html">Masuk / Daftar</a>`;return}
+ // Create a Supabase anonymous session for visitors who are not signed in.
+ // This is not a visible registration/login flow; it gives the guest a stable
+ // auth.uid so the payment order and purchased entitlement can be securely linked.
+ guestCheckout=false;
+ if(!user){
+  const {data:guestData,error:guestError}=await sb.auth.signInAnonymously();
+  if(guestError||!guestData?.user){
+   root.innerHTML=`<h1>${esc(item.title)}</h1><p>Pembelian tanpa login belum aktif. Silakan coba lagi nanti atau hubungi admin.</p><a class="btn primary" href="/login.html">Masuk / Daftar</a><small style="display:block;margin-top:10px">Admin perlu mengaktifkan Anonymous Sign-Ins di pengaturan Authentication Supabase.</small>`;
+   return;
+  }
+  user=guestData.user;
+  guestCheckout=true;
+ }
  const {data:owned}=await sb.from('review_entitlements').select('id').eq('review_id',item.id).eq('user_id',user.id).maybeSingle();
  if(owned){await unlock();return}
  const [{data:profile},{data:coupons},{data:adminClaims}]=await Promise.all([
   sb.from('profiles').select('vip_expires_at').eq('id',user.id).maybeSingle(),
-  sb.from('discount_coupons').select('code,discount_percent,uses_total,uses_used,uses_reserved').eq('user_id',user.id),
-  sb.from('admin_discount_claims').select('used_at,admin_discount_codes(code,discount_percent,min_purchase,expires_at)').eq('user_id',user.id)
+  guestCheckout?Promise.resolve({data:[]}):sb.from('discount_coupons').select('code,discount_percent,uses_total,uses_used,uses_reserved').eq('user_id',user.id),
+  guestCheckout?Promise.resolve({data:[]}):sb.from('admin_discount_claims').select('used_at,admin_discount_codes(code,discount_percent,min_purchase,expires_at)').eq('user_id',user.id)
  ]);
- vipActive=!!profile?.vip_expires_at&&new Date(profile.vip_expires_at)>new Date();
- couponOptions=(coupons||[]).filter(c=>c.uses_used+c.uses_reserved<c.uses_total).concat((adminClaims||[]).filter(x=>!x.used_at&&x.admin_discount_codes&&(!x.admin_discount_codes.expires_at||new Date(x.admin_discount_codes.expires_at)>new Date())).map(x=>({...x.admin_discount_codes,source:'admin'})));
+ vipActive=!guestCheckout&&!!profile?.vip_expires_at&&new Date(profile.vip_expires_at)>new Date();
+ couponOptions=guestCheckout?[]:(coupons||[]).filter(c=>c.uses_used+c.uses_reserved<c.uses_total).concat((adminClaims||[]).filter(x=>!x.used_at&&x.admin_discount_codes&&(!x.admin_discount_codes.expires_at||new Date(x.admin_discount_codes.expires_at)>new Date())).map(x=>({...x.admin_discount_codes,source:'admin'})));
  root.innerHTML=`<span class="eyebrow">KONFIRMASI PEMBELIAN</span><h1>${esc(item.title)}</h1><p>${esc(item.description)}</p>
+ ${guestCheckout?'<p class="guest-checkout-note" role="status">Mode pembelian tamu aktif — tidak perlu login atau membuat akun.</p>':''}
  <div class="watch-card"><b>Status:</b> Belum dibeli<br><b>Harga normal:</b> ${rp(item.price)}<br>
  ${vipActive?'<b>Benefit VIP:</b> Diskon 20%':'<b>Status VIP:</b> Tidak aktif'}
  <div style="margin-top:14px"><label for="couponCode"><b>Kode diskon referral (opsional)</b></label>
@@ -60,7 +73,7 @@ async function createOrder(){
   const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'review_download',review_id:item.id,coupon_code:couponCode}});
   if(error)throw error;if(!data?.checkout_url)throw new Error(data?.error||'Checkout gagal');
   order=data.order_id;
-  root.innerHTML=`<h1>Pembayaran ${esc(item.title)}</h1><p>Harga normal: ${rp(data.base_amount)}</p><p>Diskon: <b>${data.discount_percent||0}%</b></p><p>Nominal bayar: <b>${rp(data.amount)}</b></p><p>Status: <b id="payState">MENUNGGU PEMBAYARAN</b></p>${data.qrUrl?`<img src="${esc(data.qrUrl)}" alt="QR pembayaran Cashi" style="display:block;width:min(300px,100%);margin:16px auto">`:'<p>QR tidak tersedia, gunakan halaman checkout Cashi.</p>'}<a class="btn primary" href="${esc(data.checkout_url)}" target="_blank" rel="noopener">Buka halaman pembayaran Cashi</a><h3>Cara bayar</h3><ol><li>Scan QR atau buka halaman Cashi.</li><li>Pilih metode pembayaran yang tersedia.</li><li>Selesaikan pembayaran sesuai nominal.</li><li>Tekan cek pembayaran; status juga diperiksa otomatis.</li></ol><button class="btn" id="checkPay">Cek pembayaran sekarang</button><p id="checkMessage">Memeriksa otomatis setiap 8 detik.</p>`;
+  root.innerHTML=`<h1>Pembayaran ${esc(item.title)}</h1><p>Harga normal: ${rp(data.base_amount)}</p><p>Diskon: <b>${data.discount_percent||0}%</b></p><p>Nominal bayar: <b>${rp(data.amount)}</b></p><p>Status: <b id="payState">MENUNGGU PEMBAYARAN</b></p>${data.qrUrl?`<img src="${esc(data.qrUrl)}" alt="QR pembayaran Cashi" style="display:block;width:min(300px,100%);margin:16px auto">`:'<p>QR tidak tersedia, gunakan halaman checkout Cashi.</p>'}<a class="btn primary" href="${esc(data.checkout_url)}" target="_blank" rel="noopener">Buka halaman pembayaran Cashi</a><h3>Cara bayar</h3><ol><li>Scan QR atau buka halaman Cashi.</li><li>Pilih metode pembayaran yang tersedia.</li><li>Selesaikan pembayaran sesuai nominal.</li><li>Tekan cek pembayaran; status juga diperiksa otomatis.</li></ol><button class="btn" id="checkPay">Cek pembayaran sekarang</button><p id="checkMessage">Memeriksa otomatis setiap 8 detik.</p>${guestCheckout?'<p class="guest-checkout-note">Penting: selesaikan pembayaran dan buka hasil download di browser/perangkat yang sama. Jangan hapus data situs sebelum akses download terbuka.</p>':''}`;
   document.getElementById('checkPay').onclick=checkStatus;window.payTimer=setInterval(checkStatus,8000);
  }catch(e){root.innerHTML=`<p>Gagal membuat pembayaran: ${esc(e.message)}</p><button class="btn" onclick="location.reload()">Coba lagi</button>`}
 }
