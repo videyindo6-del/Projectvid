@@ -21,6 +21,7 @@ async function refresh(){
   readTable('admin_discount_codes',sb.from('admin_discount_codes').select('*').order('created_at',{ascending:false})),
   readTable('vip_group_secrets',sb.from('vip_group_secrets').select('group_id,telegram_url'))
  ]);
+ if(secrets.error)notify('Link undangan tidak dapat dibaca: '+secrets.error.message+' — periksa SQL/RLS vip_group_secrets.');
  const secretMap=new Map((secrets.data||[]).map(x=>[x.group_id,x.telegram_url]));
  $('planList').innerHTML=a.error?`<p class="error">${escV(a.error.message)}</p>`:(a.data||[]).map(x=>`<article class="manager-row"><div><b>${escV(x.name)}</b><small>${x.duration_days} hari · ${money(x.price)} · ${escV(x.status)}</small></div><div><button type="button" data-edit-plan="${x.id}">Edit</button><button type="button" data-del-plan="${x.id}" class="danger">Hapus</button></div></article>`).join('')||'<p>Belum ada paket VIP.</p>';
  $('groupList').innerHTML=b.error?`<p class="error">${escV(b.error.message)}</p>`:(b.data||[]).map(x=>`<article class="manager-row"><div><b>${escV(x.name)}</b><small>${money(x.price)} · ${x.member_count||0} member · ${escV(x.status)} · ${secretMap.has(x.id)?'Link tersimpan':'Link belum diatur'}</small></div><div><button type="button" data-edit-group="${x.id}">Edit</button><button type="button" data-del-group="${x.id}" class="danger">Hapus</button></div></article>`).join('')||'<p>Belum ada group VIP.</p>';
@@ -49,7 +50,7 @@ async function remove(table,id,type){
  if(!confirm(`Hapus ${label} ini? Jika sudah terkait transaksi, sistem akan mengarsipkannya agar riwayat pembayaran tetap aman.`))return;
  const {error}=await sb.from(table).delete().eq('id',id);
  if(error){
-  if((type==='plan'||type==='group')&&/foreign key|violates.*constraint|23503/i.test(error.message)){
+  if((type==='plan'||type==='group')&&(/foreign key|violates.*constraint|23503|constraint/i.test(error.message))){
    const {error:archiveError}=await sb.from(table).update({status:'archived'}).eq('id',id);
    if(archiveError){notify('Tidak bisa menghapus atau mengarsipkan: '+archiveError.message);return}
    notify(`${label} sudah dipakai transaksi, jadi diarsipkan. Riwayat pembayaran tetap aman.`);
