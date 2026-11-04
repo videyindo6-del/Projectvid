@@ -18,6 +18,55 @@ function getRouteCode(prefix) {
 }
 
 const slug = getRouteCode('r');
+
+const reviewLang = () => localStorage.getItem('boxcellink_lang') || 'id';
+const reviewEN = () => reviewLang() === 'en';
+const reviewText = (id, en) => reviewEN() ? en : id;
+const reviewToast = (message, type = 'info') => {
+  let host = document.getElementById('reviewToastHost');
+  if (!host) { host = document.createElement('div'); host.id = 'reviewToastHost'; host.className = 'review-toast-host'; host.setAttribute('aria-live','polite'); host.setAttribute('aria-atomic','true'); document.body.appendChild(host); }
+  const toast = document.createElement('div'); toast.className = `review-toast review-toast-${type}`;
+  const icon = type === 'error' ? 'fa-circle-exclamation' : type === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+  toast.innerHTML = `<i class="fa-solid ${icon}"></i><span></span>`; toast.querySelector('span').textContent = message; host.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('is-visible'));
+  setTimeout(() => { toast.classList.remove('is-visible'); setTimeout(() => toast.remove(), 250); }, 3200);
+};
+const reviewTranslations = {
+ 'Menyiapkan detail produk':'Preparing product details','Memuat media dan informasi produk...':'Loading media and product information...',
+ 'Media belum tersedia':'Media is not available','Konten media akan ditampilkan di sini setelah diunggah oleh penjual.':'Media will appear here once uploaded by the seller.',
+ 'Media ini tidak dapat dibaca.':'This media could not be displayed.','Buka media asli':'Open original media','Tutup':'Close',
+ 'Akun login dapat mengirim komentar teks maupun tautan.':'Signed-in users can post text and links.',
+ 'Pengunjung dapat berkomentar dengan teks. Untuk menyertakan tautan, silakan login.':'Guests can post text comments. Please sign in to include links.',
+ 'Komentar belum tersedia. Admin perlu menjalankan migration komentar publik.':'Comments are unavailable. The administrator needs to run the public comments migration.',
+ 'Belum ada komentar. Jadilah yang pertama berkomentar.':'No comments yet. Be the first to comment.',
+ 'Hapus komentar':'Delete comment','Komentar':'Comments','Pengunjung':'Guest','Member BoxCellink':'BoxCellink Member',
+ 'Kode review tidak terbaca':'Review code is invalid','Pastikan URL berbentuk /r/KODE_REVIEW.':'Make sure the URL follows /r/REVIEW_CODE.',
+ 'Supabase belum tersedia':'Supabase is unavailable','Periksa konfigurasi Supabase dan koneksi JavaScript.':'Check the Supabase configuration and JavaScript connection.',
+ 'Gagal memuat review':'Unable to load review','Review tidak ditemukan':'Review not found',
+ 'Pastikan slug benar dan review sudah dipublikasikan.':'Make sure the slug is correct and the review has been published.',
+ 'Terjadi kesalahan':'Something went wrong','Gagal memuat halaman review.':'Unable to load the review page.',
+ 'DETAIL PRODUK':'PRODUCT DETAILS','Cek review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.':'Review the details first. If you are interested, select Download / Buy below to continue.',
+ 'Premium content':'Premium content','Free content':'Free content','Preview media produk':'Product media preview',
+ 'Seluruh media ditampilkan di halaman ini agar bisa diperiksa sebelum membeli.':'All media is displayed here so you can review it before purchasing.',
+ 'TENTANG PRODUK':'ABOUT THIS PRODUCT','Informasi produk belum ditambahkan oleh penjual.':'The seller has not added product information yet.',
+ 'Terjual':'Sold','Views':'Views','Total like':'Total likes','Total komentar':'Total comments','Published':'Published',
+ 'HARGA AKSES':'ACCESS PRICE','AKSES KONTEN':'CONTENT ACCESS','Gratis':'Free',
+ 'Pembayaran dan akses diproses melalui BoxCellink.':'Payment and access are handled through BoxCellink.',
+ 'COMMUNITY':'COMMUNITY','Bagikan pengalamanmu':'Share your experience','Bantu pengguna lain menemukan konten menarik.':'Help others discover interesting content.',
+ 'Suka':'Like','Bagikan':'Share','Memuat...':'Loading...','Username / Nama':'Username / Name',
+ 'Masukkan nama yang ingin ditampilkan':'Enter the name you want to display','Tulis komentar yang sopan dan relevan...':'Write a polite and relevant comment...',
+ 'Kirim komentar':'Post comment','Memuat komentar...':'Loading comments...','Review lainnya':'More reviews',
+ 'Temukan koleksi dan konten pilihan lainnya.':'Discover more collections and featured content.',
+ 'Komentar gagal dikirim. Periksa koneksi atau jalankan migration komentar.':'Comment failed. Check your connection or run the comments migration.',
+ 'Komentar gagal dihapus. Pastikan policy admin sudah diterapkan.':'Could not delete comment. Make sure the admin policy has been applied.',
+ 'Hapus komentar ini?':'Delete this comment?', 'Download':'Download','Download / Beli':'Download / Buy'
+};
+function applyReviewTranslations(root = document) {
+ if (!reviewEN()) return;
+ const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let node;
+ while ((node = walker.nextNode())) { const raw = node.nodeValue, trimmed = raw.trim(); if (reviewTranslations[trimmed]) node.nodeValue = raw.replace(trimmed, reviewTranslations[trimmed]); }
+ root.querySelectorAll?.('[placeholder],[aria-label],[title]').forEach(el => { for (const attr of ['placeholder','aria-label','title']) { const value = el.getAttribute(attr); if (value && reviewTranslations[value]) el.setAttribute(attr, reviewTranslations[value]); } });
+}
 const rp = n => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
@@ -31,6 +80,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
 function showError(title, message) {
   if (!box) return;
   box.innerHTML = `<h1>${esc(title)}</h1><p>${esc(message)}</p>`;
+  applyReviewTranslations(box);
 }
 
 function setReviewLoading(message = 'Memuat media dan informasi produk...') {
@@ -44,6 +94,7 @@ function setReviewLoading(message = 'Memuat media dan informasi produk...') {
       <div class="loading-skeleton loading-skeleton-line"></div>
       <div class="loading-skeleton loading-skeleton-line short"></div>
     </div>`;
+  applyReviewTranslations(box);
 }
 
 function formatCommentContent(value) {
@@ -411,8 +462,8 @@ async function setupReviewSocial(reviewId, title) {
     const guestFields = document.getElementById('guestCommentFields');
     if (guestFields) guestFields.hidden = !!currentUser;
     if (authHint) authHint.textContent = currentUser
-      ? 'Akun login dapat mengirim komentar teks maupun tautan.'
-      : 'Pengunjung dapat berkomentar dengan teks. Untuk menyertakan tautan, silakan login.';
+      ? reviewText('Akun login dapat mengirim komentar teks maupun tautan.','Signed-in users can post text and links.')
+      : reviewText('Pengunjung dapat berkomentar dengan teks. Untuk menyertakan tautan, silakan login.','Guests can post text comments. Please sign in to include links.');
   };
 
   const loadSocial = async () => {
@@ -429,59 +480,60 @@ async function setupReviewSocial(reviewId, title) {
       if (icon) icon.className = mine ? 'fa-solid fa-heart' : 'fa-regular fa-heart';
     }
     if (comments.error) {
-      commentBox.innerHTML = '<div class="comment-empty">Komentar belum tersedia. Admin perlu menjalankan migration komentar publik.</div>';
-      document.getElementById('commentCount').textContent = '0 komentar'; return;
+      commentBox.innerHTML = '<div class="comment-empty">Komentar belum tersedia. Admin perlu menjalankan migration komentar publik.</div>'; applyReviewTranslations(commentBox);
+      document.getElementById('commentCount').textContent = reviewText('0 komentar','0 comments'); return;
     }
     const rows = comments.data || [];
-    document.getElementById('commentCount').textContent = `${rows.length} komentar`;
+    document.getElementById('commentCount').textContent = `${rows.length} ${reviewText('komentar','comments')}`;
     commentBox.innerHTML = rows.length ? rows.map(c => {
       const name = c.guest_name || (c.user_id ? 'Member BoxCellink' : 'Pengunjung');
       const del = isAdmin ? `<button type="button" class="comment-delete" data-comment-delete="${esc(c.id)}" title="Hapus komentar" aria-label="Hapus komentar"><i class="fa-solid fa-trash-can"></i></button>` : '';
-      return `<article class="review-comment"><div class="comment-avatar"><i class="fa-solid fa-user"></i></div><div class="comment-body"><div class="comment-meta"><b>${esc(name)}</b><time>${new Date(c.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</time>${del}</div><p>${formatCommentContent(c.content)}</p></div></article>`;
+      return `<article class="review-comment"><div class="comment-avatar"><i class="fa-solid fa-user"></i></div><div class="comment-body"><div class="comment-meta"><b>${esc(name)}</b><time>${new Date(c.created_at).toLocaleString(reviewEN() ? 'en-US' : 'id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</time>${del}</div><p>${formatCommentContent(c.content)}</p></div></article>`;
     }).join('') : '<div class="comment-empty">Belum ada komentar. Jadilah yang pertama berkomentar.</div>';
+    applyReviewTranslations(commentBox);
   };
 
   updateCommentForm(); await loadSocial();
   likeBtn?.addEventListener('click', async () => {
-    if (!currentUser) { alert('Silakan login terlebih dahulu untuk menggunakan fitur suka.'); location.href = `/login?next=${encodeURIComponent(location.pathname + location.search)}`; return; }
+    if (!currentUser) { reviewToast(reviewText('Silakan login terlebih dahulu untuk menggunakan fitur suka.','Please sign in to use likes.'),'info'); location.href = `/login?next=${encodeURIComponent(location.pathname + location.search)}`; return; }
     likeBtn.disabled = true;
     try {
       const { data: existing } = await sb.from('review_likes').select('id').eq('review_id', reviewId).eq('user_id', currentUser.id).maybeSingle();
       if (existing) { const { error } = await sb.from('review_likes').delete().eq('id', existing.id); if (error) throw error; }
       else { const { error } = await sb.from('review_likes').insert({ review_id: reviewId, user_id: currentUser.id }); if (error) throw error; }
       await loadSocial();
-    } catch (e) { console.error(e); alert('Like belum dapat diproses. Coba lagi beberapa saat.'); }
+    } catch (e) { console.error(e); reviewToast(reviewText('Like belum dapat diproses. Coba lagi beberapa saat.','Could not update your like. Please try again.'),'error'); }
     finally { likeBtn.disabled = false; }
   });
   document.getElementById('reviewCommentJump')?.addEventListener('click', () => commentInput?.focus());
   document.getElementById('reviewShare')?.addEventListener('click', async () => {
     try {
       if (navigator.share) await navigator.share({ title, url: location.href, text: title });
-      else { await navigator.clipboard.writeText(location.href); alert('Link review berhasil disalin.'); }
+      else { await navigator.clipboard.writeText(location.href); reviewToast(reviewText('Link review berhasil disalin.','Review link copied.'),'success'); }
       await sb.rpc('increment_review_share', { p_review_id: reviewId });
-    } catch (e) { if (e.name !== 'AbortError') alert('Tidak dapat membagikan link.'); }
+    } catch (e) { if (e.name !== 'AbortError') reviewToast(reviewText('Tidak dapat membagikan link.','Unable to share the link.'),'error'); }
   });
   commentForm?.addEventListener('submit', async e => {
     e.preventDefault(); currentUser = await getCurrentReviewUser();
     const content = commentInput.value.trim(), guestName = guestNameInput?.value.trim() || '';
     if (!content) return;
-    if (!currentUser && containsExternalLink(content)) { alert('Komentar yang berisi tautan hanya dapat dikirim oleh pengguna yang sudah login.'); return; }
-    if (!currentUser && !guestName) { guestNameInput?.focus(); alert('Masukkan username/nama sebelum mengirim komentar.'); return; }
+    if (!currentUser && containsExternalLink(content)) { reviewToast(reviewText('Komentar yang berisi tautan hanya dapat dikirim oleh pengguna yang sudah login.','Only signed-in users can post comments containing links.'),'info'); return; }
+    if (!currentUser && !guestName) { guestNameInput?.focus(); reviewToast(reviewText('Masukkan username/nama sebelum mengirim komentar.','Enter a username/name before posting your comment.'),'info'); return; }
     const button = commentForm.querySelector('button[type="submit"]');
-    button.disabled = true; button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...';
+    button.disabled = true; button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${reviewText('Mengirim...','Posting...')}`;
     try {
       const payload = { review_id: reviewId, user_id: currentUser?.id || null, guest_name: currentUser ? null : guestName.slice(0, 40), content };
       const { error } = await sb.from('review_comments').insert(payload); if (error) throw error;
       commentInput.value = ''; if (guestNameInput) guestNameInput.value = ''; await loadSocial();
-    } catch (err) { console.error('Comment insert failed:', err); alert(err?.message || 'Komentar gagal dikirim. Periksa koneksi atau jalankan migration komentar.'); }
-    finally { button.disabled = false; button.innerHTML = '<i class="fa-regular fa-paper-plane"></i> Kirim komentar'; }
+    } catch (err) { console.error('Comment insert failed:', err); reviewToast(err?.message || reviewText('Komentar gagal dikirim. Periksa koneksi atau jalankan migration komentar.','Comment failed. Check your connection or run the comments migration.'),'error'); }
+    finally { button.disabled = false; button.innerHTML = `<i class="fa-regular fa-paper-plane"></i> ${reviewText('Kirim komentar','Post comment')}`; }
   });
   commentBox?.addEventListener('click', async e => {
     const button = e.target.closest('[data-comment-delete]'); if (!button || !isAdmin) return;
-    if (!confirm('Hapus komentar ini?')) return;
+    if (!confirm(reviewText('Hapus komentar ini?','Delete this comment?'))) return;
     button.disabled = true;
     const { error } = await sb.from('review_comments').delete().eq('id', button.dataset.commentDelete);
-    if (error) { console.error(error); alert('Komentar gagal dihapus. Pastikan policy admin sudah diterapkan.'); button.disabled = false; return; }
+    if (error) { console.error(error); reviewToast(reviewText('Komentar gagal dihapus. Pastikan policy admin sudah diterapkan.','Could not delete comment. Check the admin policy.'),'error'); button.disabled = false; return; }
     await loadSocial();
   });
 }
@@ -582,22 +634,22 @@ async function load() {
     const galleryHTML = renderGallery(galleryImages, v.title);
     const reviewSlug = v.slug || v.id;
     const downloadLabel = v.access === 'paid'
-      ? 'Download / Beli ' + rp(v.price)
-      : 'Download';
+      ? reviewText('Download / Beli','Download / Buy') + ' ' + rp(v.price)
+      : reviewText('Download','Download');
 
     box.innerHTML = `
       <div class="review-shell">
         <div class="review-topline"><span class="eyebrow"><i class="fa-solid fa-shield-halved"></i> BOXCELLINK MARKETPLACE</span><span class="review-live"><i class="fa-solid fa-circle"></i> ${v.access === 'paid' ? 'Premium content' : 'Free content'}</span></div>
         <header class="review-heading"><div><p class="review-kicker">DETAIL PRODUK</p><h1>${esc(v.title)}</h1><p class="review-lead">Cek review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.</p></div></header>
-        <section class="gallery-panel"><div class="gallery-head"><div><b><i class="fa-regular fa-images"></i> Preview media produk</b><small>Seluruh media ditampilkan di halaman ini agar bisa diperiksa sebelum membeli.</small></div><span class="gallery-count"><i class="fa-regular fa-images"></i> ${galleryImages.length} media</span></div><div class="review-gallery">${galleryHTML}</div></section>
+        <section class="gallery-panel"><div class="gallery-head"><div><b><i class="fa-regular fa-images"></i> Preview media produk</b><small>Seluruh media ditampilkan di halaman ini agar bisa diperiksa sebelum membeli.</small></div><span class="gallery-count"><i class="fa-regular fa-images"></i> ${galleryImages.length} ${reviewText('media','items')}</span></div><div class="review-gallery">${galleryHTML}</div></section>
         <div class="review-viewer" id="reviewViewer" hidden><button type="button" class="viewer-close" aria-label="Tutup">×</button><img alt="Pratinjau gambar"></div>
         <section class="product-info-panel"><div class="product-description"><span class="review-kicker">TENTANG PRODUK</span><h2>${esc(v.title)}</h2><p>${esc(v.description || 'Informasi produk belum ditambahkan oleh penjual.')}</p></div>
           <div class="product-stats product-stats-grid">
-            <div><i class="fa-solid fa-bag-shopping"></i><span><b>${totalSold.toLocaleString('id-ID')}</b><small>Terjual</small></span></div>
-            <div><i class="fa-regular fa-eye"></i><span><b>${totalViews.toLocaleString('id-ID')}</b><small>Views</small></span></div>
-            <div><i class="fa-regular fa-heart"></i><span><b>${totalLikes.toLocaleString('id-ID')}</b><small>Total like</small></span></div>
-            <div><i class="fa-regular fa-comments"></i><span><b>${totalComments.toLocaleString('id-ID')}</b><small>Total komentar</small></span></div>
-            <div><i class="fa-regular fa-calendar"></i><span><b>${v.created_at ? new Date(v.created_at).toLocaleDateString('id-ID') : '-'}</b><small>Published</small></span></div>
+            <div><i class="fa-solid fa-bag-shopping"></i><span><b>${totalSold.toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</b><small>Terjual</small></span></div>
+            <div><i class="fa-regular fa-eye"></i><span><b>${totalViews.toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</b><small>Views</small></span></div>
+            <div><i class="fa-regular fa-heart"></i><span><b>${totalLikes.toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</b><small>Total like</small></span></div>
+            <div><i class="fa-regular fa-comments"></i><span><b>${totalComments.toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</b><small>Total komentar</small></span></div>
+            <div><i class="fa-regular fa-calendar"></i><span><b>${v.created_at ? new Date(v.created_at).toLocaleDateString(reviewEN() ? 'en-US' : 'id-ID') : '-'}</b><small>Published</small></span></div>
           </div>
           <div class="purchase-strip"><div><small>${v.access === 'paid' ? 'HARGA AKSES' : 'AKSES KONTEN'}</small><strong>${v.access === 'paid' ? rp(v.price) : 'Gratis'}</strong><span class="purchase-note">Pembayaran dan akses diproses melalui BoxCellink.</span></div><a class="btn primary purchase-btn" href="/d/${encodeURIComponent(reviewSlug)}"><i class="fa-solid fa-download"></i> ${esc(downloadLabel)}</a></div>
         </section>
@@ -611,6 +663,7 @@ async function load() {
           </div>
         </section>
       </div>`;
+    applyReviewTranslations(box);
     setupGalleryViewer();
     setupReviewSocial(v.id, v.title);
     loadMore(v.id);
@@ -673,6 +726,7 @@ async function loadMore(id) {
         </a>
       `;
     }).join('');
+    applyReviewTranslations(target);
 
   } catch (error) {
     console.warn('Gagal memuat rekomendasi:', error);
@@ -768,3 +822,6 @@ async function loadMore(id) {
 
 // Jalankan halaman.
 load();
+
+applyReviewTranslations(document);
+if (reviewEN()) { const reviewObserver = new MutationObserver(() => applyReviewTranslations(document)); reviewObserver.observe(document.body, { childList:true, subtree:true }); }
