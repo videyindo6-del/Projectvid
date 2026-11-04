@@ -1,7 +1,7 @@
 (() => {
   const grid = document.getElementById('telegramGrid');
   if (!grid) return;
-  const PAGE_SIZE = 15;
+  const PAGE_SIZE = 16;
   let allItems = [];
   let stats = new Map();
   let currentPage = 1;
@@ -63,18 +63,19 @@
       return `<article class="telegram-review-card">
         <a class="telegram-review-cover${thumb ? '' : ' no-image'}" href="${href}" aria-label="${esc(item.title)}">
           ${thumb ? `<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add('no-image')">` : ''}
-          <span class="telegram-cover-label">${item.access === 'paid' ? (isEN() ? 'PREMIUM' : 'BERBAYAR') : (isEN() ? 'FREE ACCESS' : 'AKSES GRATIS')}</span>
+          <span class="telegram-cover-label">${item.access === 'paid' ? (isEN() ? 'PREMIUM ACCESS' : 'AKSES PREMIUM') : (isEN() ? 'FREE ACCESS' : 'AKSES GRATIS')}</span>
         </a>
         <div class="telegram-review-content">
-          <div class="telegram-review-topline"><span>${isEN() ? 'PRODUCT REVIEW' : 'REVIEW PRODUK'}</span><strong>${esc(price)}</strong></div>
+          <div class="telegram-review-topline"><span>${isEN() ? 'OFFICIAL PRODUCT REVIEW' : 'REVIEW PRODUK'}</span><span class="telegram-review-type">${isEN() ? 'TELEGRAM MEDIA' : 'MEDIA TELEGRAM'}</span></div>
           <h2><a href="${href}">${esc(item.title)}</a></h2>
-          <p class="telegram-review-description">${esc(item.description || (isEN() ? 'View product details and review.' : 'Lihat detail produk dan ulasan lengkap.'))}</p>
+          <p class="telegram-review-description">${esc(item.description || (isEN() ? 'Open this review to see the complete product description, media preview, access information, and purchase instructions.' : 'Buka halaman review untuk melihat deskripsi produk, pratinjau media, informasi akses, dan petunjuk pembelian secara lengkap.'))}</p>
+          <div class="telegram-price-panel"><span>${isEN() ? 'ACCESS PRICE' : 'HARGA AKSES'}</span><strong>${esc(price)}</strong></div>
           <div class="telegram-review-stats">
             <div><b>${number(s.total_sold)}</b><span><i class="fa-solid fa-bag-shopping"></i> ${isEN() ? 'Sold' : 'Terjual'}</span></div>
             <div><b>${number(s.total_likes)}</b><span><i class="fa-solid fa-heart"></i> ${isEN() ? 'Likes' : 'Like'}</span></div>
             <div><b>${number(s.total_comments)}</b><span><i class="fa-solid fa-comment"></i> ${isEN() ? 'Comments' : 'Komentar'}</span></div>
           </div>
-          <a class="telegram-review-button" href="${href}">${isEN() ? 'View review' : 'Lihat Review'} <span aria-hidden="true">→</span></a>
+          <a class="telegram-review-button" href="${href}"><span>${isEN() ? 'View full review' : 'Lihat Review Lengkap'}</span><span class="telegram-review-arrow" aria-hidden="true">→</span></a>
         </div>
       </article>`;
     }).join('');
@@ -87,7 +88,7 @@
     for (let p = from; p <= to; p++) add(p, p, p === currentPage);
     if (to < totalPages) { if (to < totalPages - 1) buttons.push('<span class="telegram-page-dots">…</span>'); add(totalPages, totalPages); }
     add(currentPage + 1, isEN() ? 'Next' : '›', false, currentPage === totalPages);
-    grid.innerHTML = `${cards}<nav class="telegram-pagination" aria-label="Review pages"><span>${isEN() ? 'Showing' : 'Menampilkan'} ${start + 1}–${Math.min(start + PAGE_SIZE, allItems.length)} ${isEN() ? 'of' : 'dari'} ${number(allItems.length)} ${isEN() ? 'reviews' : 'review'}</span><div class="telegram-page-controls">${buttons.join('')}</div></nav>`;
+    grid.innerHTML = `${cards}<nav class="telegram-pagination" aria-label="Review pages"><span>${isEN() ? 'Showing' : 'Menampilkan'} ${start + 1}–${Math.min(start + PAGE_SIZE, allItems.length)} ${isEN() ? 'of' : 'dari'} ${number(allItems.length)} ${isEN() ? 'reviews' : 'review'} · ${isEN() ? '16 per page' : '16 review per halaman'}</span><div class="telegram-page-controls">${buttons.join('')}</div></nav>`;
     grid.querySelectorAll('[data-page]').forEach(button => button.addEventListener('click', () => {
       if (button.disabled) return;
       currentPage = Number(button.dataset.page);
