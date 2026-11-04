@@ -4,9 +4,10 @@ async function init(){
  if(!item){const r=await sb.from('review_items').select('id,slug,title,description,price,access,status').eq('id',slug).maybeSingle();item=r.data}
  if(!item||item.status!=='published'){root.textContent='Konten tidak ditemukan';return}
  const {data:{user}}=await sb.auth.getUser();
- if(!user){root.innerHTML=`<h1>${esc(item.title)}</h1><p>Login diperlukan untuk melanjutkan download.</p><a class="btn primary" href="/login.html">Masuk / Daftar</a>`;return}
+ if(item.access==='free'){await unlock();return}
+ if(!user){root.innerHTML=`<h1>${esc(item.title)}</h1><p>Login diperlukan untuk membeli konten berbayar.</p><a class="btn primary" href="/login.html">Masuk / Daftar</a>`;return}
  const {data:owned}=await sb.from('review_entitlements').select('id').eq('review_id',item.id).eq('user_id',user.id).maybeSingle();
- if(item.access==='free'||owned){await unlock();return}
+ if(owned){await unlock();return}
  const [{data:profile},{data:coupons}]=await Promise.all([
   sb.from('profiles').select('vip_expires_at').eq('id',user.id).maybeSingle(),
   sb.from('discount_coupons').select('code,discount_percent,uses_total,uses_used,uses_reserved').eq('user_id',user.id)
@@ -50,5 +51,5 @@ async function createOrder(){
  }catch(e){root.innerHTML=`<p>Gagal membuat pembayaran: ${esc(e.message)}</p><button class="btn" onclick="location.reload()">Coba lagi</button>`}
 }
 async function checkStatus(){if(!order)return;const {data,error}=await sb.functions.invoke('payment-status',{body:{order_id:order}});if(error){document.getElementById('checkMessage').textContent='Belum dapat memeriksa status. Coba lagi.';return}document.getElementById('payState').textContent=data.status;if(data.status==='SETTLED'){clearInterval(window.payTimer);await unlock()}else document.getElementById('checkMessage').textContent='Status: '+data.status+' · Pemeriksaan otomatis aktif.'}
-async function unlock(){const {data,error}=await sb.functions.invoke('download-link',{body:{review_id:item.id}});if(error){root.innerHTML=`<h2>Pembayaran berhasil / konten gratis</h2><p>${esc(error.message)}</p><p>Jika baru membayar, tunggu beberapa saat lalu muat ulang.</p>`;return}root.innerHTML=`<h1>Akses download tersedia</h1><p>${esc(item.title)}</p><p>Pembayaran telah terverifikasi.</p>${data.content_after_payment?`<div class="watch-card">${esc(data.content_after_payment)}</div>`:''}<a class="btn primary" href="${esc(data.download_url)}" target="_blank" rel="noopener">Download Sekarang</a>`}
+async function unlock(){location.replace('/paste/'+encodeURIComponent(item.slug))}
 init();
