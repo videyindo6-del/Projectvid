@@ -1,1 +1,103 @@
-const gridT=document.getElementById('telegramGrid');async function loadT(){const {data,error}=await sb.from('telegram_items').select('id,title,type,review_embed_url,price,categories(name)').eq('status','published').order('created_at',{ascending:false});if(error){gridT.innerHTML='<div class="empty">Database belum dikonfigurasi.</div>';return}gridT.innerHTML=(data||[]).map(x=>`<article class="media-card"><div class="media-thumb">${x.type==='paid'?'▶':'↓'}</div><div class="media-body"><h3>${escapeHtml(x.title)}</h3><p>${x.type==='paid'?((localStorage.getItem('boxcellink_lang')||'id')==='en'?'Paid: review and verify access first.':'Paid: review dan verifikasi akses terlebih dahulu.'):((localStorage.getItem('boxcellink_lang')||'id')==='en'?'Free: download access as configured.':'Free: akses download sesuai konfigurasi.')}</p><div class="row"><span class="pill ${x.type==='paid'?'orange':'green'}">${String(x.type).toUpperCase()}</span><a class="btn primary" href="${x.type==='paid'?'review.html?id='+encodeURIComponent(x.id):'download.html?id='+encodeURIComponent(x.id)}">${x.type==='paid'?'Review + Download':'Download'}</a></div></div></article>`).join('')}function escapeHtml(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}loadT();
+(() => {
+  const grid = document.getElementById('telegramGrid');
+  if (!grid) return;
+  const PAGE_SIZE = 15;
+  let allItems = [];
+  let stats = new Map();
+  let currentPage = 1;
+  const lang = () => localStorage.getItem('boxcellink_lang') || 'id';
+  const isEN = () => lang() === 'en';
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const number = value => Number(value || 0).toLocaleString(isEN() ? 'en-US' : 'id-ID');
+  const money = value => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+
+  function render() {
+    const totalPages = Math.max(1, Math.ceil(allItems.length / PAGE_SIZE));
+    currentPage = Math.min(Math.max(1, currentPage), totalPages);
+    if (!allItems.length) {
+      grid.innerHTML = `<div class="telegram-empty"><span>✦</span><h3>${isEN() ? 'No reviews yet' : 'Belum ada review'}</h3><p>${isEN() ? 'Published reviews will appear here.' : 'Review yang sudah dipublikasikan akan tampil di sini.'}</p></div>`;
+      return;
+    }
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageItems = allItems.slice(start, start + PAGE_SIZE);
+    const cards = pageItems.map(item => {
+      const s = stats.get(item.id) || {};
+      const thumb = item.thumbnail_url || (Array.isArray(item.gallery_urls) ? item.gallery_urls[0] : '') || '';
+      const price = item.access === 'free' ? (isEN() ? 'Free' : 'Gratis') : money(item.price);
+      const href = `/r/${encodeURIComponent(item.slug)}`;
+      return `<article class="telegram-review-card">
+        <a class="telegram-review-cover${thumb ? '' : ' no-image'}" href="${href}" aria-label="${esc(item.title)}">
+          ${thumb ? `<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy" onerror="this.remove();this.parentElement.classList.add('no-image')">` : ''}
+          <span class="telegram-cover-label">${item.access === 'paid' ? (isEN() ? 'PREMIUM' : 'BERBAYAR') : (isEN() ? 'FREE ACCESS' : 'AKSES GRATIS')}</span>
+        </a>
+        <div class="telegram-review-content">
+          <div class="telegram-review-topline"><span>${isEN() ? 'PRODUCT REVIEW' : 'REVIEW PRODUK'}</span><strong>${esc(price)}</strong></div>
+          <h2><a href="${href}">${esc(item.title)}</a></h2>
+          <p class="telegram-review-description">${esc(item.description || (isEN() ? 'View product details and review.' : 'Lihat detail produk dan ulasan lengkap.'))}</p>
+          <div class="telegram-review-stats">
+            <div><b>${number(s.total_sold)}</b><span><i class="fa-solid fa-bag-shopping"></i> ${isEN() ? 'Sold' : 'Terjual'}</span></div>
+            <div><b>${number(s.total_likes)}</b><span><i class="fa-solid fa-heart"></i> ${isEN() ? 'Likes' : 'Like'}</span></div>
+            <div><b>${number(s.total_comments)}</b><span><i class="fa-solid fa-comment"></i> ${isEN() ? 'Comments' : 'Komentar'}</span></div>
+          </div>
+          <a class="telegram-review-button" href="${href}">${isEN() ? 'View review' : 'Lihat Review'} <span aria-hidden="true">→</span></a>
+        </div>
+      </article>`;
+    }).join('');
+    const buttons = [];
+    const add = (p, label, active = false, disabled = false) => buttons.push(`<button type="button" class="telegram-page-btn${active ? ' is-active' : ''}" data-page="${p}" ${disabled ? 'disabled' : ''} ${active ? 'aria-current="page"' : ''}>${label}</button>`);
+    add(currentPage - 1, isEN() ? 'Previous' : '‹', false, currentPage === 1);
+    let from = Math.max(1, currentPage - 2), to = Math.min(totalPages, from + 4);
+    from = Math.max(1, to - 4);
+    if (from > 1) { add(1, '1'); if (from > 2) buttons.push('<span class="telegram-page-dots">…</span>'); }
+    for (let p = from; p <= to; p++) add(p, p, p === currentPage);
+    if (to < totalPages) { if (to < totalPages - 1) buttons.push('<span class="telegram-page-dots">…</span>'); add(totalPages, totalPages); }
+    add(currentPage + 1, isEN() ? 'Next' : '›', false, currentPage === totalPages);
+    grid.innerHTML = `${cards}<nav class="telegram-pagination" aria-label="Review pages"><span>${isEN() ? 'Showing' : 'Menampilkan'} ${start + 1}–${Math.min(start + PAGE_SIZE, allItems.length)} ${isEN() ? 'of' : 'dari'} ${number(allItems.length)} ${isEN() ? 'reviews' : 'review'}</span><div class="telegram-page-controls">${buttons.join('')}</div></nav>`;
+    grid.querySelectorAll('[data-page]').forEach(button => button.addEventListener('click', () => {
+      if (button.disabled) return;
+      currentPage = Number(button.dataset.page);
+      render();
+      grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }));
+  }
+
+  async function load() {
+    if (!window.sb) {
+      grid.innerHTML = `<div class="telegram-empty">${isEN() ? 'Service is temporarily unavailable.' : 'Layanan sementara tidak tersedia.'}</div>`;
+      return;
+    }
+    grid.innerHTML = `<div class="telegram-loading"><span class="telegram-spinner"></span>${isEN() ? 'Loading published reviews…' : 'Memuat review yang dipublikasikan…'}</div>`;
+    try {
+      const { data, error } = await sb.from('review_items')
+        .select('id,slug,title,description,thumbnail_url,gallery_urls,price,access,view_count,created_at')
+        .eq('status', 'published').order('created_at', { ascending: false });
+      if (error) throw error;
+      allItems = data || [];
+      currentPage = 1;
+      stats = new Map();
+      if (allItems.length) {
+        const { data: statRows, error: statError } = await sb.rpc('get_public_review_stats');
+        if (!statError && Array.isArray(statRows)) {
+          stats = new Map(statRows.map(row => [row.review_id, row]));
+        } else {
+          console.warn('Public review stats RPC unavailable:', statError?.message);
+          const ids = allItems.map(item => item.id);
+          const [likesResult, commentsResult] = await Promise.all([
+            sb.from('review_likes').select('review_id').in('review_id', ids),
+            sb.from('review_comments').select('review_id').in('review_id', ids).eq('is_hidden', false)
+          ]);
+          const count = rows => (rows || []).reduce((map, row) => map.set(row.review_id, (map.get(row.review_id) || 0) + 1), new Map());
+          const likes = count(likesResult.data), comments = count(commentsResult.data);
+          stats = new Map(allItems.map(item => [item.id, { total_sold: 0, total_likes: likes.get(item.id) || 0, total_comments: comments.get(item.id) || 0 }]));
+        }
+      }
+      render();
+    } catch (error) {
+      console.error('Telegram review listing:', error);
+      grid.innerHTML = `<div class="telegram-empty"><h3>${isEN() ? 'Could not load reviews' : 'Review belum dapat dimuat'}</h3><p>${esc(error.message || 'Unknown error')}</p><button class="telegram-review-button" type="button" id="telegramRetry">${isEN() ? 'Try again' : 'Coba lagi'}</button></div>`;
+      document.getElementById('telegramRetry')?.addEventListener('click', load);
+    }
+  }
+  window.addEventListener('storage', event => { if (event.key === 'boxcellink_lang') render(); });
+  load();
+})();
