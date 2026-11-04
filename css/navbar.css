@@ -10,3 +10,16 @@
 
 /* Fixed global navigation */
 .bc-navbar{position:fixed!important;top:0;left:0;right:0;width:100%;z-index:4000}.bc-navbar+.bc-nav-shade{z-index:4090}.bc-drawer{z-index:4100}body:has(.bc-navbar){padding-top:72px}@media(max-width:760px){body:has(.bc-navbar){padding-top:66px}}
+
+/* Compact half-width SaaS navigation drawer */
+.bc-drawer{width:min(330px,82vw)!important;padding:18px 16px!important}
+.bc-menu{gap:4px}
+.bc-menu-group{display:grid;gap:0}
+.bc-menu .bc-submenu-toggle{min-height:46px}
+.bc-menu .submenu-chevron{margin-left:auto;transition:transform .2s}
+.bc-menu .bc-submenu-toggle[aria-expanded="true"] .submenu-chevron{transform:rotate(180deg)}
+.bc-menu .bc-submenu{margin:2px 0 8px 17px;padding:5px 0 5px 13px;border-left:2px solid #cfe0f2;overflow:hidden;animation:navSubmenuIn .2s ease}
+.bc-menu .bc-submenu a{min-height:36px;padding-left:12px;font-size:12px}
+.bc-menu .bc-submenu .submenu-loading{padding:8px 12px;color:#8a9bad;font-size:11px}
+@keyframes navSubmenuIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-color-scheme:dark){.bc-drawer{background:#101d2d;color:#e7eff8}.bc-drawer-head{border-color:#263b52}.bc-menu a,.bc-menu button{color:#d8e4f2}.bc-menu a:hover,.bc-menu button:hover{background:#1b2c41}.bc-menu .bc-submenu{border-color:#365575}}
