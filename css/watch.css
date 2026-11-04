@@ -41,3 +41,8 @@
   .site-footer>span{padding:22px 17px 8px}
   .site-footer nav{padding:4px 17px 23px;gap:10px 17px}
 }
+
+.review-gallery img{cursor:zoom-in;max-height:520px;object-fit:contain;background:#101827;border-radius:14px}
+.review-viewer{position:fixed;inset:0;z-index:5000;background:rgba(5,10,18,.96);display:grid;place-items:center;overflow:hidden}
+.review-viewer[hidden]{display:none}.review-viewer img{max-width:92vw;max-height:88vh;object-fit:contain;touch-action:none;cursor:grab;user-select:none;transition:transform .04s}
+.viewer-close{position:absolute;right:22px;top:18px;z-index:2;border:0;border-radius:50%;width:46px;height:46px;font-size:30px;background:#fff;color:#172b45;cursor:pointer}
