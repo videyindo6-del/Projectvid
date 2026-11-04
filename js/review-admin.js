@@ -18,7 +18,9 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
 
 function notify(text, error = false) {
   if (!msg) return;
+  msg.className = '';
   msg.textContent = text;
+  msg.style.whiteSpace = 'pre-wrap';
   msg.style.color = error ? '#ef4444' : '';
 }
 
@@ -358,44 +360,31 @@ async function load() {
   try {
     const { data, error } = await sb
       .from('review_items')
-      .select('id,slug,title,price,access,status')
+      .select('id,slug,title,price,access,status,review_download_secrets(download_url)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
 
     list.innerHTML = `
-      <table class="table">
-        <tr>
-          <th>Judul</th>
-          <th>Review</th>
-          <th>Download</th>
-          <th>Harga</th>
-          <th>Akses</th>
-          <th>Status</th>
-          <th>Aksi</th>
-        </tr>
-        ${(data || []).map(x => `
-          <tr>
-            <td>${esc(x.title)}</td>
-            <td>
-              <a href="/r/${encodeURIComponent(x.slug)}" target="_blank" rel="noopener">Buka</a>
-            </td>
-            <td>
-              <a href="/d/${encodeURIComponent(x.slug)}" target="_blank" rel="noopener">Download</a>
-              <br>
-              <a href="/paste/${encodeURIComponent(x.slug)}" target="_blank" rel="noopener">Paste</a>
-            </td>
+      <table class="table review-admin-table">
+        <thead><tr>
+          <th>Judul</th><th>Link Review</th><th>Link Tujuan Download</th>
+          <th>Harga</th><th>Akses</th><th>Status</th><th>Aksi</th>
+        </tr></thead>
+        <tbody>${(data || []).map(x => {
+          const reviewUrl = `${location.origin}/r/${encodeURIComponent(x.slug)}`;
+          const downloadUrl = x.review_download_secrets?.[0]?.download_url || '';
+          return `<tr>
+            <td class="review-title-cell"><strong>${esc(x.title)}</strong><small>${esc(x.slug)}</small></td>
+            <td><div class="review-link-cell"><a href="${esc(reviewUrl)}" target="_blank" rel="noopener">${esc(reviewUrl)}</a><button type="button" class="copy-link-btn" data-copy="${esc(reviewUrl)}" title="Salin link review"><i class="fa-regular fa-copy"></i> Copy</button></div></td>
+            <td>${downloadUrl ? `<div class="review-link-cell"><a href="${esc(downloadUrl)}" target="_blank" rel="noopener noreferrer">${esc(downloadUrl)}</a><button type="button" class="copy-link-btn" data-copy="${esc(downloadUrl)}"><i class="fa-regular fa-copy"></i> Copy</button></div>` : '<span class="empty-link">Belum diatur</span>'}</td>
             <td>Rp ${Number(x.price || 0).toLocaleString('id-ID')}</td>
-            <td>${esc(x.access)}</td>
-            <td>${esc(x.status)}</td>
-            <td>
-              <button class="btn" data-edit="${esc(x.id)}">Edit</button>
-              <button class="btn" data-delete="${esc(x.id)}">Hapus</button>
-            </td>
-          </tr>
-        `).join('')}
-      </table>
-    `;
+            <td><span class="review-pill">${esc(x.access)}</span></td>
+            <td><span class="review-status ${x.status === 'published' ? 'is-published' : 'is-draft'}">${esc(x.status)}</span></td>
+            <td><div class="review-actions"><button class="btn" data-edit="${esc(x.id)}">Edit</button><button class="btn danger" data-delete="${esc(x.id)}">Hapus</button></div></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
 
     list.querySelectorAll('[data-edit]').forEach(button => {
       button.addEventListener('click', () => editReview(button.dataset.edit));
@@ -403,6 +392,20 @@ async function load() {
 
     list.querySelectorAll('[data-delete]').forEach(button => {
       button.addEventListener('click', () => removeReview(button.dataset.delete));
+    });
+
+    list.querySelectorAll('[data-copy]').forEach(button => {
+      button.addEventListener('click', async () => {
+        const value = button.dataset.copy || '';
+        try {
+          await navigator.clipboard.writeText(value);
+          const old = button.innerHTML;
+          button.innerHTML = '<i class="fa-solid fa-check"></i> Tersalin';
+          setTimeout(() => { button.innerHTML = old; }, 1400);
+        } catch {
+          window.prompt('Salin link berikut:', value);
+        }
+      });
     });
 
   } catch (error) {
@@ -624,9 +627,16 @@ form?.addEventListener('submit', async e => {
 
     for (let i = 0; i < 3; i++) addGallery();
 
-    notify(
-      `Berhasil disimpan!\nReview: /r/${slug}\nDownload: /d/${slug}\nPaste: /paste/${slug}`
-    );
+    const reviewUrl = `${location.origin}/r/${encodeURIComponent(slug)}`;
+    const checkoutUrl = `${location.origin}/d/${encodeURIComponent(slug)}`;
+    const pasteUrl = `${location.origin}/paste/${encodeURIComponent(slug)}`;
+    msg.className = 'review-save-result';
+    msg.innerHTML = `<strong><i class="fa-solid fa-circle-check"></i> Berhasil disimpan!</strong>
+      ${[['Link Review',reviewUrl],['Link Checkout',checkoutUrl],['Halaman Paste',pasteUrl]].map(([label,url]) => `<div class="saved-url-row"><span>${label}</span><a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a><button type="button" class="copy-link-btn" data-copy="${esc(url)}"><i class="fa-regular fa-copy"></i> Copy</button></div>`).join('')}`;
+    msg.querySelectorAll('[data-copy]').forEach(button => button.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(button.dataset.copy); button.innerHTML = '<i class="fa-solid fa-check"></i> Tersalin'; }
+      catch { window.prompt('Salin link berikut:', button.dataset.copy); }
+    }));
 
     await load();
 
