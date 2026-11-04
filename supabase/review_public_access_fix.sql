@@ -1,15 +1,22 @@
--- BoxCellink: perbaikan akses baca publik untuk review yang berstatus published.
--- Jalankan sekali di Supabase SQL Editor.
--- Data rahasia tetap berada di review_download_secrets dan review_content_secrets.
-alter table public.review_items enable row level security;
+-- BOXCellink: akses baca publik untuk metadata review berstatus published.
+-- Jalankan di Supabase SQL Editor pada project yang sama dengan website.
+-- Link download dan konten berbayar tetap privat di tabel *_secrets.
 
+begin;
+
+grant usage on schema public to anon, authenticated;
 grant select on table public.review_items to anon, authenticated;
+
+alter table public.review_items enable row level security;
 
 drop policy if exists "public published review items" on public.review_items;
 create policy "public published review items"
-on public.review_items
-for select
-to anon, authenticated
-using (status = 'published');
+  on public.review_items
+  for select
+  to anon, authenticated
+  using (status = 'published');
 
--- Admin tetap memakai policy admin review items yang sudah ada.
+commit;
+
+-- Verifikasi sesudah menjalankan SQL:
+-- select slug, status, title from public.review_items where slug = 'BC6E17F2';
