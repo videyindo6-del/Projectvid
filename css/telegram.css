@@ -47,3 +47,21 @@
 .telegram-page-dots{padding:0 3px;color:var(--muted,#718096)}
 @media(max-width:560px){#telegramGrid.video-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.telegram-review-card{border-radius:14px}.telegram-review-cover{aspect-ratio:4/3}.telegram-review-content{padding:11px!important}.telegram-review-topline{font-size:8px;gap:4px}.telegram-review-topline strong{font-size:10px}.telegram-review-content h2{font-size:13px!important;margin:8px 0 5px;min-height:2.5em}.telegram-review-description{font-size:10px;line-height:1.4;margin-bottom:10px;min-height:2.8em}.telegram-review-stats{padding:9px 0;gap:3px}.telegram-review-stats b{font-size:13px!important}.telegram-review-stats span{font-size:8px!important;white-space:normal}.telegram-review-stats span i{display:none}.telegram-review-button{font-size:10px;padding:9px 7px;margin-top:10px}.telegram-pagination{justify-content:center;text-align:center}.telegram-pagination>span{width:100%}.telegram-page-btn{min-width:32px;height:34px;padding:0 8px;font-size:12px}}
 @media(prefers-color-scheme:dark){.telegram-page-btn{background:#101d2d;border-color:#263b52;color:#e7eff8}.telegram-page-btn.is-active{background:linear-gradient(135deg,#174d84,#347bc0)}}
+
+/* Floating Telegram notice: stays visible without blocking the review directory. */
+.telegram-warning-float{position:fixed;right:22px;bottom:22px;z-index:1500;width:min(430px,calc(100vw - 28px));padding:20px 20px 18px;border:1px solid rgba(226,171,65,.38);border-radius:20px;background:rgba(255,250,237,.97);color:#493716;box-shadow:0 22px 65px rgba(15,35,60,.24);backdrop-filter:blur(18px);animation:telegram-notice-in .32s ease-out}
+.telegram-warning-float.is-hidden{display:none}
+.warning-float-head{display:flex;align-items:center;gap:10px;margin:0 34px 8px 0}
+.telegram-warning-float .warning-icon{display:grid;place-items:center;width:36px;height:36px;flex:none;border-radius:12px;background:#fff0c8;color:#b77913;font-size:17px}
+.telegram-warning-float .eyebrow{font-size:10px;font-weight:900;letter-spacing:1.1px;color:#95620d}
+.telegram-warning-float h2{margin:6px 28px 8px 0;font-size:18px;line-height:1.3;color:#3e3019}
+.telegram-warning-float p{margin:0 0 15px;color:#705a35;font-size:13px;line-height:1.65}
+.telegram-warning-float .warning-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.telegram-warning-float .warning-actions .btn{display:flex;justify-content:center;align-items:center;gap:7px;min-height:42px;padding:10px 12px;border:0;border-radius:11px;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer}
+.telegram-warning-float .warning-actions .btn.primary{background:linear-gradient(135deg,#168bd0,#0874b9);color:#fff}
+.telegram-warning-float .warning-yes{background:#fff;border:1px solid #e5d4ad!important;color:#5d4824}
+.telegram-warning-float .warning-dismiss{position:absolute;right:12px;top:10px;width:30px;height:30px;border:0;border-radius:9px;background:rgba(116,87,39,.09);color:#705a35;font-size:21px;line-height:1;cursor:pointer}
+.telegram-warning-float .warning-dismiss:hover{background:rgba(116,87,39,.17)}
+@keyframes telegram-notice-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:560px){.telegram-warning-float{right:12px;bottom:12px;width:calc(100vw - 24px);padding:16px;border-radius:17px}.telegram-warning-float h2{font-size:16px}.telegram-warning-float p{font-size:12px}.telegram-warning-float .warning-actions{grid-template-columns:1fr 1fr}.telegram-warning-float .warning-actions .btn{font-size:11px;padding:9px 7px}}
+@media(prefers-color-scheme:dark){.telegram-warning-float{background:rgba(26,35,48,.97);border-color:#67512b;color:#f5e8c9}.telegram-warning-float h2{color:#fff0ce}.telegram-warning-float p{color:#d8c8a5}.telegram-warning-float .eyebrow{color:#f0c36a}.telegram-warning-float .warning-icon{background:#49391d;color:#f4c35f}.telegram-warning-float .warning-yes{background:#253143!important;border-color:#49566a!important;color:#f0e5cd}.telegram-warning-float .warning-dismiss{background:#354154;color:#e6d7b7}}
