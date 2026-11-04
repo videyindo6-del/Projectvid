@@ -1,6 +1,6 @@
-const root=document.getElementById('downloadCheckout'),slug=new URLSearchParams(location.search).get('slug')||location.pathname.split('/').filter(Boolean).pop(),rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID'),esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let item,order=null,couponOptions=[],vipActive=false;
+const root=document.getElementById('downloadCheckout'),routeParts=location.pathname.split('/').filter(Boolean),slug=(new URLSearchParams(location.search).get('slug')||new URLSearchParams(location.search).get('code')||routeParts.at(-1)||'').trim(),rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID'),esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let item,order=null,couponOptions=[],vipActive=false;
 async function init(){
- let {data}=await sb.from('review_items').select('id,slug,title,description,price,access,status').eq('slug',slug).maybeSingle();item=data;
+ let {data,error:queryError}=await sb.from('review_items').select('id,slug,title,description,price,access,status').eq('slug',slug).maybeSingle();if(queryError){root.innerHTML=`<h1>Gagal memuat konten</h1><p>${esc(queryError.message)}</p><p>Pastikan migration <b>review_public_access_fix.sql</b> sudah dijalankan di Supabase.</p>`;return}item=data;
  if(!item){const r=await sb.from('review_items').select('id,slug,title,description,price,access,status').eq('id',slug).maybeSingle();item=r.data}
  if(!item||item.status!=='published'){root.textContent='Konten tidak ditemukan';return}
  const {data:{user}}=await sb.auth.getUser();
