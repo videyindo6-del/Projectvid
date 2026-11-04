@@ -1,14 +1,21 @@
 const box=document.getElementById('reviewDetail');
-const params=new URLSearchParams(location.search);
-const pathParts=location.pathname.split('/').filter(Boolean);
-const routeSlug=(pathParts.length>1?pathParts[pathParts.length-1]:'');
-const slug=(params.get('slug')||params.get('code')||routeSlug||'').trim();
+function getRouteCode(prefix){
+ const params=new URLSearchParams(location.search);
+ const fromQuery=params.get('slug')||params.get('code')||'';
+ if(fromQuery.trim())return fromQuery.trim();
+ const parts=location.pathname.split('/').filter(Boolean);
+ const prefixIndex=parts.findIndex(p=>p.toLowerCase()===prefix);
+ if(prefixIndex<0||!parts[prefixIndex+1])return '';
+ try{return decodeURIComponent(parts[prefixIndex+1]).trim()}catch{return parts[prefixIndex+1].trim()}
+}
+const slug=getRouteCode('r');
 const rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function load(){
  if(!slug){box.innerHTML='<h1>Kode review tidak terbaca</h1><p>Pastikan URL berbentuk /r/KODE_REVIEW dan file _redirects terbaru sudah terpasang.</p>';return}
  try{
   let {data:v,error:queryError}=await sb.from('review_items').select('id,slug,title,description,thumbnail_url,price,access,created_at').eq('slug',slug).maybeSingle();
+  if(!queryError&&!v){const alt=await sb.from('review_items').select('id,slug,title,description,thumbnail_url,price,access,created_at').ilike('slug',slug).maybeSingle();v=alt.data;queryError=alt.error;}
   if(queryError){box.innerHTML=`<h1>Gagal memuat review</h1><p>${esc(queryError.message)}</p><p>Periksa izin SELECT dan policy RLS tabel review_items di Supabase.</p>`;return}
   if(!v){const r=await sb.from('review_items').select('id,slug,title,description,thumbnail_url,price,access,created_at').eq('id',slug).maybeSingle();v=r.data}
   if(!v){box.innerHTML=`<h1>Review tidak ditemukan</h1><p>Kode yang dicari: <b>${esc(slug)}</b>. Pastikan slug benar dan status review adalah published.</p>`;return}
