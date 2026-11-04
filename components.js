@@ -1,5 +1,5 @@
 (() => {
-const translations={id:{dashboard:'Dashboard',account:'Akun Saya',box:'BoxVidey',telegram:'Media Telegram',review:'Review & Download',vip:'VIP',groups:'Group VIP Telegram',discount:'Kode Diskon Saya',referral:'Referral & Hadiah',categories:'Kategori',payments:'Pembayaran',login:'Masuk',register:'Daftar',logout:'Keluar',terms:'Syarat & ketentuan',privacy:'Kebijakan Dan Privasi',help:'Bantuan',cookies:'Kami menggunakan cookie untuk pengalaman yang lebih baik.',accept:'Setujui'},en:{dashboard:'Dashboard',account:'Akun Saya',box:'BoxVidey',telegram:'Telegram Media',review:'Review & Download',vip:'VIP',groups:'VIP Telegram Groups',discount:'My Discount Codes',referral:'Referral & Rewards',categories:'Categories',payments:'Payments',login:'Sign in',register:'Sign up',logout:'Sign out',terms:'Terms & Conditions',privacy:'Privacy Policy',help:'Help',cookies:'We use cookies for a better experience.',accept:'Accept'}};
+const translations={id:{admin:'Panel Admin',dashboard:'Dashboard',account:'Akun Saya',box:'BoxVidey',telegram:'Media Telegram',review:'Review & Download',vip:'VIP',groups:'Group VIP Telegram',discount:'Kode Diskon Saya',referral:'Referral & Hadiah',categories:'Kategori',payments:'Pembayaran',login:'Masuk',register:'Daftar',logout:'Keluar',terms:'Syarat & ketentuan',privacy:'Kebijakan Dan Privasi',help:'Bantuan',cookies:'Kami menggunakan cookie untuk pengalaman yang lebih baik.',accept:'Setujui'},en:{admin:'Admin Panel',dashboard:'Dashboard',account:'My Account',box:'BoxVidey',telegram:'Telegram Media',review:'Review & Download',vip:'VIP',groups:'VIP Telegram Groups',discount:'My Discount Codes',referral:'Referral & Rewards',categories:'Categories',payments:'Payments',login:'Sign in',register:'Sign up',logout:'Sign out',terms:'Terms & Conditions',privacy:'Privacy Policy',help:'Help',cookies:'We use cookies for a better experience.',accept:'Accept'}};
 const getLang=()=>localStorage.getItem('boxcellink_lang')||'id';
 function applyLocal(l=getLang()){const d=translations[l]||translations.id;document.documentElement.lang=l;document.querySelectorAll('[data-nav]').forEach(e=>{if(d[e.dataset.nav])e.textContent=d[e.dataset.nav]});document.querySelectorAll('[data-footer]').forEach(e=>{if(d[e.dataset.footer])e.textContent=d[e.dataset.footer]});const b=document.getElementById('translateLabel');if(b)b.textContent=l==='id'?'ID':'EN';}
 async function load(selector,url){const el=document.querySelector(selector);if(!el)return;try{const r=await fetch(url,{credentials:'same-origin',cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);el.innerHTML=await r.text();}catch(e){console.error('Component load failed',url,e);el.innerHTML='';}}
@@ -42,6 +42,16 @@ async function initNavbar(){
  const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');
  if(guest)guest.hidden=!!user;
  if(member)member.hidden=!user;
+ // Admin entry is visible only after Supabase confirms profiles.role === 'admin'.
+ // A failed profile lookup fails closed: ordinary members never see admin navigation.
+ const adminLink=document.getElementById('navAdmin');
+ if(adminLink)adminLink.hidden=true;
+ if(user&&window.sb?.from){
+   try{
+     const {data:profile,error:profileError}=await window.sb.from('profiles').select('role,is_banned').eq('id',user.id).maybeSingle();
+     if(!profileError&&profile?.role==='admin'&&!profile?.is_banned&&adminLink)adminLink.hidden=false;
+   }catch(e){console.warn('Admin navigation check failed; admin link remains hidden:',e);}
+ }
  if(user){
    document.getElementById('navLogout')?.addEventListener('click',async()=>{
      try{await window.sb.auth.signOut();}finally{location.replace('/index.html');}
