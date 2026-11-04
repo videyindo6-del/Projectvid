@@ -1,7 +1,5 @@
-# Cloudflare Pages automatically serves clean URLs for matching .html files.
-# Do not add 301/302 rules for /login, /register, /vip, etc.; doing so can
-# conflict with dashboard-level redirects and create ERR_TOO_MANY_REDIRECTS.
-# Keep only dynamic routes that need path parameters.
+# Parameterized routes only. Use 200 rewrites, never redirect dynamic paths.
 /v/* /watch.html?slug=:splat 200
 /r/* /review-detail.html?slug=:splat 200
 /d/* /download.html?slug=:splat 200
+/paste/* /paste.html?slug=:splat 200
