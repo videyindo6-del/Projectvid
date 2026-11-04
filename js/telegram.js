@@ -11,6 +11,41 @@
   const number = value => Number(value || 0).toLocaleString(isEN() ? 'en-US' : 'id-ID');
   const money = value => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
 
+  // Convert URLs commonly entered in Review Admin into browser-renderable thumbnails.
+  function thumbnailSource(value) {
+    let raw = String(value ?? '').trim();
+    if (!raw) return '';
+    const iframe = raw.match(/<iframe[^>]+src=[\"']([^\"']+)/i);
+    if (iframe) raw = iframe[1];
+    try {
+      const u = new URL(raw, location.origin);
+      if (!['http:', 'https:'].includes(u.protocol)) return '';
+      const driveId = u.pathname.match(/\/file\/d\/([^/]+)/)?.[1] || u.searchParams.get('id');
+      if (u.hostname.includes('drive.google.com') && driveId) {
+        return `https://drive.google.com/thumbnail?id=${encodeURIComponent(driveId)}&sz=w1000`;
+      }
+      if (u.hostname.includes('youtube.com') || u.hostname === 'youtu.be') {
+        const id = u.hostname === 'youtu.be' ? u.pathname.split('/').filter(Boolean)[0] : (u.searchParams.get('v') || u.pathname.match(/\/embed\/([^/]+)/)?.[1]);
+        if (id) return `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`;
+      }
+      if (u.hostname.includes('dropbox.com')) {
+        u.searchParams.set('raw', '1');
+        return u.href;
+      }
+      return u.href;
+    } catch { return ''; }
+  }
+
+  function reviewThumbnail(item) {
+    const gallery = Array.isArray(item.gallery_urls) ? item.gallery_urls : [];
+    const candidates = [item.thumbnail_url, ...gallery.map(x => typeof x === 'string' ? x : (x?.url || x?.src || x?.embed_url || x?.thumbnail_url))];
+    for (const candidate of candidates) {
+      const src = thumbnailSource(candidate);
+      if (src) return src;
+    }
+    return '';
+  }
+
   function render() {
     const totalPages = Math.max(1, Math.ceil(allItems.length / PAGE_SIZE));
     currentPage = Math.min(Math.max(1, currentPage), totalPages);
@@ -22,12 +57,12 @@
     const pageItems = allItems.slice(start, start + PAGE_SIZE);
     const cards = pageItems.map(item => {
       const s = stats.get(item.id) || {};
-      const thumb = item.thumbnail_url || (Array.isArray(item.gallery_urls) ? item.gallery_urls[0] : '') || '';
+      const thumb = reviewThumbnail(item);
       const price = item.access === 'free' ? (isEN() ? 'Free' : 'Gratis') : money(item.price);
       const href = `/r/${encodeURIComponent(item.slug)}`;
       return `<article class="telegram-review-card">
         <a class="telegram-review-cover${thumb ? '' : ' no-image'}" href="${href}" aria-label="${esc(item.title)}">
-          ${thumb ? `<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy" onerror="this.remove();this.parentElement.classList.add('no-image')">` : ''}
+          ${thumb ? `<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add('no-image')">` : ''}
           <span class="telegram-cover-label">${item.access === 'paid' ? (isEN() ? 'PREMIUM' : 'BERBAYAR') : (isEN() ? 'FREE ACCESS' : 'AKSES GRATIS')}</span>
         </a>
         <div class="telegram-review-content">
