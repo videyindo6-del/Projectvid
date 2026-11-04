@@ -1,5 +1,6 @@
-# Parameterized routes only. Use 200 rewrites, never redirect dynamic paths.
-/v/* /watch.html?slug=:splat 200
-/r/* /review-detail.html?slug=:splat 200
-/d/* /download.html?slug=:splat 200
-/paste/* /paste.html?slug=:splat 200
+# Cloudflare Pages proxy rewrites: keep the public URL path intact.
+# The browser scripts read the final path segment as the record slug.
+/v/* /watch.html 200
+/r/* /review-detail.html 200
+/d/* /download.html 200
+/paste/* /paste.html 200

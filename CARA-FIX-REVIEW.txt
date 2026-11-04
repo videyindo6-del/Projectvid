@@ -1,0 +1,26 @@
+PERBAIKAN REVIEW / DOWNLOAD / PASTE BOXCELLINK
+
+Akar masalah yang diperbaiki:
+1. Aturan _redirects sebelumnya menambahkan query parameter dinamis pada rewrite. Versi ini menggunakan proxy rewrite path-only yang didukung Cloudflare Pages.
+2. Browser mempertahankan URL /r/KODE, /d/KODE, dan /paste/KODE. JavaScript mengambil kode dari segmen terakhir URL, bukan bergantung pada query string.
+3. Halaman review tidak lagi gagal total jika kolom tambahan gallery_urls/view_count atau RPC penghitung view belum ada.
+4. Query publik hanya mengambil metadata review; tabel link download dan konten privat tetap tertutup.
+
+LANGKAH PEMASANGAN
+1. Ekstrak ZIP ini.
+2. Upload/Deploy SELURUH isi folder hasil ekstrak ke root project Cloudflare Pages (bukan folder pembungkus ZIP).
+3. Pastikan file _redirects berada di root output yang benar dan isinya berasal dari ZIP ini.
+4. Buka Supabase Dashboard > SQL Editor, pilih project yang sama dengan website, lalu jalankan isi supabase/review_public_access_fix.sql.
+5. Tunggu deployment Cloudflare selesai. Lakukan hard refresh atau buka lewat mode privat.
+6. Uji:
+   https://boxcelink.pages.dev/r/BC6E17F2
+   https://boxcelink.pages.dev/d/BC6E17F2
+   https://boxcelink.pages.dev/paste/BC6E17F2
+
+CATATAN AKSES
+- /r/KODE menampilkan detail review yang published.
+- /d/KODE menampilkan checkout. Konten paid memerlukan login dan pembayaran.
+- /paste/KODE memvalidasi hak akses melalui Edge Function download-link. Untuk paid, user harus memiliki entitlement yang valid. Ini memang tidak boleh dibuka hanya karena URL diketahui.
+- Jika website dideploy melalui Git, commit dan push isi folder ini ke branch produksi. Jika melalui Direct Upload, upload isi folder ini sebagai deployment baru.
+
+Jika masih gagal setelah deployment, kirim screenshot hasil halaman dan error dari browser Console/Network serta hasil SQL verifikasi di atas. Jangan kirim service-role key.
