@@ -8,7 +8,7 @@ const cors = {
 const reply = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { ...cors, 'Content-Type': 'application/json' },
+    headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
   });
 
 Deno.serve(async (req) => {
@@ -16,24 +16,42 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') return reply({ success: false, error: 'Method tidak diizinkan' }, 405);
 
   try {
-    const authorization = req.headers.get('Authorization');
-
     const url = Deno.env.get('SUPABASE_URL');
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     if (!url || !anonKey || !serviceKey) {
-      console.error('download-link: Supabase environment variables are incomplete');
       return reply({ success: false, error: 'Konfigurasi Supabase Edge Function belum lengkap. Periksa secrets server.' }, 500);
     }
 
-    // A caller may be anonymous for FREE reviews. If a bearer token is
-    // supplied, validate it; never trust a user_id supplied by the browser.
+    const body = await req.json().catch(() => ({}));
+    const reviewId = String(body?.review_id || '').trim();
+    if (!reviewId) return reply({ success: false, error: 'ID review tidak dikirim.' }, 400);
+
+    // Read the review first with the service role. FREE access is public and
+    // must not be blocked by an expired/stale browser login token.
+    const admin = createClient(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: item, error: itemError } = await admin
+      .from('review_items')
+      .select('id,title,slug,access,status')
+      .eq('id', reviewId)
+      .maybeSingle();
+    if (itemError) throw itemError;
+    if (!item || item.status !== 'published') {
+      return reply({ success: false, error: 'Konten tidak ditemukan atau belum dipublikasikan.' }, 404);
+    }
+
+    const accessType = String(item.access || '').trim().toLowerCase();
+    const isFree = accessType === 'free';
+    const authorization = req.headers.get('Authorization') || '';
+    const bearerToken = authorization.replace(/^Bearer\\s+/i, '').trim();
     let user: { id: string } | null = null;
-    // supabase-js may send the project's anon key as a Bearer header when
-    // there is no signed-in session. That is a public/anonymous caller, not
-    // an end-user JWT; do not pass it to auth.getUser().
-    const bearerToken = authorization?.replace(/^Bearer\s+/i, '').trim() || '';
-    if (bearerToken && bearerToken !== anonKey) {
+    let profile: { role?: string | null; is_banned?: boolean | null } | null = null;
+
+    // Only validate a session when the content actually requires a user.
+    // This allows FREE content to work with no session or a stale session.
+    if (!isFree && bearerToken && bearerToken !== anonKey) {
       const userClient = createClient(url, anonKey, {
         global: { headers: { Authorization: authorization } },
         auth: { persistSession: false, autoRefreshToken: false },
@@ -45,13 +63,6 @@ Deno.serve(async (req) => {
       user = { id: authData.user.id };
     }
 
-    // Service role reads protected review metadata and secrets. It is never
-    // exposed to the browser. Paid access still requires a validated user.
-    const admin = createClient(url, serviceKey, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
-
-    let profile: { role?: string | null; is_banned?: boolean | null } | null = null;
     if (user) {
       const { data, error: profileError } = await admin
         .from('profiles')
@@ -64,27 +75,7 @@ Deno.serve(async (req) => {
       if (profile.is_banned) return reply({ success: false, error: 'Akun ini sedang dibatasi.' }, 403);
     }
 
-    const body = await req.json().catch(() => ({}));
-    const reviewId = String(body?.review_id || '').trim();
-    if (!reviewId) return reply({ success: false, error: 'ID review tidak dikirim.' }, 400);
-
-    const { data: item, error: itemError } = await admin
-      .from('review_items')
-      .select('id,title,slug,access,status')
-      .eq('id', reviewId)
-      .maybeSingle();
-    if (itemError) throw itemError;
-    if (!item || item.status !== 'published') {
-      return reply({ success: false, error: 'Konten tidak ditemukan atau belum dipublikasikan.' }, 404);
-    }
-
-    // Access policy: admin can open all published reviews; every user can
-    // open FREE reviews; PAID reviews require a verified entitlement.
-    // Normalize the database value to avoid 'Free'/' free ' being treated as paid.
     const isAdmin = String(profile?.role || '').trim().toLowerCase() === 'admin';
-    const accessType = String(item.access || '').trim().toLowerCase();
-    const isFree = accessType === 'free';
-
     if (!isAdmin && !isFree && !user) {
       return reply({
         success: false,
@@ -102,9 +93,6 @@ Deno.serve(async (req) => {
         .maybeSingle();
       if (entitlementError) throw entitlementError;
 
-      // Recovery path for older/already-settled orders whose entitlement row
-      // was not created (for example, a previous settlement RPC/migration issue).
-      // Only a SETTLED order owned by this exact user and review can restore access.
       if (!entitlement) {
         const { data: settledOrder, error: settledOrderError } = await admin
           .from('cashi_orders')
@@ -127,17 +115,6 @@ Deno.serve(async (req) => {
               order_id: settledOrder.order_id,
             }, { onConflict: 'user_id,review_id', ignoreDuplicates: true });
           if (restoreError) throw restoreError;
-
-          const { data: restored, error: restoredError } = await admin
-            .from('review_entitlements')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('review_id', item.id)
-            .maybeSingle();
-          if (restoredError) throw restoredError;
-          if (!restored) {
-            return reply({ success: false, error: 'Pembayaran ditemukan, tetapi pemulihan akses gagal. Hubungi admin.', code: 'ENTITLEMENT_RESTORE_FAILED' }, 500);
-          }
         } else {
           return reply({
             success: false,
