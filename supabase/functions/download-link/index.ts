@@ -17,7 +17,6 @@ Deno.serve(async (req) => {
 
   try {
     const authorization = req.headers.get('Authorization');
-    if (!authorization) return reply({ success: false, error: 'Login diperlukan' }, 401);
 
     const url = Deno.env.get('SUPABASE_URL');
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
@@ -27,31 +26,43 @@ Deno.serve(async (req) => {
       return reply({ success: false, error: 'Konfigurasi Supabase Edge Function belum lengkap. Periksa secrets server.' }, 500);
     }
 
-    // Validate the caller's JWT first. Never trust a user_id supplied by the browser.
-    const userClient = createClient(url, anonKey, {
-      global: { headers: { Authorization: authorization } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
-    const { data: authData, error: authError } = await userClient.auth.getUser();
-    const user = authData?.user;
-    if (authError || !user) {
-      return reply({ success: false, error: 'Sesi login tidak valid. Silakan login ulang.' }, 401);
+    // A caller may be anonymous for FREE reviews. If a bearer token is
+    // supplied, validate it; never trust a user_id supplied by the browser.
+    let user: { id: string } | null = null;
+    // supabase-js may send the project's anon key as a Bearer header when
+    // there is no signed-in session. That is a public/anonymous caller, not
+    // an end-user JWT; do not pass it to auth.getUser().
+    const bearerToken = authorization?.replace(/^Bearer\s+/i, '').trim() || '';
+    if (bearerToken && bearerToken !== anonKey) {
+      const userClient = createClient(url, anonKey, {
+        global: { headers: { Authorization: authorization } },
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+      const { data: authData, error: authError } = await userClient.auth.getUser();
+      if (authError || !authData?.user) {
+        return reply({ success: false, error: 'Sesi login tidak valid. Silakan login ulang.' }, 401);
+      }
+      user = { id: authData.user.id };
     }
 
-    // Service role is used only after JWT validation, so private records can be
-    // checked safely even when the browser's RLS policy does not expose them.
+    // Service role reads protected review metadata and secrets. It is never
+    // exposed to the browser. Paid access still requires a validated user.
     const admin = createClient(url, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    const { data: profile, error: profileError } = await admin
-      .from('profiles')
-      .select('role,is_banned')
-      .eq('id', user.id)
-      .maybeSingle();
-    if (profileError) throw profileError;
-    if (!profile) return reply({ success: false, error: 'Profil akun tidak ditemukan.' }, 403);
-    if (profile.is_banned) return reply({ success: false, error: 'Akun ini sedang dibatasi.' }, 403);
+    let profile: { role?: string | null; is_banned?: boolean | null } | null = null;
+    if (user) {
+      const { data, error: profileError } = await admin
+        .from('profiles')
+        .select('role,is_banned')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (profileError) throw profileError;
+      profile = data;
+      if (!profile) return reply({ success: false, error: 'Profil akun tidak ditemukan.' }, 403);
+      if (profile.is_banned) return reply({ success: false, error: 'Akun ini sedang dibatasi.' }, 403);
+    }
 
     const body = await req.json().catch(() => ({}));
     const reviewId = String(body?.review_id || '').trim();
@@ -70,10 +81,19 @@ Deno.serve(async (req) => {
     // Access policy: admin can open all published reviews; every user can
     // open FREE reviews; PAID reviews require a verified entitlement.
     // Normalize the database value to avoid 'Free'/' free ' being treated as paid.
-    const isAdmin = String(profile.role || '').trim().toLowerCase() === 'admin';
+    const isAdmin = String(profile?.role || '').trim().toLowerCase() === 'admin';
     const accessType = String(item.access || '').trim().toLowerCase();
     const isFree = accessType === 'free';
-    if (!isAdmin && !isFree) {
+
+    if (!isAdmin && !isFree && !user) {
+      return reply({
+        success: false,
+        error: 'Konten ini berbayar. Silakan login dan selesaikan pembayaran untuk mendapatkan akses.',
+        code: 'LOGIN_REQUIRED_FOR_PAID',
+      }, 401);
+    }
+
+    if (!isAdmin && !isFree && user) {
       const { data: entitlement, error: entitlementError } = await admin
         .from('review_entitlements')
         .select('id')
