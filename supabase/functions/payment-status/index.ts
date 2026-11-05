@@ -25,10 +25,21 @@ Deno.serve(async req => {
     const raw=await r.text(); let d:any;
     try { d=raw?JSON.parse(raw):{}; } catch { return out({error:'Respons check-status Cashi bukan JSON yang valid'},502); }
     if(!r.ok||!d?.success) return out({error:d?.message||'Cashi gagal memeriksa status transaksi',detail:d},502);
-    if(String(d.order_id||'')!==order_id) return out({error:'Order ID dari Cashi tidak cocok'},409);
-    const state=String(d.status||'PENDING').toUpperCase();
+    // Cashi response may wrap transaction fields in data/result. Never mark paid
+    // unless a provider order identifier is present and matches our stored order.
+    const provider = d?.data ?? d?.result ?? d?.transaction ?? d;
+    const providerOrderId = String(provider?.order_id ?? provider?.merchant_order_id ?? provider?.reference_id ?? d?.order_id ?? '').trim();
+    if(!providerOrderId) {
+      console.error('Cashi response missing order identifier; response keys:', Object.keys(d||{}));
+      return out({error:'Respons Cashi tidak menyertakan Order ID transaksi yang dapat diverifikasi',provider_fields:Object.keys(d||{})},502);
+    }
+    if(providerOrderId!==order_id) {
+      console.error('Cashi order mismatch', {expected:order_id, received:providerOrderId});
+      return out({error:'Order ID dari Cashi tidak cocok',expected_order_id:order_id,provider_order_id:providerOrderId},409);
+    }
+    const state=String(provider?.status ?? d?.status ?? 'PENDING').toUpperCase();
     if(state==='SETTLED') {
-      const paid=Number(d.amount);
+      const paid=Number(provider?.amount ?? provider?.paid_amount ?? d?.amount);
       const expected=Number(o.amount);
       // Cashi dapat melaporkan nominal terbayar termasuk biaya gateway. Cocokkan order
       // dan batasi selisih biaya; RPC tetap menerima nominal order asli untuk settlement.
