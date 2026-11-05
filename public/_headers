@@ -1,0 +1,14 @@
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+/components.js
+  Cache-Control: no-cache, no-store, must-revalidate
+/js/*
+  Cache-Control: no-cache, no-store, must-revalidate
+/_redirects
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  X-Frame-Options: SAMEORIGIN
