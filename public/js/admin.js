@@ -1,0 +1,2 @@
+async function guardAdmin(){const {data:{user}}=await sb.auth.getUser();if(!user){location.href='login.html';return null}const {data:p,error}=await sb.from('profiles').select('role,is_banned').eq('id',user.id).single();if(error||p?.role!=='admin'||p?.is_banned){location.href='dashboard.html';return null}document.getElementById('adminEmail').textContent=user.email||'';return user}
+document.getElementById('logout')?.addEventListener('click',async()=>{await sb.auth.signOut();location.href='index.html'});guardAdmin();
