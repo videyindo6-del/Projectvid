@@ -92,3 +92,19 @@ body:has(.checkout-shell) main.container{width:min(1120px,94%);max-width:1120px;
 .payment-info-card{border-color:#e0e9f2;box-shadow:0 12px 35px rgba(25,54,87,.045)}
 .payment-info-card ol{line-height:1.85}
 @media(max-width:760px){.payment-card{box-shadow:0 12px 35px rgba(17,49,83,.07)}.qr-stage{min-height:245px}.payment-info-card{padding:17px}}
+
+/* Live payment status indicators */
+.payment-state{transition:background .2s,border-color .2s,box-shadow .2s}
+.payment-state.is-checking{background:#fff0f0;border-color:#ffb7b7;box-shadow:0 0 0 3px rgba(220,38,38,.07)}
+.payment-state.is-checking .state-pulse{background:#ef3038;box-shadow:0 0 0 0 rgba(239,48,56,.55);animation:paymentLivePulse 1.15s infinite}
+.payment-state.is-checking b{color:#c5222b}
+.payment-state.is-pending{background:#fff8df;border-color:#f1d77e}
+.payment-state.is-pending .state-pulse{background:#e5a000;box-shadow:0 0 0 4px rgba(229,160,0,.15)}
+.payment-state.is-pending b{color:#946400}
+.payment-state.is-success{background:#eaf8ef;border-color:#9edbb2}
+.payment-state.is-success .state-pulse{background:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.15)}
+.payment-state.is-success b{color:#14753a}
+.payment-state.is-error{background:#fff0f0;border-color:#f1b5b5}
+.payment-state.is-error .state-pulse{background:#dc2626;box-shadow:0 0 0 4px rgba(220,38,38,.13)}
+.payment-state.is-error b{color:#b4232c}
+@keyframes paymentLivePulse{0%{box-shadow:0 0 0 0 rgba(239,48,56,.55)}70%{box-shadow:0 0 0 9px rgba(239,48,56,0)}100%{box-shadow:0 0 0 0 rgba(239,48,56,0)}}
