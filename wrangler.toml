@@ -1,0 +1,6 @@
+name = "boxcellink"
+compatibility_date = "2026-11-05"
+pages_build_output_dir = "./public"
+
+# Root /functions contains Cloudflare Pages Functions.
+# Supabase Edge Functions in /supabase/functions are deployed separately.
