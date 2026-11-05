@@ -1,6 +1,22 @@
 (() => {
   const grid = document.getElementById('telegramGrid');
   if (!grid) return;
+
+  // Remove the legacy Telegram account notice and thumbnail overlays. These
+  // elements are no longer part of the catalogue and must never cover media.
+  const removeLegacyOverlays = () => {
+    document.querySelectorAll([
+      '.telegram-warning-float',
+      '.telegram-cover-label',
+      '.telegram-premium-badge',
+      '.telegram-access-badge',
+      '.telegram-premium-overlay',
+      '.telegram-account-notice'
+    ].join(',')).forEach(element => element.remove());
+  };
+  removeLegacyOverlays();
+  const legacyOverlayObserver = new MutationObserver(removeLegacyOverlays);
+  legacyOverlayObserver.observe(document.documentElement, { childList: true, subtree: true });
   const PAGE_SIZE = 16;
   let allItems = [];
   let stats = new Map();
@@ -63,10 +79,9 @@
       return `<article class="telegram-review-card">
         <a class="telegram-review-cover${thumb ? '' : ' no-image'}" href="${href}" aria-label="${esc(item.title)}">
           ${thumb ? `<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add('no-image')">` : ''}
-          <span class="telegram-cover-label">${item.access === 'paid' ? (isEN() ? 'PREMIUM ACCESS' : 'AKSES PREMIUM') : (isEN() ? 'FREE ACCESS' : 'AKSES GRATIS')}</span>
         </a>
         <div class="telegram-review-content">
-          <div class="telegram-review-topline"><span>${isEN() ? 'OFFICIAL PRODUCT REVIEW' : 'REVIEW PRODUK'}</span><span class="telegram-review-type">${isEN() ? 'TELEGRAM MEDIA' : 'MEDIA TELEGRAM'}</span></div>
+          <div class="telegram-review-topline"><span>${isEN() ? 'PRODUCT REVIEW' : 'REVIEW PRODUK'}</span><span class="telegram-review-type">${isEN() ? 'TELEGRAM' : 'TELEGRAM'}</span></div>
           <h2><a href="${href}">${esc(item.title)}</a></h2>
           <p class="telegram-review-description">${esc(item.description || (isEN() ? 'Open this review to see the complete product description, media preview, access information, and purchase instructions.' : 'Buka halaman review untuk melihat deskripsi produk, pratinjau media, informasi akses, dan petunjuk pembelian secara lengkap.'))}</p>
           <div class="telegram-price-panel"><span>${isEN() ? 'ACCESS PRICE' : 'HARGA AKSES'}</span><strong>${esc(price)}</strong></div>
