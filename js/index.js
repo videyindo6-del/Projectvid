@@ -1,1 +1,68 @@
-const grid=document.getElementById('videoGrid'),pager=document.getElementById('pagination');let page=1,filter='all';const perPage=30;const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));async function render(){const {data:{user}}=await sb.auth.getUser();const {data:vipItems}=await sb.from('videos').select('id,slug,title,thumbnail_url,provider').eq('status','published').eq('access','vip').order('created_at',{ascending:false}).limit(30);document.getElementById('vipVideoStrip').innerHTML=(vipItems||[]).map(v=>`<a class=\"video-card\" href=\"/v/${encodeURIComponent(v.slug)}\">${v.thumbnail_url?`<img src=\"${esc(v.thumbnail_url)}\">`:''}<div><b>${esc(v.title)}</b><small> VIP</small></div></a>`).join('')||'<span>Belum ada video VIP.</span>';let q=sb.from('videos').select('id,slug,title,provider,thumbnail_url,access,access_scope,view_count,created_at,categories(name)',{count:'exact'}).eq('status','published').order('created_at',{ascending:false});if(filter==='public')q=q.eq('access','public');if(filter==='vip')q=q.eq('access','vip');else q=q.eq('access','public');const cat=new URLSearchParams(location.search).get('category');if(cat)q=q.eq('category_id',cat);const {data,error,count}=await q.range((page-1)*perPage,page*perPage-1);if(error){grid.textContent='Gagal memuat: '+error.message;return}const {data:profile}=user?await sb.from('profiles').select('vip_expires_at').eq('id',user.id).maybeSingle():{data:null};const vip=!!profile?.vip_expires_at&&new Date(profile.vip_expires_at)>new Date();let html='';(data||[]).forEach((v,i)=>{if(i>0&&i%4===0)html+=`<div class="ad-banner" style="grid-column:1/-1">Ruang iklan Adsterra — pasang kode banner dari dashboard Adsterra</div>`;html+=`<a class="video-card" href="/v/${encodeURIComponent(v.slug||v.id.slice(0,4))}">${v.thumbnail_url?`<img src="${esc(v.thumbnail_url)}" loading="lazy">`:'<div class="ad-banner">BOX VIDEY</div>'}<div><b>${esc(v.title)}</b><small style="display:block;color:#9eabc0">${esc(v.provider)} · ${Number(v.view_count||0).toLocaleString('id-ID')} views ${v.access==='vip'?' · VIP':''}</small></div></a>`});grid.innerHTML=html||'<p>Belum ada video.</p>';pager.innerHTML='';const pages=Math.ceil((count||0)/perPage);for(let n=1;n<=pages;n++){const b=document.createElement('button');b.textContent=n;b.disabled=n===page;b.onclick=()=>{page=n;render()};pager.append(b)}document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;page=1;document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));render()})}render();
+(() => {
+  const videoGrid = document.getElementById('homeVideoGrid');
+  const telegramGrid = document.getElementById('homeTelegramGrid');
+  const search = document.getElementById('homeSearch');
+  const clear = document.getElementById('homeSearchClear');
+  const count = document.getElementById('catalogCount');
+  if (!videoGrid || !telegramGrid) return;
+
+  let videos = [], reviews = [];
+  const lang = () => localStorage.getItem('boxcellink_lang') || 'id';
+  const en = () => lang() === 'en';
+  const t = (id, english) => en() ? english : id;
+  const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const money = value => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+  const thumb = value => {
+    let raw = String(value || '').trim(); if (!raw) return '';
+    const iframe = raw.match(/<iframe[^>]+src=["']([^"']+)/i); if (iframe) raw = iframe[1];
+    try {
+      const u = new URL(raw, location.origin); if (!['http:','https:'].includes(u.protocol)) return '';
+      const id = u.pathname.match(/\/file\/d\/([^/]+)/)?.[1] || u.searchParams.get('id');
+      if (u.hostname.includes('drive.google.com') && id) return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1000`;
+      if (u.hostname.includes('youtube.com') || u.hostname === 'youtu.be') { const vid = u.hostname === 'youtu.be' ? u.pathname.split('/').filter(Boolean)[0] : (u.searchParams.get('v') || u.pathname.match(/\/embed\/([^/]+)/)?.[1]); if (vid) return `https://i.ytimg.com/vi/${encodeURIComponent(vid)}/hqdefault.jpg`; }
+      return u.href;
+    } catch { return ''; }
+  };
+  const placeholder = (icon, label) => `<div class="home-thumb-placeholder"><i class="${icon}"></i><span>${label}</span></div>`;
+
+  function render() {
+    const q = (search?.value || '').trim().toLocaleLowerCase(en() ? 'en' : 'id');
+    const foundVideos = videos.filter(v => !q || `${v.title || ''} ${v.provider || ''}`.toLocaleLowerCase().includes(q));
+    const foundReviews = reviews.filter(r => !q || `${r.title || ''} ${r.description || ''}`.toLocaleLowerCase().includes(q));
+    if (count) count.textContent = t(`${foundVideos.length + foundReviews.length} konten ditemukan`, `${foundVideos.length + foundReviews.length} items found`);
+    if (clear) clear.hidden = !(search?.value || '').length;
+    videoGrid.innerHTML = foundVideos.length ? foundVideos.slice(0, 8).map(v => {
+      const image = thumb(v.thumbnail_url), href = `/v/${encodeURIComponent(v.slug || v.id)}`;
+      return `<article class="home-content-card"><a class="home-card-thumb" href="${href}">${image ? `<img src="${esc(image)}" alt="${esc(v.title)}" loading="lazy" onerror="this.remove()">` : placeholder('fa-solid fa-play','BOX VIDEY')}<span class="thumb-play"><i class="fa-solid fa-play"></i></span><span class="thumb-tag">BOX VIDEY</span></a><div class="home-card-body"><h3><a href="${href}">${esc(v.title)}</a></h3><div class="home-card-meta"><span><i class="fa-solid fa-circle-play"></i> ${esc(v.provider || 'Video')}</span><span>${Number(v.view_count || 0).toLocaleString(en()?'en-US':'id-ID')} ${t('views','views')}</span></div><a class="home-card-link" href="${href}">${t('Tonton video','Watch video')} <i class="fa-solid fa-arrow-right"></i></a></div></article>`;
+    }).join('') : `<div class="home-empty">${t('Video tidak ditemukan.','No videos found.')}</div>`;
+
+    telegramGrid.innerHTML = foundReviews.length ? foundReviews.slice(0, 8).map(r => {
+      const image = thumb(r.thumbnail_url) || thumb(Array.isArray(r.gallery_urls) ? (typeof r.gallery_urls[0] === 'string' ? r.gallery_urls[0] : r.gallery_urls[0]?.url) : ''), href = `/r/${encodeURIComponent(r.slug)}`;
+      const price = r.access === 'free' ? t('Gratis','Free') : money(r.price);
+      return `<article class="home-content-card"><a class="home-card-thumb" href="${href}">${image ? `<img src="${esc(image)}" alt="${esc(r.title)}" loading="lazy">` : placeholder('fa-brands fa-telegram','TELEGRAM MEDIA')}<span class="thumb-tag telegram-tag">TELEGRAM</span></a><div class="home-card-body"><div class="home-review-label">${t('REVIEW TELEGRAM','TELEGRAM REVIEW')}</div><h3><a href="${href}">${esc(r.title)}</a></h3><p class="home-review-description">${esc(r.description || t('Lihat detail review dan informasi akses media ini.','View the review details and access information for this media.')).slice(0,105)}</p><div class="home-card-meta"><span><i class="fa-solid fa-ticket"></i> ${t('Harga akses','Access price')}</span><strong>${price}</strong></div><a class="home-card-link" href="${href}">${t('Lihat review','View review')} <i class="fa-solid fa-arrow-right"></i></a></div></article>`;
+    }).join('') : `<div class="home-empty">${t('Review Telegram tidak ditemukan.','No Telegram reviews found.')}</div>`;
+  }
+
+  async function load() {
+    if (!window.sb) { videoGrid.innerHTML = telegramGrid.innerHTML = `<div class="home-empty">${t('Layanan sementara tidak tersedia.','Service is temporarily unavailable.')}</div>`; return; }
+    try {
+      const [videoResult, reviewResult] = await Promise.all([
+        sb.from('videos').select('id,slug,title,provider,thumbnail_url,access,view_count,created_at').eq('status','published').eq('access','public').order('created_at',{ascending:false}).limit(40),
+        sb.from('review_items').select('id,slug,title,description,thumbnail_url,gallery_urls,price,access,created_at').eq('status','published').order('created_at',{ascending:false}).limit(40)
+      ]);
+      if (videoResult.error) throw videoResult.error;
+      if (reviewResult.error) throw reviewResult.error;
+      videos = videoResult.data || []; reviews = reviewResult.data || [];
+      render();
+    } catch (error) {
+      console.error('Homepage content failed:', error);
+      videoGrid.innerHTML = `<div class="home-empty">${t('Video belum dapat dimuat. Silakan coba lagi nanti.','Videos could not be loaded. Please try again later.')}</div>`;
+      telegramGrid.innerHTML = `<div class="home-empty">${t('Review belum dapat dimuat. Silakan coba lagi nanti.','Reviews could not be loaded. Please try again later.')}</div>`;
+      if (count) count.textContent = t('Konten belum tersedia','Content unavailable');
+    }
+  }
+  search?.addEventListener('input', render);
+  clear?.addEventListener('click', () => { search.value = ''; search.focus(); render(); });
+  window.addEventListener('storage', e => { if (e.key === 'boxcellink_lang') render(); });
+  load();
+})();
