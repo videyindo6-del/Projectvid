@@ -19,7 +19,8 @@ async function init(){
   if(!data){const byId=await sb.from('review_items').select('id,slug,title,description,price,access,status').eq('id',slug).maybeSingle();data=byId.data}
   item=data;if(!item||item.status!=='published'){root.innerHTML='<div class="checkout-error"><h2>Konten tidak ditemukan</h2><p>Produk tidak tersedia atau belum dipublikasikan.</p></div>';return}
   let {data:{user}}=await sb.auth.getUser();
-  if(item.access==='free'){await unlock();return}
+  const accessType=String(item.access||'').trim().toLowerCase();
+  if(accessType==='free'){await unlock();return}
   if(!user){
    const {data:guestData,error:guestError}=await sb.auth.signInAnonymously();
    if(guestError||!guestData?.user)throw new Error('Pembelian tamu belum aktif. Admin perlu mengaktifkan Anonymous Sign-Ins di Supabase.');
@@ -44,7 +45,7 @@ function renderCheckout(){
   <div class="checkout-main"><div class="checkout-intro"><span class="checkout-eyebrow"><i class="fa-solid fa-bag-shopping"></i> ${t('title')}</span><h1>${esc(item.title)}</h1><p>${esc(item.description||'')}</p></div>
   ${guestCheckout?`<div class="guest-checkout-note"><i class="fa-solid fa-user-shield"></i><span>${t('guest')}</span></div>`:''}
   <section class="checkout-card"><div class="checkout-card-title"><span class="checkout-icon"><i class="fa-solid fa-receipt"></i></span><div><b>Ringkasan pesanan</b><small>Order summary</small></div><span class="checkout-status">${t('status')}</span></div>
-   <div class="checkout-product"><div class="checkout-product-icon"><i class="fa-solid fa-photo-film"></i></div><div class="checkout-product-info"><b>${esc(item.title)}</b><small>${item.access==='paid'?'Digital content':'Free content'}</small></div><strong>${rp(item.price)}</strong></div>
+   <div class="checkout-product"><div class="checkout-product-icon"><i class="fa-solid fa-photo-film"></i></div><div class="checkout-product-info"><b>${esc(item.title)}</b><small>${String(item.access||'').trim().toLowerCase()==='paid'?'Digital content':'Free content'}</small></div><strong>${rp(item.price)}</strong></div>
    <div class="checkout-line"><span>${t('normal')}</span><b>${rp(item.price)}</b></div><div class="checkout-line"><span>${t('vip')}</span><b class="${vipActive?'text-success':''}">${vipActive?t('active'):t('inactive')}</b></div>
    <div class="checkout-field"><label for="couponCode"><i class="fa-solid fa-ticket"></i> ${t('coupon')}</label><select id="couponCode"><option value="">${t('none')}</option>${couponOptions.map(c=>`<option value="${esc(c.code)}">${esc(c.code)} — ${c.discount_percent}%</option>`).join('')}</select></div>
    <div class="checkout-total"><div><small id="discountLabel">${t('discount')} 0%</small><b>${t('total')}</b></div><strong id="totalAmount">${rp(item.price)}</strong></div>
