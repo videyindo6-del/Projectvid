@@ -2,6 +2,7 @@ const root=document.getElementById('downloadCheckout');
 function getRouteCode(prefix){const p=new URLSearchParams(location.search);const q=p.get('slug')||p.get('code')||'';if(q.trim())return q.trim();const a=location.pathname.split('/').filter(Boolean),i=a.findIndex(x=>x.toLowerCase()===prefix);if(i<0||!a[i+1])return'';try{return decodeURIComponent(a[i+1]).trim()}catch{return a[i+1].trim()}}
 const slug=getRouteCode('d'),rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID'),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let item,order=null,couponOptions=[],vipActive=false,guestCheckout=false,lang=localStorage.getItem('boxcellink_lang')||'id',payTimer=null,lastPaymentData=null,polling=false;
+const PAYMENT_POLL_INTERVAL=15000; // Hindari request berlebihan ke payment gateway.
 const words={
  id:{loading:'Menyiapkan halaman pembelian...',secure:'Checkout aman',guest:'Mode pembelian tamu aktif — tidak perlu login atau membuat akun.',title:'Konfirmasi pembelian',status:'Belum dibeli',normal:'Harga normal',vip:'Status VIP',active:'Aktif · Diskon 20%',inactive:'Tidak aktif',coupon:'Kode diskon referral (opsional)',none:'Tanpa kode diskon',buy:'Beli sekarang',agreeTitle:'Persetujuan pembelian',agreeText:'Pastikan produk dan nominal pembayaran sudah benar. Setelah pembayaran dilakukan, transaksi akan diproses sesuai ketentuan.',agree:'Saya setuju untuk melanjutkan pembelian dan melakukan pembayaran sesuai nominal yang ditampilkan.',cancel:'Kembali',continue:'Setuju & lanjutkan',preparing:'Menyiapkan pembayaran',preparingText:'Menghubungkan ke Cashi dan membuat QR pembayaran yang sesuai dengan nominal transaksi.',payment:'Pembayaran Cashi',amount:'Total pembayaran',waiting:'Menunggu pembayaran',check:'Cek pembayaran',auto:'Status pembayaran diperiksa otomatis setiap 3 detik.',how:'Cara pembayaran',step1:'Buka aplikasi pembayaran yang mendukung QRIS dan siapkan fitur pemindai QR.',step2:'Pindai QR pembayaran yang tampil pada halaman ini.',step3:'Bayar tepat sesuai nominal yang tertera.',step4:'Biarkan halaman ini terbuka. Status akan diperiksa otomatis setiap 3 detik.',support:'Bantuan pembayaran',supportText:'Jika pembayaran berhasil tetapi status belum berubah, tunggu sebentar lalu cek kembali. Simpan bukti pembayaran dan Order ID untuk bantuan.',open:'Buka halaman Cashi',guestWarn:'Selesaikan pembayaran dan buka akses download pada browser/perangkat yang sama. Jangan hapus data situs sebelum akses terbuka.',processing:'Memeriksa pembayaran...',paid:'Pembayaran berhasil! Membuka akses...',failed:'Belum dapat memeriksa pembayaran. Silakan coba lagi.',discount:'Diskon',total:'Total setelah diskon',free:'Konten ini gratis.'},
  en:{loading:'Preparing checkout...',secure:'Secure checkout',guest:'Guest checkout is active — no login or account creation required.',title:'Confirm your purchase',status:'Not purchased',normal:'Regular price',vip:'VIP status',active:'Active · 20% discount',inactive:'Inactive',coupon:'Referral discount code (optional)',none:'No discount code',buy:'Buy now',agreeTitle:'Purchase agreement',agreeText:'Please verify the product and payment amount. Once payment is made, the transaction will be processed according to the terms.',agree:'I agree to continue with this purchase and pay the amount shown.',cancel:'Go back',continue:'Agree & continue',preparing:'Preparing payment',preparingText:'Connecting to Cashi and creating a payment QR for your exact order amount.',payment:'Cashi payment',amount:'Payment total',waiting:'Waiting for payment',check:'Check payment',auto:'Payment status is checked automatically every 3 seconds.',how:'How to pay',step1:'Open a QRIS-supported payment app and prepare its QR scanner.',step2:'Scan the payment QR displayed on this page.',step3:'Pay the exact amount shown.',step4:'Keep this page open. Payment status is checked automatically every 3 seconds.',support:'Payment support',supportText:'If payment succeeds but the status has not updated, wait briefly and check again. Keep your payment receipt and Order ID for support.',open:'Open Cashi payment page',guestWarn:'Complete payment and open your download access in the same browser/device. Do not clear site data before access is available.',processing:'Checking payment...',paid:'Payment successful! Opening access...',failed:'Unable to check payment. Please try again.',discount:'Discount',total:'Total after discount',free:'This content is free.'}
@@ -97,7 +98,12 @@ async function checkStatus(manual=false){
  else {msg.textContent=t('processing')}
  try{
   const {data,error}=await sb.functions.invoke('payment-status',{body:{order_id:order}});
-  if(error||!data?.success)throw new Error(data?.detail?.message||data?.error||error?.message||'Status check failed');
+  if(error){
+   let detail='';
+   try{const response=error.context; if(response&&typeof response.clone==='function'){const body=await response.clone().json();detail=body?.error||body?.message||body?.detail?.message||''}}catch{}
+   throw new Error(detail||error.message||'Fungsi payment-status gagal dipanggil.');
+  }
+  if(!data?.success)throw new Error(data?.error||data?.detail?.message||'Server tidak mengembalikan status pembayaran yang valid.');
   const state=String(data.status||'PENDING').toUpperCase();
   const stateEl=document.getElementById('payState');if(stateEl)stateEl.textContent=state;
   if(['SETTLED','PAID','SUCCESS','COMPLETED'].includes(state)){
@@ -106,11 +112,11 @@ async function checkStatus(manual=false){
   if(['FAILED','EXPIRED','CANCELLED','CANCELED'].includes(state)){
    msg.textContent=`Status: ${state}. Hubungi admin jika pembayaran sudah terpotong.`;
   } else msg.textContent=manual?`Status: ${state} · ${t('auto')}`:t('auto');
- }catch(e){msg.textContent=t('failed')}
+ }catch(e){msg.textContent=`${t('failed')} (${String(e?.message||'Kesalahan tidak diketahui').slice(0,180)})`;console.error('BoxCellink payment-status:',e)}
  finally{
   polling=false;
   if(manual&&document.getElementById('checkPay')){btn.disabled=false;btn.innerHTML=`<i class="fa-solid fa-rotate"></i> ${t('check')}`}
-  if(order&&document.getElementById('checkPay'))payTimer=setTimeout(()=>checkStatus(false),3000);
+  if(order&&document.getElementById('checkPay'))payTimer=setTimeout(()=>checkStatus(false),PAYMENT_POLL_INTERVAL);
  }
 }
 async function unlock(){if(payTimer)clearTimeout(payTimer);location.replace('/paste/'+encodeURIComponent(item.slug))}
