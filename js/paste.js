@@ -112,11 +112,13 @@ async function run() {
     });
   } catch (error) {
     const message = error?.message || 'Akses belum tersedia.';
+    const returnTo = location.pathname + location.search;
+    const needsLogin = /sesi login tidak valid|login ulang|login diperlukan|konten ini berbayar/i.test(message);
     root.innerHTML = `
       <h1>Akses belum tersedia</h1>
       <p>${esc(message)}</p>
       <a class="btn primary" href="/d/${encodeURIComponent(slug)}">Periksa status / lanjutkan pembayaran</a>
-      <p><a href="/login.html?next=${encodeURIComponent(location.pathname + location.search)}">Login ke akun lain</a></p>`;
+      ${needsLogin ? `<p><a href="/login.html?next=${encodeURIComponent(returnTo)}">Login dengan akun pembelian</a></p>` : ''}`;
   }
 }
 
