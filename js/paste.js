@@ -33,10 +33,8 @@ async function run() {
     if (!window.sb) throw new Error('Supabase belum terkonfigurasi. Periksa js/config.js.');
     if (!slug) throw new Error('Kode review tidak terbaca. Pastikan URL berbentuk /paste/KODE_REVIEW.');
 
-    const { data: authData, error: authError } = await sb.auth.getUser();
-    if (authError || !authData?.user) {
-      throw new Error('Silakan login menggunakan akun admin atau akun yang sudah membeli konten ini.');
-    }
+    // Free content is public and does not require login. The Edge Function
+    // enforces login + entitlement only when the selected review is PAID.
 
     // The public page can read published review metadata. The Edge Function
     // performs the authoritative admin/entitlement check and reads private links.
