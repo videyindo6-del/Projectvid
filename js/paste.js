@@ -66,12 +66,50 @@ async function run() {
     }
 
     const data = result.data;
+    const downloadUrl = new URL(String(data.download_url || ''));
+    if (!['http:', 'https:'].includes(downloadUrl.protocol)) {
+      throw new Error('Link download dari admin tidak valid. Periksa kembali pengaturan link di panel admin.');
+    }
+
+    const accessLabel = data.is_admin
+      ? 'AKSES ADMIN TERVERIFIKASI'
+      : (String(item.access || '').trim().toLowerCase() === 'free' ? 'FREE ACCESS' : 'AKSES PEMBELIAN TERVERIFIKASI');
+    const accessMessage = data.is_admin
+      ? 'Akses admin berhasil diverifikasi. Link download yang diterapkan admin tersedia di bawah ini.'
+      : (String(item.access || '').trim().toLowerCase() === 'free'
+          ? 'Konten ini gratis. Link download yang diterapkan admin tersedia di bawah ini.'
+          : 'Pembelian berhasil diverifikasi. Link download yang diterapkan admin tersedia di bawah ini.');
+
     root.innerHTML = `
-      <span class="eyebrow">${data.is_admin ? 'AKSES ADMIN TERVERIFIKASI' : 'AKSES TERVERIFIKASI'}</span>
+      <span class="eyebrow">${accessLabel}</span>
       <h1>${esc(data.title || item.title)}</h1>
-      <p>${data.is_admin ? 'Akses admin berhasil diverifikasi.' : 'Hak akses pembelian berhasil diverifikasi.'} Link download tersedia di bawah ini.</p>
+      <p>${accessMessage}</p>
       ${data.content_after_payment ? `<div class="watch-card"><p>${esc(data.content_after_payment)}</p></div>` : ''}
-      <a class="btn primary" href="${esc(data.download_url)}" target="_blank" rel="noopener noreferrer">Download Sekarang</a>`;
+      <div class="paste-download-link" style="margin:18px 0;padding:16px;border:1px solid var(--border-color,#dbe2ea);border-radius:14px;background:var(--card-bg,#fff)">
+        <div style="font-size:12px;font-weight:700;letter-spacing:.06em;opacity:.7;margin-bottom:8px">LINK DOWNLOAD DARI PANEL ADMIN</div>
+        <a id="pasteDownloadUrl" href="${esc(downloadUrl.href)}" target="_blank" rel="noopener noreferrer" style="display:block;overflow-wrap:anywhere;word-break:break-word;margin-bottom:12px">${esc(downloadUrl.href)}</a>
+        <button class="btn" type="button" id="copyPasteDownloadUrl">Salin Link</button>
+      </div>
+      <a class="btn primary" href="${esc(downloadUrl.href)}" target="_blank" rel="noopener noreferrer">Download Sekarang</a>`;
+
+    document.getElementById('copyPasteDownloadUrl')?.addEventListener('click', async () => {
+      const button = document.getElementById('copyPasteDownloadUrl');
+      try {
+        await navigator.clipboard.writeText(downloadUrl.href);
+        button.textContent = 'Link berhasil disalin ✓';
+      } catch (_) {
+        const field = document.createElement('textarea');
+        field.value = downloadUrl.href;
+        field.setAttribute('readonly', '');
+        field.style.position = 'absolute';
+        field.style.left = '-9999px';
+        document.body.appendChild(field);
+        field.select();
+        const copied = document.execCommand('copy');
+        field.remove();
+        button.textContent = copied ? 'Link berhasil disalin ✓' : 'Salin manual dari link di atas';
+      }
+    });
   } catch (error) {
     const message = error?.message || 'Akses belum tersedia.';
     root.innerHTML = `
