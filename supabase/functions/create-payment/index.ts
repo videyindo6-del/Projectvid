@@ -68,10 +68,10 @@ Deno.serve(async req=>{
    if(couponCode) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
    throw gatewayError;
   }
-  if(!response.ok||!result?.success||!result?.checkout_url){
+  if(!response.ok||!result?.success||!result?.checkout_url||!String(result?.orderId||result?.order_id||'').trim()){
    await admin.from('cashi_orders').update({status:'FAILED',gateway_payload:result||{}}).eq('order_id',order_id);
    if(couponCode) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
-   return reply({error:result?.message||'Cashi gagal membuat pembayaran'},502);
+   return reply({error:result?.message||'Cashi gagal membuat pembayaran atau tidak mengembalikan Order ID Cashi'},502);
   }
   const {error:updateError}=await admin.from('cashi_orders').update({checkout_url:result.checkout_url,gateway_payload:result}).eq('order_id',order_id);
   if(updateError){
@@ -79,6 +79,6 @@ Deno.serve(async req=>{
    if(couponCode) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
    throw updateError;
   }
-  return reply({success:true,order_id,amount,base_amount:baseAmount,discount_percent:discountPercent,checkout_url:result.checkout_url,qrUrl:result.qrUrl||null,expires_at:result.expires_at||null});
+  return reply({success:true,order_id,provider_order_id:String(result.orderId||result.order_id),amount,base_amount:baseAmount,discount_percent:discountPercent,checkout_url:result.checkout_url,qrUrl:result.qrUrl||null,expires_at:result.expires_at||null});
  } catch(e) { console.error(e); return reply({error:e.message||'Internal error'},500); }
 });
