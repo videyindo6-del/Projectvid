@@ -1,0 +1,59 @@
+
+/* Account Center — warm ivory SaaS theme */
+body:has(.account-page){background:#f7f5ef!important;color:#292d35!important}
+.account-page{color:#292d35!important}
+.account-page .account-hero{background:linear-gradient(130deg,#fffefa 0%,#f0eee6 100%)!important;border:1px solid #e8e3d8!important;box-shadow:0 18px 48px rgba(65,55,35,.08)!important}
+.account-kicker,.section-eyebrow{color:#8a7042!important}
+.account-hero h1{color:#292d35!important}
+.account-hero p,.account-hero-meta{color:#6e6a60!important}
+.account-hero-meta i{color:#a9874e!important}
+.hero-orbit{border-color:#c9b98f!important}.hero-glass{background:linear-gradient(145deg,#d9c99f,#b49b68)!important;color:#fff!important;box-shadow:0 12px 35px #8d784b30!important}
+.hero-float{background:#fffefa!important;border-color:#e8dfcd!important;color:#947944!important;box-shadow:0 6px 20px #76643a18!important}
+.account-notice{background:#fffefa!important;border-color:#e8dfd0!important;color:#625b4d!important}
+.account-notice.is-success{background:#f0f8f1!important;border-color:#cfe5d2!important;color:#28633a!important}
+.account-notice.is-error{background:#fff3f0!important;border-color:#f0d0c8!important;color:#8b3528!important}
+.account-overview .overview-card,.account-page .account-panel,.account-page .media-section,.account-empty,.account-simple-row,.library-item,.purchase-row{background:#fffefa!important;border:1px solid #e9e4da!important;box-shadow:0 8px 24px rgba(55,48,32,.045)!important}
+.overview-card{background:#fffefa!important}.overview-icon{background:#f2eee4!important;border-color:#e6ddca!important;color:#927747!important}
+.membership-icon{background:#f8f0dc!important;color:#a37b2e!important;border-color:#ebddbd!important}
+.secure-icon{background:#edf4ed!important;color:#4e805b!important;border-color:#d8e7d8!important}
+.overview-card small,.overview-muted,.account-panel label,.panel-heading p,.account-panel form>small,.section-heading p,.library-info p,.library-price,.account-simple-row small,.purchase-row small{color:#777367!important}
+.overview-card b,.section-heading h2,.panel-heading h3,.library-info h3,.account-simple-row b,.account-empty>b{color:#302f2a!important}
+.section-heading h2>i{color:#a78950!important}.section-heading-icon{background:#f4f0e6!important;border-color:#e7dfcf!important;color:#987c48!important}
+.account-panel input{background:#fff!important;border-color:#e3ded3!important;color:#333!important}
+.account-panel input:focus{border-color:#b49a66!important;box-shadow:0 0 0 3px #b49a661c!important}
+.account-panel input::placeholder{color:#aaa397!important}
+.account-action{background:linear-gradient(135deg,#9b804b,#80683c)!important;border-color:#8c7446!important;color:#fff!important}
+.library-count{background:#f3eee2!important;border-color:#e7dcc5!important;color:#846b3d!important}
+.library-toolbar{background:#f7f4ec!important;border-color:#e9e2d4!important;color:#777263!important}
+.library-thumb,.simple-row-icon{background:#f0ece2!important;border-color:#e5dece!important;color:#927747!important}
+.tag-purchased{background:#edf6ed!important;color:#477b50!important}.tag-access{background:#f1eee6!important;color:#887044!important}
+.library-check{background:#4b9860!important}.library-detail-link{color:#927747!important}
+.account-empty{background:#fffefa!important;border-color:#ded7c8!important}.account-empty>span{background:#f2eee4!important;color:#967c4d!important}
+.expired-link{background:#f1eee7!important;color:#817a6d!important}
+.group-purchase-success{background:#f0f8f1!important;border-color:#d1e6d4!important;color:#376c42!important}
+.account-upgrade{display:flex;justify-content:space-between;align-items:center;gap:22px;margin:20px 0 32px;padding:25px 30px;border:1px solid #e8ddc4;border-radius:22px;background:linear-gradient(115deg,#fffefa,#f3eddf);box-shadow:0 12px 32px rgba(74,60,32,.07)}
+.upgrade-copy{max-width:760px}.upgrade-kicker{display:inline-flex;align-items:center;gap:7px;color:#947744;font-size:10px;font-weight:900;letter-spacing:1.3px}
+.account-upgrade h2{margin:9px 0 7px;color:#302d26;font-size:22px}.account-upgrade p{margin:0;color:#777064;font-size:12px;line-height:1.7}
+.account-upgrade ul{display:grid;gap:7px;margin:13px 0 17px;padding:0;list-style:none;color:#625d52;font-size:12px}
+.account-upgrade li{display:flex;align-items:center;gap:8px}.account-upgrade li:before{content:"✓";display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#e9f2e8;color:#4c8052;font-weight:900}
+.upgrade-button{min-width:160px}.upgrade-emblem{width:94px;height:94px;display:grid;align-content:center;justify-items:center;gap:3px;flex:none;border:1px solid #e5d4ad;border-radius:27px;background:linear-gradient(145deg,#f8efd9,#e9d8b4);color:#9a793d;box-shadow:inset 0 1px #fff;font-size:26px}.upgrade-emblem span{font-size:11px;font-weight:950;letter-spacing:2px}
+.account-library-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.library-item{grid-template-columns:90px minmax(0,1fr);align-items:start;padding:12px}
+.library-thumb{width:90px;height:78px;grid-row:span 2}.library-actions{grid-column:1/-1;display:flex;align-items:center;min-width:0}.library-actions .account-action{flex:1}.library-detail-link{padding:10px}
+.account-pagination{display:flex;justify-content:center;align-items:center;gap:15px;padding:18px 0 2px;color:#716b5e;font-size:12px;font-weight:800}
+.account-pagination button{padding:9px 14px;border:1px solid #e2dacb;border-radius:10px;background:#fffefa;color:#79643d;font:inherit;cursor:pointer}
+.account-pagination button:disabled{opacity:.4;cursor:not-allowed}
+.watch-history-strip{display:flex;gap:14px;overflow-x:auto;padding:3px 2px 14px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.history-card{flex:0 0 235px;overflow:hidden;border:1px solid #e8e2d7;border-radius:16px;background:#fffefa;scroll-snap-align:start;box-shadow:0 7px 20px #51452a0b}
+.history-card>img,.history-placeholder{display:block;width:100%;height:132px;object-fit:cover;background:#eee9dd}
+.history-placeholder{display:grid;place-items:center;color:#a28a5a;font-size:25px}
+.history-card-info{display:grid;gap:7px;padding:12px}
+.history-card-info b{color:#343129;font-size:12px;line-height:1.45}.history-card-info small{color:#817b70;font-size:10px}
+.history-card-info a{color:#947744;text-decoration:none;font-size:11px;font-weight:850}
+.email-change-notice{align-items:flex-start!important}.email-change-notice>div{display:grid;gap:8px}
+.email-change-flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:5px 0}
+.email-change-flow del{color:#9b8e85;font-size:12px}.email-change-flow>i{color:#9b804b}
+.email-change-flow strong{font-size:15px;color:#27864a;text-shadow:0 0 8px #73d78c,0 0 18px #b2f0bd;animation:emailGlow 1.8s ease-in-out infinite alternate}
+.email-change-notice small{color:#65705e!important;font-size:10px}
+@keyframes emailGlow{from{text-shadow:0 0 4px #9be5a8}to{text-shadow:0 0 9px #55c875,0 0 20px #b5efbd}}
+@media(max-width:680px){.account-upgrade{padding:20px;align-items:flex-start}.upgrade-emblem{width:65px;height:65px;border-radius:19px;font-size:19px}.account-library-grid{grid-template-columns:1fr}.library-item{grid-template-columns:76px minmax(0,1fr)}.library-thumb{width:76px;height:68px}.history-card{flex-basis:210px}}
