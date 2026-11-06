@@ -1,1 +1,118 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Akun Saya — BoxCellink</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link rel="stylesheet" href="css/shared.css"><link rel="stylesheet" href="css/member-pages.css"><link rel="stylesheet" href="css/upgrade-pages.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"></head><body><div data-component="navbar"></div><main class="page"><header class="upgrade-hero"><span class="eyebrow">ACCOUNT CENTER</span><h1>Akun Saya</h1><p>Kelola informasi akun, keamanan, status membership, dan akses pembelian.</p></header><div id="accountNotice" class="discount-explain" hidden></div><section class="account-grid"><article class="account-panel"><h2>Informasi Akun</h2><div class="account-field"><small>Nama akun</small><b id="accountName">—</b></div><div class="account-field"><small>Status akun</small><b id="accountStatus">—</b></div><div class="account-field"><small>Gmail / Email</small><b id="accountEmail">—</b></div></article><article class="account-panel"><h2>Ganti Gmail</h2><form id="emailForm"><label>Email baru</label><input id="newEmail" type="email" required placeholder="nama@email.com"><button class="btn primary">Kirim konfirmasi email</button><small>Supabase akan mengirim tautan konfirmasi ke email baru.</small></form></article><article class="account-panel"><h2>Ganti Kata Sandi</h2><form id="passwordForm"><label>Kata sandi baru</label><input id="newPassword" type="password" minlength="8" required placeholder="Minimal 8 karakter"><button class="btn primary">Perbarui kata sandi</button></form></article></section><div id="groupPurchaseSuccess" class="group-purchase-success" hidden></div><section class="plans"><h2><i class="fa-brands fa-telegram"></i> Riwayat Pembelian Media Telegram</h2><p>Media yang sudah berhasil dibeli dan akses review yang tersedia di akun ini.</p><div id="purchaseLinks" class="purchase-list">Memuat riwayat pembelian...</div></section><section class="plans"><h2><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Tonton BoxVidey</h2><p>Video yang pernah kamu buka akan tercatat di sini.</p><div id="watchHistory" class="purchase-list">Memuat riwayat tontonan...</div></section><section class="plans"><h2>Group VIP Telegram</h2><div id="groupLinks" class="purchase-list">Memuat akses group...</div></section></main><div data-component="footer"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script><script src="components.js"></script><script src="js/account.js"></script><script src="js/page-i18n.js"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1424">
+<title>Akun Saya — BoxCellink</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="css/shared.css">
+<link rel="stylesheet" href="css/member-pages.css">
+<link rel="stylesheet" href="css/upgrade-pages.css">
+<link rel="stylesheet" href="/css/navbar.css">
+<link rel="stylesheet" href="/css/footer.css">
+</head>
+<body>
+<div data-component="navbar"></div>
+<main class="page account-page">
+  <section class="account-hero">
+    <div class="account-hero-copy">
+      <span class="account-kicker"><i class="fa-solid fa-grid-2"></i> BOXCELLINK / ACCOUNT CENTER</span>
+      <h1>Akun Saya</h1>
+      <p>Kelola profil, keamanan akun, membership, dan seluruh media Telegram yang sudah kamu beli dalam satu tempat.</p>
+      <div class="account-hero-meta">
+        <span><i class="fa-solid fa-shield-halved"></i> Secure account</span>
+        <span><i class="fa-solid fa-bolt"></i> Instant access</span>
+      </div>
+    </div>
+    <div class="account-hero-art" aria-hidden="true">
+      <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+      <div class="hero-glass"><i class="fa-solid fa-user-astronaut"></i></div>
+      <span class="hero-float float-check"><i class="fa-solid fa-check"></i></span>
+      <span class="hero-float float-lock"><i class="fa-solid fa-lock"></i></span>
+    </div>
+  </section>
+
+  <div id="accountNotice" class="account-notice" hidden></div>
+  <section class="account-overview" aria-label="Account overview">
+    <article class="overview-card overview-identity">
+      <span class="overview-icon"><i class="fa-solid fa-user"></i></span>
+      <div><small data-account-i18n="account">Akun</small><b id="accountName">Memuat...</b><span id="accountEmail" class="overview-muted">—</span></div>
+    </article>
+    <article class="overview-card">
+      <span class="overview-icon membership-icon"><i class="fa-solid fa-crown"></i></span>
+      <div><small data-account-i18n="membership">Membership</small><b id="accountStatus">Memeriksa status...</b><span class="overview-muted" data-account-i18n="membership_desc">Status akses akun saat ini</span></div>
+    </article>
+    <article class="overview-card">
+      <span class="overview-icon secure-icon"><i class="fa-solid fa-fingerprint"></i></span>
+      <div><small data-account-i18n="security">Keamanan</small><b data-account-i18n="protected">Akun terlindungi</b><span class="overview-muted" data-account-i18n="security_desc">Dikelola melalui Supabase Auth</span></div>
+    </article>
+  </section>
+
+  <section class="account-section">
+    <div class="section-heading">
+      <div><span class="section-eyebrow" data-account-i18n="personal_settings">PERSONAL SETTINGS</span><h2 data-account-i18n="account_settings">Pengaturan Akun</h2><p data-account-i18n="settings_desc">Perbarui informasi login dan jaga keamanan akunmu.</p></div>
+      <span class="section-heading-icon"><i class="fa-solid fa-sliders"></i></span>
+    </div>
+    <div class="account-grid">
+      <article class="account-panel">
+        <div class="panel-heading"><span class="panel-icon"><i class="fa-solid fa-envelope"></i></span><div><h3 data-account-i18n="change_email">Ganti Email</h3><p data-account-i18n="email_desc">Perbarui alamat email akun.</p></div></div>
+        <form id="emailForm">
+          <label for="newEmail" data-account-i18n="new_email">Email baru</label>
+          <input id="newEmail" type="email" required autocomplete="email" placeholder="nama@email.com">
+          <button class="account-action" type="submit"><i class="fa-solid fa-paper-plane"></i><span data-account-i18n="send_confirmation">Kirim konfirmasi</span></button>
+          <small data-account-i18n="email_hint">Konfirmasi akan dikirim ke alamat email baru.</small>
+        </form>
+      </article>
+      <article class="account-panel">
+        <div class="panel-heading"><span class="panel-icon password-icon"><i class="fa-solid fa-key"></i></span><div><h3 data-account-i18n="change_password">Ganti Kata Sandi</h3><p data-account-i18n="password_desc">Gunakan kata sandi yang kuat.</p></div></div>
+        <form id="passwordForm">
+          <label for="newPassword" data-account-i18n="new_password">Kata sandi baru</label>
+          <input id="newPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Minimal 8 karakter">
+          <button class="account-action" type="submit"><i class="fa-solid fa-shield-halved"></i><span data-account-i18n="update_password">Perbarui kata sandi</span></button>
+          <small data-account-i18n="password_hint">Minimal 8 karakter untuk keamanan akun.</small>
+        </form>
+      </article>
+    </div>
+  </section>
+
+  <section class="account-section media-section">
+    <div class="section-heading">
+      <div><span class="section-eyebrow" data-account-i18n="your_library">YOUR LIBRARY</span><h2><i class="fa-brands fa-telegram telegram-heading-icon"></i> <span data-account-i18n="telegram_media">Media Telegram Saya</span></h2><p data-account-i18n="library_desc">Semua review yang sudah berhasil kamu beli akan otomatis tersimpan di sini.</p></div>
+      <span class="library-count" id="purchaseCount">0 <span data-account-i18n="items">MEDIA</span></span>
+    </div>
+    <div class="library-toolbar">
+      <span><i class="fa-solid fa-circle-check"></i> <span data-account-i18n="verified_purchases">Pembelian terverifikasi</span></span>
+      <span><i class="fa-solid fa-cloud-arrow-down"></i> <span data-account-i18n="access_anytime">Akses dari halaman akun</span></span>
+    </div>
+    <div id="purchaseLinks" class="purchase-list account-library" aria-live="polite">
+      <div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_library">Memuat media Telegram...</span></div>
+    </div>
+  </section>
+
+  <div id="groupPurchaseSuccess" class="group-purchase-success" hidden></div>
+
+  <section class="account-section">
+    <div class="section-heading">
+      <div><span class="section-eyebrow" data-account-i18n="recent_activity">RECENT ACTIVITY</span><h2><i class="fa-solid fa-clock-rotate-left"></i> <span data-account-i18n="watch_history">Riwayat Tonton</span></h2><p data-account-i18n="watch_desc">Lanjutkan video BoxVidey yang pernah kamu buka.</p></div>
+    </div>
+    <div id="watchHistory" class="purchase-list">
+      <div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_history">Memuat riwayat tontonan...</span></div>
+    </div>
+  </section>
+
+  <section class="account-section">
+    <div class="section-heading">
+      <div><span class="section-eyebrow" data-account-i18n="exclusive_access">EXCLUSIVE ACCESS</span><h2><i class="fa-brands fa-telegram telegram-heading-icon"></i> <span data-account-i18n="vip_groups">Group VIP Telegram</span></h2><p data-account-i18n="groups_desc">Kelola undangan group VIP yang sudah kamu beli.</p></div>
+    </div>
+    <div id="groupLinks" class="purchase-list"><div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_groups">Memuat akses group...</span></div></div>
+  </section>
+</main>
+<div data-component="footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="components.js"></script>
+<script src="js/account.js"></script>
+<script src="js/page-i18n.js"></script>
+</body>
+</html>
