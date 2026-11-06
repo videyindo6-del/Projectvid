@@ -180,3 +180,72 @@ body:has(.review-shell) main.container{width:min(1180px,94%);max-width:1180px;ma
  .purchase-strip{align-items:stretch}
  .purchase-btn{width:100%}
 }
+
+
+/* =====================================================
+   REVIEW DETAIL — PREMIUM COMPACT LAYOUT
+===================================================== */
+.review-heading{padding:4px 2px 2px!important}
+.review-heading h1{font-size:clamp(24px,3vw,34px)!important;margin:4px 0 6px!important}
+.review-lead{font-size:13px!important;line-height:1.55!important;max-width:680px}
+.gallery-panel{padding:clamp(12px,2vw,22px)!important}
+.gallery-head{margin-bottom:10px!important}
+.gallery-head b{font-size:14px!important}
+.gallery-head small{font-size:11px!important}
+.review-gallery{margin:12px 0 4px!important;overflow:hidden!important}
+.review-gallery-track{display:flex!important;gap:12px!important;overflow-x:auto!important;scroll-snap-type:x mandatory!important;scroll-behavior:smooth!important;scrollbar-width:none!important}
+.review-gallery-track::-webkit-scrollbar{display:none!important}
+.review-gallery-track>.review-gallery-item{flex:0 0 100%!important;width:100%!important;min-width:100%!important;min-height:clamp(260px,52vw,620px)!important;scroll-snap-align:start!important}
+.review-gallery-item>img{width:100%!important;height:clamp(260px,52vw,620px)!important;max-height:none!important;object-fit:contain!important}
+.review-gallery-embed iframe{height:clamp(260px,52vw,620px)!important}
+.gallery-controls[hidden]{display:none!important}
+.gallery-controls{padding-top:10px!important;gap:12px!important}
+.gallery-controls button{width:36px!important;height:36px!important;transition:transform .2s,background .2s,box-shadow .2s!important}
+.gallery-controls button:hover{transform:translateY(-2px);box-shadow:0 7px 16px #245b9920}
+.product-info-panel{padding:16px 18px!important}
+.product-description .review-kicker{font-size:9px!important}
+.product-description h2{font-size:16px!important;margin:4px 0!important}
+.product-description p{font-size:12px!important;line-height:1.55!important}
+.product-stats{gap:10px!important;margin:12px 0!important;padding:10px 0!important}
+.product-stats>div{min-width:115px!important;gap:8px!important}
+.product-stats>div>i{width:32px!important;height:32px!important;font-size:13px!important;border-radius:10px!important}
+.product-stats b{font-size:13px!important}
+.product-stats small{font-size:10px!important}
+.purchase-strip{gap:12px!important}
+.purchase-strip>div>small{font-size:9px!important}
+.purchase-strip>div>strong{font-size:19px!important}
+.purchase-note{font-size:10px!important}
+.purchase-btn{position:relative;overflow:hidden;min-height:46px!important;transition:transform .2s,box-shadow .2s!important;animation:reviewDownloadPulse 2.8s ease-in-out infinite}
+.purchase-btn:hover{transform:translateY(-3px) scale(1.015)!important;box-shadow:0 13px 28px #245b9940!important}
+.purchase-btn:active{transform:scale(.96)!important;filter:brightness(.92)}
+.purchase-btn i{transition:transform .25s}
+.purchase-btn:hover i{transform:translateY(3px);animation:reviewDownloadBounce .65s ease-in-out infinite alternate}
+@keyframes reviewDownloadPulse{0%,100%{box-shadow:0 8px 20px #245b9925}50%{box-shadow:0 10px 26px #245b9945}}
+@keyframes reviewDownloadBounce{to{transform:translateY(4px)}}
+.related-section{margin-top:30px}
+.related-heading h2{font-size:21px!important}
+#moreReviews.video-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+.premium-related-card{display:block!important;overflow:hidden!important;border:1px solid #e5ebf3!important;border-radius:16px!important;background:#fff!important;text-decoration:none!important;box-shadow:0 8px 24px rgba(25,54,87,.055)!important;transition:transform .22s,box-shadow .22s!important}
+.premium-related-card:hover{transform:translateY(-4px)!important;box-shadow:0 16px 34px rgba(25,54,87,.12)!important}
+.premium-related-card .related-thumb{height:clamp(110px,18vw,190px);background:#edf2f8;overflow:hidden}
+.premium-related-card .related-thumb img{width:100%;height:100%;display:block;object-fit:cover}
+.related-thumb-empty{height:100%;display:grid;place-items:center;color:#91a2b6;font-size:28px}
+.related-card-info{padding:12px!important;display:grid;gap:6px}
+.related-card-info b{font-size:13px!important;line-height:1.45!important;color:#1c3856!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.related-card-info small{font-size:11px!important;color:#4775a5!important;font-weight:800}
+#reviewPages.pagination{display:flex;justify-content:center;align-items:center;gap:7px;margin:20px 0 8px}
+#reviewPages button{width:36px;height:36px;border:1px solid #dce5ef;background:#fff;border-radius:10px;color:#49627d;font-weight:800;cursor:pointer;transition:.2s}
+#reviewPages button:hover:not(:disabled),#reviewPages button.active{background:#245b99;color:#fff;border-color:#245b99;box-shadow:0 6px 15px #245b9928}
+#reviewPages button:disabled{opacity:.35;cursor:not-allowed}
+@media(max-width:600px){
+ #moreReviews.video-grid{gap:10px!important}
+ .premium-related-card .related-thumb{height:125px}
+ .related-card-info{padding:10px!important}
+ .related-card-info b{font-size:12px!important}
+ .product-info-panel{padding:13px!important}
+ .product-stats>div{min-width:calc(50% - 8px)!important}
+ .purchase-strip{align-items:flex-start!important;flex-direction:column!important}
+ .purchase-btn{width:100%!important}
+ .gallery-controls small{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.purchase-btn,.purchase-btn i{animation:none!important;transition:none!important}}
