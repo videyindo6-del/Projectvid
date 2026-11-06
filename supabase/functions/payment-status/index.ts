@@ -58,9 +58,14 @@ Deno.serve(async req => {
         provider_order_id: providerOrderIdFromCreate
       });
     }
-    const state=String(provider?.status ?? 'PENDING').toUpperCase();
+    const state=String(provider?.status ?? d?.status ?? 'PENDING').toUpperCase();
     if(state==='SETTLED') {
-      const paid=Number(provider?.amount ?? provider?.paid_amount);
+      // Cashi's documented check-status example returns status/amount/order_id
+      // at the top level. Some gateway responses wrap the same fields in data/result.
+      // Read both shapes; never treat a missing amount as a successful payment.
+      const rawPaidAmount = provider?.amount ?? provider?.paid_amount
+        ?? d?.amount ?? d?.paid_amount ?? d?.data?.amount ?? d?.data?.paid_amount;
+      const paid=Number(rawPaidAmount);
       const expected=Number(o.amount);
       // Cashi dapat melaporkan total yang dibayar pembeli (termasuk biaya/penyesuaian
       // gateway), sehingga nilainya bisa lebih besar dari nominal order lokal.
@@ -75,7 +80,14 @@ Deno.serve(async req => {
           expected_amount: expected,
           provider_amount: paid
         });
-        return out({error:'Nominal pembayaran lebih kecil atau tidak valid',expected_amount:expected,provider_amount:paid},409);
+        return out({
+          error:'Nominal pembayaran Cashi tidak cocok atau tidak tersedia',
+          expected_amount:expected,
+          provider_amount:Number.isFinite(paid)?paid:null,
+          provider_amount_raw:rawPaidAmount ?? null,
+          provider_status:state,
+          order_id
+        },409);
       }
       if(paid>expected) console.info('Cashi settled with gateway fee/overpayment', {order_id,expected_amount:expected,provider_amount:paid});
       const {data,error}=await admin.rpc('settle_cashi_order',{p_order_id:order_id,p_amount:expected,p_payload:d});
@@ -85,7 +97,7 @@ Deno.serve(async req => {
       if(o.coupon_code) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
       await admin.from('cashi_orders').update({status:state==='CANCELLED'||state==='CANCELED'?'FAILED':state}).eq('order_id',order_id);
     }
-    return out({success:true,status:state,amount:provider?.amount,order_id});
+    return out({success:true,status:state,amount:provider?.amount ?? d?.amount ?? null,order_id});
   } catch(e) {
     console.error('payment-status error',e);
     return out({error:e?.message||'Kesalahan internal saat memeriksa pembayaran'},500);
