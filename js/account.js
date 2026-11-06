@@ -115,7 +115,6 @@ function applyAccountLanguage(){
  if(pass)pass.placeholder=langA()==='en'?'At least 8 characters':'Minimal 8 karakter';
  const title=document.querySelector('title');if(title)title.textContent=langA()==='en'?'My Account — BoxCellink':'Akun Saya — BoxCellink';
 }
-document.addEventListener('boxcellink:language-change',()=>{ location.reload(); });
 async function initAccount(){
  if(!window.sb?.auth)throw new Error('Supabase client unavailable');
  const {data:{user},error:authError}=await sb.auth.getUser();
