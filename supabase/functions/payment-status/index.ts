@@ -41,7 +41,6 @@ Deno.serve(async req => {
     const success = d?.success === true || d?.data?.success === true || d?.result?.success === true;
     if(!r.ok||!success) return out({error:d?.message||d?.error||'Cashi gagal memeriksa status transaksi',detail:d},502);
 
-    const providerOrderIdFromCreate=String(o.gateway_payload?.orderId ?? o.gateway_payload?.order_id ?? order_id).trim();
     const echoedOrderId=String(provider?.order_id ?? provider?.orderId ?? d?.order_id ?? d?.orderId ?? '').trim();
     const allowedOrderIds=new Set([order_id,providerOrderIdFromCreate]);
     if(echoedOrderId && !allowedOrderIds.has(echoedOrderId)){
@@ -66,7 +65,8 @@ Deno.serve(async req => {
       // Cashi dapat mengembalikan jumlah yang dibayar pembeli setelah biaya gateway
       // (contoh dokumentasi: order 50.000, status amount 50.078). ID harus cocok
       // dan status harus SETTLED; nilai yang lebih besar diterima, yang kurang ditolak.
-      if(!Number.isFinite(paid)||paid<=0||!Number.isFinite(expected)||expected<=0||paid<expected){
+      const maxAllowed=expected+Math.ceil(expected*0.03)+100;
+      if(!Number.isSafeInteger(paid)||paid<=0||!Number.isSafeInteger(expected)||expected<=0||paid<expected||paid>maxAllowed){
         console.error('Cashi settled amount mismatch',{merchant_order_id:order_id,provider_order_id:providerOrderIdFromCreate,expected_amount:expected,provider_amount:paid,raw_amount:rawPaidAmount??null});
         return out({error:'Nominal pembayaran Cashi lebih kecil dari tagihan atau tidak tersedia',expected_amount:expected,provider_amount:Number.isFinite(paid)?paid:null,provider_amount_raw:rawPaidAmount??null,provider_status:state,order_id},409);
       }
