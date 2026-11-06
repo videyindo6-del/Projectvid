@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/member-pages.css">
 <link rel="stylesheet" href="css/upgrade-pages.css">
+<link rel="stylesheet" href="css/account-premium.css">
+<link rel="stylesheet" href="css/account-premium.css">
 <link rel="stylesheet" href="/css/navbar.css">
 <link rel="stylesheet" href="/css/footer.css">
 </head>
@@ -18,11 +20,11 @@
   <section class="account-hero">
     <div class="account-hero-copy">
       <span class="account-kicker"><i class="fa-solid fa-grid-2"></i> BOXCELLINK / ACCOUNT CENTER</span>
-      <h1>Akun Saya</h1>
-      <p>Kelola profil, keamanan akun, membership, dan seluruh media Telegram yang sudah kamu beli dalam satu tempat.</p>
+      <h1 data-account-i18n="hero_title">Akun Saya</h1>
+      <p data-account-i18n="hero_desc">Kelola profil, keamanan akun, membership, dan seluruh media yang sudah kamu beli dalam satu tempat.</p>
       <div class="account-hero-meta">
-        <span><i class="fa-solid fa-shield-halved"></i> Secure account</span>
-        <span><i class="fa-solid fa-bolt"></i> Instant access</span>
+        <span data-account-i18n="secure_label"><i class="fa-solid fa-shield-halved"></i> Secure account</span>
+        <span data-account-i18n="instant_label"><i class="fa-solid fa-bolt"></i> Instant access</span>
       </div>
     </div>
     <div class="account-hero-art" aria-hidden="true">
@@ -49,6 +51,24 @@
     </article>
   </section>
 
+  <section class="account-upgrade">
+    <div class="upgrade-copy"><span class="upgrade-kicker"><i class="fa-solid fa-crown"></i> BOXCELLINK VIP</span>
+      <h2 data-account-i18n="upgrade_title">Upgrade Status Account</h2>
+      <p data-account-i18n="upgrade_desc">Nikmati pengalaman BoxCellink yang lebih nyaman dengan status VIP.</p>
+      <ul><li data-account-i18n="benefit_no_ads">Nonton BoxVidey tanpa iklan</li><li data-account-i18n="benefit_discount">Diskon 20% untuk pembelian Review yang memenuhi syarat</li><li data-account-i18n="benefit_exclusive">Akses video khusus VIP selama masa aktif</li></ul>
+      <a class="account-action upgrade-button" href="/vip.html"><i class="fa-solid fa-arrow-up-right-from-square"></i><span data-account-i18n="upgrade_button">Upgrade ke VIP</span></a>
+    </div><div class="upgrade-emblem"><i class="fa-solid fa-crown"></i><span>VIP</span></div>
+  </section>
+
+  <section class="account-upgrade">
+    <div class="upgrade-copy"><span class="upgrade-kicker"><i class="fa-solid fa-crown"></i> BOXCELLINK VIP</span>
+      <h2 data-account-i18n="upgrade_title">Upgrade Status Account</h2>
+      <p data-account-i18n="upgrade_desc">Nikmati pengalaman BoxCellink yang lebih nyaman dengan status VIP.</p>
+      <ul><li data-account-i18n="benefit_no_ads">Nonton BoxVidey tanpa iklan</li><li data-account-i18n="benefit_discount">Diskon 20% untuk pembelian Review yang memenuhi syarat</li><li data-account-i18n="benefit_exclusive">Akses video khusus VIP selama masa aktif</li></ul>
+      <a class="account-action upgrade-button" href="/vip.html"><i class="fa-solid fa-arrow-up-right-from-square"></i><span data-account-i18n="upgrade_button">Upgrade ke VIP</span></a>
+    </div><div class="upgrade-emblem"><i class="fa-solid fa-crown"></i><span>VIP</span></div>
+  </section>
+
   <section class="account-section">
     <div class="section-heading">
       <div><span class="section-eyebrow" data-account-i18n="personal_settings">PERSONAL SETTINGS</span><h2 data-account-i18n="account_settings">Pengaturan Akun</h2><p data-account-i18n="settings_desc">Perbarui informasi login dan jaga keamanan akunmu.</p></div>
@@ -58,7 +78,9 @@
       <article class="account-panel">
         <div class="panel-heading"><span class="panel-icon"><i class="fa-solid fa-envelope"></i></span><div><h3 data-account-i18n="change_email">Ganti Email</h3><p data-account-i18n="email_desc">Perbarui alamat email akun.</p></div></div>
         <form id="emailForm">
-          <label for="newEmail" data-account-i18n="new_email">Email baru</label>
+          <label for="oldEmail" data-account-i18n="old_email">Gmail saat ini</label>
+          <input id="oldEmail" type="email" required autocomplete="email" placeholder="email-lama@gmail.com">
+          <label for="newEmail" data-account-i18n="new_email">Gmail baru</label>
           <input id="newEmail" type="email" required autocomplete="email" placeholder="nama@email.com">
           <button class="account-action" type="submit"><i class="fa-solid fa-paper-plane"></i><span data-account-i18n="send_confirmation">Kirim konfirmasi</span></button>
           <small data-account-i18n="email_hint">Konfirmasi akan dikirim ke alamat email baru.</small>
@@ -67,10 +89,14 @@
       <article class="account-panel">
         <div class="panel-heading"><span class="panel-icon password-icon"><i class="fa-solid fa-key"></i></span><div><h3 data-account-i18n="change_password">Ganti Kata Sandi</h3><p data-account-i18n="password_desc">Gunakan kata sandi yang kuat.</p></div></div>
         <form id="passwordForm">
+          <label for="passwordEmail" data-account-i18n="current_email">Gmail saat ini</label>
+          <input id="passwordEmail" type="email" required autocomplete="email" placeholder="email@gmail.com">
+          <label for="passwordEmail" data-account-i18n="current_email">Gmail saat ini</label>
+          <input id="passwordEmail" type="email" required autocomplete="email" placeholder="email@gmail.com">
           <label for="newPassword" data-account-i18n="new_password">Kata sandi baru</label>
           <input id="newPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Minimal 8 karakter">
           <button class="account-action" type="submit"><i class="fa-solid fa-shield-halved"></i><span data-account-i18n="update_password">Perbarui kata sandi</span></button>
-          <small data-account-i18n="password_hint">Minimal 8 karakter untuk keamanan akun.</small>
+          <small data-account-i18n="password_hint">Masukkan Gmail akun saat ini dan kata sandi baru (minimal 8 karakter).</small>
         </form>
       </article>
     </div>
