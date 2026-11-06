@@ -28,17 +28,35 @@ Deno.serve(async req => {
     const raw=await r.text(); let d:any;
     try { d=raw?JSON.parse(raw):{}; } catch { return out({error:'Respons check-status Cashi bukan JSON yang valid'},502); }
     if(!r.ok||!d?.success) return out({error:d?.message||'Cashi gagal memeriksa status transaksi',detail:d},502);
-    // Cashi check-status is requested using the provider order ID in the URL.
-    // Some live responses omit the order_id echo even though the request itself
-    // is scoped to that order. If Cashi does return an ID, it must match.
+    // Cashi memakai dua ID berbeda:
+    // - order_id yang kita kirim saat create-order (ID transaksi Boxcelink)
+    // - orderId yang dikembalikan create-order (ID transaksi Cashi untuk URL check-status)
+    // Pada contoh dokumentasi Cashi, check-status mengembalikan order_id merchant,
+    // bukan orderId provider. Karena itu validasi harus menerima salah satu dari
+    // dua ID yang sudah tersimpan/terikat pada order ini.
     const provider = d?.data ?? d?.result ?? d?.transaction ?? d;
-    const providerOrderId = String(provider?.order_id ?? provider?.orderId ?? '').trim();
-    if(providerOrderId && providerOrderId !== providerOrderIdFromCreate) {
-      console.error('Cashi order mismatch', {expected_provider_order_id:providerOrderIdFromCreate, received:providerOrderId});
-      return out({error:'Order ID dari Cashi tidak cocok',expected_provider_order_id:providerOrderIdFromCreate,provider_order_id:providerOrderId},409);
+    const echoedOrderId = String(provider?.order_id ?? provider?.orderId ?? '').trim();
+    const allowedOrderIds = new Set([order_id, providerOrderIdFromCreate]);
+    if(echoedOrderId && !allowedOrderIds.has(echoedOrderId)) {
+      console.error('Cashi order mismatch', {
+        merchant_order_id: order_id,
+        expected_provider_order_id: providerOrderIdFromCreate,
+        received_order_id: echoedOrderId
+      });
+      return out({
+        error:'Order ID dari Cashi tidak cocok',
+        expected_merchant_order_id:order_id,
+        expected_provider_order_id:providerOrderIdFromCreate,
+        provider_order_id:echoedOrderId
+      },409);
     }
-    if(!providerOrderId) {
-      console.warn('Cashi check-status omitted order_id; using requested provider order ID:', providerOrderIdFromCreate);
+    if(!echoedOrderId) {
+      // Tetap aman: request dilakukan memakai providerOrderId yang diambil dari
+      // gateway_payload milik order di database, bukan ID bebas dari browser.
+      console.warn('Cashi check-status omitted order_id; correlated through stored provider order ID', {
+        merchant_order_id: order_id,
+        provider_order_id: providerOrderIdFromCreate
+      });
     }
     const state=String(provider?.status ?? 'PENDING').toUpperCase();
     if(state==='SETTLED') {
@@ -47,7 +65,7 @@ Deno.serve(async req => {
       // Cashi dapat melaporkan nominal terbayar termasuk biaya gateway. Cocokkan order
       // dan batasi selisih biaya; RPC tetap menerima nominal order asli untuk settlement.
       const maxAllowed=expected+Math.ceil(expected*0.03)+100;
-      if(!Number.isFinite(paid)||paid<expected||paid>maxAllowed) return out({error:'Nominal pembayaran tidak sesuai dengan order',expected_amount:expected,provider_amount:d.amount},409);
+      if(!Number.isFinite(paid)||paid<expected||paid>maxAllowed) return out({error:'Nominal pembayaran tidak sesuai dengan order',expected_amount:expected,provider_amount:paid,maximum_accepted_amount:maxAllowed},409);
       const {data,error}=await admin.rpc('settle_cashi_order',{p_order_id:order_id,p_amount:expected,p_payload:d});
       if(error||!data?.ok) { console.error('Cashi settlement rejected',error||data); return out({error:'Pembayaran terdeteksi SETTLED tetapi aktivasi akses gagal. Hubungi admin dengan Order ID.',detail:data||error?.message},500); }
     }
