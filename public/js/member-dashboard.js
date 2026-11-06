@@ -29,11 +29,59 @@
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const num = value => Number(value || 0).toLocaleString(lang() === 'id' ? 'id-ID' : 'en-US');
   const rupiah = value => lang() === 'id' ? 'Rp ' + num(value) : 'IDR ' + num(value);
-  const thumb = (url, title, icon='fa-play') => url
-    ? `<img class="media-thumb" src="${esc(url)}" alt="${esc(title)}" loading="lazy" onerror="this.onerror=null;this.parentElement.classList.add('thumb-fallback');this.remove()">`
-    : `<div class="media-thumb thumb-fallback"><i class="fa-solid ${icon}"></i></div>`;
+  function thumbnailCandidates(url, embedUrl='') {
+    const raw = String(url || '').trim();
+    const source = String(embedUrl || '').trim();
+    const candidates = [];
+    const add = value => { if (value && /^https?:\/\//i.test(value) && !candidates.includes(value)) candidates.push(value); };
+    const normalize = value => {
+      if (!value) return '';
+      const iframe = value.match(/<iframe[^>]+src=[\"']([^\"']+)/i);
+      let clean = iframe ? iframe[1] : value;
+      try {
+        const u = new URL(clean, location.origin);
+        if (!['http:', 'https:'].includes(u.protocol)) return '';
+        if (/drive\.google\.com$/i.test(u.hostname)) {
+          const id = u.pathname.match(/\/file\/d\/([^/]+)/)?.[1] || u.searchParams.get('id');
+          if (id) return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1000`;
+        }
+        if (/youtu\.be|youtube\.com/i.test(u.hostname)) {
+          const id = u.hostname === 'youtu.be' ? u.pathname.split('/').filter(Boolean)[0] : (u.searchParams.get('v') || u.pathname.match(/\/embed\/([^/]+)/)?.[1]);
+          if (id) return `https://img.youtube.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`;
+        }
+        const videy = u.searchParams.get('id') || u.pathname.match(/(?:videy\.co\/v\/|cdn\.videy\.co\/)([a-zA-Z0-9_-]+)/i)?.[1];
+        if (/videy\.co$/i.test(u.hostname) && videy) return `https://cdn.videy.co/${encodeURIComponent(videy)}.jpg`;
+        if (/\.(mp4|webm|m3u8)(?:$|\?)/i.test(clean)) {
+          const id = u.pathname.split('/').filter(Boolean).pop()?.replace(/\.(mp4|webm|m3u8)$/i,'');
+          if (/cdn\.videy\.co$/i.test(u.hostname) && id) return `https://cdn.videy.co/${encodeURIComponent(id)}.jpg`;
+          return '';
+        }
+        return clean;
+      } catch { return ''; }
+    };
+    add(normalize(raw)); add(normalize(source));
+    return candidates;
+  }
+  window.boxThumbError = img => {
+    const list = JSON.parse(img.dataset.candidates || '[]');
+    const next = Number(img.dataset.candidateIndex || 0) + 1;
+    if (next < list.length) {
+      img.dataset.candidateIndex = String(next);
+      img.src = list[next];
+    } else {
+      img.onerror = null;
+      img.remove();
+      img.parentElement?.classList.add('thumb-fallback');
+    }
+  };
+  const thumb = (url, title, icon='fa-play', embedUrl='') => {
+    const candidates = thumbnailCandidates(url, embedUrl);
+    return candidates.length
+      ? `<img class="media-thumb" src="${esc(candidates[0])}" data-candidates="${esc(JSON.stringify(candidates))}" data-candidate-index="0" alt="${esc(title)}" loading="lazy" onerror="window.boxThumbError(this)">`
+      : `<div class="media-thumb thumb-fallback"><i class="${icon.startsWith('fa-brands') ? 'fa-brands' : 'fa-solid'} ${icon.replace('fa-brands ', '')}"></i></div>`;
+  };
   const empty = message => `<div class="member-empty"><i class="fa-regular fa-folder-open"></i><b>${esc(message)}</b><span>${esc(t('empty'))}</span></div>`;
-  const stat = (icon, value, label, color='') => `<span class="stat-item ${color}"><i class="fa-solid ${icon}"></i><b>${num(value)}</b><small>${esc(label)}</small></span>`;
+  const stat = (icon, value, label, color='') => `<span class="stat-item ${color}"><i class="${icon.startsWith('fa-brands') ? 'fa-brands' : 'fa-solid'} ${icon.replace('fa-brands ', '')}"></i><b>${num(value)}</b><small>${esc(label)}</small></span>`;
   const safeVideoUrl = v => v.slug ? `/v/${encodeURIComponent(v.slug)}` : `/watch.html?id=${encodeURIComponent(v.id)}`;
   const safeReviewUrl = r => `/r/${encodeURIComponent(r.slug || '')}`;
 
@@ -41,7 +89,7 @@
     const href = safeVideoUrl(v);
     const isVip = String(v.access || '').toLowerCase() === 'vip';
     return `<article class="member-media-card dashboard-video-card">
-      <a class="member-media-cover" href="${href}" aria-label="${esc(v.title || t('noTitle'))}">${thumb(v.thumbnail_url,v.title)}<span class="media-kind video-kind">BOXVIDEY</span><span class="access-chip ${isVip?'vip-chip':'basic-chip'}"><i class="fa-solid ${isVip?'fa-crown':'fa-circle-check'}"></i> ${isVip?t('vip'):t('basic')}</span></a>
+      <a class="member-media-cover" href="${href}" aria-label="${esc(v.title || t('noTitle'))}">${thumb(v.thumbnail_url,v.title,'fa-play',v.embed_url)}<span class="media-kind video-kind">BOXVIDEY</span><span class="access-chip ${isVip?'vip-chip':'basic-chip'}"><i class="fa-solid ${isVip?'fa-crown':'fa-circle-check'}"></i> ${isVip?t('vip'):t('basic')}</span></a>
       <div class="member-media-body"><div class="published-label"><i class="fa-solid fa-circle-check"></i> ${t('published')}</div>
         <h3><a href="${href}">${esc(v.title || t('noTitle'))}</a></h3>
         <div class="member-media-stats video-stats">${stat('fa-eye',v.view_count,t('views'),'stat-views')}${stat('fa-heart',stats.total_likes,t('likes'),'stat-likes')}${stat('fa-comment',stats.total_comments,t('comments'),'stat-comments')}</div>
@@ -51,7 +99,7 @@
 
   function reviewCard(r, stats={}) {
     const gallery = Array.isArray(r.gallery_urls) ? r.gallery_urls : [];
-    const galleryThumb = gallery.map(item => typeof item === 'string' ? item : (item?.url || item?.src || item?.thumbnail_url || '')).find(Boolean);
+    const galleryThumb = gallery.map(item => typeof item === 'string' ? item : (item?.thumbnail_url || item?.url || item?.src || '')).find(Boolean);
     const href = safeReviewUrl(r);
     const price = String(r.access || '').toLowerCase() === 'free' || Number(r.price || 0) <= 0 ? t('free') : rupiah(r.price);
     return `<article class="member-media-card dashboard-review-card">
@@ -70,12 +118,12 @@
     const href = isTelegram ? safeReviewUrl(item) : safeVideoUrl(item);
     const title = item.title || t('noTitle');
     const gallery = Array.isArray(item.gallery_urls) ? item.gallery_urls : [];
-    const cover = isTelegram ? (item.thumbnail_url || gallery.map(x => typeof x === 'string' ? x : (x?.url || x?.src || x?.thumbnail_url || '')).find(Boolean)) : item.thumbnail_url;
+    const cover = isTelegram ? (item.thumbnail_url || gallery.map(x => typeof x === 'string' ? x : (x?.thumbnail_url || x?.url || x?.src || '')).find(Boolean)) : item.thumbnail_url;
     const metric = isTelegram ? `${num(stats.total_sold)} ${t('sold').toLowerCase()}` : `${num(item.view_count)} ${t('views').toLowerCase()}`;
     const medal = index === 0 ? 'fa-trophy' : index === 1 ? 'fa-medal' : index === 2 ? 'fa-award' : 'fa-hashtag';
     return `<a class="mini-card rank-card rank-${index+1}" href="${href}">
       <span class="rank-badge"><i class="fa-solid ${medal}"></i><b>#${index+1}</b></span>
-      ${thumb(cover,title,isTelegram?'fa-brands fa-telegram':'fa-play')}
+      ${thumb(cover,title,isTelegram?'fa-brands fa-telegram':'fa-play',item.embed_url)}
       <b class="rank-title">${esc(title)}</b><span class="rank-metric">${esc(metric)}</span>
     </a>`;
   }
@@ -134,7 +182,7 @@
     async function loadVideos(page) {
       videoPage = page;
       const from=(page-1)*16, to=from+15;
-      const {data:videos,error,count} = await sb.from('videos').select('id,slug,title,thumbnail_url,view_count,access,created_at',{count:'exact'}).eq('status','published').order('created_at',{ascending:false}).range(from,to);
+      const {data:videos,error,count} = await sb.from('videos').select('id,slug,title,thumbnail_url,embed_url,view_count,access,created_at',{count:'exact'}).eq('status','published').order('created_at',{ascending:false}).range(from,to);
       if (error) { console.warn('Dashboard videos:',error.message); $('latestVideos').innerHTML=empty(t('loadError')); return; }
       const stats=await fetchVideoStats((videos||[]).map(v=>v.id));
       $('latestVideos').innerHTML=(videos||[]).map(v=>videoCard(v,stats.get(v.id)||{})).join('') || empty(t('noVideos'));
@@ -152,13 +200,13 @@
     await Promise.all([loadVideos(1),loadReviews(1)]);
 
     // VIP strip only contains published VIP videos.
-    const {data:vipVideos,error:vipError}=await sb.from('videos').select('id,slug,title,thumbnail_url,view_count,access').eq('status','published').eq('access','vip').order('created_at',{ascending:false}).limit(8);
+    const {data:vipVideos,error:vipError}=await sb.from('videos').select('id,slug,title,thumbnail_url,embed_url,view_count,access').eq('status','published').eq('access','vip').order('created_at',{ascending:false}).limit(8);
     if(vipError) console.warn('VIP videos:',vipError.message);
-    $('vipVideos').innerHTML=(vipVideos||[]).map(v=>`<a class="mini-card" href="${safeVideoUrl(v)}">${thumb(v.thumbnail_url,v.title,'fa-crown')}<b>${esc(v.title||t('noTitle'))}</b><span><i class="fa-solid fa-crown"></i> VIP · ${num(v.view_count)} ${t('views').toLowerCase()}</span></a>`).join('') || `<a class="mini-card" href="/vip.html"><i class="fa-solid fa-crown"></i><b>${t('exploreVip')}</b><span>${t('vipDesc')}</span></a>`;
+    $('vipVideos').innerHTML=(vipVideos||[]).map(v=>`<a class="mini-card" href="${safeVideoUrl(v)}">${thumb(v.thumbnail_url,v.title,'fa-crown',v.embed_url)}<b>${esc(v.title||t('noTitle'))}</b><span><i class="fa-solid fa-crown"></i> VIP · ${num(v.view_count)} ${t('views').toLowerCase()}</span></a>`).join('') || `<a class="mini-card" href="/vip.html"><i class="fa-solid fa-crown"></i><b>${t('exploreVip')}</b><span>${t('vipDesc')}</span></a>`;
 
     // Ranking uses only published rows; top ten is calculated independently from the paginated lists.
     const [{data:topVideos,error:topVideoError},{data:topReviews,error:topReviewError}] = await Promise.all([
-      sb.from('videos').select('id,slug,title,thumbnail_url,view_count,access').eq('status','published').order('view_count',{ascending:false}).limit(10),
+      sb.from('videos').select('id,slug,title,thumbnail_url,embed_url,view_count,access').eq('status','published').order('view_count',{ascending:false}).limit(10),
       sb.from('review_items').select('id,slug,title,thumbnail_url,gallery_urls,view_count,price,access').eq('status','published').order('created_at',{ascending:false}).limit(1000)
     ]);
     if(topVideoError) console.warn('Top BoxVidey:',topVideoError.message);
