@@ -3,13 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b1424">
+<meta name="theme-color" content="#f7f8fc">
 <title>Akun Saya — BoxCellink</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/member-pages.css">
 <link rel="stylesheet" href="css/upgrade-pages.css">
-<link rel="stylesheet" href="css/account-premium.css">
 <link rel="stylesheet" href="css/account-premium.css">
 <link rel="stylesheet" href="/css/navbar.css">
 <link rel="stylesheet" href="/css/footer.css">
@@ -60,14 +59,7 @@
     </div><div class="upgrade-emblem"><i class="fa-solid fa-crown"></i><span>VIP</span></div>
   </section>
 
-  <section class="account-upgrade">
-    <div class="upgrade-copy"><span class="upgrade-kicker"><i class="fa-solid fa-crown"></i> BOXCELLINK VIP</span>
-      <h2 data-account-i18n="upgrade_title">Upgrade Status Account</h2>
-      <p data-account-i18n="upgrade_desc">Nikmati pengalaman BoxCellink yang lebih nyaman dengan status VIP.</p>
-      <ul><li data-account-i18n="benefit_no_ads">Nonton BoxVidey tanpa iklan</li><li data-account-i18n="benefit_discount">Diskon 20% untuk pembelian Review yang memenuhi syarat</li><li data-account-i18n="benefit_exclusive">Akses video khusus VIP selama masa aktif</li></ul>
-      <a class="account-action upgrade-button" href="/vip.html"><i class="fa-solid fa-arrow-up-right-from-square"></i><span data-account-i18n="upgrade_button">Upgrade ke VIP</span></a>
-    </div><div class="upgrade-emblem"><i class="fa-solid fa-crown"></i><span>VIP</span></div>
-  </section>
+
 
   <section class="account-section">
     <div class="section-heading">
@@ -78,25 +70,23 @@
       <article class="account-panel">
         <div class="panel-heading"><span class="panel-icon"><i class="fa-solid fa-envelope"></i></span><div><h3 data-account-i18n="change_email">Ganti Email</h3><p data-account-i18n="email_desc">Perbarui alamat email akun.</p></div></div>
         <form id="emailForm">
-          <label for="oldEmail" data-account-i18n="old_email">Gmail saat ini</label>
-          <input id="oldEmail" type="email" required autocomplete="email" placeholder="email-lama@gmail.com">
+          <label for="oldEmail" data-account-i18n="old_email">Gmail lama</label>
+          <input id="oldEmail" type="email" required autocomplete="email" placeholder="gmail-lama@gmail.com">
           <label for="newEmail" data-account-i18n="new_email">Gmail baru</label>
-          <input id="newEmail" type="email" required autocomplete="email" placeholder="nama@email.com">
-          <button class="account-action" type="submit"><i class="fa-solid fa-paper-plane"></i><span data-account-i18n="send_confirmation">Kirim konfirmasi</span></button>
-          <small data-account-i18n="email_hint">Konfirmasi akan dikirim ke alamat email baru.</small>
+          <input id="newEmail" type="email" required autocomplete="email" placeholder="gmail-baru@gmail.com">
+          <button class="account-action" type="submit"><i class="fa-solid fa-envelope-circle-check"></i><span data-account-i18n="change_email_button">Ganti Gmail sekarang</span></button>
+          <small data-account-i18n="email_hint">Gmail akun akan langsung diperbarui setelah berhasil diproses.</small>
         </form>
       </article>
       <article class="account-panel">
         <div class="panel-heading"><span class="panel-icon password-icon"><i class="fa-solid fa-key"></i></span><div><h3 data-account-i18n="change_password">Ganti Kata Sandi</h3><p data-account-i18n="password_desc">Gunakan kata sandi yang kuat.</p></div></div>
         <form id="passwordForm">
-          <label for="passwordEmail" data-account-i18n="current_email">Gmail saat ini</label>
-          <input id="passwordEmail" type="email" required autocomplete="email" placeholder="email@gmail.com">
-          <label for="passwordEmail" data-account-i18n="current_email">Gmail saat ini</label>
-          <input id="passwordEmail" type="email" required autocomplete="email" placeholder="email@gmail.com">
+          <label for="passwordEmail" data-account-i18n="current_email">Gmail akun</label>
+          <input id="passwordEmail" type="email" required autocomplete="email" placeholder="gmail-akun@gmail.com">
           <label for="newPassword" data-account-i18n="new_password">Kata sandi baru</label>
           <input id="newPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Minimal 8 karakter">
           <button class="account-action" type="submit"><i class="fa-solid fa-shield-halved"></i><span data-account-i18n="update_password">Perbarui kata sandi</span></button>
-          <small data-account-i18n="password_hint">Masukkan Gmail akun saat ini dan kata sandi baru (minimal 8 karakter).</small>
+          <small data-account-i18n="password_hint">Masukkan Gmail akun dan kata sandi baru (minimal 8 karakter).</small>
         </form>
       </article>
     </div>
