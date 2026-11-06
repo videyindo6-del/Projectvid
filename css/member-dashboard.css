@@ -104,3 +104,26 @@
  .pager button{min-width:34px;height:35px;padding:0 9px}
 }
 .stat-comments i{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:5px;background:#65758a;color:#fff!important;font-size:9px!important}
+
+/* BoxCellink dashboard SaaS refinement */
+.member-main{max-width:1320px;padding:30px 24px 76px}
+.announce{position:relative;overflow:hidden;min-height:126px;padding:25px 28px;border:1px solid #d8e5f3;background:radial-gradient(circle at 90% 10%,rgba(76,139,207,.15),transparent 34%),linear-gradient(115deg,#edf5ff,#fff 70%);border-radius:22px}
+.announce:after{content:"";position:absolute;width:190px;height:190px;border:1px solid rgba(37,99,185,.10);border-radius:50%;right:35px;top:-105px;box-shadow:0 0 0 22px rgba(37,99,185,.025),0 0 0 45px rgba(37,99,185,.02);pointer-events:none}
+.announce h2{font-size:clamp(20px,3vw,27px);letter-spacing:-.7px;color:#173858}
+.section{margin:38px 0}
+.section-head{align-items:center;padding-bottom:13px;border-bottom:1px solid #e7edf4}
+.section-head h2{font-size:clamp(19px,2.4vw,24px);letter-spacing:-.65px;color:#173858}
+.section-head .eyebrow{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:8px;background:#edf4fc;border:1px solid #dce8f6}
+.section-head>a{display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid #dce7f2;border-radius:10px;background:#fff}
+.cat-card,.mini-card{border-radius:16px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.cat-card:hover,.mini-card:hover{transform:translateY(-3px);border-color:#bfd4e9;box-shadow:0 14px 28px rgba(16,36,63,.09)}
+.member-media-card{border-radius:20px}
+.member-media-cover{background:linear-gradient(135deg,#102d4e,#4386c7)}
+.member-media-cover .media-thumb{width:100%;height:100%;object-fit:cover}
+.member-media-cover .thumb-fallback{position:absolute;inset:0}
+.member-media-cover .thumb-fallback i{font-size:40px}
+.media-thumb{display:block}
+.rank-card .media-thumb{width:100%;height:auto;aspect-ratio:16/10;object-fit:cover}
+.review-thumb-fallback{display:grid;place-items:center;min-height:180px;background:linear-gradient(135deg,#173858,#4d8bd5);color:#fff;font-weight:800}
+.review-thumb-fallback i{font-size:32px}
+@media(max-width:700px){.member-main{padding:20px 14px 55px}.announce{padding:18px;gap:12px}.announce-icon{width:44px;height:44px;flex:0 0 44px}.section{margin:29px 0}.section-head{align-items:flex-start}.section-head h2{font-size:19px}.section-head>a{font-size:11px;padding:8px}.video-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.member-media-body{padding:11px}.member-media-body h3{font-size:13px}.member-media-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
