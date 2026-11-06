@@ -28,3 +28,14 @@ body{margin:0;background:#f6f7fa;color:#10243f;font-family:Inter,system-ui,sans-
 @media(max-width:850px){.account-page .account-hero{padding:30px}.account-hero-art{width:170px;transform:scale(.85)}.account-overview{grid-template-columns:1fr 1fr}.overview-identity{grid-column:1/-1}}
 @media(max-width:650px){.account-page{padding:18px 14px 55px}.account-page .account-hero{min-height:0;padding:25px 22px;border-radius:22px}.account-hero-art{display:none}.account-hero h1{font-size:36px}.account-hero p{font-size:12px}.account-hero-meta{gap:12px;font-size:10px}.account-overview{grid-template-columns:1fr;gap:9px;margin:13px 0 30px}.overview-identity{grid-column:auto}.overview-card{padding:13px}.account-section{margin-top:28px}.section-heading h2{font-size:19px}.section-heading p{max-width:290px}.account-grid{grid-template-columns:1fr}.account-panel{padding:18px}.media-section{padding:15px;border-radius:19px}.library-toolbar{gap:9px;display:grid}.library-item{grid-template-columns:76px minmax(0,1fr);gap:11px;padding:11px}.library-thumb{width:76px;height:68px;grid-row:span 2}.library-info h3{font-size:12px}.library-tags{margin-bottom:5px}.tag-purchased,.tag-access{font-size:8px}.library-actions{grid-column:1/-1;display:flex;min-width:0;align-items:center;padding-top:2px}.library-actions .account-action{flex:1}.library-detail-link{padding:9px}.account-simple-row{flex-wrap:wrap}.account-simple-row .account-action{width:100%}.library-count{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.library-item,.account-action{transition:none}}
+
+/* VIP Group access cards in Account Center */
+.vip-owned-group{align-items:center;gap:16px}
+.vip-owned-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;min-width:190px}
+.vip-owned-actions .account-action,.vip-owned-actions .library-detail-link{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:8px 11px;border-radius:10px;font-size:11px;font-weight:800;text-decoration:none;cursor:pointer}
+.vip-owned-actions button{border:1px solid #d8e5f2;background:#f5f9fd;color:#285f91}
+.vip-owned-actions .library-detail-link{border:0;background:transparent;color:#3974a7}
+.group-purchase-success{display:flex;align-items:center;gap:14px}
+.group-purchase-success>div{display:grid;gap:6px}
+.group-purchase-success .account-action{display:inline-flex;width:max-content;align-items:center;gap:8px;padding:9px 13px;border-radius:10px;background:#1f639e;color:#fff;text-decoration:none;font-weight:800}
+@media(max-width:640px){.vip-owned-group{align-items:flex-start;flex-wrap:wrap}.vip-owned-actions{width:100%;justify-content:flex-start;min-width:0}}
