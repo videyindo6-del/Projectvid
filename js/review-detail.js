@@ -46,7 +46,7 @@ const reviewTranslations = {
  'Pastikan slug benar dan review sudah dipublikasikan.':'Make sure the slug is correct and the review has been published.',
  'Terjadi kesalahan':'Something went wrong','Gagal memuat halaman review.':'Unable to load the review page.',
  'DETAIL PRODUK':'PRODUCT DETAILS','Cek review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.':'Review the details first. If you are interested, select Download / Buy below to continue.',
- 'Premium content':'Premium content','Free content':'Free content','Preview media produk':'Product media preview',
+ 'Premium content':'Premium content','Free content':'Free content','Preview media produk':'Product media preview','Geser ke samping untuk melihat semua media':'Swipe sideways to view all media','Media':'Media','dari':'of',
  'Seluruh media ditampilkan di halaman ini agar bisa diperiksa sebelum membeli.':'All media is displayed here so you can review it before purchasing.',
  'TENTANG PRODUK':'ABOUT THIS PRODUCT','Informasi produk belum ditambahkan oleh penjual.':'The seller has not added product information yet.',
  'Terjual':'Sold','Views':'Views','Total like':'Total likes','Total komentar':'Total comments','Published':'Published',
@@ -437,7 +437,7 @@ function setupGalleryControls(){
   if(!track)return;
   const counter=document.getElementById('galleryCounter');
   const items=[...track.children];
-  const update=()=>{const width=track.clientWidth||1;const index=Math.min(items.length,Math.max(1,Math.round(track.scrollLeft/width)+1));if(counter)counter.textContent=`${index} / ${items.length}`;};
+  const update=()=>{const first=items[0];const step=first?first.getBoundingClientRect().width+14:track.clientWidth||1;const index=Math.min(items.length,Math.max(1,Math.round(track.scrollLeft/step)+1));if(counter)counter.textContent=`${index} / ${items.length}`;};
   document.getElementById('galleryPrev')?.addEventListener('click',()=>track.scrollBy({left:-track.clientWidth,behavior:'smooth'}));
   document.getElementById('galleryNext')?.addEventListener('click',()=>track.scrollBy({left:track.clientWidth,behavior:'smooth'}));
   track.addEventListener('scroll',update,{passive:true});
@@ -641,7 +641,7 @@ async function load() {
       <div class="review-shell">
         <div class="review-topline"><span class="eyebrow"><i class="fa-solid fa-shield-halved"></i> BOXCELLINK MARKETPLACE</span><span class="review-live"><i class="fa-solid fa-circle"></i> ${v.access === 'paid' ? 'Premium content' : 'Free content'}</span></div>
         <header class="review-heading"><div><p class="review-kicker">DETAIL PRODUK</p><h1>${esc(v.title)}</h1><p class="review-lead">Cek review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.</p></div></header>
-        <section class="gallery-panel"><div class="gallery-head"><div><b><i class="fa-regular fa-images"></i> Preview media produk</b><small>Seluruh media ditampilkan di halaman ini agar bisa diperiksa sebelum membeli.</small></div><span class="gallery-count"><i class="fa-regular fa-images"></i> ${galleryImages.length} ${reviewText('media','items')}</span></div><div class="review-gallery">${galleryHTML}</div></section>
+        <section class="gallery-panel"><div class="gallery-head"><div><b><i class="fa-regular fa-images"></i> Preview media produk</b><small>Seluruh media ditampilkan di halaman ini agar bisa diperiksa sebelum membeli.</small></div><span class="gallery-count"><i class="fa-regular fa-images"></i> ${galleryImages.length} ${reviewText('media','items')}</span></div><div class="review-gallery">${galleryHTML}</div><div class="gallery-controls" aria-label="Kontrol galeri"><button type="button" id="galleryPrev" aria-label="Media sebelumnya"><i class="fa-solid fa-chevron-left"></i></button><span id="galleryCounter">1 / ${galleryImages.length}</span><button type="button" id="galleryNext" aria-label="Media berikutnya"><i class="fa-solid fa-chevron-right"></i></button><small>${reviewText("Geser ke samping untuk melihat semua media","Swipe sideways to view all media")}</small></div></section>
         <div class="review-viewer" id="reviewViewer" hidden><button type="button" class="viewer-close" aria-label="Tutup">×</button><img alt="Pratinjau gambar"></div>
         <section class="product-info-panel"><div class="product-description"><span class="review-kicker">TENTANG PRODUK</span><h2>${esc(v.title)}</h2><p>${esc(v.description || 'Informasi produk belum ditambahkan oleh penjual.')}</p></div>
           <div class="product-stats product-stats-grid">
@@ -665,6 +665,7 @@ async function load() {
       </div>`;
     applyReviewTranslations(box);
     setupGalleryViewer();
+    setupGalleryControls();
     setupReviewSocial(v.id, v.title);
     loadMore(v.id);
 
