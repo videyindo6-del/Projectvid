@@ -685,7 +685,7 @@ async function loadMore(id) {
   const target = document.getElementById('moreReviews');
   const pages = document.getElementById('reviewPages');
   if (!target) return;
-  const perPage = 4;
+  const perPage = 8;
   let allReviews = [];
   let currentPage = 1;
 
@@ -703,7 +703,15 @@ async function loadMore(id) {
       return `
         <a class="video-card premium-related-card" href="/r/${encodeURIComponent(x.slug || '')}">
           <div class="related-thumb">${thumbUrl ? `<img src="${esc(thumbUrl)}" alt="${esc(x.title)}" loading="lazy">` : `<span class="related-thumb-empty"><i class="fa-regular fa-image"></i></span>`}</div>
-          <div class="related-card-info"><b>${esc(x.title)}</b><small>${x.access === 'paid' ? rp(x.price) : reviewText('Gratis','Free')}</small></div>
+          <div class="related-card-info">
+            <b>${esc(x.title)}</b>
+            <small class="related-price">${x.access === 'paid' ? rp(x.price) : reviewText('Gratis','Free')}</small>
+            <div class="related-card-stats">
+              <span><i class="fa-solid fa-bag-shopping"></i> ${Number(x.total_sold || 0).toLocaleString(reviewEN() ? 'en-US' : 'id-ID')} ${reviewText('terjual','sold')}</span>
+              <span><i class="fa-regular fa-heart"></i> ${Number(x.total_likes || 0).toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</span>
+              <span><i class="fa-regular fa-comment"></i> ${Number(x.total_comments || 0).toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</span>
+            </div>
+          </div>
         </a>`;
     }).join('');
     if (pages) {
@@ -724,13 +732,32 @@ async function loadMore(id) {
 
   try {
     const { data, error } = await sb.from('review_items')
-      .select('slug,title,thumbnail_url,price,access')
+      .select('id,slug,title,thumbnail_url,price,access')
       .eq('status', 'published')
       .neq('id', id)
       .order('created_at', { ascending: false })
       .limit(100);
     if (error) throw error;
     allReviews = data || [];
+    // Public aggregate stats are loaded in one request for all related reviews.
+    let statsByReview = new Map();
+    try {
+      const { data: statRows, error: statsError } = await sb.rpc('get_public_review_stats');
+      if (!statsError && Array.isArray(statRows)) {
+        statsByReview = new Map(statRows.map(row => [String(row.review_id), row]));
+      }
+    } catch (statsError) {
+      console.warn('Statistik review terkait tidak tersedia:', statsError);
+    }
+    allReviews = allReviews.map(item => {
+      const row = statsByReview.get(String(item.id)) || {};
+      return {
+        ...item,
+        total_sold: Number(row.total_sold || 0),
+        total_likes: Number(row.total_likes || 0),
+        total_comments: Number(row.total_comments || 0)
+      };
+    });
     renderPage(1);
   } catch (error) {
     console.warn('Gagal memuat rekomendasi:', error);
