@@ -62,10 +62,22 @@ Deno.serve(async req => {
     if(state==='SETTLED') {
       const paid=Number(provider?.amount ?? provider?.paid_amount);
       const expected=Number(o.amount);
-      // Cashi dapat melaporkan nominal terbayar termasuk biaya gateway. Cocokkan order
-      // dan batasi selisih biaya; RPC tetap menerima nominal order asli untuk settlement.
-      const maxAllowed=expected+Math.ceil(expected*0.03)+100;
-      if(!Number.isFinite(paid)||paid<expected||paid>maxAllowed) return out({error:'Nominal pembayaran tidak sesuai dengan order',expected_amount:expected,provider_amount:paid,maximum_accepted_amount:maxAllowed},409);
+      // Cashi dapat melaporkan total yang dibayar pembeli (termasuk biaya/penyesuaian
+      // gateway), sehingga nilainya bisa lebih besar dari nominal order lokal.
+      // Status SETTLED + ID transaksi yang sudah dikorelasikan di atas adalah bukti
+      // transaksi provider; tolak hanya jika nominal tidak tersedia/tidak valid atau
+      // jumlah yang dibayar kurang dari tagihan. Settlement tetap memakai nominal order
+      // lokal, bukan nominal provider, agar ledger Boxcelink tidak berubah.
+      if(!Number.isFinite(paid)||paid<=0||!Number.isFinite(expected)||expected<=0||paid<expected) {
+        console.error('Cashi settled amount below expected amount', {
+          merchant_order_id: order_id,
+          provider_order_id: providerOrderIdFromCreate,
+          expected_amount: expected,
+          provider_amount: paid
+        });
+        return out({error:'Nominal pembayaran lebih kecil atau tidak valid',expected_amount:expected,provider_amount:paid},409);
+      }
+      if(paid>expected) console.info('Cashi settled with gateway fee/overpayment', {order_id,expected_amount:expected,provider_amount:paid});
       const {data,error}=await admin.rpc('settle_cashi_order',{p_order_id:order_id,p_amount:expected,p_payload:d});
       if(error||!data?.ok) { console.error('Cashi settlement rejected',error||data); return out({error:'Pembayaran terdeteksi SETTLED tetapi aktivasi akses gagal. Hubungi admin dengan Order ID.',detail:data||error?.message},500); }
     }
