@@ -11,6 +11,7 @@ Deno.serve(async req=>{
   const admin=createClient(url,service); const apiKey=Deno.env.get('CASHI_API_KEY'); if(!apiKey) throw new Error('CASHI_API_KEY belum disetel'); const body=await req.json(); const purpose=body.purpose;
   if(!['vip','review_download','vip_group'].includes(purpose)) return reply({error:'Jenis transaksi tidak valid'},400);
   let baseAmount=0,plan_id=null,review_id=null,vip_group_id=null,vip_group_invite_url:string|null=null,discountPercent=0,couponCode:string|null=null;
+  const requestedCoupon=purpose==='review_download'&&body.coupon_code?String(body.coupon_code).trim():'';
   const order_id=`BC${Date.now()}${crypto.randomUUID().replaceAll('-','').slice(0,8).toUpperCase()}`;
   if(purpose==='vip') {
    const {data,error}=await admin.from('vip_plans').select('id,price,status').eq('id',body.plan_id).single();
@@ -36,31 +37,47 @@ Deno.serve(async req=>{
    baseAmount=Number(data.price); review_id=data.id;
    const {data:profile}=await admin.from('profiles').select('vip_expires_at').eq('id',user.id).maybeSingle();
    if(profile?.vip_expires_at && new Date(profile.vip_expires_at)>new Date()) discountPercent=20;
-   if(body.coupon_code && String(body.coupon_code).trim()) {
-    const {data:reserved,error:reserveError}=await admin.rpc('reserve_referral_coupon',{p_user_id:user.id,p_code:String(body.coupon_code).trim(),p_order_id:order_id});
-    if(reserveError) throw reserveError;
-    if(!reserved?.ok) return reply({error:reserved?.reason||'Kode diskon tidak valid'},400);
-    couponCode=reserved.coupon_code;
-    discountPercent=Math.max(discountPercent,Number(reserved.discount_percent)||0);
-   }
   }
+  if(!Number.isSafeInteger(baseAmount)||baseAmount<2000||baseAmount>10000000) return reply({error:'Nominal harus antara Rp2.000 sampai Rp10.000.000'},400);
+
+  // Insert first: reserve_referral_coupon locks and updates this order row.
+  const {error:ins}=await admin.from('cashi_orders').insert({
+   order_id,user_id:user.id,purpose,plan_id,review_id,vip_group_id,vip_group_invite_url,
+   amount:baseAmount,base_amount:baseAmount,discount_percent:discountPercent
+  });
+  if(ins) throw ins;
+
+  if(requestedCoupon) {
+   const {data:reserved,error:reserveError}=await admin.rpc('reserve_referral_coupon',{
+    p_user_id:user.id,p_code:requestedCoupon,p_order_id:order_id
+   });
+   if(reserveError||!reserved?.ok) {
+    await admin.from('cashi_orders').delete().eq('order_id',order_id).eq('user_id',user.id);
+    if(reserveError) throw reserveError;
+    return reply({error:reserved?.reason||'Kode diskon tidak valid'},400);
+   }
+   couponCode=reserved.coupon_code;
+   discountPercent=Math.max(discountPercent,Number(reserved.discount_percent)||0);
+  }
+
   const amount=Math.round(baseAmount*(100-discountPercent)/100);
-  if(!Number.isInteger(baseAmount)||baseAmount<2000||baseAmount>10000000||amount<2000) {
+  if(amount<2000) {
    if(couponCode) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
+   await admin.from('cashi_orders').update({status:'FAILED'}).eq('order_id',order_id);
    return reply({error:'Nominal setelah diskon harus minimal Rp2.000'},400);
   }
-  const {error:ins}=await admin.from('cashi_orders').insert({
-   order_id,user_id:user.id,purpose,plan_id,review_id,vip_group_id,vip_group_invite_url,amount,base_amount:baseAmount,
-   discount_percent:discountPercent,coupon_code:couponCode
-  });
-  if(ins) {
+  const {error:amountUpdateError}=await admin.from('cashi_orders').update({
+   amount,base_amount:baseAmount,discount_percent:discountPercent,coupon_code:couponCode
+  }).eq('order_id',order_id);
+  if(amountUpdateError) {
    if(couponCode) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
-   throw ins;
+   await admin.from('cashi_orders').update({status:'FAILED'}).eq('order_id',order_id);
+   throw amountUpdateError;
   }
   let response:Response;
   let result:any;
   try {
-   response=await fetch('https://cashi.id/api/create-order',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({amount,order_id}),signal:AbortSignal.timeout(20000)});
+   response=await fetch('https://cashi.id/api/create-order',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({amount,order_id,kode_channel:'QRIS_CUSTOM'}),signal:AbortSignal.timeout(20000)});
    const raw=await response.text();
    try { result=raw ? JSON.parse(raw) : {}; } catch { throw new Error('Respons Cashi bukan JSON yang valid'); }
   } catch(gatewayError) {
