@@ -24,12 +24,13 @@ Deno.serve(async req=>{
   if(d.status!=='SETTLED'||!d.order_id) return new Response('Event ignored',{status:200});
   if(String(d.order_id).startsWith('TEST-')) return new Response('Test connection successful',{status:200});
   const admin=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-  const paid=Number(d.amount??payload.amount??0);
-  if(!Number.isSafeInteger(paid)||paid<=0) return new Response('Invalid amount',{status:400});
-  const {data:order,error:orderError}=await admin.from('cashi_orders').select('amount').eq('order_id',String(d.order_id)).maybeSingle();
+  const {data:order,error:orderError}=await admin.from('cashi_orders').select('amount,gateway_payload').eq('order_id',String(d.order_id)).maybeSingle();
   if(orderError||!order) return new Response('Order not found',{status:404});
-  const expectedAmount=Number(order.amount), maxAllowed=expectedAmount+Math.ceil(expectedAmount*0.03)+100;
-  if(paid<expectedAmount||paid>maxAllowed) return new Response('Amount mismatch',{status:400});
+  const expectedAmount=Number(order.amount);
+  const webhookAmount=d.amount??payload.amount??order.gateway_payload?.amount??null;
+  const paid=Number(webhookAmount);
+  const maxAllowed=expectedAmount+Math.ceil(expectedAmount*0.03)+100;
+  if(!Number.isSafeInteger(paid)||paid<=0||paid<expectedAmount||paid>maxAllowed) return new Response('Amount mismatch',{status:400});
   const {data,error}=await admin.rpc('settle_cashi_order',{p_order_id:String(d.order_id),p_amount:expectedAmount,p_payload:payload});
   if(error){console.error(error);return new Response('Settlement failed',{status:500})}
   if(!data?.ok) return new Response(data?.reason||'Rejected',{status:400});
