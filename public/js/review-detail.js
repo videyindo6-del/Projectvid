@@ -435,6 +435,8 @@ function setupGalleryViewer() {
 function setupGalleryControls(){
   const track=document.getElementById('reviewGalleryTrack');
   if(!track)return;
+  const controls=document.querySelector('.gallery-controls');
+  if(controls && track.children.length <= 1) controls.hidden=true;
   const counter=document.getElementById('galleryCounter');
   const items=[...track.children];
   const update=()=>{const first=items[0];const step=first?first.getBoundingClientRect().width+14:track.clientWidth||1;const index=Math.min(items.length,Math.max(1,Math.round(track.scrollLeft/step)+1));if(counter)counter.textContent=`${index} / ${items.length}`;};
@@ -681,57 +683,59 @@ async function load() {
 
 async function loadMore(id) {
   const target = document.getElementById('moreReviews');
+  const pages = document.getElementById('reviewPages');
   if (!target) return;
+  const perPage = 4;
+  let allReviews = [];
+  let currentPage = 1;
+
+  function renderPage(page) {
+    currentPage = page;
+    const totalPages = Math.max(1, Math.ceil(allReviews.length / perPage));
+    const rows = allReviews.slice((page - 1) * perPage, page * perPage);
+    target.innerHTML = rows.map(x => {
+      const thumbnail = x.thumbnail_url ? getEmbedInfo(x.thumbnail_url) : null;
+      const thumbUrl = thumbnail
+        ? thumbnail.isDrive
+          ? (() => { const driveId = getDriveId(x.thumbnail_url); return driveId ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(driveId)}&sz=w600` : ''; })()
+          : thumbnail.type === 'image' ? thumbnail.src : ''
+        : '';
+      return `
+        <a class="video-card premium-related-card" href="/r/${encodeURIComponent(x.slug || '')}">
+          <div class="related-thumb">${thumbUrl ? `<img src="${esc(thumbUrl)}" alt="${esc(x.title)}" loading="lazy">` : `<span class="related-thumb-empty"><i class="fa-regular fa-image"></i></span>`}</div>
+          <div class="related-card-info"><b>${esc(x.title)}</b><small>${x.access === 'paid' ? rp(x.price) : reviewText('Gratis','Free')}</small></div>
+        </a>`;
+    }).join('');
+    if (pages) {
+      if (totalPages <= 1) pages.innerHTML = '';
+      else {
+        let buttons = `<button type="button" class="page-arrow" data-page="${Math.max(1,page-1)}" aria-label="Previous page" ${page===1?'disabled':''}><i class="fa-solid fa-chevron-left"></i></button>`;
+        for (let n=1;n<=totalPages;n++) buttons += `<button type="button" class="page-number ${n===page?'active':''}" data-page="${n}" aria-current="${n===page?'page':'false'}">${n}</button>`;
+        buttons += `<button type="button" class="page-arrow" data-page="${Math.min(totalPages,page+1)}" aria-label="Next page" ${page===totalPages?'disabled':''}><i class="fa-solid fa-chevron-right"></i></button>`;
+        pages.innerHTML = buttons;
+        pages.querySelectorAll('button[data-page]').forEach(btn => btn.addEventListener('click', () => {
+          renderPage(Number(btn.dataset.page));
+          document.querySelector('.related-section')?.scrollIntoView({behavior:'smooth',block:'start'});
+        }));
+      }
+    }
+    applyReviewTranslations(target);
+  }
 
   try {
-    const { data, error } = await sb
-      .from('review_items')
+    const { data, error } = await sb.from('review_items')
       .select('slug,title,thumbnail_url,price,access')
       .eq('status', 'published')
       .neq('id', id)
       .order('created_at', { ascending: false })
-      .limit(12);
-
+      .limit(100);
     if (error) throw error;
-
-    target.innerHTML = (data || []).map(x => {
-      const thumbnail = x.thumbnail_url
-        ? getEmbedInfo(x.thumbnail_url)
-        : null;
-
-      // Thumbnail kartu harus berupa gambar, bukan iframe.
-      const thumbUrl = thumbnail
-        ? thumbnail.isDrive
-          ? (() => {
-              const id = getDriveId(x.thumbnail_url);
-              return id
-                ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w600`
-                : '';
-            })()
-          : thumbnail.src
-        : '';
-
-      return `
-        <a class="video-card premium-related-card" href="/r/${encodeURIComponent(x.slug || '')}">
-          ${
-            thumbUrl
-              ? `<img src="${esc(thumbUrl)}" alt="${esc(x.title)}" loading="lazy">`
-              : ''
-          }
-          <div>
-            <b>${esc(x.title)}</b>
-            <small style="display:block">
-              ${x.access === 'paid' ? rp(x.price) : 'Gratis'}
-            </small>
-          </div>
-        </a>
-      `;
-    }).join('');
-    applyReviewTranslations(target);
-
+    allReviews = data || [];
+    renderPage(1);
   } catch (error) {
     console.warn('Gagal memuat rekomendasi:', error);
     target.innerHTML = '';
+    if (pages) pages.innerHTML = '';
   }
 }
 
@@ -746,10 +750,28 @@ async function loadMore(id) {
   style.id = 'reviewGalleryEmbedStyles';
   style.textContent = `
     .review-gallery{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:16px;
+      display:block;
+      width:100%;
       margin:20px 0;
+      overflow:hidden;
+      border-radius:18px;
+    }
+    .review-gallery-track{
+      display:flex;
+      width:100%;
+      gap:14px;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      scroll-behavior:smooth;
+      scrollbar-width:none;
+      -webkit-overflow-scrolling:touch;
+    }
+    .review-gallery-track::-webkit-scrollbar{display:none}
+    .review-gallery-track>.review-gallery-item{
+      flex:0 0 100%;
+      width:100%;
+      min-width:100%;
+      scroll-snap-align:start;
     }
     .review-gallery-item{
       position:relative;
