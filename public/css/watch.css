@@ -59,3 +59,41 @@ body{background:var(--watch-bg);color:var(--watch-ink);font-family:"DM Sans",Int
 .ad-unit-320{display:none}
 @media(max-width:760px){.watch-player.is-vertical{width:min(100%,360px);max-height:75vh}.desktop-ad-only{display:none!important}.ad-unit-728{display:none!important}.ad-unit-320{display:flex!important;min-height:50px}.adsterra-wide-slot.ad-unit-468{min-height:60px}.adsterra-wide-wrap{padding:7px}.ad-side-card{display:none!important}}
 @media(min-width:761px){.watch-player.is-vertical{width:min(100%,430px)}}
+
+/* Watch page visual cleanup: ads render directly, without card/form chrome. */
+.guest-ad-stack{position:relative;inset:auto;z-index:5;width:100%;display:flex;flex-direction:column;gap:8px;margin:0 0 16px;padding:0;pointer-events:auto}
+.guest-ad-stack[hidden]{display:none!important}
+.adsterra-social-slot{width:100%;min-height:88px;height:92px;display:flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden}
+.adsterra-social-slot iframe{display:block;width:100%;height:92px;border:0;background:transparent}
+.adsterra-wide-wrap,.ad-side-card{width:100%;margin:14px 0 20px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.ad-label{display:none!important}
+.adsterra-wide-slot,.ad-box{background:transparent;border:0;border-radius:0;box-shadow:none;padding:0;min-height:0}
+.adsterra-wide-slot iframe,.ad-box iframe{display:block;max-width:100%;border:0;margin-inline:auto}
+.adsterra-wide-slot.ad-unit-728{min-height:100px}
+.adsterra-wide-slot.ad-unit-320{min-height:58px}
+.adsterra-wide-slot.ad-unit-468{min-height:68px}
+.adsterra-wide-wrap:empty,.ad-side-card:empty{display:none}
+.ad-side-card{display:flex;justify-content:center;align-items:center}
+.ad-side-card .ad-box{width:100%}
+.watch-orientation-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.watch-orientation-tools>span{margin-right:auto;color:#728198;font-size:11px;font-weight:800}
+.watch-orientation-tools button{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border:1px solid #dce5f0;border-radius:10px;background:#fff;color:#52657d;font:800 11px "DM Sans",sans-serif;cursor:pointer}
+.watch-orientation-tools button.active{background:#eaf2fc;border-color:#8eb4e3;color:#205b9f}
+.watch-player{transition:width .2s ease,aspect-ratio .2s ease}
+.watch-player.is-horizontal{width:100%;aspect-ratio:16/9;max-height:min(72vh,780px)}
+.watch-player.is-vertical{width:min(100%,430px);aspect-ratio:9/16;max-height:78vh;margin-inline:auto}
+.watch-player.is-vertical iframe,.watch-player.is-vertical video{object-fit:contain}
+.vip-player-notice{position:absolute;z-index:3;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:20px;text-align:center;background:linear-gradient(180deg,rgba(7,17,31,.72),rgba(7,17,31,.88));color:#fff}
+.vip-player-notice.is-dismissed{display:none}
+.vip-player-notice b{font:800 clamp(16px,2.2vw,22px) Manrope,sans-serif}
+.vip-player-notice p{margin:0;color:#e1e9f4;font-size:12px}
+.vip-notice-icon{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:rgba(245,184,72,.18);color:#ffd27a;font-size:20px}
+.vip-notice-actions{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:5px}
+.vip-notice-actions .action-primary,.vip-notice-actions .action-secondary{display:inline-flex;align-items:center;justify-content:center;padding:9px 14px;border-radius:9px;font-size:11px;font-weight:800}
+.vip-no-thumbnail{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#294d78,#101a2a 68%);color:#d7e8ff;font-size:64px}
+.vip-preview-placeholder>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.45)}
+@media(max-width:760px){.guest-ad-stack{margin-bottom:12px}.adsterra-social-slot,.adsterra-social-slot iframe{height:96px;min-height:96px}.watch-orientation-tools{justify-content:stretch}.watch-orientation-tools>span{width:100%}.watch-orientation-tools button{flex:1;justify-content:center;padding:9px 7px;font-size:10px}.watch-player.is-vertical{width:min(100%,360px);max-height:76vh}.adsterra-wide-wrap{margin:10px 0 15px}.ad-side-card{display:none!important}}
+
+.adsterra-banner-clean{grid-column:1/-1;display:block;width:100%;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.adsterra-banner-clean .ad-box{width:100%;min-height:250px;background:transparent}
+.adsterra-banner-clean .ad-box iframe{width:100%;min-height:250px}
