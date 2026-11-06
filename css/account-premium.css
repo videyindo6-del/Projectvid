@@ -57,3 +57,63 @@ body:has(.account-page){background:#f7f5ef!important;color:#292d35!important}
 .email-change-notice small{color:#65705e!important;font-size:10px}
 @keyframes emailGlow{from{text-shadow:0 0 4px #9be5a8}to{text-shadow:0 0 9px #55c875,0 0 20px #b5efbd}}
 @media(max-width:680px){.account-upgrade{padding:20px;align-items:flex-start}.upgrade-emblem{width:65px;height:65px;border-radius:19px;font-size:19px}.account-library-grid{grid-template-columns:1fr}.library-item{grid-template-columns:76px minmax(0,1fr)}.library-thumb{width:76px;height:68px}.history-card{flex-basis:210px}}
+
+/* BoxCellink Account refresh: ivory + blue premium SaaS */
+body:has(.account-page){background:#f7f8fc!important;color:#243047!important}
+.account-page,.account-page *{box-sizing:border-box}
+.account-page{color:#243047!important}
+.account-page .account-hero{background:radial-gradient(circle at 82% 18%,rgba(82,145,255,.13),transparent 34%),linear-gradient(135deg,#fffefa 0%,#f0f4fb 100%)!important;border:1px solid #e2e9f4!important;box-shadow:0 18px 48px rgba(37,74,130,.08)!important}
+.account-kicker,.section-eyebrow,.upgrade-kicker{color:#3975cf!important}
+.account-hero h1,.account-page h2,.account-page h3{color:#25334b!important}
+.account-hero p,.account-hero-meta,.section-heading p{color:#6b778b!important}
+.account-hero-meta i{color:#3975cf!important}
+.hero-orbit{border-color:#b8d1f4!important}.hero-glass{background:linear-gradient(145deg,#8bb8f5,#3979d5)!important;color:#fff!important;box-shadow:0 12px 35px #3979d533!important}
+.hero-float{background:#fff!important;border-color:#dce8f8!important;color:#3975cf!important;box-shadow:0 6px 20px #315d9918!important}
+.account-notice{background:#fff!important;border-color:#dfe8f5!important;color:#53647d!important}
+.account-notice.is-success{background:#eef9f2!important;border-color:#ccebd6!important;color:#246a42!important}
+.account-notice.is-error{background:#fff2f0!important;border-color:#f2d4cf!important;color:#963d35!important}
+.account-overview .overview-card,.account-page .account-panel,.account-page .media-section,.account-page .account-section,.account-empty,.account-simple-row,.library-item,.purchase-row{background:#fffefa!important;border:1px solid #e4eaf3!important;box-shadow:0 8px 24px rgba(44,72,112,.045)!important}
+.overview-card{background:#fffefa!important}.overview-icon{background:#edf4ff!important;border-color:#dce9fb!important;color:#3975cf!important}
+.membership-icon{background:#eef4ff!important;color:#3975cf!important;border-color:#d7e5fa!important}
+.secure-icon{background:#edf8f2!important;color:#39845a!important;border-color:#d7eddf!important}
+.overview-card small,.overview-muted,.account-panel label,.panel-heading p,.account-panel form>small,.library-info p,.library-price,.account-simple-row small,.purchase-row small{color:#748197!important}
+.overview-card b,.section-heading h2,.panel-heading h3,.library-info h3,.account-simple-row b,.account-empty>b{color:#29364d!important}
+.section-heading h2>i{color:#3975cf!important}.section-heading-icon{background:#edf4ff!important;border-color:#dce8f8!important;color:#3975cf!important}
+.account-panel input{background:#fff!important;border-color:#dce5f1!important;color:#29364d!important}
+.account-panel input:focus{border-color:#6da0ed!important;box-shadow:0 0 0 4px #3979d51a!important}
+.account-panel input::placeholder{color:#a2adbd!important}
+.account-action{background:linear-gradient(135deg,#4d8de8,#2869c5)!important;border:1px solid #3478d2!important;color:#fff!important;box-shadow:0 7px 18px #3478d222!important;transition:transform .2s ease,box-shadow .2s ease,filter .2s ease!important}
+.account-action:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 11px 24px #3478d233!important}
+.account-action:disabled{opacity:.6;cursor:wait;transform:none}
+.library-count{background:#edf4ff!important;border-color:#dce8f8!important;color:#3975cf!important}
+.library-toolbar{background:#f4f7fc!important;border-color:#e4ebf5!important;color:#748197!important}
+.library-thumb,.simple-row-icon{background:#edf4ff!important;border-color:#dce8f8!important;color:#3975cf!important}
+.tag-purchased{background:#edf8f2!important;color:#39845a!important}.tag-access{background:#edf4ff!important;color:#3975cf!important}
+.library-check{background:#39845a!important}.library-detail-link{color:#3975cf!important}
+.account-empty{background:#fffefa!important;border-color:#e1e9f3!important}.account-empty>span{background:#edf4ff!important;color:#3975cf!important}
+.expired-link{background:#f1f4f8!important;color:#7a8798!important}
+.group-purchase-success{background:#eef9f2!important;border-color:#ccebd6!important;color:#286b43!important}
+.account-upgrade{position:relative;isolation:isolate;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:22px;margin:20px 0 32px;padding:27px 30px;border:1px solid #dce8f8;border-radius:24px;background:radial-gradient(circle at 90% 5%,#dceaff 0,transparent 33%),linear-gradient(115deg,#fffefa,#f0f5fd)!important;box-shadow:0 14px 38px rgba(45,91,157,.09)!important;animation:upgradeFloat 6s ease-in-out infinite}
+.account-upgrade:after{content:"";position:absolute;z-index:-1;width:190px;height:190px;right:40px;top:-125px;border:1px solid #b8d1f4;border-radius:50%;box-shadow:0 0 0 18px #3979d508,0 0 0 38px #3979d506;animation:upgradeOrbit 18s linear infinite}
+.upgrade-copy{max-width:760px}.upgrade-kicker{display:inline-flex;align-items:center;gap:7px;font-size:10px;font-weight:900;letter-spacing:1.3px}
+.account-upgrade h2{margin:9px 0 7px;color:#29364d!important;font-size:22px}.account-upgrade p{margin:0;color:#718097!important;font-size:12px;line-height:1.7}
+.account-upgrade ul{display:grid;gap:8px;margin:14px 0 18px;padding:0;list-style:none;color:#52627a;font-size:12px}
+.account-upgrade li{display:flex;align-items:center;gap:8px}.account-upgrade li:before{content:"✓";display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#eaf3ff;color:#3478d2;font-weight:900}
+.upgrade-button{min-width:170px}.upgrade-emblem{width:100px;height:100px;display:grid;align-content:center;justify-items:center;gap:3px;flex:none;border:1px solid #c9ddfa;border-radius:29px;background:linear-gradient(145deg,#eaf3ff,#cbdfff);color:#3478d2;box-shadow:inset 0 1px #fff,0 10px 24px #3979d51c;font-size:28px;animation:emblemPulse 3s ease-in-out infinite}.upgrade-emblem span{font-size:11px;font-weight:950;letter-spacing:2px}
+.account-library-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.library-item{grid-template-columns:90px minmax(0,1fr);align-items:start;padding:12px}
+.library-thumb{width:90px;height:78px;grid-row:span 2}.library-actions{grid-column:1/-1;display:flex;align-items:center;min-width:0}.library-actions .account-action{flex:1}.library-detail-link{padding:10px}
+.account-pagination{display:flex;justify-content:center;align-items:center;gap:15px;padding:18px 0 2px;color:#718097;font-size:12px;font-weight:800}
+.account-pagination button{padding:9px 14px;border:1px solid #dce5f1;border-radius:10px;background:#fff;color:#3975cf;font:inherit;cursor:pointer}
+.account-pagination button:disabled{opacity:.4;cursor:not-allowed}
+.watch-history-strip{display:flex;gap:14px;overflow-x:auto;padding:3px 2px 14px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.history-card{flex:0 0 235px;overflow:hidden;border:1px solid #e2e9f3;border-radius:16px;background:#fffefa;scroll-snap-align:start;box-shadow:0 7px 20px #315d990b}
+.history-card>img,.history-placeholder{display:block;width:100%;height:132px;object-fit:cover;background:#edf2f9}
+.history-placeholder{display:grid;place-items:center;color:#5790df;font-size:25px}
+.history-card-info{display:grid;gap:7px;padding:12px}.history-card-info b{color:#29364d;font-size:12px;line-height:1.45}.history-card-info small{color:#7a8799;font-size:10px}.history-card-info a{color:#3975cf;text-decoration:none;font-size:11px;font-weight:850}
+.email-change-notice{align-items:flex-start!important}.email-change-notice>div{display:grid;gap:8px}.email-change-flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:5px 0}.email-change-flow del{color:#9aa5b4;font-size:12px}.email-change-flow>i{color:#3975cf}.email-change-flow strong{font-size:15px;color:#21834e;text-shadow:0 0 8px #8ce4ad,0 0 18px #b8f2c9;animation:emailGlow 1.8s ease-in-out infinite alternate}.email-change-notice small{color:#64758c!important;font-size:10px}
+@keyframes emailGlow{from{text-shadow:0 0 4px #a6edbb}to{text-shadow:0 0 9px #54c982,0 0 20px #c4f5d0}}
+@keyframes upgradeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes upgradeOrbit{to{transform:rotate(360deg)}}
+@keyframes emblemPulse{0%,100%{box-shadow:inset 0 1px #fff,0 10px 24px #3979d51c}50%{box-shadow:inset 0 1px #fff,0 12px 32px #3979d538}}
+@media(max-width:680px){.account-upgrade{padding:20px;align-items:flex-start}.upgrade-emblem{width:65px;height:65px;border-radius:19px;font-size:19px}.account-library-grid{grid-template-columns:1fr}.library-item{grid-template-columns:76px minmax(0,1fr)}.library-thumb{width:76px;height:68px}.history-card{flex-basis:210px}}
