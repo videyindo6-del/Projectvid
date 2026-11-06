@@ -5,10 +5,10 @@ const escA = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;'
 const langA = () => localStorage.getItem('boxcellink_lang') === 'en' ? 'en' : 'id';
 const copyA = {
  id:{
-  account:'Akun',hero_title:'Akun Saya',hero_desc:'Kelola profil, keamanan akun, membership, dan seluruh media yang sudah kamu beli dalam satu tempat.',secure_label:'Secure account',instant_label:'Akses instan',upgrade_title:'Upgrade Status Account',upgrade_desc:'Nikmati pengalaman BoxCellink yang lebih nyaman dengan status VIP.',benefit_no_ads:'Nonton BoxVidey tanpa iklan',benefit_discount:'Diskon 20% untuk pembelian Review yang memenuhi syarat',benefit_exclusive:'Akses video khusus VIP selama masa aktif',upgrade_button:'Upgrade ke VIP',old_email:'Gmail saat ini',current_email:'Gmail saat ini',membership:'Membership',membership_desc:'Status akses akun saat ini',security:'Keamanan',protected:'Akun terlindungi',security_desc:'Dikelola melalui Supabase Auth',
+  account:'Akun',hero_title:'Akun Saya',hero_desc:'Kelola profil, keamanan akun, membership, dan seluruh media yang sudah kamu beli dalam satu tempat.',secure_label:'Secure account',instant_label:'Akses instan',upgrade_title:'Upgrade Status Account',upgrade_desc:'Nikmati pengalaman BoxCellink yang lebih nyaman dengan status VIP.',benefit_no_ads:'Nonton BoxVidey tanpa iklan',benefit_discount:'Diskon 20% untuk pembelian Review yang memenuhi syarat',benefit_exclusive:'Akses video khusus VIP selama masa aktif',upgrade_button:'Upgrade ke VIP',old_email:'Gmail lama',current_email:'Gmail akun',membership:'Membership',membership_desc:'Status akses akun saat ini',security:'Keamanan',protected:'Akun terlindungi',security_desc:'Dikelola melalui Supabase Auth',
   personal_settings:'PENGATURAN PERSONAL',account_settings:'Pengaturan Akun',settings_desc:'Perbarui informasi login dan jaga keamanan akunmu.',
-  change_email:'Ganti Email',email_desc:'Masukkan Gmail lama dan Gmail baru untuk mengajukan perubahan alamat akun.',new_email:'Gmail baru',send_confirmation:'Kirim konfirmasi',email_hint:'Konfirmasi akan dikirim ke alamat email baru.',
-  change_password:'Ganti Kata Sandi',password_desc:'Konfirmasi Gmail akun saat ini, lalu masukkan kata sandi baru.',new_password:'Kata sandi baru',update_password:'Perbarui kata sandi',password_hint:'Minimal 8 karakter untuk keamanan akun.',
+  change_email:'Ganti Email',email_desc:'Masukkan Gmail lama dan Gmail baru untuk mengajukan perubahan alamat akun.',new_email:'Gmail baru',send_confirmation:'Ganti Gmail',change_email_button:'Ganti Gmail sekarang',email_hint:'Gmail akun akan langsung diperbarui setelah berhasil diproses.',
+  change_password:'Ganti Kata Sandi',password_desc:'Konfirmasi Gmail akun saat ini, lalu masukkan kata sandi baru.',new_password:'Kata sandi baru',update_password:'Perbarui kata sandi',password_hint:'Masukkan Gmail akun dan kata sandi baru (minimal 8 karakter).',
   your_library:'KOLEKSI MEDIA KAMU',telegram_media:'Media Telegram Saya',library_desc:'Semua review yang sudah berhasil kamu beli akan otomatis tersimpan di sini.',items:'MEDIA',verified_purchases:'Pembelian terverifikasi',access_anytime:'Akses dari halaman akun',loading_library:'Memuat media Telegram...',
   recent_activity:'AKTIVITAS TERBARU',watch_history:'Riwayat Tonton',watch_desc:'Lanjutkan video BoxVidey yang pernah kamu buka.',loading_history:'Memuat riwayat tontonan...',
   exclusive_access:'AKSES EKSKLUSIF',vip_groups:'Group VIP Telegram',groups_desc:'Kelola undangan group VIP yang sudah kamu beli.',loading_groups:'Memuat akses group...',
@@ -16,13 +16,13 @@ const copyA = {
   purchased:'Dibeli',open_media:'Buka Media',details:'Detail Review',no_media:'Belum ada media yang dibeli.',no_media_desc:'Review yang kamu beli akan muncul otomatis di bagian ini setelah pembayaran berhasil diverifikasi.',purchase_success:'Pembelian berhasil',verified:'Akses aktif',price:'Total pembayaran',watch_again:'Tonton lagi',watched:'Ditonton',
   no_history:'Belum ada riwayat tontonan.',no_groups:'Belum ada Group VIP yang dibeli.',group_success:'Pembayaran Group VIP berhasil!',group_active:'Akses group aktif.',invite_until:'Link undangan aktif sampai',invite_expired:'Link undangan tidak tersedia. Hubungi admin untuk pembaruan.',join_group:'Masuk Group',expired:'Link tidak tersedia',check_link:'Cek link terbaru',copy_link:'Salin link',link_updated:'Link undangan mengikuti pengaturan terbaru admin.',group_notice:'Pembayaran berhasil! Akses Group VIP kamu sudah aktif.',
   email_sent:'Tautan konfirmasi dikirim ke email baru.',password_updated:'Kata sandi berhasil diperbarui.',email_failed:'Gagal memperbarui email.',password_failed:'Gagal memperbarui kata sandi.',
-  load_failed:'Riwayat media tidak dapat dimuat.',order_fallback:'Menampilkan pembelian yang telah terverifikasi.',retry:'Coba muat ulang',previous:'Sebelumnya',next:'Berikutnya',email_request_ok:'Permintaan perubahan Gmail berhasil dikirim.',email_confirm_pending:'Konfirmasi perubahan akan dikirim oleh Supabase ke Gmail baru. Perubahan aktif setelah dikonfirmasi.',sign_in:'Silakan login untuk melihat akun.'
+  load_failed:'Riwayat media tidak dapat dimuat.',order_fallback:'Menampilkan pembelian yang telah terverifikasi.',retry:'Coba muat ulang',previous:'Sebelumnya',next:'Berikutnya',email_request_ok:'Gmail berhasil diganti.',email_confirm_pending:'Alamat Gmail akun telah diperbarui.',sign_in:'Silakan login untuk melihat akun.'
  },
  en:{
-  account:'Account',hero_title:'My Account',hero_desc:'Manage your profile, account security, membership, and all purchased media in one place.',secure_label:'Secure account',instant_label:'Instant access',upgrade_title:'Upgrade Account Status',upgrade_desc:'Enjoy a better BoxCellink experience with VIP membership.',benefit_no_ads:'Watch BoxVidey without ads',benefit_discount:'20% off eligible Review purchases',benefit_exclusive:'Access VIP-only videos while membership is active',upgrade_button:'Upgrade to VIP',old_email:'Current email',current_email:'Current email',membership:'Membership',membership_desc:'Your current account access',security:'Security',protected:'Account protected',security_desc:'Managed securely with Supabase Auth',
+  account:'Account',hero_title:'My Account',hero_desc:'Manage your profile, account security, membership, and all purchased media in one place.',secure_label:'Secure account',instant_label:'Instant access',upgrade_title:'Upgrade Account Status',upgrade_desc:'Enjoy a better BoxCellink experience with VIP membership.',benefit_no_ads:'Watch BoxVidey without ads',benefit_discount:'20% off eligible Review purchases',benefit_exclusive:'Access VIP-only videos while membership is active',upgrade_button:'Upgrade to VIP',old_email:'Old Gmail',current_email:'Account Gmail',membership:'Membership',membership_desc:'Your current account access',security:'Security',protected:'Account protected',security_desc:'Managed securely with Supabase Auth',
   personal_settings:'PERSONAL SETTINGS',account_settings:'Account settings',settings_desc:'Update your login details and keep your account secure.',
-  change_email:'Change email',email_desc:'Enter your old and new email addresses to request an account email change.',new_email:'New Gmail',send_confirmation:'Send confirmation',email_hint:'A confirmation link will be sent to your new email.',
-  change_password:'Change password',password_desc:'Confirm your current account email, then enter a new password.',new_password:'New password',update_password:'Update password',password_hint:'At least 8 characters for account security.',
+  change_email:'Change email',email_desc:'Enter your old and new Gmail addresses to update your account.',new_email:'New Gmail',send_confirmation:'Change Gmail',change_email_button:'Change Gmail now',email_hint:'Your account Gmail will be updated immediately after processing.',
+  change_password:'Change password',password_desc:'Enter your account Gmail and a new password.',new_password:'New password',update_password:'Update password',password_hint:'Enter your account Gmail and a new password (at least 8 characters).',
   your_library:'YOUR MEDIA LIBRARY',telegram_media:'My Telegram Media',library_desc:'All reviews you have successfully purchased are automatically saved here.',items:'ITEMS',verified_purchases:'Verified purchases',access_anytime:'Access from your account page',loading_library:'Loading Telegram media...',
   recent_activity:'RECENT ACTIVITY',watch_history:'Watch history',watch_desc:'Continue watching BoxVidey videos you have opened.',loading_history:'Loading watch history...',
   exclusive_access:'EXCLUSIVE ACCESS',vip_groups:'VIP Telegram Groups',groups_desc:'Manage invitations for VIP groups you have purchased.',loading_groups:'Loading group access...',
@@ -30,7 +30,7 @@ const copyA = {
   purchased:'Purchased',open_media:'Open media',details:'Review details',no_media:'No purchased media yet.',no_media_desc:'Reviews you purchase will automatically appear here after payment is verified.',purchase_success:'Purchase successful',verified:'Access active',price:'Payment total',watch_again:'Watch again',watched:'Watched',
   no_history:'No watch history yet.',no_groups:'No VIP Telegram groups purchased yet.',group_success:'VIP Group payment successful!',group_active:'Group access is active.',invite_until:'Invitation link active until',invite_expired:'Invitation link has expired',join_group:'Join group',expired:'Link expired',
   email_sent:'A confirmation link has been sent to your new email.',password_updated:'Your password has been updated.',email_failed:'Unable to update email.',password_failed:'Unable to update password.',
-  load_failed:'Unable to load purchased media.',order_fallback:'Showing verified purchases.',retry:'Reload',previous:'Previous',next:'Next',email_request_ok:'Email change request submitted successfully.',email_confirm_pending:'Supabase will send a confirmation to your new email. The change takes effect after confirmation.',sign_in:'Please sign in to view your account.'
+  load_failed:'Unable to load purchased media.',order_fallback:'Showing verified purchases.',retry:'Reload',previous:'Previous',next:'Next',email_request_ok:'Gmail changed successfully.',email_confirm_pending:'Your account Gmail address has been updated.',sign_in:'Please sign in to view your account.'
  }
 };
 const t = key => copyA[langA()][key] || copyA.id[key] || key;
@@ -111,11 +111,11 @@ function applyAccountLanguage(){
  const old=$('oldEmail'),fresh=$('newEmail'),passEmail=$('passwordEmail'),pass=$('newPassword');
  if(old)old.placeholder=langA()==='en'?'current-email@gmail.com':'email-lama@gmail.com';
  if(fresh)fresh.placeholder=langA()==='en'?'new-email@gmail.com':'email-baru@gmail.com';
- if(passEmail)passEmail.placeholder=langA()==='en'?'current-email@gmail.com':'email@gmail.com';
+ if(passEmail)passEmail.placeholder=langA()==='en'?'account-gmail@gmail.com':'gmail-akun@gmail.com';
  if(pass)pass.placeholder=langA()==='en'?'At least 8 characters':'Minimal 8 karakter';
  const title=document.querySelector('title');if(title)title.textContent=langA()==='en'?'My Account — BoxCellink':'Akun Saya — BoxCellink';
 }
-document.addEventListener('boxcellink:language-change',()=>location.reload());
+document.addEventListener('boxcellink:language-change',()=>{ location.reload(); });
 async function initAccount(){
  if(!window.sb?.auth)throw new Error('Supabase client unavailable');
  const {data:{user},error:authError}=await sb.auth.getUser();
@@ -127,16 +127,18 @@ async function initAccount(){
  $('accountEmail').textContent=user.email||'—';
  const now=new Date(),premium=p?.premium_expires_at&&new Date(p.premium_expires_at)>now,vip=p?.vip_expires_at&&new Date(p.vip_expires_at)>now;
  $('accountStatus').textContent=p?.role==='admin'?t('admin'):premium?`${t('premium_until')} ${dateA(p.premium_expires_at)}`:vip?`${t('vip_until')} ${dateA(p.vip_expires_at)}`:t('basic');
- showNotice(langA()==='en'?'Email changes require confirmation from Supabase Auth.':'Perubahan email memerlukan konfirmasi dari Supabase Auth. Pastikan email baru dapat menerima pesan.');
  $('emailForm').onsubmit=async e=>{
   e.preventDefault();const btn=e.currentTarget.querySelector('button');btn.disabled=true;
   const oldEmail=$('oldEmail').value.trim().toLowerCase(),newEmail=$('newEmail').value.trim().toLowerCase();
   try{
-   if(oldEmail!==(user.email||'').toLowerCase())throw new Error(langA()==='en'?'Current email does not match the signed-in account.':'Gmail lama tidak cocok dengan akun yang sedang login.');
-   if(oldEmail===newEmail)throw new Error(langA()==='en'?'New email must be different.':'Gmail baru harus berbeda dari Gmail lama.');
-   const {error}=await sb.auth.updateUser({email:newEmail});if(error)throw error;
+   if(oldEmail!==(user.email||'').toLowerCase())throw new Error(langA()==='en'?'Old Gmail does not match this account.':'Gmail lama tidak cocok dengan akun ini.');
+   if(!newEmail||oldEmail===newEmail)throw new Error(langA()==='en'?'Enter a different new Gmail address.':'Masukkan Gmail baru yang berbeda.');
+   const {data,error}=await sb.functions.invoke('change-account-email',{body:{oldEmail,newEmail}});
+   if(error)throw error;
+   const confirmedEmail=data?.email||newEmail;
+   $('accountEmail').textContent=confirmedEmail;
    const notice=$('accountNotice');notice.hidden=false;notice.className='account-notice is-success email-change-notice';
-   notice.innerHTML=`<i class="fa-solid fa-circle-check"></i><div><b>${escA(t('email_request_ok'))}</b><div class="email-change-flow"><del>${escA(oldEmail)}</del><i class="fa-solid fa-arrow-right"></i><strong>${escA(newEmail)}</strong></div><small>${escA(t('email_confirm_pending'))}</small></div>`;
+   notice.innerHTML=`<i class="fa-solid fa-circle-check"></i><div><b>${escA(t('email_request_ok'))}</b><div class="email-change-flow"><del>${escA(oldEmail)}</del><i class="fa-solid fa-arrow-right"></i><strong>${escA(confirmedEmail)}</strong></div><small>${escA(t('email_confirm_pending'))}</small></div>`;
    e.currentTarget.reset();
   }catch(err){showNotice(`${t('email_failed')} ${err.message||''}`,'error');}
   finally{btn.disabled=false;}
@@ -144,7 +146,7 @@ async function initAccount(){
 $('passwordForm').onsubmit=async e=>{
   e.preventDefault();const btn=e.currentTarget.querySelector('button');btn.disabled=true;
   try{
-   if($('passwordEmail').value.trim().toLowerCase()!==(user.email||'').toLowerCase())throw new Error(langA()==='en'?'Current email does not match the signed-in account.':'Gmail saat ini tidak cocok dengan akun yang sedang login.');
+   if($('passwordEmail').value.trim().toLowerCase()!==(user.email||'').toLowerCase())throw new Error(langA()==='en'?'Account Gmail does not match the signed-in account.':'Gmail akun tidak cocok dengan akun yang sedang login.');
    const {error}=await sb.auth.updateUser({password:$('newPassword').value});if(error)throw error;
    showNotice(t('password_updated'),'success');e.currentTarget.reset();
   }catch(err){showNotice(`${t('password_failed')} ${err.message||''}`,'error');}
