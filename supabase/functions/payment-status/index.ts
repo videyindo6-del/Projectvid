@@ -28,19 +28,17 @@ Deno.serve(async req => {
     const raw=await r.text(); let d:any;
     try { d=raw?JSON.parse(raw):{}; } catch { return out({error:'Respons check-status Cashi bukan JSON yang valid'},502); }
     if(!r.ok||!d?.success) return out({error:d?.message||'Cashi gagal memeriksa status transaksi',detail:d},502);
-    // Cashi response may wrap transaction fields in data/result. Never mark paid
-    // unless a provider order identifier is present and matches our stored order.
+    // Cashi check-status is requested using the provider order ID in the URL.
+    // Some live responses omit the order_id echo even though the request itself
+    // is scoped to that order. If Cashi does return an ID, it must match.
     const provider = d?.data ?? d?.result ?? d?.transaction ?? d;
-    // Official Cashi check-status response documents `order_id`; compare it
-    // with the `orderId` returned by create-order, not blindly with our DB ID.
     const providerOrderId = String(provider?.order_id ?? provider?.orderId ?? '').trim();
-    if(!providerOrderId) {
-      console.error('Cashi check-status response missing order_id; response keys:', Object.keys(provider||{}));
-      return out({error:'Respons check-status Cashi tidak menyertakan order_id',provider_fields:Object.keys(provider||{})},502);
-    }
-    if(providerOrderId!==providerOrderIdFromCreate) {
+    if(providerOrderId && providerOrderId !== providerOrderIdFromCreate) {
       console.error('Cashi order mismatch', {expected_provider_order_id:providerOrderIdFromCreate, received:providerOrderId});
       return out({error:'Order ID dari Cashi tidak cocok',expected_provider_order_id:providerOrderIdFromCreate,provider_order_id:providerOrderId},409);
+    }
+    if(!providerOrderId) {
+      console.warn('Cashi check-status omitted order_id; using requested provider order ID:', providerOrderIdFromCreate);
     }
     const state=String(provider?.status ?? 'PENDING').toUpperCase();
     if(state==='SETTLED') {
