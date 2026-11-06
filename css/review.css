@@ -249,3 +249,62 @@ body:has(.review-shell) main.container{width:min(1180px,94%);max-width:1180px;ma
  .gallery-controls small{font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){.purchase-btn,.purchase-btn i{animation:none!important;transition:none!important}}
+
+
+/* =====================================================
+   BOXCELLINK REVIEW — IVORY LIGHT THEME + COMPACT STATS
+   ===================================================== */
+body:has(.review-shell){background:#f4f1e8!important;color:#26364a!important;color-scheme:light!important}
+.review-shell{background:#fffdf7!important;border-color:#e8e2d5!important;box-shadow:0 18px 54px rgba(57,49,34,.07)!important}
+.review-topline{background:#fbf9f2!important;border-color:#eae4d8!important}
+.gallery-panel,.product-info-panel,.social-panel{background:#fffdf8!important;border-color:#e9e3d7!important;box-shadow:0 8px 24px rgba(62,53,36,.045)!important}
+.review-heading h1,.gallery-head b,.product-description h2,.social-title h2,.related-heading h2{color:#29394d!important}
+.review-lead,.gallery-head small,.social-subtitle,.related-heading p{color:#7a7d7c!important}
+.review-gallery-track>.review-gallery-item,.review-gallery-item,.review-gallery-item>img,.review-gallery-item video,.review-gallery-embed iframe{background:#f1eee5!important}
+.media-item-head{background:#ebe6da!important;color:#586474!important;border-bottom:1px solid #e1dacb!important}
+.media-index{color:#54749a!important}
+.review-open-original{background:#ebe6da!important;color:#45688f!important}
+.gallery-controls button{background:#f8f5ed!important;border-color:#e4ddcf!important;color:#456b98!important}
+.gallery-controls span{color:#4b5c70!important}
+.product-info-panel{padding:13px 16px!important}
+.product-description .review-kicker{font-size:9px!important}
+.product-description h2{font-size:15px!important;margin:2px 0 4px!important}
+.product-description p{font-size:11px!important;line-height:1.45!important;color:#777d83!important}
+.product-stats-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:7px!important;margin:9px 0!important;padding:9px 0!important}
+.product-stats-grid>div{display:flex!important;align-items:center!important;gap:7px!important;min-width:0!important;padding:8px 9px!important;background:#faf8f1!important;border:1px solid #eee8dc!important;border-radius:11px!important}
+.product-stats-grid>div>i{width:27px!important;height:27px!important;flex:0 0 27px!important;border-radius:8px!important;background:#f0eee5!important;color:#6784a4!important;font-size:11px!important}
+.product-stats-grid b{font-size:11px!important;color:#35465a!important;line-height:1.2!important}
+.product-stats-grid small{font-size:9px!important;color:#858783!important;line-height:1.25!important}
+.purchase-strip{background:#f8f5ed!important;border-color:#e9e2d5!important}
+.purchase-strip>div>small{color:#7c817f!important}
+.purchase-strip>div>strong{color:#294d75!important}
+.purchase-note{color:#858783!important}
+#moreReviews.video-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.premium-related-card{background:#fffdf8!important;border-color:#e8e2d7!important}
+.premium-related-card .related-thumb{background:#f1eee5!important}
+.related-card-info{background:#fffdf8!important}
+.related-card-info b{color:#34465a!important}
+.related-card-info .related-price{color:#5479a2!important}
+.related-card-stats{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:3px;color:#858783;font-size:10px;font-weight:700}
+.related-card-stats span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.related-card-stats i{color:#8294a5;font-size:10px}
+#reviewPages button{background:#fffdf8!important;border-color:#e7e0d4!important;color:#536477!important}
+#reviewPages button:hover:not(:disabled),#reviewPages button.active{background:#315f91!important;border-color:#315f91!important;color:#fff!important}
+@media(prefers-color-scheme:dark){
+ body:has(.review-shell){background:#f4f1e8!important;color:#26364a!important}
+ .review-shell,.gallery-panel,.product-info-panel,.social-panel,.premium-related-card{background:#fffdf8!important;border-color:#e9e3d7!important}
+ .review-topline{background:#fbf9f2!important;border-color:#eae4d8!important}
+ .review-heading h1,.social-title h2,.related-heading h2,.comment-heading h3{color:#29394d!important}
+ .review-lead,.social-subtitle,.related-heading p,.review-comment p{color:#747b80!important}
+ .comment-meta b{color:#35465a!important}
+ .comment-area textarea,.guest-comment-fields input{background:#fffdf8!important;border-color:#e4ddcf!important;color:#35465a!important}
+ .comment-empty{background:#f8f5ed!important;color:#777d83!important}
+ .purchase-strip{background:#f8f5ed!important;border-color:#e9e2d5!important}
+ .purchase-strip>div>strong{color:#294d75!important}
+}
+@media(max-width:760px){
+ .product-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .product-stats-grid>div{padding:7px!important}
+ .product-info-panel{padding:11px!important}
+ .related-card-stats{gap:7px;font-size:9px}
+}
