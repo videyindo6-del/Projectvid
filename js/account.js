@@ -1,29 +1,159 @@
-const escA=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const dateA=v=>v?new Date(v).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}):'—';
-async function initAccount(){
- const {data:{user}}=await sb.auth.getUser();
- if(!user){location.href='login.html?next='+encodeURIComponent('/account.html');return}
- const {data:p}=await sb.from('profiles').select('full_name,vip_expires_at,premium_expires_at,role').eq('id',user.id).maybeSingle();
- document.getElementById('accountName').textContent=p?.full_name||user.user_metadata?.full_name||'—';
- document.getElementById('accountEmail').textContent=user.email||'—';
- const now=new Date(),premium=p?.premium_expires_at&&new Date(p.premium_expires_at)>now,vip=p?.vip_expires_at&&new Date(p.vip_expires_at)>now;
- document.getElementById('accountStatus').textContent=p?.role==='admin'?'Administrator':premium?'Premium aktif sampai '+dateA(p.premium_expires_at):vip?'VIP aktif sampai '+dateA(p.vip_expires_at):'Basic / Free';
- const notice=document.getElementById('accountNotice');notice.hidden=false;notice.textContent='Perubahan email memerlukan konfirmasi dari Supabase Auth. Pastikan email baru dapat menerima pesan.';
- document.getElementById('emailForm').onsubmit=async e=>{e.preventDefault();const {error}=await sb.auth.updateUser({email:document.getElementById('newEmail').value.trim()});alert(error?.message||'Tautan konfirmasi dikirim ke email baru.');};
- document.getElementById('passwordForm').onsubmit=async e=>{e.preventDefault();const {error}=await sb.auth.updateUser({password:document.getElementById('newPassword').value});alert(error?.message||'Kata sandi berhasil diperbarui.');if(!error)e.target.reset()};
- const purchases=document.getElementById('purchaseLinks');
- const {data:ents,error}=await sb.from('review_entitlements').select('id,created_at,review_items(title,slug,thumbnail_url)').eq('user_id',user.id).order('created_at',{ascending:false});
- purchases.innerHTML=error?`<p class="account-error">${escA(error.message)}</p>`:(ents||[]).map(x=>`<article class="purchase-row"><div class="account-row-main">${x.review_items?.thumbnail_url?`<img src="${escA(x.review_items.thumbnail_url)}" alt="">`:'<span class="account-row-icon"><i class="fa-brands fa-telegram"></i></span>'}<span><b>${escA(x.review_items?.title||'Media Telegram')}</b><small>Dibeli ${dateA(x.created_at)}</small></span></div><a class="btn primary" href="/r/${encodeURIComponent(x.review_items?.slug||'')}">Buka media</a></article>`).join('')||'<p>Belum ada pembelian media Telegram.</p>';
- const {data:groups,gerror}=await sb.rpc('get_my_vip_group_entitlements');
- document.getElementById('groupLinks').innerHTML=gerror?'<p>Riwayat group belum dapat dimuat. Jalankan migrasi Group VIP terbaru.</p>':(groups||[]).map(x=>{
-   const expires=x.invite_expires_at?new Date(x.invite_expires_at):new Date(new Date(x.purchased_at).getTime()+12*3600000),valid=expires>now;
-   return `<article class="purchase-row"><div><b>${escA(x.group_name||'VIP Telegram')}</b><small>Pembelian berhasil · ${valid?'Link aktif sampai '+dateA(expires):'Link undangan telah kedaluwarsa'}</small></div>${valid&&x.telegram_url?`<a class="btn primary" href="${escA(x.telegram_url)}" target="_blank" rel="noopener">Masuk Group</a>`:'<span class="expired-link">Link berakhir</span>'}</article>`;
- }).join('')||'<p>Belum ada Group VIP yang dibeli.</p>';
- const freshGroup=(groups||[]).find(x=>new Date(x.purchased_at)>new Date(Date.now()-12*3600000)&&x.telegram_url&&(!x.invite_expires_at||new Date(x.invite_expires_at)>now));
- const successBox=document.getElementById('groupPurchaseSuccess');
- if(freshGroup&&successBox){successBox.hidden=false;successBox.innerHTML=`<i class="fa-solid fa-circle-check"></i><div><b>Pembayaran Group VIP berhasil!</b><span>Akses ${escA(freshGroup.group_name||'Group VIP')} sudah aktif. Link undangan tersedia sampai ${dateA(freshGroup.invite_expires_at||new Date(new Date(freshGroup.purchased_at).getTime()+12*3600000))}.</span></div>`;}
- const watch=document.getElementById('watchHistory');
- const {data:history,error:historyError}=await sb.from('video_watch_history').select('watched_at,videos(title,slug,thumbnail_url)').eq('user_id',user.id).order('watched_at',{ascending:false}).limit(50);
- watch.innerHTML=historyError?`<p class="account-error">Riwayat tonton belum tersedia. Jalankan migrasi BoxCellink terbaru.</p>`:(history||[]).map(x=>`<article class="purchase-row"><div class="account-row-main">${x.videos?.thumbnail_url?`<img src="${escA(x.videos.thumbnail_url)}" alt="">`:'<span class="account-row-icon"><i class="fa-solid fa-play"></i></span>'}<span><b>${escA(x.videos?.title||'Video BoxVidey')}</b><small>Ditonton ${dateA(x.watched_at)}</small></span></div>${x.videos?.slug?`<a class="btn primary" href="/v/${encodeURIComponent(x.videos.slug)}">Tonton lagi</a>`:''}</article>`).join('')||'<p>Belum ada riwayat tontonan BoxVidey.</p>';
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const escA = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const langA = () => localStorage.getItem('boxcellink_lang') === 'en' ? 'en' : 'id';
+const copyA = {
+ id:{
+  account:'Akun',membership:'Membership',membership_desc:'Status akses akun saat ini',security:'Keamanan',protected:'Akun terlindungi',security_desc:'Dikelola melalui Supabase Auth',
+  personal_settings:'PENGATURAN PERSONAL',account_settings:'Pengaturan Akun',settings_desc:'Perbarui informasi login dan jaga keamanan akunmu.',
+  change_email:'Ganti Email',email_desc:'Perbarui alamat email akun.',new_email:'Email baru',send_confirmation:'Kirim konfirmasi',email_hint:'Konfirmasi akan dikirim ke alamat email baru.',
+  change_password:'Ganti Kata Sandi',password_desc:'Gunakan kata sandi yang kuat.',new_password:'Kata sandi baru',update_password:'Perbarui kata sandi',password_hint:'Minimal 8 karakter untuk keamanan akun.',
+  your_library:'KOLEKSI MEDIA KAMU',telegram_media:'Media Telegram Saya',library_desc:'Semua review yang sudah berhasil kamu beli akan otomatis tersimpan di sini.',items:'MEDIA',verified_purchases:'Pembelian terverifikasi',access_anytime:'Akses dari halaman akun',loading_library:'Memuat media Telegram...',
+  recent_activity:'AKTIVITAS TERBARU',watch_history:'Riwayat Tonton',watch_desc:'Lanjutkan video BoxVidey yang pernah kamu buka.',loading_history:'Memuat riwayat tontonan...',
+  exclusive_access:'AKSES EKSKLUSIF',vip_groups:'Group VIP Telegram',groups_desc:'Kelola undangan group VIP yang sudah kamu beli.',loading_groups:'Memuat akses group...',
+  basic:'Basic / Free',admin:'Administrator',premium_until:'Premium aktif sampai',vip_until:'VIP aktif sampai',account_error:'Gagal memuat informasi akun',
+  purchased:'Dibeli',open_media:'Buka Media',details:'Detail Review',no_media:'Belum ada media yang dibeli.',no_media_desc:'Review yang kamu beli akan muncul otomatis di bagian ini setelah pembayaran berhasil diverifikasi.',purchase_success:'Pembelian berhasil',verified:'Akses aktif',price:'Total pembayaran',watch_again:'Tonton lagi',watched:'Ditonton',
+  no_history:'Belum ada riwayat tontonan.',no_groups:'Belum ada Group VIP yang dibeli.',group_success:'Pembayaran Group VIP berhasil!',group_active:'Akses group aktif.',invite_until:'Link undangan aktif sampai',invite_expired:'Link undangan tidak tersedia. Hubungi admin untuk pembaruan.',join_group:'Masuk Group',expired:'Link tidak tersedia',check_link:'Cek link terbaru',copy_link:'Salin link',link_updated:'Link undangan mengikuti pengaturan terbaru admin.',group_notice:'Pembayaran berhasil! Akses Group VIP kamu sudah aktif.',
+  email_sent:'Tautan konfirmasi dikirim ke email baru.',password_updated:'Kata sandi berhasil diperbarui.',email_failed:'Gagal memperbarui email.',password_failed:'Gagal memperbarui kata sandi.',
+  load_failed:'Riwayat media tidak dapat dimuat.',order_fallback:'Menampilkan pembelian yang telah terverifikasi.',retry:'Coba muat ulang',sign_in:'Silakan login untuk melihat akun.'
+ },
+ en:{
+  account:'Account',membership:'Membership',membership_desc:'Your current account access',security:'Security',protected:'Account protected',security_desc:'Managed securely with Supabase Auth',
+  personal_settings:'PERSONAL SETTINGS',account_settings:'Account settings',settings_desc:'Update your login details and keep your account secure.',
+  change_email:'Change email',email_desc:'Update your account email address.',new_email:'New email',send_confirmation:'Send confirmation',email_hint:'A confirmation link will be sent to your new email.',
+  change_password:'Change password',password_desc:'Choose a strong password.',new_password:'New password',update_password:'Update password',password_hint:'At least 8 characters for account security.',
+  your_library:'YOUR MEDIA LIBRARY',telegram_media:'My Telegram Media',library_desc:'All reviews you have successfully purchased are automatically saved here.',items:'ITEMS',verified_purchases:'Verified purchases',access_anytime:'Access from your account page',loading_library:'Loading Telegram media...',
+  recent_activity:'RECENT ACTIVITY',watch_history:'Watch history',watch_desc:'Continue watching BoxVidey videos you have opened.',loading_history:'Loading watch history...',
+  exclusive_access:'EXCLUSIVE ACCESS',vip_groups:'VIP Telegram Groups',groups_desc:'Manage invitations for VIP groups you have purchased.',loading_groups:'Loading group access...',
+  basic:'Basic / Free',admin:'Administrator',premium_until:'Premium active until',vip_until:'VIP active until',account_error:'Unable to load account information',
+  purchased:'Purchased',open_media:'Open media',details:'Review details',no_media:'No purchased media yet.',no_media_desc:'Reviews you purchase will automatically appear here after payment is verified.',purchase_success:'Purchase successful',verified:'Access active',price:'Payment total',watch_again:'Watch again',watched:'Watched',
+  no_history:'No watch history yet.',no_groups:'No VIP Telegram groups purchased yet.',group_success:'VIP Group payment successful!',group_active:'Group access is active.',invite_until:'Invitation link active until',invite_expired:'Invitation link has expired',join_group:'Join group',expired:'Link expired',
+  email_sent:'A confirmation link has been sent to your new email.',password_updated:'Your password has been updated.',email_failed:'Unable to update email.',password_failed:'Unable to update password.',
+  load_failed:'Unable to load purchased media.',order_fallback:'Showing verified purchases.',retry:'Reload',sign_in:'Please sign in to view your account.'
+ }
+};
+const t = key => copyA[langA()][key] || copyA.id[key] || key;
+const dateA = value => value ? new Date(value).toLocaleString(langA()==='en'?'en-US':'id-ID',{dateStyle:'medium',timeStyle:'short'}) : '—';
+const moneyA = value => 'Rp '+Number(value||0).toLocaleString('id-ID');
+function showNotice(message,type='info'){
+ const el=$('accountNotice'); if(!el)return;
+ el.hidden=false;el.className='account-notice '+(type==='error'?'is-error':type==='success'?'is-success':'');
+ el.innerHTML=`<i class="fa-solid ${type==='error'?'fa-circle-exclamation':type==='success'?'fa-circle-check':'fa-circle-info'}"></i><span>${escA(message)}</span>`;
 }
-initAccount().catch(e=>{console.error(e);document.getElementById('accountNotice').textContent='Gagal memuat informasi akun: '+(e.message||'Kesalahan tidak diketahui')});
+function emptyState(icon,title,desc=''){
+ return `<div class="account-empty"><span><i class="fa-solid ${icon}"></i></span><b>${escA(title)}</b>${desc?`<p>${escA(desc)}</p>`:''}</div>`;
+}
+function renderPurchases(items,usingFallback=false){
+ const host=$('purchaseLinks'),count=$('purchaseCount'); if(!host)return;
+ if(count)count.innerHTML=`${items.length} <span>${escA(t('items'))}</span>`;
+ if(!items.length){host.innerHTML=emptyState('fa-box-open',t('no_media'),t('no_media_desc'));return;}
+ host.innerHTML=items.map(item=>{
+  const title=item.review_items?.title||item.title||'Media Telegram';
+  const slug=item.review_items?.slug||item.slug||'';
+  const thumb=item.review_items?.thumbnail_url||item.thumbnail_url||'';
+  const bought=item.created_at||item.settled_at;
+  const price=item.amount??item.price;
+  const mediaUrl=slug?`/paste/${encodeURIComponent(slug)}`:'#';
+  const detailUrl=slug?`/r/${encodeURIComponent(slug)}`:'#';
+  return `<article class="library-item">
+    <div class="library-thumb">${thumb?`<img src="${escA(thumb)}" alt="${escA(title)}" loading="lazy" onerror="this.remove();this.parentElement.innerHTML='<i class=&quot;fa-brands fa-telegram&quot;></i>'">`:'<i class="fa-brands fa-telegram"></i>'}<span class="library-check"><i class="fa-solid fa-check"></i></span></div>
+    <div class="library-info"><div class="library-tags"><span class="tag-purchased"><i class="fa-solid fa-circle-check"></i> ${escA(t('purchase_success'))}</span><span class="tag-access">${escA(t('verified'))}</span></div>
+      <h3>${escA(title)}</h3><p><i class="fa-regular fa-calendar-check"></i> ${escA(t('purchased'))} ${escA(dateA(bought))}</p>
+      ${price!=null?`<small class="library-price">${escA(t('price'))}: <b>${escA(moneyA(price))}</b></small>`:''}
+    </div>
+    <div class="library-actions">${slug?`<a class="account-action" href="${mediaUrl}"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${escA(t('open_media'))}</a><a class="library-detail-link" href="${detailUrl}">${escA(t('details'))} <i class="fa-solid fa-arrow-right"></i></a>`:'<span class="expired-link">Review unavailable</span>'}</div>
+  </article>`;
+ }).join('');
+ if(usingFallback) showNotice(t('order_fallback'),'success');
+}
+async function loadPurchasedMedia(user){
+ const host=$('purchaseLinks');
+ // The entitlement is the canonical access record. Settled orders are also
+ // queried as a recovery path so a completed payment remains visible if an
+ // older settlement missed creating its entitlement row.
+ const [entRes,orderRes]=await Promise.all([
+  sb.from('review_entitlements').select('id,review_id,created_at,order_id,review_items(id,title,slug,thumbnail_url,price,access)').eq('user_id',user.id).order('created_at',{ascending:false}),
+  sb.from('cashi_orders').select('order_id,review_id,amount,created_at,settled_at,status').eq('user_id',user.id).eq('purpose','review_download').eq('status','SETTLED').order('settled_at',{ascending:false})
+ ]);
+ if(entRes.error && orderRes.error){
+  host.innerHTML=emptyState('fa-triangle-exclamation',t('load_failed'),entRes.error.message||orderRes.error.message);
+  return;
+ }
+ const merged=new Map();
+ for(const row of (entRes.data||[])){
+  const item=row.review_items||{};
+  merged.set(row.review_id,{...row,...item,review_items:item,created_at:row.created_at});
+ }
+ const orders=orderRes.data||[];
+ const missingIds=[...new Set(orders.map(o=>o.review_id).filter(id=>{
+  if(!id)return false;
+  const existing=merged.get(id);
+  return !existing || !(existing.slug || existing.review_items?.slug);
+ }))];
+ let missingItems=[];
+ if(missingIds.length){
+  const {data,error}=await sb.from('review_items').select('id,title,slug,thumbnail_url,price,access').in('id',missingIds);
+  if(!error)missingItems=data||[];
+ }
+ const itemById=new Map(missingItems.map(x=>[x.id,x]));
+ for(const order of orders){
+  const existing=merged.get(order.review_id);
+  const item=itemById.get(order.review_id);
+  if(existing){
+   if(item)merged.set(order.review_id,{...existing,...item,review_items:item,amount:order.amount,settled_at:order.settled_at});
+   continue;
+  }
+  if(item)merged.set(order.review_id,{...item,review_items:item,order_id:order.order_id,created_at:order.settled_at||order.created_at,settled_at:order.settled_at,amount:order.amount});
+ }
+ const items=[...merged.values()].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+ renderPurchases(items,!!items.length&&!((entRes.data||[]).length));
+}
+async function initAccount(){
+ if(!window.sb?.auth)throw new Error('Supabase client unavailable');
+ const {data:{user},error:authError}=await sb.auth.getUser();
+ if(authError)throw authError;
+ if(!user){location.replace('/login.html?next='+encodeURIComponent('/account'));return;}
+ const {data:p,error:profileError}=await sb.from('profiles').select('full_name,vip_expires_at,premium_expires_at,role').eq('id',user.id).maybeSingle();
+ if(profileError)console.warn('Account profile:',profileError.message);
+ $('accountName').textContent=p?.full_name||user.user_metadata?.full_name||user.email?.split('@')[0]||'—';
+ $('accountEmail').textContent=user.email||'—';
+ const now=new Date(),premium=p?.premium_expires_at&&new Date(p.premium_expires_at)>now,vip=p?.vip_expires_at&&new Date(p.vip_expires_at)>now;
+ $('accountStatus').textContent=p?.role==='admin'?t('admin'):premium?`${t('premium_until')} ${dateA(p.premium_expires_at)}`:vip?`${t('vip_until')} ${dateA(p.vip_expires_at)}`:t('basic');
+ showNotice(langA()==='en'?'Email changes require confirmation from Supabase Auth.':'Perubahan email memerlukan konfirmasi dari Supabase Auth. Pastikan email baru dapat menerima pesan.');
+ $('emailForm').onsubmit=async e=>{
+  e.preventDefault();const btn=e.currentTarget.querySelector('button');btn.disabled=true;
+  try{const {error}=await sb.auth.updateUser({email:$('newEmail').value.trim()});if(error)throw error;showNotice(t('email_sent'),'success');e.currentTarget.reset();}
+  catch(err){showNotice(`${t('email_failed')} ${err.message||''}`,'error');}
+  finally{btn.disabled=false;}
+ };
+ $('passwordForm').onsubmit=async e=>{
+  e.preventDefault();const btn=e.currentTarget.querySelector('button');btn.disabled=true;
+  try{const {error}=await sb.auth.updateUser({password:$('newPassword').value});if(error)throw error;showNotice(t('password_updated'),'success');e.currentTarget.reset();}
+  catch(err){showNotice(`${t('password_failed')} ${err.message||''}`,'error');}
+  finally{btn.disabled=false;}
+ };
+ await loadPurchasedMedia(user);
+
+ const {data:groups,error:gerror}=await sb.rpc('get_my_vip_group_entitlements');
+ const groupRows=(groups||[]);
+ $('groupLinks').innerHTML=gerror?emptyState('fa-triangle-exclamation',langA()==='en'?'Group history unavailable':'Riwayat group belum dapat dimuat',gerror.message):groupRows.map(x=>{
+  const link=/^https:\/\/(t\.me|telegram\.me)\//i.test(x.telegram_url||'')?x.telegram_url:'';
+  return `<article class="purchase-row account-simple-row vip-owned-group"><span class="simple-row-icon"><i class="fa-brands fa-telegram"></i></span><div><b>${escA(x.group_name||'VIP Telegram')}</b><small>${escA(t('purchased'))} ${escA(dateA(x.purchased_at))} · ${escA(t('link_updated'))}</small></div><div class="vip-owned-actions">${link?`<a class="account-action" href="${escA(link)}" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i> ${escA(t('join_group'))}</a><button class="account-action vip-copy-link" type="button" data-link="${escA(link)}"><i class="fa-regular fa-copy"></i> ${escA(t('copy_link'))}</button>`:`<span class="expired-link">${escA(t('invite_expired'))}</span>`}<button class="library-detail-link vip-refresh-link" type="button" onclick="location.reload()">${escA(t('check_link'))} <i class="fa-solid fa-rotate"></i></button></div></article>`;
+ }).join('')||emptyState('fa-users',t('no_groups'));
+ $('groupLinks')?.querySelectorAll('.vip-copy-link').forEach(btn=>btn.addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(btn.dataset.link);btn.innerHTML='<i class="fa-solid fa-check"></i> '+(langA()==='en'?'Copied':'Tersalin');}
+  catch{showNotice(langA()==='en'?'Could not copy the link. Open the group button instead.':'Link tidak dapat disalin. Gunakan tombol Masuk Group.','error');}
+ }));
+ const freshGroup=groupRows.find(x=>new Date(x.purchased_at)>new Date(Date.now()-24*3600000)&&x.telegram_url);
+ const successBox=$('groupPurchaseSuccess');
+ if(freshGroup&&successBox){successBox.hidden=false;successBox.innerHTML=`<i class="fa-solid fa-circle-check"></i><div><b>${escA(t('group_notice'))}</b><span>${escA(freshGroup.group_name||'VIP Telegram')} · ${escA(t('link_updated'))}</span>${freshGroup.telegram_url?`<a class="account-action" href="${escA(freshGroup.telegram_url)}" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i> ${escA(t('join_group'))}</a>`:''}</div>`;}
+
+ const {data:history,error:historyError}=await sb.from('video_watch_history').select('watched_at,videos(title,slug,thumbnail_url)').eq('user_id',user.id).order('watched_at',{ascending:false}).limit(50);
+ $('watchHistory').innerHTML=historyError?emptyState('fa-clock',langA()==='en'?'Watch history unavailable':'Riwayat tonton belum tersedia',historyError.message):(history||[]).map(x=>`<article class="purchase-row account-simple-row"><span class="simple-row-icon">${x.videos?.thumbnail_url?`<img src="${escA(x.videos.thumbnail_url)}" alt="">`:'<i class="fa-solid fa-play"></i>'}</span><div><b>${escA(x.videos?.title||'Video BoxVidey')}</b><small>${escA(t('watched'))} ${escA(dateA(x.watched_at))}</small></div>${x.videos?.slug?`<a class="account-action" href="/v/${encodeURIComponent(x.videos.slug)}"><i class="fa-solid fa-play"></i> ${escA(t('watch_again'))}</a>`:''}</article>`).join('')||emptyState('fa-clock',t('no_history'));
+}
+document.addEventListener('DOMContentLoaded',()=>initAccount().catch(error=>{
+ console.error('BoxCellink account:',error);
+ const notice=$('accountNotice');if(notice){notice.hidden=false;notice.className='account-notice is-error';notice.innerHTML=`<i class="fa-solid fa-circle-exclamation"></i><span>${escA(t('account_error'))}: ${escA(error.message||'Unknown error')}</span>`;}
+}));
+})();
