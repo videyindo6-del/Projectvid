@@ -51,6 +51,51 @@ const AD_UNITS={
 };
 function mountAdUnit(host,unit){if(!host||host.dataset.loaded==='1')return;host.dataset.loaded='1';const {width,height,key}=unit;const frame=document.createElement('iframe');frame.title='Advertisement';frame.width=String(width);frame.height=String(height);frame.loading='lazy';frame.scrolling='no';frame.referrerPolicy='no-referrer-when-downgrade';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');frame.style.cssText=`display:block;border:0;width:min(100%,${width}px);height:${height}px;margin:auto;overflow:hidden`;const srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent}</style></head><body><script>var atOptions={key:'${key}',format:'iframe',height:${height},width:${width},params:{}};<\/script><script src="https://www.highrevenueformat.com/${key}/invoke.js"><\/script></body></html>`;frame.srcdoc=srcdoc;host.replaceChildren(frame)}
 function mountInlineAd(host){if(!host||host.dataset.loaded==='1')return;host.dataset.loaded='1';const frame=document.createElement('iframe');frame.title='Advertisement';frame.loading='lazy';frame.scrolling='no';frame.style.cssText='display:block;width:100%;min-height:250px;border:0;overflow:hidden';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;min-height:250px}</style></head><body><script async="async" data-cfasync="false" src="https://pl32231888.profitableratecpmnetwork.com/d0c4535d3914ad4b2c4e09c4aa337646/invoke.js"><\/script><div id="container-d0c4535d3914ad4b2c4e09c4aa337646"></div></body></html>';host.replaceChildren(frame)}
+function mountFloatingBanner(){
+ const wrap=$('#floatingBannerAd'),slot=$('#floatingBannerAdSlot'),hide=$('#hideFloatingBanner'),show=$('#showFloatingBanner');
+ if(!wrap||!slot||wrap.dataset.loaded==='1')return;
+ wrap.dataset.loaded='1';
+ const frame=document.createElement('iframe');frame.title='Iklan banner';frame.width='320';frame.height='50';frame.loading='eager';frame.scrolling='no';
+ frame.style.cssText='display:block;width:320px;max-width:100%;height:50px;border:0;margin:auto';
+ frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:320px;height:50px;overflow:hidden}</style></head><body><script>var atOptions={key:'e48004340d99ba399e04e57dd40239fa',format:'iframe',height:50,width:320,params:{}};<\/script><script src="https://www.highrevenueformat.com/e48004340d99ba399e04e57dd40239fa/invoke.js"><\/script></body></html>`;
+ slot.replaceChildren(frame);
+ window.setTimeout(()=>{if(!isVip&&!sessionStorage.getItem('boxcellinkFloatingAdHidden'))wrap.hidden=false},7000);
+ hide?.addEventListener('click',()=>{wrap.hidden=true;show.hidden=false;sessionStorage.setItem('boxcellinkFloatingAdHidden','1')});
+ show?.addEventListener('click',()=>{wrap.hidden=false;show.hidden=true;sessionStorage.removeItem('boxcellinkFloatingAdHidden')});
+}
+let interstitialTimer=null,interstitialOpen=false,interstitialCountdown=null;
+function showVideoInterstitial(){
+ if(isVip||interstitialOpen||document.hidden)return;
+ const overlay=$('#videoInterstitialAd'),slot=$('#videoInterstitialSlot'),close=$('#closeVideoInterstitial');
+ if(!overlay||!slot||!close)return;
+ interstitialOpen=true;overlay.hidden=false;close.disabled=true;
+ let left=5;close.textContent=`Lewati dalam ${left}`;
+ const frame=document.createElement('iframe');frame.title='Iklan';frame.style.cssText='display:block;width:100%;height:100%;min-height:70vh;border:0';
+ frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;background:#fff;overflow:auto}</style></head><body><script async="async" data-cfasync="false" src="https://pl32231888.profitableratecpmnetwork.com/d0c4535d3914ad4b2c4e09c4aa337646/invoke.js"><\/script><div id="container-d0c4535d3914ad4b2c4e09c4aa337646"></div></body></html>';
+ slot.replaceChildren(frame);
+ interstitialCountdown=window.setInterval(()=>{left--;if(left<=0){clearInterval(interstitialCountdown);close.disabled=false;close.textContent='Tutup iklan'}else close.textContent=`Lewati dalam ${left}`},1000);
+}
+function closeVideoInterstitial(){const overlay=$('#videoInterstitialAd');if(!overlay)return;overlay.hidden=true;interstitialOpen=false;clearInterval(interstitialCountdown);$('#videoInterstitialSlot')?.replaceChildren()}
+function startVideoAdCycle(){
+ if(isVip||interstitialTimer)return;
+ interstitialTimer=window.setInterval(()=>{if(videoPlaybackActive&&!document.hidden)showVideoInterstitial()},10000);
+}
+let videoPlaybackActive=false;
+function setupVideoAdPlayback(){
+ const host=$('#watchContent');if(!host||isVip)return;
+ host.addEventListener('play',e=>{if(e.target?.tagName==='VIDEO'){videoPlaybackActive=true;startVideoAdCycle()}},true);
+ host.addEventListener('pause',e=>{if(e.target?.tagName==='VIDEO')videoPlaybackActive=false},true);
+ host.addEventListener('ended',()=>{videoPlaybackActive=false},true);
+ // Embed players are cross-origin; count an explicit interaction with the player as playback intent.
+ host.addEventListener('click',e=>{if(e.target.closest('.watch-player iframe')){videoPlaybackActive=true;startVideoAdCycle()}});
+ window.addEventListener('message',e=>{
+  const d=e.data;if(!d)return;let s='';try{s=typeof d==='string'?d:JSON.stringify(d)}catch{}
+  if(/"event"\s*:\s*"(?:pause|ended|finish)"|"infoDelivery".*"playerState"\s*:\s*2/i.test(s))videoPlaybackActive=false;
+  if(/"event"\s*:\s*"(?:play|playing)"|"playerState"\s*:\s*1/i.test(s)){videoPlaybackActive=true;startVideoAdCycle()}
+ });
+ $('#closeVideoInterstitial')?.addEventListener('click',closeVideoInterstitial);
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)closeVideoInterstitial()});
+}
 function setupGuestAds(){
  const role=isVip?'vip':(currentUser?'member':'guest');
  const bannerSelectors=role==='guest'
@@ -64,26 +109,14 @@ function setupGuestAds(){
   host.hidden=false;const wrapper=host.closest('.ad-side-card,.adsterra-wide-wrap');if(wrapper)wrapper.hidden=false;mountAdUnit(host,unit);
  }));
  if(role!=='vip')document.querySelectorAll('.ad-inline-300').forEach(mountInlineAd);
- const socialStack=document.getElementById('guestAdTop');
- if(role==='guest'||role==='member'){
-  if(socialStack){socialStack.hidden=false;socialStack.dataset.adRole=role;socialStack.setAttribute('aria-label','Iklan social bar mengambang');}
-  document.querySelectorAll('.adsterra-social-slot').forEach((host,i)=>{
-   const shouldShow=role==='guest'||i===0;
-   host.hidden=!shouldShow;
-   if(!shouldShow)return;
-   host.innerHTML='';host.dataset.stackIndex=String(i);
-   const frame=document.createElement('iframe');frame.title='Social Bar advertisement '+(i+1);frame.loading='eager';
-   frame.style.cssText='display:block;width:100%;height:76px;border:0;overflow:hidden;background:transparent';
-   frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
-   frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent}</style></head><body><script src="https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js"><\/script></body></html>';
-   host.replaceChildren(frame);
-  });
- }else{socialStack?.remove();document.getElementById('guestPopunderSlot')?.remove();}
- // Pop-under is loaded once per page for guests after a short delay. Re-injecting it
- // on a 3-second loop is blocked by browsers and can violate ad-network frequency rules.
- if(role==='guest'&&!window.__boxcellinkPopunderLoaded){
-  window.__boxcellinkPopunderLoaded=true;
-  window.setTimeout(()=>{const pop=document.createElement('script');pop.src='https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js';pop.async=true;document.head.appendChild(pop)},3000);
+ const socialStack=$('#guestAdTop');
+ if(role!=='vip'){
+  if(socialStack){socialStack.hidden=true;socialStack.dataset.adRole=role;}
+  mountFloatingBanner();
+  setupVideoAdPlayback();
+ }else{
+  socialStack?.remove();$('#floatingBannerAd')?.remove();$('#showFloatingBanner')?.remove();$('#videoInterstitialAd')?.remove();
+  if(interstitialTimer)clearInterval(interstitialTimer);
  }
 }
 async function showGuestWatchPreparation(){
