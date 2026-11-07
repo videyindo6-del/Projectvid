@@ -6,6 +6,56 @@
   const count = document.getElementById('catalogCount');
   if (!videoGrid || !telegramGrid) return;
 
+  // Homepage CTA mengikuti sesi Supabase: tombol Login/Register hanya untuk guest.
+  const guestActions = document.getElementById('homeGuestActions');
+  const bottomCta = document.getElementById('homeBottomCta');
+  const ctaDescription = document.getElementById('homeCtaDescription');
+  const ctaLink = document.getElementById('homeCtaLink');
+  let authStateResolved = false;
+  function updateHomeAuthUI(user) {
+    authStateResolved = true;
+    if (guestActions) guestActions.hidden = !!user;
+    if (bottomCta) {
+      bottomCta.hidden = false;
+      if (user) {
+        if (ctaDescription) ctaDescription.textContent = en()
+          ? 'Continue exploring your Boxcelink member area.'
+          : 'Lanjutkan menjelajahi konten dan fitur member Boxcelink.';
+        if (ctaLink) {
+          ctaLink.href = '/dashboard.html';
+          ctaLink.innerHTML = `${en() ? 'Open Dashboard' : 'Buka Dashboard'} <i class="fa-solid fa-arrow-right"></i>`;
+        }
+      } else {
+        if (ctaDescription) ctaDescription.textContent = en()
+          ? 'Create a free account to enjoy a more complete content experience.'
+          : 'Buat akun gratis untuk menikmati pengalaman konten yang lebih lengkap.';
+        if (ctaLink) {
+          ctaLink.href = '/register.html';
+          ctaLink.innerHTML = `${en() ? 'Create account' : 'Buat akun'} <i class="fa-solid fa-arrow-right"></i>`;
+        }
+      }
+    }
+  }
+  async function checkHomeAuth() {
+    if (!window.sb?.auth) {
+      updateHomeAuthUI(null);
+      return;
+    }
+    try {
+      const { data, error } = await window.sb.auth.getSession();
+      if (error) throw error;
+      updateHomeAuthUI(data?.session?.user || null);
+    } catch (error) {
+      // Jika pemeriksaan sesi gagal, jangan menyimpulkan bahwa user sudah logout.
+      console.warn('Homepage auth state unavailable:', error);
+      updateHomeAuthUI(null);
+    }
+    window.sb.auth.onAuthStateChange((_event, session) => {
+      updateHomeAuthUI(session?.user || null);
+    });
+  }
+  checkHomeAuth();
+
   let videos = [], reviews = [];
   const lang = () => localStorage.getItem('boxcellink_lang') || 'id';
   const en = () => lang() === 'en';
