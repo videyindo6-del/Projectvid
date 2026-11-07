@@ -29,9 +29,9 @@
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const num = value => Number(value || 0).toLocaleString(lang() === 'id' ? 'id-ID' : 'en-US');
   const rupiah = value => lang() === 'id' ? 'Rp ' + num(value) : 'IDR ' + num(value);
-  const thumb = (url, title, icon='fa-play') => url
-    ? `<img class="media-thumb" src="${esc(url)}" alt="${esc(title)}" loading="lazy" onerror="this.onerror=null;this.parentElement.classList.add('thumb-fallback');this.remove()">`
-    : `<div class="media-thumb thumb-fallback"><i class="fa-solid ${icon}"></i></div>`;
+  const thumb = (url, title, iconClass='fa-solid fa-play') => url
+    ? `<img class="media-thumb" src="${esc(url)}" alt="${esc(title)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.onerror=null;this.classList.add('is-broken');this.outerHTML='<div class=\'media-thumb thumb-fallback\'><i class=\'${iconClass}\'></i></div>'">`
+    : `<div class="media-thumb thumb-fallback"><i class="${esc(iconClass)}"></i></div>`;
   const empty = message => `<div class="member-empty"><i class="fa-regular fa-folder-open"></i><b>${esc(message)}</b><span>${esc(t('empty'))}</span></div>`;
   const stat = (icon, value, label, color='') => `<span class="stat-item ${color}"><i class="fa-solid ${icon}"></i><b>${num(value)}</b><small>${esc(label)}</small></span>`;
   const safeVideoUrl = v => v.slug ? `/v/${encodeURIComponent(v.slug)}` : `/watch.html?id=${encodeURIComponent(v.id)}`;
