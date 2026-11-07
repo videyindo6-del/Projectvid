@@ -3,41 +3,51 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#102b49">
-<title>VIP Membership — Boxcellink</title>
+<title>VIP Membership — BoxCellink</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 <link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css">
 <link rel="stylesheet" href="/css/upgrade-pages.css"><link rel="stylesheet" href="/css/vip-saas-premium.css">
 </head>
-<body>
+<body class="vip-membership-page">
 <div data-component="navbar"></div>
-<main class="page">
-  <section class="upgrade-hero">
-    <span class="eyebrow">BOXCELLINK MEMBERSHIP</span>
-    <h1>Upgrade pengalaman menonton Anda.</h1>
-    <p>Dapatkan akses ke konten BoxVidey khusus VIP, diskon member untuk konten review berbayar yang memenuhi syarat, dan kelola masa aktif dari satu akun.</p>
-    <div class="vip-status" id="vipStatus" aria-live="polite"><span><i class="fa-solid fa-circle-notch fa-spin"></i> Memeriksa status membership...</span></div>
+<main class="page vip-page">
+  <section class="upgrade-hero vip-hero">
+    <div class="vip-hero-copy">
+      <span class="eyebrow">BOXCELLINK MEMBERSHIP</span>
+      <h1>Upgrade pengalaman menonton Anda.</h1>
+      <p>Dapatkan akses ke konten BoxVidey khusus VIP, diskon member untuk konten review berbayar yang memenuhi syarat, dan kelola masa aktif dari satu akun.</p>
+      <div class="vip-status" id="vipStatus" aria-live="polite">
+        <span class="vip-status-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Memeriksa status membership...</span>
+      </div>
+    </div>
+    <div class="vip-hero-mark" aria-hidden="true"><span><i class="fa-solid fa-crown"></i></span><small>PREMIUM<br>MEMBERSHIP</small></div>
   </section>
 
   <section class="benefit-grid" aria-label="Keuntungan VIP">
     <article><i class="fa-solid fa-crown"></i><h3>Akses konten VIP</h3><p>Tonton konten BoxVidey yang ditandai khusus VIP selama masa aktif akun.</p></article>
     <article><i class="fa-solid fa-tags"></i><h3>Diskon member</h3><p>VIP aktif memperoleh diskon 20% untuk konten review berbayar yang memenuhi syarat.</p></article>
-    <article><i class="fa-solid fa-calendar-check"></i><h3>Masa aktif transparan</h3><p>Periksa tanggal kedaluwarsa membership kapan saja melalui halaman Akun Saya.</p></article>
-    <article><i class="fa-solid fa-shield-halved"></i><h3>Pembayaran terverifikasi</h3><p>Akses diaktifkan setelah pembayaran berhasil dikonfirmasi oleh server.</p></article>
+    <article><i class="fa-solid fa-calendar-check"></i><h3>Masa aktif transparan</h3><p>Tanggal mulai dan kedaluwarsa membership ditampilkan secara jelas.</p></article>
+    <article><i class="fa-solid fa-shield-halved"></i><h3>Pembayaran terverifikasi</h3><p>Status VIP diaktifkan otomatis setelah pembayaran dikonfirmasi server.</p></article>
   </section>
 
-  <section class="plans">
+  <section class="plans" id="vipPackages">
     <div class="section-title"><span class="eyebrow">PILIH MEMBERSHIP</span><h2>Daftar Paket VIP</h2><p>Paket dan harga mengikuti pengaturan resmi dari admin.</p></div>
     <div id="vipPlans" class="plan-grid"><div class="empty-state"><i class="fa-solid fa-circle-notch fa-spin"></i> Memuat paket VIP...</div></div>
   </section>
 
   <section class="discount-explain">
-    <h2>Ketentuan diskon VIP 20%</h2>
+    <div class="discount-icon"><i class="fa-solid fa-percent"></i></div>
+    <div><h2>Ketentuan diskon VIP 20%</h2>
     <p>Diskon berlaku untuk pembelian konten review berbayar selama status VIP masih aktif, kecuali konten yang dikecualikan oleh admin. Diskon dihitung otomatis saat checkout dan tidak berlaku untuk paket VIP atau Group VIP Telegram. Jika kupon referral juga digunakan, sistem menerapkan diskon tertinggi yang memenuhi syarat, bukan menjumlahkan diskon.</p>
-    <p>Membership Group VIP Telegram terpisah dari VIP akun website.</p>
+    <p>Membership Group VIP Telegram terpisah dari VIP akun website.</p></div>
   </section>
 
   <a class="telegram-cta" href="/vip-groups.html"><i class="fa-brands fa-telegram"></i><div><strong>Group VIP Telegram</strong><span>Lihat group, harga, dan detail akses secara terpisah.</span></div><i class="fa-solid fa-arrow-right"></i></a>
 </main>
+<div id="vipNotice" class="vip-notice" role="status" aria-live="polite" hidden>
+  <span class="vip-notice-icon"><i class="fa-solid fa-check"></i></span><div><strong id="vipNoticeTitle"></strong><p id="vipNoticeText"></p></div>
+  <button type="button" id="vipNoticeClose" aria-label="Tutup notifikasi"><i class="fa-solid fa-xmark"></i></button>
+</div>
 <div data-component="footer"></div>
 <script src="/components.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
