@@ -97,3 +97,48 @@ body{background:var(--watch-bg);color:var(--watch-ink);font-family:"DM Sans",Int
 .adsterra-banner-clean{grid-column:1/-1;display:block;width:100%;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
 .adsterra-banner-clean .ad-box{width:100%;min-height:250px;background:transparent}
 .adsterra-banner-clean .ad-box iframe{width:100%;min-height:250px}
+
+
+/* BoxCellink Watch — refined ivory/blue SaaS finish */
+:root{--watch-bg:#f7f5ef;--watch-surface:#fffefa;--watch-ink:#233b57;--watch-muted:#74849a;--watch-line:#e8e9e5;--watch-blue:#3478bd;--watch-blue-dark:#245b94;--watch-blue-soft:#edf4fb;--watch-shadow:0 10px 28px rgba(39,65,94,.055)}
+body{background:#f7f5ef;color:#233b57}
+.watch-shell{width:min(1280px,94%);margin:28px auto 58px}
+.watch-topline{margin-bottom:18px}
+.watch-topline h1{color:#203b59;letter-spacing:-1.15px}
+.watch-main-card,.section-panel,.side-card{background:#fffefa;border-color:#e8e9e5;border-radius:17px;box-shadow:0 9px 26px rgba(39,65,94,.045)}
+.section-panel{padding:20px}
+.section-heading h2{color:#233e5c}
+.watch-layout{grid-template-columns:minmax(0,1fr) 270px;gap:18px}
+.watch-sidebar{gap:12px}
+.side-card{padding:15px}
+/* Compact VIP membership card: small footprint, clear upgrade action */
+.vip-side-card{display:grid;grid-template-columns:36px minmax(0,1fr);column-gap:11px;align-items:center;background:linear-gradient(135deg,#f5f9ff,#edf4fc);border:1px solid #dce8f5;color:#294766;padding:14px}
+.vip-side-card:after{width:90px;height:90px;right:-48px;top:-50px;border-color:rgba(52,120,189,.12);box-shadow:0 0 0 13px rgba(52,120,189,.035),0 0 0 26px rgba(52,120,189,.025)}
+.vip-side-icon{grid-row:1/4;width:36px;height:36px;margin:0;border-radius:11px;background:#e1edfa;color:#3478bd;font-size:14px}
+.vip-side-card .eyebrow{font-size:8px;letter-spacing:1.1px;color:#6483a5}
+.vip-side-card h3{font:800 14px/1.3 Manrope,sans-serif;color:#294766;margin:4px 0}
+.vip-side-card p{font-size:10px;line-height:1.5;color:#71839a;margin:0 0 8px}
+.vip-side-card .action-primary{justify-self:start;position:relative;z-index:1;padding:7px 10px;border-radius:8px;background:#3478bd;color:#fff;font-size:10px;box-shadow:0 4px 10px rgba(52,120,189,.15)}
+.category-link{padding:9px 8px;border:1px solid transparent;border-radius:9px;font-size:11px}
+.category-link:hover{background:#f1f6fc;border-color:#e3edf8}
+.category-count{display:inline-flex;align-items:center;white-space:nowrap;padding:4px 7px;border-radius:7px;background:#edf4fb;color:#3472ad;font-size:9px;font-weight:850;line-height:1.2}
+.category-video-head h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.category-video-head .category-count{font-family:"DM Sans",sans-serif}
+.video-tile-link{background:#edf2f7;border:1px solid #e7edf4}
+.video-tile-link img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb-placeholder{min-height:100%;width:100%;display:grid;place-items:center;background:linear-gradient(135deg,#edf4fb,#dce9f7);color:#83a3c7}
+.tile-copy h3{color:#29425f}
+.adsterra-banner{background:#fbfcfd;border-color:#e6ebf1}
+/* Floating, overlapping social-bar placements */
+.guest-ad-stack{position:fixed!important;top:88px!important;right:14px!important;bottom:auto!important;z-index:6500!important;width:min(300px,calc(100vw - 28px))!important;display:flex!important;flex-direction:column!important;align-items:stretch;gap:0!important;pointer-events:none}
+.guest-ad-stack[hidden]{display:none!important}
+.adsterra-social-slot{position:relative;min-height:66px;height:76px;margin:0 0 -22px 0;padding:5px;border:1px solid rgba(202,216,232,.9);border-radius:12px;background:rgba(255,254,250,.97);box-shadow:0 8px 24px rgba(30,55,82,.16);overflow:hidden;pointer-events:auto;transform:translateX(calc(var(--stack-index,0)*-2px))}
+.adsterra-social-slot:nth-child(1){z-index:3;margin-right:0}
+.adsterra-social-slot:nth-child(2){z-index:2;margin-right:8px}
+.adsterra-social-slot:nth-child(3){z-index:1;margin-right:16px}
+.adsterra-social-slot iframe{width:100%;height:100%;border:0;border-radius:8px}
+.adsterra-social-slot:empty{display:none}
+@media(max-width:760px){.watch-shell{width:94%;margin:18px auto 42px}.watch-layout{grid-template-columns:1fr}.watch-sidebar{grid-template-columns:repeat(2,minmax(0,1fr))}.vip-side-card{grid-template-columns:34px minmax(0,1fr)}.guest-ad-stack{top:76px!important;right:8px!important;width:min(238px,calc(100vw - 16px))!important}.adsterra-social-slot{height:64px;min-height:58px;margin-bottom:-19px}}
+@media(max-width:480px){.watch-sidebar{grid-template-columns:1fr}.vip-side-card{grid-template-columns:36px minmax(0,1fr)}.section-panel{padding:15px}.guest-ad-stack{top:70px!important;width:min(210px,calc(100vw - 16px))!important}.adsterra-social-slot{height:58px;min-height:54px;margin-bottom:-17px}}
+
+.thumb-failed{position:relative!important;background:linear-gradient(135deg,#edf4fb,#dce9f7)!important;display:grid!important;place-items:center!important}.thumb-failed:after{content:"\f144";font-family:"Font Awesome 6 Free";font-weight:900;color:#83a3c7;font-size:26px}
