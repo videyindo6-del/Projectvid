@@ -51,11 +51,54 @@ const AD_UNITS={
 };
 function mountAdUnit(host,unit){if(!host||host.dataset.loaded==='1')return;host.dataset.loaded='1';const {width,height,key}=unit;const frame=document.createElement('iframe');frame.title='Advertisement';frame.width=String(width);frame.height=String(height);frame.loading='lazy';frame.scrolling='no';frame.referrerPolicy='no-referrer-when-downgrade';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');frame.style.cssText=`display:block;border:0;width:min(100%,${width}px);height:${height}px;margin:auto;overflow:hidden`;const srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent}</style></head><body><script>var atOptions={key:'${key}',format:'iframe',height:${height},width:${width},params:{}};<\/script><script src="https://www.highrevenueformat.com/${key}/invoke.js"><\/script></body></html>`;frame.srcdoc=srcdoc;host.replaceChildren(frame)}
 function mountInlineAd(host){if(!host||host.dataset.loaded==='1')return;host.dataset.loaded='1';const frame=document.createElement('iframe');frame.title='Advertisement';frame.loading='lazy';frame.scrolling='no';frame.style.cssText='display:block;width:100%;min-height:250px;border:0;overflow:hidden';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;min-height:250px}</style></head><body><script async="async" data-cfasync="false" src="https://pl32231888.profitableratecpmnetwork.com/d0c4535d3914ad4b2c4e09c4aa337646/invoke.js"><\/script><div id="container-d0c4535d3914ad4b2c4e09c4aa337646"></div></body></html>';host.replaceChildren(frame)}
-function setupGuestAds(){const fullAds=!isVip;const bannerHosts=[['.ad-unit-728',AD_UNITS.banner728],['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300],['#ad160x300',AD_UNITS.banner160x300],['#ad160x600',AD_UNITS.banner160x600]];document.querySelectorAll('.guest-and-vip-banner').forEach(el=>el.hidden=false);bannerHosts.forEach(([sel,unit])=>document.querySelectorAll(sel).forEach(host=>mountAdUnit(host,unit)));document.querySelectorAll('.ad-inline-300').forEach(mountInlineAd);if(fullAds){const socialStack=document.getElementById('guestAdTop');if(socialStack){socialStack.hidden=false;socialStack.setAttribute('aria-label','Iklan social bar mengambang');}document.querySelectorAll('.adsterra-social-slot').forEach((host,i)=>{host.innerHTML='';host.dataset.stackIndex=String(i);const frame=document.createElement('iframe');frame.title='Social Bar advertisement '+(i+1);frame.loading='eager';frame.style.cssText='display:block;width:100%;height:76px;border:0;overflow:hidden;background:transparent';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent}</style></head><body><script src="https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js"><\/script></body></html>';host.replaceChildren(frame)});const pop=document.createElement('script');pop.src='https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js';pop.async=true;document.head.appendChild(pop);}
- else {document.getElementById('guestAdTop')?.remove();document.getElementById('guestPopunderSlot')?.remove();}
+function setupGuestAds(){
+ const role=isVip?'vip':(currentUser?'member':'guest');
+ const bannerSelectors=role==='guest'
+  ?[['.ad-unit-728',AD_UNITS.banner728],['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300],['#ad160x300',AD_UNITS.banner160x300],['#ad160x600',AD_UNITS.banner160x600]]
+  :role==='member'
+   ?[['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300]]
+   :[['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468]];
+ document.querySelectorAll('.adsterra-wide-wrap,.ad-side-card').forEach(el=>el.hidden=true);
+ document.querySelectorAll('.ad-unit-728,.ad-unit-320,.ad-unit-468,#ad300x250,#ad160x300,#ad160x600').forEach(el=>el.hidden=true);
+ bannerSelectors.forEach(([sel,unit])=>document.querySelectorAll(sel).forEach(host=>{
+  host.hidden=false;const wrapper=host.closest('.ad-side-card,.adsterra-wide-wrap');if(wrapper)wrapper.hidden=false;mountAdUnit(host,unit);
+ }));
+ if(role!=='vip')document.querySelectorAll('.ad-inline-300').forEach(mountInlineAd);
+ const socialStack=document.getElementById('guestAdTop');
+ if(role==='guest'||role==='member'){
+  if(socialStack){socialStack.hidden=false;socialStack.dataset.adRole=role;socialStack.setAttribute('aria-label','Iklan social bar mengambang');}
+  document.querySelectorAll('.adsterra-social-slot').forEach((host,i)=>{
+   const shouldShow=role==='guest'||i===0;
+   host.hidden=!shouldShow;
+   if(!shouldShow)return;
+   host.innerHTML='';host.dataset.stackIndex=String(i);
+   const frame=document.createElement('iframe');frame.title='Social Bar advertisement '+(i+1);frame.loading='eager';
+   frame.style.cssText='display:block;width:100%;height:76px;border:0;overflow:hidden;background:transparent';
+   frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');
+   frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent}</style></head><body><script src="https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js"><\/script></body></html>';
+   host.replaceChildren(frame);
+  });
+ }else{socialStack?.remove();document.getElementById('guestPopunderSlot')?.remove();}
+ // Pop-under is loaded once per page for guests after a short delay. Re-injecting it
+ // on a 3-second loop is blocked by browsers and can violate ad-network frequency rules.
+ if(role==='guest'&&!window.__boxcellinkPopunderLoaded){
+  window.__boxcellinkPopunderLoaded=true;
+  window.setTimeout(()=>{const pop=document.createElement('script');pop.src='https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js';pop.async=true;document.head.appendChild(pop)},3000);
+ }
+}
+async function showGuestWatchPreparation(){
+ const host=$('#watchContent');if(!host)return;
+ const messages=lang()==='en'
+  ?['Preparing media','Preparing page','Checking status','Media ready to watch']
+  :['Menyiapkan media','Menyiapkan halaman','Memeriksa status','Media siap ditonton'];
+ host.innerHTML=`<div class="watch-preparation" role="status" aria-live="polite"><span class="preparation-orb"><i class="fa-solid fa-play"></i></span><strong id="watchPreparationText">${messages[0]}</strong><div class="preparation-track"><span></span></div><small>BOXCELLINK · WATCH</small></div>`;
+ let index=0;const text=$('#watchPreparationText');
+ const ticker=window.setInterval(()=>{index=Math.min(index+1,messages.length-1);if(text)text.textContent=messages[index]},750);
+ await new Promise(resolve=>window.setTimeout(resolve,3000));
+ window.clearInterval(ticker);
 }
 function saveGuestHistory(v){try{const key='boxcellink_watch_history_guest';let a=JSON.parse(localStorage.getItem(key)||'[]');a=a.filter(x=>x.id!==v.id);a.unshift({id:v.id,title:v.title,slug:v.slug,thumbnail_url:v.thumbnail_url,watched_at:new Date().toISOString()});localStorage.setItem(key,JSON.stringify(a.slice(0,20)))}catch{}}
-async function load(){applyLang();try{const {data:{user},error:authErr}=await sb.auth.getUser();if(!authErr)currentUser=user||null;if(currentUser){const {data:p}=await sb.from('profiles').select('vip_expires_at').eq('id',currentUser.id).maybeSingle();isVip=!!p?.vip_expires_at&&new Date(p.vip_expires_at)>new Date()}setupGuestAds();applyLang();
+async function load(){applyLang();try{const {data:{user},error:authErr}=await sb.auth.getUser();if(!authErr)currentUser=user||null;if(currentUser){const {data:p}=await sb.from('profiles').select('vip_expires_at').eq('id',currentUser.id).maybeSingle();isVip=!!p?.vip_expires_at&&new Date(p.vip_expires_at)>new Date()}if(!currentUser)await showGuestWatchPreparation();setupGuestAds();applyLang();
  const path=location.pathname.split('/').filter(Boolean),slug=(new URLSearchParams(location.search).get('slug')||path.at(-1)||'').trim();let q=sb.from('videos').select('*,categories(name)').eq('status','published');let {data:v,error}=await q.eq('slug',slug).maybeSingle();if(!v&&!error){const byId=await sb.from('videos').select('*,categories(name)').eq('id',slug).maybeSingle();v=byId.data;error=byId.error}if(error||!v){$('#watchContent').innerHTML=`<div class="empty-state large"><i class="fa-regular fa-circle-play"></i><h2>${tr('notFound')}</h2></div>`;return}currentVideo=v;
  await sb.rpc('increment_video_view',{p_video_id:v.id});if(currentUser)await sb.rpc('record_video_watch',{p_video_id:v.id});else saveGuestHistory(v);
  const [{count:likes},{data:comments},{data:liked}]=await Promise.all([sb.from('video_likes').select('*',{count:'exact',head:true}).eq('video_id',v.id),sb.from('video_comments').select('id,body,created_at,user_id,guest_name').eq('video_id',v.id).order('created_at',{ascending:false}).limit(50),currentUser?sb.from('video_likes').select('id').eq('video_id',v.id).eq('user_id',currentUser.id).maybeSingle():Promise.resolve({data:null})]);
