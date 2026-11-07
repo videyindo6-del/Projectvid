@@ -12,3 +12,46 @@ body:has(.upgrade-hero){background:radial-gradient(circle at 8% 0%,rgba(37,99,23
 .discount-explain{margin-top:26px!important;padding:22px!important;border:1px solid var(--vip-line)!important;border-radius:18px!important;background:#fff!important;color:var(--vip-ink)}.discount-explain p{color:var(--vip-muted);line-height:1.75}.telegram-cta{display:flex;align-items:center;gap:15px;margin-top:20px;padding:19px 22px;border:1px solid #cfe1f8;border-radius:18px;background:#eff6ff;color:#174a83!important;text-decoration:none}.telegram-cta>i:first-child{font-size:25px}.telegram-cta div{display:grid;gap:4px;flex:1}.telegram-cta span{color:#64748b}.empty-state{padding:28px;border:1px dashed #cbd5e1;border-radius:18px;background:rgba(255,255,255,.7);color:#64748b;text-align:center}.error-state{color:#b42318}.vip-admin-side{box-shadow:12px 0 40px rgba(8,26,48,.12);background:linear-gradient(180deg,#0d2744,#123b64)!important}.vip-admin-main>header{box-shadow:0 20px 50px rgba(16,43,73,.16)}.manager-section{box-shadow:0 12px 35px rgba(16,43,73,.055)!important}.manager-row{background:linear-gradient(180deg,#fff,#fbfdff);border-color:#e7edf5!important}.manager-row button{font-weight:800;transition:.15s}.manager-row button:hover{transform:translateY(-1px);border-color:#93b4df;background:#eff6ff}.manager-row button.danger:hover{background:#fff1f0;border-color:#fecaca}
 @media(max-width:900px){.benefit-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:600px){.page{padding:20px 14px 44px!important}.upgrade-hero{border-radius:20px!important;padding:26px 21px!important}.benefit-grid{grid-template-columns:1fr!important}.plan-grid,.group-grid{grid-template-columns:1fr!important}.premium-plan,.premium-group{padding:20px!important}.group-card-top{align-items:flex-start}}
+
+/* VIP membership page refinement */
+.vip-page{padding-bottom:76px!important}
+.vip-hero{display:flex;align-items:center;justify-content:space-between;gap:28px;min-height:310px}
+.vip-hero-copy{position:relative;z-index:1;max-width:790px}
+.vip-hero-mark{position:relative;z-index:1;flex:0 0 190px;display:grid;justify-items:center;gap:12px;color:#dbeafe;text-align:center;letter-spacing:.2em;font-size:10px;font-weight:900}
+.vip-hero-mark span{display:grid;place-items:center;width:142px;height:142px;border:1px solid #ffffff38;border-radius:42px;background:linear-gradient(145deg,#ffffff28,#ffffff08);box-shadow:0 20px 55px #07172d55,inset 0 1px #ffffff40;transform:rotate(-7deg)}
+.vip-hero-mark i{font-size:62px;color:#f8d889;filter:drop-shadow(0 8px 18px #f3c96955)}
+.vip-status{align-items:flex-start;max-width:760px;gap:9px!important;padding:17px 19px!important}
+.vip-status-kicker{font-size:10px!important;letter-spacing:.14em;font-weight:900;color:#bfdbfe!important}
+.vip-active-title{font-size:16px;display:flex;align-items:center;gap:9px}
+.vip-active-title i{color:#86efac}
+.vip-timeline{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;margin-top:4px}
+.vip-timeline>div{display:grid;gap:5px;padding:12px 13px;border:1px solid #ffffff24;border-radius:12px;background:#ffffff0b;min-width:0}
+.vip-timeline span{font-size:10px;font-weight:800;letter-spacing:.1em;color:#bfdbfe}
+.vip-timeline strong{font-size:13px;color:#fff;overflow-wrap:anywhere}
+.vip-remaining{font-size:12px!important;color:#e0f2fe!important}
+.vip-status-link{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 15px;border-radius:10px;background:#fff;color:#174675!important;font-weight:900;text-decoration:none}
+.vip-buy-button{display:flex;align-items:center;justify-content:center;gap:9px}
+.vip-buy-button:disabled{opacity:.65;cursor:wait;transform:none!important}
+.benefit-grid article{transition:transform .2s ease,box-shadow .2s ease}
+.benefit-grid article:hover{transform:translateY(-3px);box-shadow:0 18px 38px #102b4914!important}
+.discount-explain{display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:start}
+.discount-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:#eaf2ff;color:#2563eb;font-size:20px}
+.vip-notice{position:fixed;right:22px;bottom:22px;z-index:9999;display:grid;grid-template-columns:42px 1fr 30px;align-items:center;gap:12px;width:min(430px,calc(100vw - 28px));padding:16px;border:1px solid #bbf7d0;border-radius:17px;background:#f0fdf4;color:#14532d;box-shadow:0 18px 55px #06172d30;animation:vipNoticeIn .35s ease both}
+.vip-notice[hidden]{display:none!important}
+.vip-notice-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:#dcfce7;color:#15803d;font-size:18px}
+.vip-notice strong{display:block;font-size:14px;font-weight:900}
+.vip-notice p{margin:4px 0 0;font-size:12px;line-height:1.55;color:#166534}
+.vip-notice button{align-self:start;border:0;background:transparent;color:inherit;font-size:18px;cursor:pointer}
+.vip-notice.is-error{border-color:#fecaca;background:#fff1f2;color:#9f1239}
+.vip-notice.is-error .vip-notice-icon{background:#ffe4e6;color:#be123c}
+.vip-notice.is-error p{color:#9f1239}
+@keyframes vipNoticeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){.vip-hero{min-height:0}.vip-hero-mark{display:none}.vip-timeline{grid-template-columns:1fr}.vip-notice{right:14px;bottom:14px}}
+@media(prefers-reduced-motion:reduce){.vip-notice{animation:none}.benefit-grid article{transition:none}}
+html.dark body:has(.upgrade-hero),body.dark:has(.upgrade-hero){background:#091421;color:#e5edf7}
+html.dark .benefit-grid article,html.dark .plan-card,html.dark .discount-explain{background:#111f30!important;border-color:#26384d!important;color:#e5edf7!important}
+html.dark .benefit-grid p,html.dark .plan-card p,html.dark .discount-explain p{color:#a9bbd0!important}
+html.dark .plan-card h3,html.dark .discount-explain h2{color:#f1f5f9}
+html.dark .telegram-cta{background:#10263e;border-color:#244568;color:#dbeafe!important}
+html.dark .telegram-cta span{color:#a9bbd0}
+html.dark .empty-state{background:#101e2d;border-color:#33475e;color:#a9bbd0}
