@@ -42,81 +42,90 @@ function cardMarkup(v){const vip=isVipVideo(v),orient=orientation(v);return `<ar
 function adMarkup(){return `<div class="adsterra-banner adsterra-banner-clean"><div class="ad-box ad-inline-native"></div></div>`}
 const AD_DIRECT_LINK='https://www.profitableratecpmnetwork.com/vw721j6q?key=e997cbbb9bbee0de7820bd0c98fc8351';
 const AD_UNITS={
-  banner728:{width:728,height:90,key:'b5df562e06e9e080a144e679bdd04b11'},
-  banner320:{width:320,height:50,key:'e48004340d99ba399e04e57dd40239fa'},
-  banner160x300:{width:160,height:300,key:'a658feb34047aeb8881f5e3dba68dd7d'},
-  banner160x600:{width:160,height:600,key:'596986d6909968eec943bfa00d2ad02b'},
-  banner468:{width:468,height:60,key:'32b22531e798b31302788d3f353a1b96'},
-  banner300:{width:300,height:250,key:'896ad8ddb5ea1d057ac6d61226e3f54d'}
+ banner728:{width:728,height:90,key:'b5df562e06e9e080a144e679bdd04b11'},
+ banner320:{width:320,height:50,key:'e48004340d99ba399e04e57dd40239fa'},
+ banner468:{width:468,height:60,key:'32b22531e798b31302788d3f353a1b96'},
+ banner300:{width:300,height:250,key:'896ad8ddb5ea1d057ac6d61226e3f54d'}
 };
-function mountAdUnit(host,unit){if(!host||host.dataset.loaded==='1')return;host.dataset.loaded='1';const {width,height,key}=unit;const frame=document.createElement('iframe');frame.title='Advertisement';frame.width=String(width);frame.height=String(height);frame.loading='lazy';frame.scrolling='no';frame.referrerPolicy='no-referrer-when-downgrade';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');frame.style.cssText=`display:block;border:0;width:min(100%,${width}px);height:${height}px;margin:auto;overflow:hidden`;const srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent}</style></head><body><script>var atOptions={key:'${key}',format:'iframe',height:${height},width:${width},params:{}};<\/script><script src="https://www.highrevenueformat.com/${key}/invoke.js"><\/script></body></html>`;frame.srcdoc=srcdoc;host.replaceChildren(frame)}
-function mountInlineAd(host){if(!host||host.dataset.loaded==='1')return;host.dataset.loaded='1';const frame=document.createElement('iframe');frame.title='Advertisement';frame.loading='lazy';frame.scrolling='no';frame.style.cssText='display:block;width:100%;min-height:250px;border:0;overflow:hidden';frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox');frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;min-height:250px}</style></head><body><script async="async" data-cfasync="false" src="https://pl32231888.profitableratecpmnetwork.com/d0c4535d3914ad4b2c4e09c4aa337646/invoke.js"><\/script><div id="container-d0c4535d3914ad4b2c4e09c4aa337646"></div></body></html>';host.replaceChildren(frame)}
+function injectScript(parent,src,attrs={}){
+ if(!parent)return null;
+ const script=document.createElement('script');script.src=src;
+ Object.entries(attrs).forEach(([k,v])=>script.setAttribute(k,v));
+ parent.appendChild(script);return script;
+}
+function mountAdUnit(host,unit){
+ if(!host||host.dataset.loaded==='1')return;host.dataset.loaded='1';
+ const {width,height,key}=unit;
+ const frame=document.createElement('iframe');frame.title='Advertisement';frame.width=String(width);frame.height=String(height);frame.loading='lazy';frame.scrolling='no';
+ frame.style.cssText=`display:block;border:0;background:transparent;width:min(100%,${width}px);height:${height}px;margin:0 auto;overflow:hidden`;
+ frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:transparent}</style></head><body><script>var atOptions={key:'${key}',format:'iframe',height:${height},width:${width},params:{}};<\/script><script src="https://www.highrevenueformat.com/${key}/invoke.js"><\/script></body></html>`;
+ host.replaceChildren(frame);
+}
+function mountInlineAd(host){
+ if(!host||host.dataset.loaded==='1')return;host.dataset.loaded='1';
+ host.style.cssText='display:block;width:100%;min-height:250px;margin:12px 0;padding:0;background:transparent;border:0;box-shadow:none;border-radius:0';
+ const frame=document.createElement('iframe');frame.title='Advertisement';frame.loading='lazy';frame.scrolling='no';
+ frame.style.cssText='display:block;width:100%;min-height:250px;height:300px;border:0;background:transparent';
+ frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;min-height:250px;background:transparent}</style></head><body><script async="async" data-cfasync="false" src="https://pl32231888.profitableratecpmnetwork.com/d0c4535d3914ad4b2c4e09c4aa337646/invoke.js"><\\/script><div id="container-d0c4535d3914ad4b2c4e09c4aa337646"></div></body></html>';
+ host.replaceChildren(frame);
+}
+function setupSocialBars(){
+ const stack=$('#guestAdTop');if(!stack||stack.dataset.loaded==='1'||isVip)return;
+ stack.dataset.loaded='1';stack.hidden=false;
+ stack.querySelectorAll('.adsterra-social-slot').forEach(slot=>{
+  slot.style.cssText='display:block;min-height:1px;margin:0;padding:0;background:transparent;border:0;box-shadow:none';
+  injectScript(slot,'https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js');
+ });
+}
+let popunderStarted=false;
+function setupPopunder(){
+ if(isVip||popunderStarted)return;popunderStarted=true;
+ // Load publisher popunder once. Its frequency/cooldown is governed by the ad network/browser.
+ injectScript(document.body,'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js');
+}
 function mountFloatingBanner(){
  const wrap=$('#floatingBannerAd'),slot=$('#floatingBannerAdSlot'),hide=$('#hideFloatingBanner'),show=$('#showFloatingBanner');
- if(!wrap||!slot||wrap.dataset.loaded==='1')return;
+ if(!wrap||!slot||wrap.dataset.loaded==='1'||isVip)return;
  wrap.dataset.loaded='1';
- const frame=document.createElement('iframe');frame.title='Iklan banner';frame.width='320';frame.height='50';frame.loading='eager';frame.scrolling='no';
- frame.style.cssText='display:block;width:320px;max-width:100%;height:50px;border:0;margin:auto';
- frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:320px;height:50px;overflow:hidden}</style></head><body><script>var atOptions={key:'e48004340d99ba399e04e57dd40239fa',format:'iframe',height:50,width:320,params:{}};<\/script><script src="https://www.highrevenueformat.com/e48004340d99ba399e04e57dd40239fa/invoke.js"><\/script></body></html>`;
+ slot.style.cssText='width:300px;max-width:100%;min-height:250px;margin:0;padding:0;background:transparent;border:0;box-shadow:none';
+ const frame=document.createElement('iframe');frame.title='Iklan mengambang';frame.width='300';frame.height='250';frame.loading='eager';frame.scrolling='no';
+ frame.style.cssText='display:block;width:300px;max-width:100%;height:250px;border:0;margin:0 auto;background:transparent';
+ frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:300px;height:250px;overflow:hidden;background:transparent}</style></head><body><script>var atOptions={key:'896ad8ddb5ea1d057ac6d61226e3f54d',format:'iframe',height:250,width:300,params:{}};<\/script><script src="https://www.highrevenueformat.com/896ad8ddb5ea1d057ac6d61226e3f54d/invoke.js"><\/script></body></html>`;
  slot.replaceChildren(frame);
- window.setTimeout(()=>{if(!isVip&&!sessionStorage.getItem('boxcellinkFloatingAdHidden'))wrap.hidden=false},7000);
- hide?.addEventListener('click',()=>{wrap.hidden=true;show.hidden=false;sessionStorage.setItem('boxcellinkFloatingAdHidden','1')});
- show?.addEventListener('click',()=>{wrap.hidden=false;show.hidden=true;sessionStorage.removeItem('boxcellinkFloatingAdHidden')});
-}
-let interstitialTimer=null,interstitialOpen=false,interstitialCountdown=null;
-function showVideoInterstitial(){
- if(isVip||interstitialOpen||document.hidden)return;
- const overlay=$('#videoInterstitialAd'),slot=$('#videoInterstitialSlot'),close=$('#closeVideoInterstitial');
- if(!overlay||!slot||!close)return;
- interstitialOpen=true;overlay.hidden=false;close.disabled=true;
- let left=5;close.textContent=`Lewati dalam ${left}`;
- const frame=document.createElement('iframe');frame.title='Iklan';frame.style.cssText='display:block;width:100%;height:100%;min-height:70vh;border:0';
- frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:100%;height:100%;background:#fff;overflow:auto}</style></head><body><script async="async" data-cfasync="false" src="https://pl32231888.profitableratecpmnetwork.com/d0c4535d3914ad4b2c4e09c4aa337646/invoke.js"><\/script><div id="container-d0c4535d3914ad4b2c4e09c4aa337646"></div></body></html>';
- slot.replaceChildren(frame);
- interstitialCountdown=window.setInterval(()=>{left--;if(left<=0){clearInterval(interstitialCountdown);close.disabled=false;close.textContent='Tutup iklan'}else close.textContent=`Lewati dalam ${left}`},1000);
-}
-function closeVideoInterstitial(){const overlay=$('#videoInterstitialAd');if(!overlay)return;overlay.hidden=true;interstitialOpen=false;clearInterval(interstitialCountdown);$('#videoInterstitialSlot')?.replaceChildren()}
-function startVideoAdCycle(){
- if(isVip||interstitialTimer)return;
- interstitialTimer=window.setInterval(()=>{if(videoPlaybackActive&&!document.hidden)showVideoInterstitial()},10000);
+ window.setTimeout(()=>{if(!isVip&&!sessionStorage.getItem('boxcellinkFloatingAdHidden')){wrap.hidden=false;wrap.classList.add('is-visible')}},7000);
+ hide?.addEventListener('click',()=>{wrap.classList.remove('is-visible');wrap.hidden=true;show.hidden=false;sessionStorage.setItem('boxcellinkFloatingAdHidden','1')});
+ show?.addEventListener('click',()=>{wrap.hidden=false;wrap.classList.add('is-visible');show.hidden=true;sessionStorage.removeItem('boxcellinkFloatingAdHidden')});
 }
 let videoPlaybackActive=false;
 function setupVideoAdPlayback(){
  const host=$('#watchContent');if(!host||isVip)return;
- host.addEventListener('play',e=>{if(e.target?.tagName==='VIDEO'){videoPlaybackActive=true;startVideoAdCycle()}},true);
+ host.addEventListener('play',e=>{if(e.target?.tagName==='VIDEO')videoPlaybackActive=true},true);
  host.addEventListener('pause',e=>{if(e.target?.tagName==='VIDEO')videoPlaybackActive=false},true);
  host.addEventListener('ended',()=>{videoPlaybackActive=false},true);
- // Embed players are cross-origin; count an explicit interaction with the player as playback intent.
- host.addEventListener('click',e=>{if(e.target.closest('.watch-player iframe')){videoPlaybackActive=true;startVideoAdCycle()}});
- window.addEventListener('message',e=>{
-  const d=e.data;if(!d)return;let s='';try{s=typeof d==='string'?d:JSON.stringify(d)}catch{}
-  if(/"event"\s*:\s*"(?:pause|ended|finish)"|"infoDelivery".*"playerState"\s*:\s*2/i.test(s))videoPlaybackActive=false;
-  if(/"event"\s*:\s*"(?:play|playing)"|"playerState"\s*:\s*1/i.test(s)){videoPlaybackActive=true;startVideoAdCycle()}
+ host.addEventListener('click',e=>{if(e.target.closest('.watch-player iframe'))videoPlaybackActive=true});
+ window.addEventListener('message',e=>{const d=e.data;let t='';try{t=typeof d==='string'?d:JSON.stringify(d)}catch{}
+  if(/"event"\s*:\s*"(?:pause|ended|finish)"|"playerState"\s*:\s*2/i.test(t))videoPlaybackActive=false;
+  if(/"event"\s*:\s*"(?:play|playing)"|"playerState"\s*:\s*1/i.test(t))videoPlaybackActive=true;
  });
- $('#closeVideoInterstitial')?.addEventListener('click',closeVideoInterstitial);
- document.addEventListener('visibilitychange',()=>{if(document.hidden)closeVideoInterstitial()});
 }
 function setupGuestAds(){
  const role=isVip?'vip':(currentUser?'member':'guest');
- const bannerSelectors=role==='guest'
-  ?[['.ad-unit-728',AD_UNITS.banner728],['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300],['#ad160x300',AD_UNITS.banner160x300],['#ad160x600',AD_UNITS.banner160x600]]
-  :role==='member'
-   ?[['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300]]
-   :[['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468]];
- document.querySelectorAll('.adsterra-wide-wrap,.ad-side-card').forEach(el=>el.hidden=true);
+ // 728x90 is the standard banner for VIP; non-VIP also gets the 300x250 banner.
+ document.querySelectorAll('.adsterra-wide-wrap,.ad-side-card').forEach(el=>{el.hidden=true;el.style.cssText='background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'});
  document.querySelectorAll('.ad-unit-728,.ad-unit-320,.ad-unit-468,#ad300x250,#ad160x300,#ad160x600').forEach(el=>el.hidden=true);
- bannerSelectors.forEach(([sel,unit])=>document.querySelectorAll(sel).forEach(host=>{
-  host.hidden=false;const wrapper=host.closest('.ad-side-card,.adsterra-wide-wrap');if(wrapper)wrapper.hidden=false;mountAdUnit(host,unit);
+ const banners=role==='vip'
+  ?[['.ad-unit-728',AD_UNITS.banner728]]
+  :[['.ad-unit-728',AD_UNITS.banner728],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300]];
+ banners.forEach(([sel,unit])=>document.querySelectorAll(sel).forEach(host=>{
+  host.hidden=false;host.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px auto;max-width:100%';
+  const wrapper=host.closest('.ad-side-card,.adsterra-wide-wrap');if(wrapper){wrapper.hidden=false;wrapper.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'}
+  mountAdUnit(host,unit);
  }));
- if(role!=='vip')document.querySelectorAll('.ad-inline-300').forEach(mountInlineAd);
- const socialStack=$('#guestAdTop');
  if(role!=='vip'){
-  if(socialStack){socialStack.hidden=true;socialStack.dataset.adRole=role;}
-  mountFloatingBanner();
-  setupVideoAdPlayback();
+  document.querySelectorAll('.ad-inline-300').forEach(mountInlineAd);
+  setupSocialBars();setupPopunder();mountFloatingBanner();setupVideoAdPlayback();
  }else{
-  socialStack?.remove();$('#floatingBannerAd')?.remove();$('#showFloatingBanner')?.remove();$('#videoInterstitialAd')?.remove();
-  if(interstitialTimer)clearInterval(interstitialTimer);
+  $('#guestAdTop')?.remove();$('#floatingBannerAd')?.remove();$('#showFloatingBanner')?.remove();$('#guestPopunderSlot')?.remove();
  }
 }
 async function showGuestWatchPreparation(){
