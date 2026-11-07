@@ -1,3 +1,5 @@
+-- Membership timeline fields
+alter table public.profiles add column if not exists vip_started_at timestamptz;
 -- BoxCellink premium member/admin expansion. Run after all existing migrations.
 begin;
 
@@ -200,8 +202,14 @@ begin
  end if;
 
  if o.purpose='vip' then
-  select greatest(coalesce(vip_expires_at,now()),now()) into v_exp from public.profiles where id=o.user_id for update;
-  update public.profiles set vip_expires_at=coalesce(v_exp,now())+make_interval(days=>v_days) where id=o.user_id;
+  select vip_expires_at into v_exp from public.profiles where id=o.user_id for update;
+  update public.profiles
+  set vip_started_at=case
+        when v_exp is null or v_exp<=now() then now()
+        else coalesce(vip_started_at,now())
+      end,
+      vip_expires_at=greatest(coalesce(v_exp,now()),now())+make_interval(days=>v_days)
+  where id=o.user_id;
  elsif o.purpose='review_download' then
   insert into public.review_entitlements(user_id,review_id,order_id)
   values(o.user_id,o.review_id,o.order_id) on conflict(user_id,review_id) do nothing;
@@ -230,6 +238,7 @@ begin
   if auth.uid() is not null and auth.uid()=old.id and not public.is_admin() then
     new.role:=old.role;
     new.is_banned:=old.is_banned;
+    new.vip_started_at:=old.vip_started_at;
     new.vip_expires_at:=old.vip_expires_at;
     new.premium_expires_at:=old.premium_expires_at;
   end if;
