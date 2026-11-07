@@ -243,3 +243,48 @@ body{background:var(--dash-bg);color:var(--dash-ink)}
   .member-media-stats,.member-card-link{border-color:#263950}
   .media-description,.member-media-stats small,.cat-card span,.mini-card span{color:var(--dash-muted)}
 }
+
+
+/* BoxCellink member dashboard — ivory & premium blue palette */
+:root{
+  --ink:#233b57!important;
+  --muted:#71839a!important;
+  --line:#e8e5dc!important;
+  --surface:#fffefa!important;
+  --bg:#f7f5ef!important;
+  --blue:#3478bd!important;
+  --soft:#eaf2fb!important;
+  --shadow:0 12px 34px rgba(42,76,112,.075)!important;
+}
+html,body{background:#f7f5ef!important;color:#233b57!important}
+.member-main{background:transparent!important}
+.announce{background:linear-gradient(120deg,#edf4fb 0%,#fffefa 72%)!important;border-color:#dce7f1!important;box-shadow:0 12px 32px rgba(48,91,135,.07)!important}
+.announce-icon{background:linear-gradient(145deg,#3c79b6,#75a6d2)!important;color:#fff!important}
+.announce small,.eyebrow{color:#3979b8!important}
+.section-head h2,.member-media-body h3 a,.rank-title{color:#294766!important}
+.section-head a,.member-card-link{color:#3478bd!important}
+.member-media-card,.cat-card,.mini-card,.video-card{background:#fffefa!important;border-color:#e9e5dc!important;box-shadow:0 9px 26px rgba(48,76,105,.06)!important}
+.member-media-card:hover{border-color:#b9d0e5!important;box-shadow:0 15px 34px rgba(48,76,105,.11)!important}
+.member-media-cover{background:#e8eff5!important}
+.thumb-fallback{background:linear-gradient(135deg,#e8f0f8,#d7e6f4)!important;color:#5483b1!important}
+.media-kind{background:rgba(48,91,135,.82)!important}
+.telegram-kind{background:rgba(48,126,171,.88)!important}
+.member-media-body h3 a:hover,.cat-card:hover,.section-head a:hover{color:#2468a8!important}
+.member-media-stats{border-color:#eeeae2!important}
+.member-media-stats b{color:#34516f!important}
+.member-media-stats small,.media-description{color:#78889a!important}
+.media-price-row b{color:#3478bd!important}
+.access-chip.basic-chip{background:#eaf3fb!important;color:#3978b5!important}
+.access-chip.vip-chip{background:#f8f0df!important;color:#9b762e!important}
+.pager button{background:#fffefa!important;border-color:#e4e5e2!important;color:#45617d!important}
+.pager button.active{background:#397cba!important;border-color:#397cba!important;color:#fff!important}
+.cat-card i,.mini-card .mini-icon{background:#eaf2fb!important;color:#3979b8!important}
+.member-empty{background:#fffefa!important;border-color:#e9e5dc!important;color:#71839a!important}
+.member-drawer{background:#fffefa!important;color:#294766!important}
+.member-drawer a:hover,.member-drawer button:hover{background:#eaf2fb!important;color:#3478bd!important}
+.dashboard-thumb-video{object-fit:cover;background:#e8eff5}
+.media-thumb[hidden],.thumb-fallback[hidden]{display:none!important}
+@media(prefers-color-scheme:dark){
+ html,body{background:#f7f5ef!important;color:#233b57!important}
+ .member-media-card,.cat-card,.mini-card,.video-card,.member-drawer{background:#fffefa!important;color:#294766!important}
+}
