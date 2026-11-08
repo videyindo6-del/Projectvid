@@ -100,18 +100,27 @@
       const s = stats.get(item.id) || {}, thumb = reviewThumbnail(item);
       const price = item.access === 'free' ? (isEN()?'Free':'Gratis') : money(item.price);
       const href = `/r/${encodeURIComponent(item.slug)}`;
+      const categoryName = categories.find(c => c.id === item.category_id)?.name || (isEN() ? 'Telegram media' : 'Media Telegram');
       return `<article class="telegram-review-card">
-        <a class="telegram-review-cover${thumb?'':' no-image'}" href="${href}" aria-label="${esc(item.title)}">${thumb?`<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add('no-image')">`:''}</a>
+        <a class="telegram-review-cover${thumb?'':' no-image'}" href="${href}" aria-label="${esc(item.title)}">
+          ${thumb?`<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add('no-image')">`:''}
+          <span class="telegram-cover-badge"><i class="fa-brands fa-telegram" aria-hidden="true"></i> TELEGRAM</span>
+          <span class="telegram-cover-open"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
+        </a>
         <div class="telegram-review-content">
-          <div class="telegram-review-topline"><span>${isEN()?'PRODUCT REVIEW':'REVIEW PRODUK'}</span><span class="telegram-review-type">TELEGRAM</span></div>
+          <div class="telegram-review-topline"><span><i class="fa-solid fa-layer-group" aria-hidden="true"></i> ${esc(categoryName)}</span><span class="telegram-review-kind">${isEN()?'REVIEW':'ULASAN'}</span></div>
           <h2><a href="${href}">${esc(item.title)}</a></h2>
-          <div class="telegram-price-panel"><span>${isEN()?'ACCESS PRICE':'HARGA AKSES'}</span><strong>${esc(price)}</strong></div>
-          <div class="telegram-review-stats">
-            <div><b>${number(s.total_sold)}</b><span><i class="fa-solid fa-fire" aria-hidden="true"></i> ${isEN()?'Sold':'Terjual'}</span></div>
-            <div><b>${number(s.total_likes)}</b><span><i class="fa-solid fa-heart" aria-hidden="true"></i> ${isEN()?'Like':'Like'}</span></div>
-            <div><b>${number(s.total_comments)}</b><span><i class="fa-solid fa-comment" aria-hidden="true"></i> ${isEN()?'Comments':'Komentar'}</span></div>
+          ${item.description ? `<p class="telegram-review-description">${esc(item.description)}</p>` : ''}
+          <div class="telegram-price-panel">
+            <span>${isEN()?'ONE-TIME ACCESS':'AKSES SEKALI BAYAR'}</span>
+            <strong>${esc(price)}</strong>
           </div>
-          <a class="telegram-review-button" href="${href}"><span>${isEN()?'View Full Review':'Lihat Review Lengkap'}</span><span class="telegram-review-arrow" aria-hidden="true">→</span></a>
+          <div class="telegram-review-stats" aria-label="${isEN()?'Review statistics':'Statistik review'}">
+            <div><span class="telegram-stat-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span><b>${number(s.total_sold)}</b><small>${isEN()?'Sold':'Terjual'}</small></div>
+            <div><span class="telegram-stat-icon"><i class="fa-solid fa-heart" aria-hidden="true"></i></span><b>${number(s.total_likes)}</b><small>${isEN()?'Likes':'Disukai'}</small></div>
+            <div><span class="telegram-stat-icon"><i class="fa-solid fa-comments" aria-hidden="true"></i></span><b>${number(s.total_comments)}</b><small>${isEN()?'Comments':'Komentar'}</small></div>
+          </div>
+          <a class="telegram-review-button" href="${href}"><span>${isEN()?'Explore review':'Lihat detail review'}</span><i class="fa-solid fa-arrow-right telegram-review-arrow" aria-hidden="true"></i></a>
         </div>
       </article>`;
     }).join('');
