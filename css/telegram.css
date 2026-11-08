@@ -461,3 +461,35 @@ body.telegram-directory-page{background:#f8f7f2!important;color:#172d49!importan
   #telegramGrid .telegram-page-controls{justify-content:center!important;gap:5px!important}
   #telegramGrid .telegram-page-btn{min-width:32px!important;height:34px!important;padding:0 8px!important;border-radius:9px!important;font-size:11px!important}
 }
+
+
+/* Explicit cover fallback: intentional branded artwork instead of an empty gradient */
+#telegramGrid .telegram-review-cover.no-image{
+  background:linear-gradient(145deg,#eaf3fc 0%,#d9e9f8 52%,#c9def1 100%)!important;
+}
+#telegramGrid .telegram-review-cover.no-image:before,
+#telegramGrid .telegram-review-cover.no-image:after{display:none!important;content:none!important}
+#telegramGrid .telegram-cover-placeholder{
+  position:absolute!important;inset:0!important;z-index:1!important;
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:9px!important;text-align:center!important;color:#477eaf!important;
+  background:radial-gradient(circle at 50% 35%,#ffffffb8,transparent 48%)!important;
+}
+#telegramGrid .telegram-cover-placeholder i{
+  display:grid!important;place-items:center!important;width:58px!important;height:58px!important;
+  border:1px solid #ffffffd9!important;border-radius:19px!important;
+  background:#ffffffa8!important;color:#3678b4!important;font-size:27px!important;
+  box-shadow:0 10px 25px #285b8718!important;
+}
+#telegramGrid .telegram-cover-placeholder strong{
+  color:#315d86!important;font-size:11px!important;font-weight:950!important;letter-spacing:2px!important;
+}
+#telegramGrid .telegram-cover-placeholder small{
+  color:#718da8!important;font-size:9px!important;font-weight:650!important;letter-spacing:.2px!important;
+}
+@media(max-width:600px){
+  #telegramGrid .telegram-review-cover{aspect-ratio:16/10!important}
+  #telegramGrid .telegram-cover-placeholder i{width:48px!important;height:48px!important;border-radius:15px!important;font-size:23px!important}
+  #telegramGrid .telegram-cover-placeholder strong{font-size:9px!important}
+  #telegramGrid .telegram-cover-placeholder small{font-size:8px!important}
+}
