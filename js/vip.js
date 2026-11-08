@@ -9,7 +9,7 @@ const text={
   until:'Berlaku sampai',since:'Aktif sejak',expired:'Membership VIP telah berakhir',choose:'Pilih paket untuk mengaktifkan keuntungan VIP.',
   loginFirst:'Login terlebih dahulu untuk membeli paket VIP.',plansError:'Paket VIP tidak dapat dimuat.',noPlans:'Belum ada paket VIP yang tersedia.',
   planTag:'VIP MEMBERSHIP',days:'hari masa aktif',vipContent:'Konten khusus VIP',discount:'Diskon 20% konten berbayar yang memenuhi syarat',manage:'Kelola masa aktif di halaman Akun Saya',
-  buy:'Beli paket ini',processing:'Membuat pembayaran…',checkoutError:'Gagal membuat pembayaran',successTitle:'Selamat! VIP berhasil diaktifkan',successText:'Pembayaran berhasil diverifikasi. Akun kamu sekarang berstatus VIP.',expiredTitle:'Masa pembayaran berakhir',expiredText:'Pembayaran belum berhasil. Kamu bisa mencoba membeli paket kembali.',
+  buy:'Beli paket ini',processing:'Membuat pembayaran…',checkoutError:'Gagal membuat pembayaran',successTitle:'Selamat! VIP berhasil diaktifkan',successText:'Upgrade account berhasil ke VIP! Nikmati semua video tanpa iklan dan diskon 20% untuk pembelian media Telegram yang memenuhi syarat.',expiredTitle:'Masa pembayaran berakhir',expiredText:'Pembayaran belum berhasil. Kamu bisa mencoba membeli paket kembali.',
   pending:'Pembayaran sedang diverifikasi…',checking:'Memeriksa pembayaran…',activeLabel:'STATUS MEMBERSHIP',startLabel:'WAKTU AKTIF',endLabel:'WAKTU EXPIRED',
   daysLeft:'Sisa masa aktif',daysLeftUnit:'hari',account:'Akun',checkout:'Lanjutkan pembayaran',genericError:'Terjadi kesalahan. Silakan coba lagi.'
  },
@@ -73,15 +73,15 @@ async function refreshMembership(){
 }
 function renderPlans(plans){
  const en=lang()==='en';
- plansBox.innerHTML=(plans||[]).map(v=>`<article class="plan-card premium-plan">
-  <span class="plan-tag"><i class="fa-solid fa-sparkles"></i> ${safe(t('planTag'))}</span>
+ plansBox.innerHTML=(plans||[]).map(v=>{const gold=/premium|gold|emas/i.test(String(v.name||''));return `<article class="plan-card premium-plan ${gold?'is-gold':''}">
+  <span class="plan-tag"><i class="fa-solid ${gold?'fa-crown':'fa-sparkles'}"></i> ${gold?'GOLD MEMBER':safe(t('planTag'))}</span>
   <div class="premium-plan-icon"><i class="fa-solid fa-crown"></i></div>
   <h3>${safe(v.name)}</h3>
   <div class="plan-price">${safe(money(v.price))}</div>
   <p class="plan-duration"><i class="fa-regular fa-calendar"></i> ${Number(v.duration_days)||0} ${safe(t('days'))}</p>
   <ul><li><i class="fa-solid fa-check"></i> ${safe(t('vipContent'))}</li><li><i class="fa-solid fa-check"></i> ${safe(t('discount'))}</li><li><i class="fa-solid fa-check"></i> ${safe(t('manage'))}</li></ul>
   <button class="btn primary vip-buy-button" type="button" data-buy-plan="${safe(v.id)}"><i class="fa-solid fa-lock"></i> ${safe(t('buy'))}</button>
- </article>`).join('')||`<div class="empty-state">${safe(t('noPlans'))}</div>`;
+ </article>`}).join('')||`<div class="empty-state">${safe(t('noPlans'))}</div>`;
  plansBox.querySelectorAll('[data-buy-plan]').forEach(button=>button.addEventListener('click',()=>buyVip(button.dataset.buyPlan,button)));
 }
 async function loadPlans(){
@@ -96,9 +96,8 @@ async function buyVip(id,button){
   const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip',plan_id:id}});
   if(error)throw error;if(!data?.checkout_url||!data?.order_id)throw new Error(data?.error||t('checkoutError'));
   const plan=(window.__vipPlans||[]).find(x=>String(x.id)===String(id));
-  localStorage.setItem('boxcellink_pending_vip',JSON.stringify({order_id:data.order_id,user_id:currentUser.id,plan_name:plan?.name||'',created_at:new Date().toISOString()}));
-  notice(t('checkout'),t('pending'));
-  location.href=data.checkout_url;
+  localStorage.setItem('boxcellink_pending_vip',JSON.stringify({order_id:data.order_id,user_id:currentUser.id,plan_name:plan?.name||'',amount:data.amount,qr_url:data.qrUrl||null,checkout_url:data.checkout_url||null,expires_at:data.expires_at||null,created_at:new Date().toISOString()}));
+  location.href='/vip-checkout.html?order_id='+encodeURIComponent(data.order_id);
  }catch(error){
   notice(t('checkoutError'),error?.message||t('genericError'),'error');
   if(button){button.disabled=false;button.innerHTML=old||safe(t('buy'));}
