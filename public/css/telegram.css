@@ -24,132 +24,58 @@
 @keyframes telegram-spin{to{transform:rotate(360deg)}}
 @media(max-width:900px){#telegramGrid.video-grid{grid-template-columns:1fr}.telegram-review-card{grid-template-columns:minmax(160px,.72fr) minmax(0,1.28fr)}}
 @media(max-width:560px){.telegram-review-card{grid-template-columns:1fr}.telegram-review-cover,.telegram-review-cover img{min-height:210px;height:210px}.telegram-review-content{padding:17px}.telegram-review-stats b{font-size:16px}}
-@media(prefers-color-scheme:dark){.telegram-review-card,.telegram-loading,.telegram-empty{background:#101d2d;border-color:#263b52}.telegram-review-content h2,.telegram-review-stats b{color:#e7eff8}.telegram-review-stats{border-color:#263b52}.telegram-review-description,.telegram-review-stats span,.telegram-review-topline{color:#a7b8cb}}
-
-/* Premium two-column review directory + pagination */
-#telegramGrid.video-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:stretch}
-#telegramGrid .telegram-review-card{display:flex;flex-direction:column;min-width:0;border-radius:20px}
-#telegramGrid .telegram-review-cover{height:auto;min-height:0;aspect-ratio:16/9;flex:none}
-#telegramGrid .telegram-review-cover img{height:100%;min-height:0;object-fit:cover}
-#telegramGrid .telegram-review-content{flex:1;padding:18px}
-#telegramGrid .telegram-review-content h2{font-size:clamp(15px,1.4vw,19px);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em}
-#telegramGrid .telegram-review-description{min-height:2.8em}
-#telegramGrid .telegram-review-stats{gap:5px}
-#telegramGrid .telegram-review-stats b{font-size:clamp(15px,1.7vw,20px)}
-#telegramGrid .telegram-review-stats span{font-size:10px}
-.telegram-pagination{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 2px;margin-top:4px;color:var(--muted,#718096);font-size:13px}
-.telegram-page-controls{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
-.telegram-page-btn{min-width:38px;height:38px;padding:0 11px;border:1px solid var(--line,#dce3ec);border-radius:11px;background:var(--surface,#fff);color:var(--text,#17263b);font:inherit;font-weight:750;cursor:pointer;transition:all .18s ease}
-.telegram-page-btn:hover:not(:disabled){border-color:var(--primary,#2866a5);color:var(--primary,#2866a5);transform:translateY(-1px)}
-.telegram-page-btn.is-active{background:linear-gradient(135deg,#174d84,#347bc0);border-color:transparent;color:#fff;box-shadow:0 6px 16px rgba(37,99,185,.2)}
-.telegram-page-btn:disabled{opacity:.4;cursor:not-allowed}
-.telegram-page-dots{padding:0 3px;color:var(--muted,#718096)}
-@media(max-width:560px){#telegramGrid.video-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.telegram-review-card{border-radius:14px}.telegram-review-cover{aspect-ratio:4/3}.telegram-review-content{padding:11px!important}.telegram-review-topline{font-size:8px;gap:4px}.telegram-review-topline strong{font-size:10px}.telegram-review-content h2{font-size:13px!important;margin:8px 0 5px;min-height:2.5em}.telegram-review-description{font-size:10px;line-height:1.4;margin-bottom:10px;min-height:2.8em}.telegram-review-stats{padding:9px 0;gap:3px}.telegram-review-stats b{font-size:13px!important}.telegram-review-stats span{font-size:8px!important;white-space:normal}.telegram-review-stats span i{display:none}.telegram-review-button{font-size:10px;padding:9px 7px;margin-top:10px}.telegram-pagination{justify-content:center;text-align:center}.telegram-pagination>span{width:100%}.telegram-page-btn{min-width:32px;height:34px;padding:0 8px;font-size:12px}}
-@media(prefers-color-scheme:dark){.telegram-page-btn{background:#101d2d;border-color:#263b52;color:#e7eff8}.telegram-page-btn.is-active{background:linear-gradient(135deg,#174d84,#347bc0)}}
-
-/* Floating Telegram notice: stays visible without blocking the review directory. */
-
-/* 2026 layout correction: keep the fixed global navbar clear of page content
-   and render the Telegram account notice as a compact in-flow panel. */
-.telegram-page{width:min(1180px,calc(100% - 36px));margin:0 auto;padding:30px 0 64px}
-.telegram-page .hero{position:relative;margin:0 0 20px;padding:clamp(22px,4vw,38px);border:1px solid var(--line,#e4e8ef);border-radius:24px;background:linear-gradient(135deg,#f8fbff,#fff);box-shadow:0 12px 34px rgba(16,36,63,.055)}
-.telegram-page .hero h1{max-width:760px;margin:9px 0 10px;font-size:clamp(27px,4vw,42px);line-height:1.12;letter-spacing:-1.1px}
-.telegram-page .hero p{max-width:760px;margin:0;color:var(--muted,#718096);line-height:1.75}
-#telegramGrid.video-grid{scroll-margin-top:92px}
-
-/* Telegram directory — refined premium layout */
-.telegram-page{width:min(1220px,calc(100% - 40px));padding-top:34px}
-.telegram-page .hero{padding:clamp(26px,4.5vw,48px);border-radius:26px;background:radial-gradient(circle at 90% 10%,rgba(32,143,210,.12),transparent 34%),linear-gradient(135deg,#f7fbff,#fff);}
-.telegram-page .hero .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(35,128,190,.18);border-radius:999px;background:rgba(38,135,195,.07);color:#2478ad;font-size:11px;font-weight:850;letter-spacing:1.1px}
-.telegram-page .hero h1{max-width:820px;font-size:clamp(29px,4.2vw,46px);letter-spacing:-1.35px}
-.telegram-page .hero p{max-width:800px;font-size:14px;line-height:1.8}
-#telegramGrid.video-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:26px}
-#telegramGrid .telegram-review-card{overflow:hidden;border:1px solid #e2eaf2;border-radius:22px;background:#fff;box-shadow:0 12px 34px rgba(16,36,63,.065);transition:transform .22s ease,box-shadow .22s ease}
-#telegramGrid .telegram-review-card:hover{transform:translateY(-4px);box-shadow:0 20px 46px rgba(16,36,63,.12)}
-#telegramGrid .telegram-review-cover{aspect-ratio:4/5;min-height:310px;max-height:430px;background:linear-gradient(145deg,#102b4a,#2866a5 60%,#8ab5df)}
-#telegramGrid .telegram-review-cover img{object-fit:cover;object-position:center}
-#telegramGrid .telegram-review-content{padding:22px;display:flex;flex-direction:column}
-#telegramGrid .telegram-review-topline{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#718096;font-size:10px;font-weight:850;letter-spacing:.7px}
-#telegramGrid .telegram-review-type{padding:5px 8px;border-radius:999px;background:#eef6fc;color:#37749d;font-size:9px;white-space:nowrap}
-#telegramGrid .telegram-review-content h2{min-height:0;margin:13px 0 9px;font-size:clamp(17px,1.7vw,21px);line-height:1.35;letter-spacing:-.35px;-webkit-line-clamp:3}
-#telegramGrid .telegram-review-content h2 a{color:inherit;text-decoration:none}
-#telegramGrid .telegram-review-description{min-height:0;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;margin:0 0 16px;color:#64758a;font-size:13px;line-height:1.7}
-#telegramGrid .telegram-price-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:13px 15px;border:1px solid #b8e8ce;border-radius:14px;background:linear-gradient(110deg,#effcf4,#e4f8ec);color:#167344}
-#telegramGrid .telegram-price-panel span{font-size:10px;font-weight:900;letter-spacing:.8px}
-#telegramGrid .telegram-price-panel strong{font-size:clamp(17px,2vw,22px);font-weight:900;letter-spacing:-.3px}
-#telegramGrid .telegram-review-stats{margin-top:auto;padding:14px 0 2px;border-top:1px solid #edf1f5}
-#telegramGrid .telegram-review-stats b{font-size:18px;color:#1e344b}
-#telegramGrid .telegram-review-stats span{font-size:10px;color:#7b8999}
-#telegramGrid .telegram-review-button{position:relative;overflow:hidden;margin-top:17px;padding:13px 16px;border-radius:13px;background:linear-gradient(110deg,#14558d,#267fc0);box-shadow:0 8px 20px rgba(37,99,185,.2);animation:telegram-button-float 2.8s ease-in-out infinite}
-#telegramGrid .telegram-review-button:hover{animation-play-state:paused;filter:brightness(1.08);transform:translateY(-1px)}
-.telegram-review-arrow{font-size:20px;transition:transform .2s ease}
-.telegram-review-button:hover .telegram-review-arrow{transform:translateX(5px)}
-@keyframes telegram-button-float{0%,100%{box-shadow:0 7px 17px rgba(37,99,185,.16)}50%{box-shadow:0 10px 24px rgba(37,99,185,.3)}}
-.telegram-pagination{padding:22px 4px 28px}
-@media(max-width:390px){#telegramGrid.video-grid{grid-template-columns:1fr}#telegramGrid .telegram-review-cover{aspect-ratio:4/3;min-height:240px}#telegramGrid .telegram-review-content{padding:16px}#telegramGrid .telegram-review-content h2{font-size:17px}#telegramGrid .telegram-review-description{font-size:12px}}
 
 
-/* Final Telegram catalogue refinement */
-.telegram-page{width:min(1160px,calc(100% - 36px));padding-top:22px}
-.telegram-page .hero{padding:22px 26px!important;border:1px solid rgba(65,130,185,.12);border-radius:20px!important;box-shadow:0 12px 34px rgba(16,36,63,.045)}
-.telegram-page .hero .eyebrow{padding:5px 9px;font-size:9px;letter-spacing:.8px}
-.telegram-page .hero h1{max-width:760px;margin:10px 0 6px;font-size:clamp(21px,2.5vw,30px)!important;line-height:1.2;letter-spacing:-.7px}
-.telegram-page .hero p{max-width:720px;margin:0;font-size:12px!important;line-height:1.6!important;color:var(--muted,#718096)}
-#telegramGrid.video-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important;margin-top:20px}
-#telegramGrid .telegram-review-card{min-width:0;display:flex;flex-direction:column;border-radius:18px}
-#telegramGrid .telegram-review-cover{display:block;aspect-ratio:16/10!important;min-height:0!important;max-height:none!important;overflow:hidden}
-#telegramGrid .telegram-review-cover img{width:100%;height:100%;min-height:0!important;object-fit:cover}
-#telegramGrid .telegram-review-content{padding:16px}
-#telegramGrid .telegram-review-content h2{font-size:clamp(15px,1.5vw,19px);margin:10px 0 7px;line-height:1.3}
-#telegramGrid .telegram-review-description{font-size:12px;line-height:1.55;-webkit-line-clamp:3;margin-bottom:12px}
-#telegramGrid .telegram-review-topline{font-size:9px}
-#telegramGrid .telegram-review-type{font-size:8px}
-#telegramGrid .telegram-price-panel{padding:10px 12px;margin-bottom:10px}
-#telegramGrid .telegram-review-stats{padding:10px 0 2px}
-#telegramGrid .telegram-review-stats b{font-size:16px}
-#telegramGrid .telegram-review-button{margin-top:12px;padding:11px 12px;font-size:11px}
-@media(max-width:720px){.telegram-page{width:calc(100% - 24px);padding-top:15px}.telegram-page .hero{padding:17px!important;border-radius:16px!important}#telegramGrid.video-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin-top:14px}#telegramGrid .telegram-review-cover{aspect-ratio:4/3!important}#telegramGrid .telegram-review-content{padding:10px}#telegramGrid .telegram-review-topline{font-size:7px;gap:3px;letter-spacing:0}#telegramGrid .telegram-review-type{font-size:7px;padding:3px 5px}#telegramGrid .telegram-review-content h2{font-size:12px;margin:7px 0 5px;line-height:1.3}#telegramGrid .telegram-review-description{font-size:9px;line-height:1.45;-webkit-line-clamp:3;margin-bottom:8px}#telegramGrid .telegram-price-panel{padding:7px 8px;gap:4px}#telegramGrid .telegram-price-panel span{font-size:7px}#telegramGrid .telegram-price-panel strong{font-size:12px}#telegramGrid .telegram-review-stats{gap:2px;padding:8px 0 1px}#telegramGrid .telegram-review-stats b{font-size:12px}#telegramGrid .telegram-review-stats span{font-size:7px;white-space:normal}#telegramGrid .telegram-review-button{font-size:8px;padding:8px 5px;margin-top:8px;gap:5px}#telegramGrid .telegram-review-arrow{font-size:14px}.telegram-pagination{gap:8px;font-size:10px}}
-@media(max-width:360px){#telegramGrid.video-grid{gap:7px!important}#telegramGrid .telegram-review-content{padding:8px}#telegramGrid .telegram-review-content h2{font-size:11px}#telegramGrid .telegram-review-description{font-size:8px}#telegramGrid .telegram-review-stats b{font-size:11px}}
-@media(prefers-reduced-motion:reduce){#telegramGrid .telegram-review-card,#telegramGrid .telegram-review-button{transition:none!important;animation:none!important}}
-
-/* Final hard-stop: legacy account notices and access overlays are not shown on this page. */
-body.telegram-directory-page .telegram-warning-float,
-body.telegram-directory-page .telegram-account-notice,
-body.telegram-directory-page .telegram-premium-overlay,
-body.telegram-directory-page .telegram-premium-badge,
-body.telegram-directory-page .telegram-access-badge,
-body.telegram-directory-page #telegramGrid .telegram-cover-label {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-/* BoxCellink Telegram catalogue — search, admin categories and premium review cards */
-.telegram-tools{width:min(1160px,calc(100% - 36px));margin:18px auto 8px;display:grid;gap:16px}
-.telegram-search{height:52px;display:flex;align-items:center;gap:12px;padding:0 16px;border:1px solid #dce6f0;border-radius:15px;background:#fff;box-shadow:0 8px 24px rgba(20,45,75,.055);color:#718096}
-.telegram-search>i{font-size:16px;color:#3280b8}.telegram-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#172b43;font:inherit;font-size:14px}.telegram-search input::placeholder{color:#98a6b7}.telegram-search button{width:30px;height:30px;border:0;border-radius:9px;background:#eef4f9;color:#52677d;cursor:pointer}.telegram-category-wrap{display:grid;gap:10px}.telegram-category-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}.telegram-category-heading span{font-size:10px;font-weight:900;letter-spacing:1.2px;color:#52677d}.telegram-category-heading small{font-size:11px;color:#8997a8}.telegram-category-list{display:flex;gap:8px;overflow-x:auto;padding:2px 1px 8px;scrollbar-width:thin}.telegram-category-chip{flex:0 0 auto;padding:9px 15px;border:1px solid #dce6f0;border-radius:999px;background:#fff;color:#52677d;font:inherit;font-size:12px;font-weight:750;cursor:pointer;transition:.18s}.telegram-category-chip:hover{border-color:#6aa7d4;color:#236c9f}.telegram-category-chip.is-active{border-color:#246da5;background:linear-gradient(120deg,#164e7d,#287fba);color:#fff;box-shadow:0 6px 16px rgba(36,109,165,.2)}
-#telegramGrid.video-grid{width:min(1160px,calc(100% - 36px));margin:20px auto 52px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:stretch}
-#telegramGrid .telegram-review-card{display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #e1e9f1;border-radius:20px;background:#fff;box-shadow:0 12px 32px rgba(18,43,72,.07);transition:transform .22s ease,box-shadow .22s ease}
-#telegramGrid .telegram-review-card:hover{transform:translateY(-4px);box-shadow:0 20px 42px rgba(18,43,72,.13)}
-#telegramGrid .telegram-review-cover{position:relative;display:block;width:100%;height:auto;min-height:0;aspect-ratio:16/9;overflow:hidden;background:linear-gradient(135deg,#0d2945,#2b6d9e)}
-#telegramGrid .telegram-review-cover img{position:absolute;inset:0;width:100%;height:100%;min-height:0;object-fit:cover;object-position:center;transition:transform .35s ease}
-#telegramGrid .telegram-review-card:hover .telegram-review-cover img{transform:scale(1.035)}
-#telegramGrid .telegram-review-content{display:flex;flex:1;flex-direction:column;min-width:0;padding:19px}
-#telegramGrid .telegram-review-topline{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#75869a;font-size:10px;font-weight:900;letter-spacing:1px}
-#telegramGrid .telegram-review-type{padding:5px 9px;border-radius:7px;background:#edf6fc;color:#2875a8;font-size:9px;font-weight:900;letter-spacing:.7px}
-#telegramGrid .telegram-review-content h2{min-height:0;margin:11px 0 15px;font-size:clamp(16px,1.6vw,21px);line-height:1.35;letter-spacing:-.35px;overflow-wrap:anywhere}
-#telegramGrid .telegram-review-content h2 a{color:#172b43;text-decoration:none}#telegramGrid .telegram-review-content h2 a:hover{color:#247bb4}
-#telegramGrid .telegram-price-panel{display:flex;flex-direction:column;align-items:flex-start;gap:5px;margin:0 0 13px;padding:13px 15px;border:1px solid #bde8cf;border-radius:13px;background:linear-gradient(120deg,#f0fcf4,#e7f8ee);color:#167344}
-#telegramGrid .telegram-price-panel span{font-size:9px;font-weight:900;letter-spacing:1px}#telegramGrid .telegram-price-panel strong{font-size:clamp(18px,2vw,23px);font-weight:900;line-height:1.2;letter-spacing:-.4px}
-#telegramGrid .telegram-review-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-top:auto;padding:12px 0 3px;border-top:1px solid #edf1f5;border-bottom:0}
-#telegramGrid .telegram-review-stats>div{align-items:center;gap:5px;text-align:center}
-#telegramGrid .telegram-review-stats b{font-size:17px;color:#1d344c}
-#telegramGrid .telegram-review-stats span{display:flex;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:700;color:#748397;white-space:nowrap}
-#telegramGrid .telegram-review-stats span .fa-fire{color:#e6a323}#telegramGrid .telegram-review-stats span .fa-heart{color:#e34e68}#telegramGrid .telegram-review-stats span .fa-comment{color:#718096}
-#telegramGrid .telegram-review-button{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;padding:13px 15px;border-radius:12px;background:linear-gradient(110deg,#15527f,#2b83bd);color:#fff!important;font-size:12px;font-weight:850;text-decoration:none;box-shadow:0 7px 18px rgba(37,99,185,.16)}
-#telegramGrid .telegram-review-arrow{font-size:21px;line-height:1}
-#telegramGrid .telegram-pagination{grid-column:1/-1;display:flex;justify-content:center;padding:10px 0 18px}
-#telegramGrid .telegram-page-controls{gap:7px}
-@media(max-width:720px){.telegram-tools{width:calc(100% - 24px);gap:12px;margin-top:14px}.telegram-search{height:46px;padding:0 13px}.telegram-search input{font-size:12px}.telegram-category-heading small{font-size:9px}.telegram-category-chip{padding:8px 12px;font-size:10px}#telegramGrid.video-grid{width:calc(100% - 24px);grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:11px!important;margin-top:14px}#telegramGrid .telegram-review-card{border-radius:14px}#telegramGrid .telegram-review-cover{aspect-ratio:4/3}#telegramGrid .telegram-review-content{padding:10px}#telegramGrid .telegram-review-topline{font-size:7px;letter-spacing:.4px;gap:4px}#telegramGrid .telegram-review-type{font-size:7px;padding:4px 6px}#telegramGrid .telegram-review-content h2{font-size:12px;margin:8px 0 10px;line-height:1.35}#telegramGrid .telegram-price-panel{padding:8px 9px;gap:4px;margin-bottom:8px}#telegramGrid .telegram-price-panel span{font-size:7px}#telegramGrid .telegram-price-panel strong{font-size:13px}#telegramGrid .telegram-review-stats{gap:2px;padding:9px 0 1px}#telegramGrid .telegram-review-stats b{font-size:13px}#telegramGrid .telegram-review-stats span{font-size:8px;gap:3px;white-space:normal;flex-wrap:wrap}#telegramGrid .telegram-review-stats span i{font-size:9px}#telegramGrid .telegram-review-button{font-size:9px;padding:9px 8px;margin-top:9px}#telegramGrid .telegram-review-arrow{font-size:16px}}
-@media(max-width:360px){#telegramGrid.video-grid{gap:7px!important}#telegramGrid .telegram-review-content{padding:8px}#telegramGrid .telegram-review-topline{font-size:6px}#telegramGrid .telegram-review-type{font-size:6px}#telegramGrid .telegram-review-content h2{font-size:11px}#telegramGrid .telegram-review-stats b{font-size:11px}#telegramGrid .telegram-review-stats span{font-size:7px}#telegramGrid .telegram-review-button{font-size:8px;padding:8px 6px}}
-@media(prefers-color-scheme:dark){.telegram-search,.telegram-category-chip{background:#101d2d;border-color:#293c51;color:#dce8f5}.telegram-search input{color:#e7eff8}.telegram-category-heading span{color:#b7c7d8}#telegramGrid .telegram-review-card{background:#101d2d;border-color:#293c51}#telegramGrid .telegram-review-content h2 a{color:#e7eff8}#telegramGrid .telegram-review-stats b{color:#e7eff8}#telegramGrid .telegram-review-stats span{color:#a7b8cb}#telegramGrid .telegram-review-stats{border-color:#293c51}#telegramGrid .telegram-price-panel{background:linear-gradient(120deg,#102d22,#153b2c);border-color:#24583e;color:#8ce0ae}}
+/* BoxCellink ivory + blue premium refresh */
+body.telegram-directory-page{background:#f8f7f2!important;color:#172d49!important}
+.telegram-page{max-width:1240px!important;padding-top:28px!important}
+.telegram-page .hero{position:relative;overflow:hidden;margin:8px 0 25px;padding:clamp(25px,4vw,42px);border:1px solid #e5e8ed;border-radius:25px;background:linear-gradient(120deg,#fffefa 0%,#f4f8fd 70%,#eaf3fc 100%)!important;box-shadow:0 16px 45px rgba(26,55,88,.07)}
+.telegram-page .hero:after{content:"";position:absolute;width:240px;height:240px;right:-70px;top:-115px;border-radius:50%;background:radial-gradient(circle,#8db9e74a,transparent 70%);pointer-events:none}
+.telegram-page .hero .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #d7e6f5;border-radius:999px;background:#edf5fc;color:#2866ad;font-size:10px;font-weight:900;letter-spacing:1.2px}
+.telegram-page .hero h1{margin:15px 0 8px;color:#172f4e;font-size:clamp(28px,4vw,42px);font-weight:900;letter-spacing:-1.3px}
+.telegram-page .hero p{max-width:650px;margin:0;color:#718096;font-size:14px;line-height:1.7}
+.telegram-top10-section{margin:0 0 24px;padding:23px;border:1px solid #e4e9ef;border-radius:22px;background:#fffefa;box-shadow:0 12px 34px rgba(23,48,77,.055)}
+.telegram-section-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:17px}
+.telegram-section-kicker{color:#4380b8;font-size:9px;font-weight:900;letter-spacing:1.5px}
+.telegram-section-heading h2{margin:4px 0;color:#1b3554;font-size:23px;font-weight:900;letter-spacing:-.6px}
+.telegram-section-heading p{margin:0;color:#7a8798;font-size:12px}
+.telegram-top10-count{display:inline-flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid #d8e7f6;border-radius:999px;background:#f0f6fc;color:#2866ad;font-size:10px;font-weight:900;letter-spacing:.7px;white-space:nowrap}
+.telegram-top10-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.telegram-top10-card{position:relative;display:flex;align-items:center;gap:10px;min-width:0;padding:10px;border:1px solid #e8edf3;border-radius:15px;background:linear-gradient(145deg,#fff,#f9fbfd);color:#1d3551;text-decoration:none;transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.telegram-top10-card:hover{transform:translateY(-4px);border-color:#a9c8e8;box-shadow:0 12px 25px rgba(37,91,145,.12)}
+.telegram-top10-rank{display:grid;place-items:center;flex:0 0 25px;width:25px;height:25px;border-radius:8px;background:#eaf2fa;color:#2866ad;font-size:11px;font-weight:950}
+.telegram-top10-card:nth-child(1) .telegram-top10-rank{background:linear-gradient(135deg,#f8e7b8,#fff4d8);color:#956b19}
+.telegram-top10-thumb{position:relative;display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;overflow:hidden;border-radius:11px;background:linear-gradient(145deg,#dceaf7,#f3f7fb);color:#397bb5}
+.telegram-top10-thumb img{width:100%;height:100%;object-fit:cover}
+.telegram-top10-info{display:flex;flex:1;flex-direction:column;gap:4px;min-width:0}
+.telegram-top10-info strong{overflow:hidden;color:#203954;font-size:11px;font-weight:850;line-height:1.35;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.telegram-top10-info small{color:#8491a1;font-size:9px}
+.telegram-top10-info b{color:#2866ad;font-size:10px}
+.telegram-top10-open{color:#9aabba;font-size:10px}
+.telegram-top10-loading,.telegram-top10-empty{grid-column:1/-1;padding:20px;color:#8190a1;text-align:center;font-size:12px}
+.telegram-tools{padding:18px!important;border:1px solid #e4e9ef!important;border-radius:19px!important;background:#fffefa!important;box-shadow:0 10px 28px rgba(23,48,77,.045)!important}
+.telegram-search{height:49px!important;border:1px solid #dfe6ee!important;border-radius:13px!important;background:#fff!important;box-shadow:inset 0 1px 2px #172d4908}
+.telegram-search input{color:#1c3552!important}
+.telegram-category-heading span{color:#36516e!important}
+.telegram-category-chip{border:1px solid #dce5ef!important;background:#fffefa!important;color:#58708a!important;transition:all .22s ease!important}
+.telegram-category-chip:hover,.telegram-category-chip.is-active{border-color:#2866ad!important;background:linear-gradient(120deg,#245b99,#4385c7)!important;color:#fff!important;box-shadow:0 7px 17px #2866ad25!important;transform:translateY(-1px)}
+#telegramGrid.video-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+#telegramGrid .telegram-review-card{border:1px solid #e3e9f0!important;border-radius:19px!important;background:#fffefa!important;box-shadow:0 12px 34px rgba(20,43,73,.07)!important;transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease!important}
+#telegramGrid .telegram-review-card:hover{transform:translateY(-5px)!important;border-color:#b8d0e9!important;box-shadow:0 20px 42px rgba(20,65,112,.13)!important}
+#telegramGrid .telegram-review-cover{background:linear-gradient(145deg,#e7f0f9,#cbdff1)!important}
+#telegramGrid .telegram-review-content h2 a{color:#1b3554!important}
+#telegramGrid .telegram-price-panel{border:1px solid #d8e7f6!important;background:linear-gradient(120deg,#f2f7fc,#eaf3fb)!important;color:#2866ad!important}
+#telegramGrid .telegram-review-stats{border-color:#edf0f4!important}
+#telegramGrid .telegram-review-stats b{color:#1c3552!important}
+#telegramGrid .telegram-review-button{position:relative;overflow:hidden;justify-content:center!important;gap:12px;border:1px solid #245b99!important;background:linear-gradient(110deg,#1e4f83,#347fc0,#2866ad)!important;background-size:180% 100%!important;box-shadow:0 8px 19px rgba(40,102,173,.22)!important;transition:transform .25s ease,box-shadow .25s ease,background-position .35s ease!important}
+#telegramGrid .telegram-review-button:before{content:"";position:absolute;top:-80%;left:-45%;width:32%;height:260%;transform:rotate(25deg);background:linear-gradient(90deg,transparent,#ffffff55,transparent);transition:left .55s ease}
+#telegramGrid .telegram-review-button:hover{transform:translateY(-2px)!important;background-position:100% 0!important;box-shadow:0 12px 24px rgba(40,102,173,.3)!important}
+#telegramGrid .telegram-review-button:hover:before{left:125%}
+#telegramGrid .telegram-review-arrow{transition:transform .25s ease}
+#telegramGrid .telegram-review-button:hover .telegram-review-arrow{transform:translateX(5px)}
+#telegramGrid .telegram-page-btn{border:1px solid #dce5ef!important;border-radius:10px!important;background:#fffefa!important;color:#36516e!important;transition:.2s ease}
+#telegramGrid .telegram-page-btn:hover,#telegramGrid .telegram-page-btn.is-active{border-color:#2866ad!important;background:#2866ad!important;color:#fff!important;transform:translateY(-1px)}
+@media(max-width:1000px){.telegram-top10-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.telegram-page{padding-top:16px!important}.telegram-page .hero{margin:4px 0 16px;padding:23px 19px;border-radius:19px}.telegram-page .hero h1{font-size:27px}.telegram-page .hero p{font-size:12px}.telegram-top10-section{padding:15px;margin-bottom:15px;border-radius:17px}.telegram-section-heading h2{font-size:20px}.telegram-section-heading p{font-size:10px}.telegram-top10-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.telegram-top10-card{gap:7px;padding:8px;border-radius:12px}.telegram-top10-thumb{flex-basis:38px;width:38px;height:38px}.telegram-top10-rank{flex-basis:22px;width:22px;height:22px;font-size:9px}.telegram-top10-info strong{font-size:10px}.telegram-top10-info small{font-size:8px}.telegram-top10-info b{font-size:9px}.telegram-top10-open{display:none}.telegram-tools{width:100%!important;margin:0!important;padding:14px!important}.telegram-section-heading{align-items:flex-start}.telegram-top10-count{font-size:9px;padding:8px}#telegramGrid.video-grid{width:100%!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:11px!important;margin:15px 0 35px!important}#telegramGrid .telegram-review-card{grid-template-columns:1fr!important;border-radius:15px!important}#telegramGrid .telegram-review-cover{min-height:0!important;aspect-ratio:4/3}#telegramGrid .telegram-review-cover img{min-height:0!important}#telegramGrid .telegram-review-content{padding:11px!important}#telegramGrid .telegram-review-content h2{font-size:12px!important;margin:8px 0 10px!important}#telegramGrid .telegram-price-panel{padding:9px!important}#telegramGrid .telegram-review-button{font-size:9px!important;padding:10px 7px!important}}
+@media(max-width:360px){.telegram-top10-grid{grid-template-columns:1fr}#telegramGrid .telegram-review-content{padding:9px!important}}
+@media(prefers-reduced-motion:reduce){.telegram-top10-card,#telegramGrid .telegram-review-card,#telegramGrid .telegram-review-button{transition:none!important;animation:none!important}}
