@@ -91,9 +91,13 @@ body.telegram-directory-page{background:#f8f7f2!important;color:#172d49!importan
   display:flex!important;
   align-items:center!important;
   gap:12px!important;
-  width:100%!important;
+  width:min(100%,480px)!important;
+  max-width:480px!important;
+  margin:0 auto!important;
   padding:0 15px!important;
+  box-sizing:border-box!important;
 }
+
 .telegram-search input{
   flex:1 1 auto!important;
   min-width:0!important;
@@ -103,6 +107,14 @@ body.telegram-directory-page{background:#f8f7f2!important;color:#172d49!importan
   outline:0!important;
   background:transparent!important;
   box-shadow:none!important;
+}
+
+@media(max-width:600px){
+  .telegram-search{
+    width:calc(100% - 28px)!important;
+    max-width:420px!important;
+    height:45px!important;
+  }
 }
 .telegram-category-wrap{
   display:flex!important;
