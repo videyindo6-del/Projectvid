@@ -116,7 +116,7 @@
             <strong>${esc(price)}</strong>
           </div>
           <div class="telegram-review-stats" aria-label="${isEN()?'Review statistics':'Statistik review'}">
-            <div><span class="telegram-stat-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i></span><b>${number(s.total_sold)}</b><small>${isEN()?'Sold':'Terjual'}</small></div>
+            <div><span class="telegram-stat-icon"><i class="fa-solid ${item.access === 'free' ? 'fa-eye' : 'fa-bag-shopping'}" aria-hidden="true"></i></span><b>${number(item.access === 'free' ? item.view_count : s.total_sold)}</b><small>${item.access === 'free' ? (isEN()?'Opens':'Dibuka') : (isEN()?'Sold':'Terjual')}</small></div>
             <div><span class="telegram-stat-icon"><i class="fa-solid fa-heart" aria-hidden="true"></i></span><b>${number(s.total_likes)}</b><small>${isEN()?'Likes':'Disukai'}</small></div>
             <div><span class="telegram-stat-icon"><i class="fa-solid fa-comments" aria-hidden="true"></i></span><b>${number(s.total_comments)}</b><small>${isEN()?'Comments':'Komentar'}</small></div>
           </div>
@@ -128,13 +128,13 @@
     if (visibleItems.length > PAGE_SIZE) {
       const buttons = [];
       const add = (p,label,active=false,disabled=false) => buttons.push(`<button type="button" class="telegram-page-btn${active?' is-active':''}" data-page="${p}" ${disabled?'disabled':''} ${active?'aria-current="page"':''}>${label}</button>`);
-      add(currentPage-1,isEN()?'Previous':'‹',false,currentPage===1);
+      add(currentPage-1,'<i class="fa-solid fa-chevron-left" aria-hidden="true"></i>',false,currentPage===1);
       let from=Math.max(1,currentPage-2),to=Math.min(totalPages,from+4); from=Math.max(1,to-4);
       if(from>1){add(1,'1');if(from>2)buttons.push('<span class="telegram-page-dots">…</span>');}
       for(let p=from;p<=to;p++) add(p,String(p),p===currentPage);
       if(to<totalPages){if(to<totalPages-1)buttons.push('<span class="telegram-page-dots">…</span>');add(totalPages,String(totalPages));}
-      add(currentPage+1,isEN()?'Next':'›',false,currentPage===totalPages);
-      pager=`<nav class="telegram-pagination" aria-label="Review pages"><div class="telegram-page-controls">${buttons.join('')}</div></nav>`;
+      add(currentPage+1,'<i class="fa-solid fa-chevron-right" aria-hidden="true"></i>',false,currentPage===totalPages);
+      pager=`<nav class="telegram-pagination" aria-label="${isEN()?'Review pages':'Halaman review'}"><div class="telegram-pagination-inner"><span class="telegram-pagination-label">${isEN()?'Page':'Halaman'} <b>${currentPage}</b> ${isEN()?'of':'dari'} <b>${totalPages}</b></span><div class="telegram-page-controls">${buttons.join('')}</div></div></nav>`;
     }
     grid.innerHTML = cards + pager;
     grid.querySelectorAll('[data-page]').forEach(btn => btn.addEventListener('click',()=>{
