@@ -103,7 +103,7 @@
       const categoryName = categories.find(c => c.id === item.category_id)?.name || (isEN() ? 'Telegram media' : 'Media Telegram');
       return `<article class="telegram-review-card">
         <a class="telegram-review-cover${thumb?'':' no-image'}" href="${href}" aria-label="${esc(item.title)}">
-          ${thumb?`<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add('no-image')">`:''}
+          ${thumb?`<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add('no-image');this.parentElement.querySelector('.telegram-cover-placeholder')?.remove()">`:`<span class="telegram-cover-placeholder"><i class="fa-brands fa-telegram" aria-hidden="true"></i><strong>BOXCELLINK</strong><small>${isEN()?'Preview unavailable':'Preview belum tersedia'}</small></span>`}
           <span class="telegram-cover-badge"><i class="fa-brands fa-telegram" aria-hidden="true"></i> TELEGRAM</span>
           <span class="telegram-cover-open"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
         </a>
