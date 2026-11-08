@@ -55,3 +55,40 @@ html.dark .plan-card h3,html.dark .discount-explain h2{color:#f1f5f9}
 html.dark .telegram-cta{background:#10263e;border-color:#244568;color:#dbeafe!important}
 html.dark .telegram-cta span{color:#a9bbd0}
 html.dark .empty-state{background:#101e2d;border-color:#33475e;color:#a9bbd0}
+
+/* Compact premium membership refresh */
+.vip-page{max-width:1080px!important;padding-top:22px!important;padding-bottom:48px!important}
+.vip-hero{min-height:0!important;padding:30px 34px!important;border-radius:22px!important;gap:20px!important}
+.vip-hero h1{font-size:clamp(1.75rem,3vw,2.55rem)!important;max-width:650px}
+.vip-hero p{font-size:14px;line-height:1.65;max-width:650px;margin:10px 0 0}
+.vip-status{margin-top:15px!important;padding:12px 15px!important;max-width:620px!important;gap:7px!important;border-radius:13px!important}
+.vip-status>span:not(.vip-status-kicker){font-size:12px}
+.vip-timeline>div{padding:9px 11px}
+.plans{margin-top:25px!important}
+.section-title{margin-bottom:13px!important}.section-title h2{font-size:1.55rem!important;margin:4px 0}.section-title p{font-size:12px;margin:5px 0}
+.plan-grid{grid-template-columns:repeat(auto-fit,minmax(225px,1fr))!important;gap:13px!important}
+.premium-plan{padding:19px!important;border-radius:17px!important;overflow:hidden;isolation:isolate;animation:vipCardEnter .55s both;transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease!important}
+.premium-plan:nth-child(2){animation-delay:.07s}.premium-plan:nth-child(3){animation-delay:.14s}.premium-plan:nth-child(4){animation-delay:.21s}
+.premium-plan:before{content:"";position:absolute;inset:-70% auto -70% -45%;width:38%;z-index:-1;background:linear-gradient(90deg,transparent,#ffffff75,transparent);transform:rotate(22deg);animation:vipCardShine 5.5s ease-in-out infinite;pointer-events:none}
+.premium-plan:hover{transform:translateY(-5px) scale(1.012)!important;box-shadow:0 20px 42px #102b4920!important;border-color:#a9c8ee!important}
+.premium-plan-icon{width:43px!important;height:43px!important;margin:12px 0 9px!important;border-radius:13px!important;font-size:18px!important;animation:vipIconFloat 3s ease-in-out infinite}
+.premium-plan h3{font-size:1.08rem!important;margin:4px 0}.plan-price{font-size:1.55rem!important;margin:8px 0!important}.plan-duration{font-size:12px;margin:5px 0!important}
+.premium-plan ul{gap:7px!important;padding:12px 0!important;margin:10px 0!important}.premium-plan li{font-size:11px;line-height:1.45}.premium-plan .btn{min-height:41px!important;font-size:12px}
+.premium-plan.is-gold{border:1px solid #d9ad48!important;background:radial-gradient(ellipse at 90% 0%,#fff0bd 0,transparent 45%),linear-gradient(145deg,#fffdf5,#fff8e6 55%,#fff)!important;box-shadow:0 12px 34px #b985251c!important}
+.premium-plan.is-gold .plan-tag{background:linear-gradient(110deg,#f8e5a8,#fff4cc,#e7bd58)!important;color:#704b08!important}
+.premium-plan.is-gold .premium-plan-icon{background:linear-gradient(135deg,#fff0b8,#e8b83e)!important;color:#704b08!important;box-shadow:0 7px 22px #d9a52e40}
+.premium-plan.is-gold .plan-price{color:#93640b!important}.premium-plan.is-gold .vip-buy-button{background:linear-gradient(110deg,#80530b,#d5a536,#80530b)!important;color:#fff!important;border:0!important;background-size:200% 100%;animation:goldButtonFlow 4s linear infinite}
+.vip-benefits-panel{display:grid;grid-template-columns:minmax(190px,.72fr) 1.8fr;gap:16px;align-items:center;margin:18px 0 0;padding:17px 19px;border:1px solid var(--vip-line);border-radius:17px;background:var(--vip-surface);box-shadow:0 8px 24px #102b4909}
+.vip-benefits-heading .eyebrow{font-size:9px;letter-spacing:.13em;color:#3974b9;font-weight:900}.vip-benefits-heading h2{font-size:15px;line-height:1.35;margin:5px 0 0;letter-spacing:-.02em}
+.vip-benefits-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px 16px}.vip-benefits-list article{display:grid;grid-template-columns:30px 1fr;gap:9px;align-items:start;min-width:0}.vip-benefits-list article>i{display:grid;place-items:center;width:29px;height:29px;border-radius:9px;background:#edf4ff;color:#2866aa;font-size:12px}.vip-benefits-list h3{font-size:11px;margin:0 0 3px}.vip-benefits-list p{font-size:10px;line-height:1.45;color:var(--vip-muted);margin:0}
+.discount-explain{margin-top:15px!important;padding:15px 17px!important;gap:12px!important;border-radius:15px!important}.discount-explain h2{font-size:14px;margin:0 0 5px}.discount-explain p{font-size:10px;line-height:1.55;margin:4px 0}.discount-icon{width:39px;height:39px;border-radius:12px;font-size:16px}
+.telegram-cta{margin-top:12px!important;padding:13px 16px!important;border-radius:14px!important}.telegram-cta strong{font-size:12px}.telegram-cta span{font-size:10px}
+@keyframes vipCardEnter{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+@keyframes vipCardShine{0%,65%{left:-55%;opacity:0}75%{opacity:.8}100%{left:135%;opacity:0}}
+@keyframes vipIconFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(2deg)}}
+@keyframes goldButtonFlow{to{background-position:200% 0}}
+@media(max-width:700px){.vip-page{padding:15px 12px 35px!important}.vip-hero{padding:23px 19px!important}.vip-benefits-panel{grid-template-columns:1fr;gap:12px;padding:14px}.vip-benefits-list{gap:10px}.plan-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.premium-plan{padding:14px!important}.plan-price{font-size:1.25rem!important}.premium-plan li{font-size:10px}}
+@media(max-width:430px){.plan-grid{grid-template-columns:1fr!important}.vip-benefits-list{grid-template-columns:1fr}.vip-benefits-heading h2{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.premium-plan,.premium-plan:before,.premium-plan-icon,.is-gold .vip-buy-button{animation:none!important;transition:none!important}}
+html.dark .vip-benefits-panel{background:#111f30!important;border-color:#26384d!important}html.dark .vip-benefits-list p{color:#a9bbd0}
+html.dark .premium-plan.is-gold{background:linear-gradient(145deg,#342a15,#1d1b16)!important;border-color:#9b792e!important}html.dark .premium-plan.is-gold h3,html.dark .premium-plan.is-gold li{color:#f8e9c0!important}
