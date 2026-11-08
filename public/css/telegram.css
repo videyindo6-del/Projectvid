@@ -505,3 +505,113 @@ body.telegram-directory-page{background:#f8f7f2!important;color:#172d49!importan
   #telegramGrid .telegram-cover-placeholder strong{font-size:9px!important}
   #telegramGrid .telegram-cover-placeholder small{font-size:8px!important}
 }
+
+
+/* ==========================================
+   BOXCellink — Telegram Search & Category
+   Compact Premium Layout
+========================================== */
+
+/* Batasi lebar keseluruhan panel pencarian */
+.telegram-tools {
+    width: 100% !important;
+    max-width: 850px !important;
+    margin: 0 auto 24px !important;
+    padding: 22px !important;
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 18px !important;
+}
+
+/* Search dibuat lebih pendek dan proporsional */
+.telegram-search {
+    width: 100% !important;
+    max-width: 430px !important;
+    height: 46px !important;
+    margin: 0 auto !important;
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+    border-radius: 12px !important;
+}
+
+/* Input pencarian */
+.telegram-search input {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+    height: 100% !important;
+}
+
+/* Area kategori */
+.telegram-category-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding-top: 16px !important;
+    gap: 12px !important;
+}
+
+/* Judul kategori */
+.telegram-category-heading {
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+/* Tombol kategori */
+.telegram-category-list {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 9px !important;
+    width: 100% !important;
+}
+
+/* Ukuran tombol kategori */
+.telegram-category-chip {
+    flex: 0 0 auto !important;
+    min-height: 36px !important;
+    padding: 8px 15px !important;
+    font-size: 11px !important;
+    border-radius: 999px !important;
+}
+
+/* Tampilan HP */
+@media (max-width: 600px) {
+    .telegram-tools {
+        width: calc(100% - 24px) !important;
+        max-width: 430px !important;
+        margin: 0 auto 18px !important;
+        padding: 15px !important;
+        gap: 16px !important;
+        border-radius: 16px !important;
+    }
+
+    .telegram-search {
+        width: 100% !important;
+        max-width: 340px !important;
+        height: 43px !important;
+    }
+
+    .telegram-category-wrap {
+        padding-top: 13px !important;
+    }
+
+    .telegram-category-list {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        width: 100% !important;
+        padding: 2px 2px 9px !important;
+        gap: 8px !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .telegram-category-chip {
+        min-height: 34px !important;
+        padding: 8px 13px !important;
+        font-size: 10px !important;
+    }
+}
