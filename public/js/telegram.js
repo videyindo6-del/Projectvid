@@ -3,6 +3,7 @@
   const searchInput = document.getElementById('telegramSearch');
   const searchClear = document.getElementById('telegramSearchClear');
   const categoryRoot = document.getElementById('telegramCategories');
+  const top10Root = document.getElementById('telegramTop10');
   if (!grid) return;
 
   const removeLegacyOverlays = () => document.querySelectorAll([
@@ -53,6 +54,29 @@
       selectedCategory = btn.dataset.category; currentPage = 1; renderCategories(); applyFilters();
     }));
   }
+  function renderTop10() {
+    if (!top10Root) return;
+    const ranked = [...allItems].sort((a,b) => {
+      const x=stats.get(a.id)||{}, y=stats.get(b.id)||{};
+      const score = (s,item) => Number(s.total_sold||0)*1000000 + Number(s.total_likes||0)*1000 + Number(s.total_comments||0)*100 + Number(item.view_count||0);
+      return score(y,b)-score(x,a);
+    }).slice(0,10);
+    if (!ranked.length) {
+      top10Root.innerHTML='<div class="telegram-top10-empty">Belum ada review yang dapat ditampilkan.</div>';
+      return;
+    }
+    top10Root.innerHTML=ranked.map((item,index)=>{
+      const thumb=reviewThumbnail(item), href=`/r/${encodeURIComponent(item.slug)}`;
+      const price=item.access==='free'?(isEN()?'Free':'Gratis'):money(item.price);
+      return `<a class="telegram-top10-card" href="${href}">
+        <span class="telegram-top10-rank">${String(index+1).padStart(2,'0')}</span>
+        <span class="telegram-top10-thumb${thumb?'':' no-image'}">${thumb?`<img src="${esc(thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true">`:'<i class="fa-brands fa-telegram"></i>'}</span>
+        <span class="telegram-top10-info"><strong>${esc(item.title)}</strong><small><i class="fa-solid fa-eye"></i> ${number(item.view_count)} ${isEN()?'views':'views'}</small><b>${esc(price)}</b></span>
+        <i class="fa-solid fa-arrow-up-right-from-square telegram-top10-open"></i>
+      </a>`;
+    }).join('');
+  }
+
   function applyFilters() {
     const q = (searchInput?.value || '').trim().toLocaleLowerCase(isEN()?'en':'id');
     visibleItems = allItems.filter(item => {
@@ -139,6 +163,7 @@
           stats=new Map(allItems.map(item=>[item.id,{total_sold:sold.get(item.id)||0,total_likes:l.get(item.id)||0,total_comments:c.get(item.id)||0}]));
         }
       }
+      renderTop10();
       applyFilters();
     } catch(error) {
       console.error('Telegram review listing:',error);
