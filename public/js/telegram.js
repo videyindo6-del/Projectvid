@@ -13,7 +13,7 @@
   removeLegacyOverlays();
   new MutationObserver(removeLegacyOverlays).observe(document.documentElement, {childList:true,subtree:true});
 
-  const PAGE_SIZE = 16;
+  const PAGE_SIZE = 10;
   let allItems = [], visibleItems = [], stats = new Map(), categories = [];
   let currentPage = 1, selectedCategory = 'all';
   const lang = () => localStorage.getItem('boxcellink_lang') || 'id';
