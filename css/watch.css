@@ -243,3 +243,7 @@ body{background:#f7f5ef;color:#233b57}
  box-shadow:none!important;padding:0!important;
 }
 #floatingBannerAd{overflow:visible!important}
+
+/* Social Bar publisher code is loaded once at body end; keep the three overlay layers available without hiding the provider's own iframe. */
+#guestAdTop.guest-ad-stack{position:fixed!important;top:70px!important;right:10px!important;left:auto!important;bottom:auto!important;z-index:9500!important;width:min(230px,calc(100vw - 20px))!important;display:none!important;pointer-events:none!important}
+#guestAdTop .adsterra-social-slot{position:relative!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;overflow:visible!important;pointer-events:none!important}

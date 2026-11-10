@@ -1,0 +1,33 @@
+#bc-support-root{position:fixed;right:22px;bottom:22px;z-index:9998;font-family:inherit}
+.bc-support-toggle{width:62px;height:62px;border:0;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#1769aa,#0d3d69);color:#fff;font-size:24px;box-shadow:0 10px 30px #123d6650;cursor:pointer;transition:transform .25s,background .25s;position:relative;z-index:3}
+.bc-support-toggle:hover{transform:translateY(-3px) scale(1.04)}
+.bc-support-menu{position:absolute;right:0;bottom:0;width:62px;height:62px;pointer-events:none}
+.bc-support-choice{position:absolute;right:4px;bottom:4px;display:flex;align-items:center;gap:9px;text-decoration:none;color:#17324d;font-size:12px;font-weight:750;white-space:nowrap;opacity:0;transform:translate(0,0) scale(.35);transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .2s;pointer-events:none}
+.bc-support-choice>span:last-child{background:#fff;padding:9px 12px;border-radius:999px;box-shadow:0 5px 20px #123d6620;border:1px solid #e4edf6}
+.bc-support-choice-icon{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;background:#1769aa;font-size:19px;box-shadow:0 7px 20px #123d6630}
+.bc-support-channel .bc-support-choice-icon,.bc-support-group .bc-support-choice-icon{background:#229ed9}
+.bc-support-menu.is-open{pointer-events:auto}
+.bc-support-menu.is-open .bc-support-choice{opacity:1;pointer-events:auto;transform:scale(1)}
+.bc-support-menu.is-open .bc-support-admin{transform:translate(-2px,-158px) scale(1)}
+.bc-support-menu.is-open .bc-support-channel{transform:translate(-104px,-108px) scale(1)}
+.bc-support-menu.is-open .bc-support-group{transform:translate(-128px,-8px) scale(1)}
+.bc-support-choice[aria-disabled=true]{opacity:.5!important;cursor:not-allowed}
+.bc-support-chat{position:absolute;right:0;bottom:76px;width:min(365px,calc(100vw - 32px));height:min(520px,calc(100dvh - 130px));background:#fff;border:1px solid #dce7f1;border-radius:20px;box-shadow:0 18px 55px #0b27452b;overflow:hidden;display:flex;flex-direction:column;color:#17324d}
+.bc-support-chat[hidden]{display:none}
+.bc-support-chat header{padding:15px 16px;background:linear-gradient(120deg,#12395e,#1d659e);color:#fff;display:flex;justify-content:space-between;align-items:center}
+.bc-support-chat header b{display:block;font-size:14px}.bc-support-chat header small{display:block;color:#d9e9f7;margin-top:4px;font-size:11px}
+.bc-support-chat header button{border:0;background:#ffffff20;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer}
+.bc-support-messages{padding:14px;flex:1;overflow:auto;background:#f5f8fc;display:flex;flex-direction:column;gap:10px}
+.bc-support-empty{margin:auto;text-align:center;color:#718096;font-size:13px;line-height:1.6;padding:20px}
+.bc-support-bubble{max-width:86%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
+.bc-support-bubble.mine{align-self:flex-end;background:#dceeff;border-bottom-right-radius:4px}
+.bc-support-bubble.theirs{align-self:flex-start;background:#fff;border:1px solid #e5ebf2;border-bottom-left-radius:4px}
+.bc-support-bubble small{display:block;margin-top:5px;font-size:10px;color:#718096}
+#bcSupportForm{display:flex;gap:8px;padding:11px;border-top:1px solid #e7edf4}
+#bcSupportForm input{flex:1;min-width:0;border:1px solid #d8e2ed;border-radius:999px;padding:11px 14px;font:inherit;font-size:13px;outline:none}
+#bcSupportForm input:focus{border-color:#4389c4}
+#bcSupportForm button{width:42px;height:42px;border:0;border-radius:50%;background:#1769aa;color:#fff;font-size:16px;cursor:pointer}
+#bcSupportForm button:disabled{opacity:.5}
+.bc-support-foot{font-size:10px;color:#8290a0;text-align:center;padding:0 10px 9px}
+.bc-support-foot a{color:#1769aa;font-weight:700}
+@media(max-width:520px){#bc-support-root{right:15px;bottom:16px}.bc-support-toggle{width:56px;height:56px}.bc-support-menu{width:56px;height:56px}.bc-support-menu.is-open .bc-support-admin{transform:translate(-1px,-150px) scale(1)}.bc-support-menu.is-open .bc-support-channel{transform:translate(-99px,-103px) scale(1)}.bc-support-menu.is-open .bc-support-group{transform:translate(-123px,-5px) scale(1)}}
