@@ -42,3 +42,9 @@
 .bc-nav-btn:hover,.bc-icon-btn:hover{background:#eef5fb!important;border-color:#b9d0e5!important}
 .bc-nav-shade{background:rgba(20,39,58,.42)!important}
 @media(prefers-color-scheme:dark){.bc-navbar{color-scheme:light}.bc-drawer{color-scheme:light}.bc-menu a,.bc-menu button{color:#30465d!important}}
+
+/* Ensure collapsed navigation submenus are completely removed from layout */
+.bc-menu .bc-submenu[hidden]{display:none!important;visibility:hidden!important;max-height:0!important;margin:0!important;padding:0!important;border:0!important;overflow:hidden!important;animation:none!important}
+.bc-menu .bc-submenu:not([hidden]){display:grid;gap:1px;margin:1px 0 6px 17px;padding:3px 0 3px 12px;visibility:visible}
+.bc-menu .bc-submenu:not([hidden]) a{min-height:34px;padding-top:5px;padding-bottom:5px;border-radius:8px}
+.bc-menu .bc-submenu-toggle[aria-expanded="false"]+.bc-submenu[hidden]{pointer-events:none}

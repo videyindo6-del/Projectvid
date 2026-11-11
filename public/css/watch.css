@@ -250,3 +250,17 @@ body{background:#f7f5ef;color:#233b57}
 
 /* Premium access gate dialog */
 .access-modal{max-width:520px!important;border:1px solid #dce7f1!important;border-radius:24px!important;background:linear-gradient(145deg,#fffefa,#f4f8fc)!important;box-shadow:0 28px 90px rgba(15,40,66,.24)!important}.access-modal .modal-crown{background:#e5f1fb!important;color:#286ba7!important}.access-modal .eyebrow{color:#3974a7!important;letter-spacing:.12em}.access-modal h2{color:#1c3e5f!important;line-height:1.2}.access-modal p{color:#64788d!important;line-height:1.7}.access-modal-benefits{display:grid;gap:9px;margin:18px 0 20px;padding:14px;border:1px solid #e0e9f1;border-radius:14px;background:rgba(255,255,255,.75);color:#3f5b75;font-size:13px}.access-modal-benefits span{display:flex;align-items:flex-start;gap:9px}.access-modal-benefits i{color:#2d80bd;margin-top:2px}.access-modal-actions{display:flex;flex-wrap:wrap;gap:9px}.access-modal-actions>*{flex:1 1 155px;justify-content:center}.access-modal-actions [hidden]{display:none!important}
+
+/* Mid-screen stacked banner rail */
+.guest-ad-stack{position:fixed;right:14px;top:38%;bottom:auto;z-index:4500;display:flex;flex-direction:column;gap:7px;width:min(320px,calc(100vw - 20px));pointer-events:none;transform:translateY(-20%)}
+.guest-ad-stack .adsterra-social-slot{width:100%;min-height:50px;padding:0;border:0;border-radius:8px;background:transparent;box-shadow:0 5px 18px rgba(20,42,70,.16);overflow:hidden}
+.guest-ad-stack .adsterra-social-slot iframe{display:block;width:100%;max-width:320px;height:50px;border:0;margin:0 auto}
+.floating-banner-ad{left:18px;right:auto;top:45%;bottom:auto;transform:none;width:min(320px,calc(100vw - 20px));padding:0 8px 8px;border-radius:13px;touch-action:pan-y}
+.floating-ad-toolbar{height:31px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 -8px 6px;padding:0 8px 0 11px;border-radius:12px 12px 0 0;background:#edf4fb;color:#55718f;font:800 9px "DM Sans",sans-serif;letter-spacing:.55px;cursor:move;touch-action:none;user-select:none}
+.floating-ad-toolbar>span{display:flex;align-items:center;gap:7px}
+.floating-ad-toolbar .floating-ad-close{position:static;flex:none;width:23px;height:23px;font-size:16px;line-height:20px}
+#floatingBannerAdSlot{padding:0;min-height:50px}
+.show-floating-ad{left:18px;right:auto;top:45%;bottom:auto;transform:translateY(275px)}
+@media(max-width:600px){.guest-ad-stack{right:8px;top:34%;width:min(300px,calc(100vw - 16px));gap:5px}.floating-banner-ad{left:8px;right:auto;top:auto;bottom:12px;width:min(320px,calc(100vw - 16px))}.show-floating-ad{left:10px;right:auto;top:auto;bottom:14px;transform:none}}
+
+.watch-history-thumb{display:block;width:100%;height:100%;object-fit:cover;background:#e9eef5}
