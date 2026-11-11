@@ -489,17 +489,36 @@ window.editReview = editReview;
 // =====================================================
 
 async function removeReview(id) {
-  if (!confirm('Yakin ingin menghapus review ini?')) return;
-
   try {
+    // Tampilkan dampak penghapusan agar admin tahu riwayat pesanan tidak ikut hilang.
+    const { count, error: countError } = await sb
+      .from('cashi_orders')
+      .select('id', { count: 'exact', head: true })
+      .eq('review_id', id)
+      .eq('purpose', 'review_download');
+
+    if (countError) throw countError;
+
+    const linkedOrders = Number(count || 0);
+    const warning = linkedOrders
+      ? `\n\nAda ${linkedOrders} riwayat pesanan terkait. Riwayat pesanan akan tetap disimpan; pesanan yang masih pending akan dibatalkan otomatis dan tautan review pada pesanan akan dilepas.`
+      : '';
+
+    if (!confirm(`Yakin ingin menghapus review ini?${warning}`)) return;
+
     const { error } = await sb
       .from('review_items')
       .delete()
       .eq('id', id);
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === '23503' || /foreign key|cashi_orders_review_id_fkey/i.test(error.message || '')) {
+        throw new Error('Review masih terhubung dengan riwayat pesanan. Jalankan file supabase/review_delete_preserve_orders.sql di SQL Editor Supabase terlebih dahulu, lalu coba hapus lagi.');
+      }
+      throw error;
+    }
 
-    notify('Review berhasil dihapus.');
+    notify('Review berhasil dihapus. Riwayat pesanan tetap tersimpan.');
     await load();
 
   } catch (error) {
