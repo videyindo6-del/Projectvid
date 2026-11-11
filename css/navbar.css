@@ -22,4 +22,23 @@
 .bc-menu .bc-submenu a{min-height:36px;padding-left:12px;font-size:12px}
 .bc-menu .bc-submenu .submenu-loading{padding:8px 12px;color:#8a9bad;font-size:11px}
 @keyframes navSubmenuIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-color-scheme:dark){.bc-drawer{background:#101d2d;color:#e7eff8}.bc-drawer-head{border-color:#263b52}.bc-menu a,.bc-menu button{color:#d8e4f2}.bc-menu a:hover,.bc-menu button:hover{background:#1b2c41}.bc-menu .bc-submenu{border-color:#365575}}
+
+
+/* BoxCellink unified ivory + blue SaaS navigation */
+:root{--bc-ivory:#fbfaf6;--bc-blue:#245b96;--bc-blue-strong:#174675;--bc-line:#e6e8ec;--bc-ink:#20364d}
+.bc-navbar{background:rgba(251,250,246,.96)!important;border-bottom:1px solid #e8e5dc!important;box-shadow:0 8px 28px rgba(26,55,84,.075)!important}
+.bc-nav-inner{max-width:1320px;min-height:70px}
+.bc-brand{color:var(--bc-ink)!important;letter-spacing:.065em}
+.bc-brand-mark{background:linear-gradient(145deg,#214f80,#4d8cc8)!important;box-shadow:0 7px 18px rgba(36,91,150,.2)!important}
+.bc-drawer{background:var(--bc-ivory)!important;border-right:1px solid #e9e5dc;box-shadow:18px 0 55px rgba(22,48,73,.18)!important}
+.bc-drawer-head{border-color:#e9e5dc!important}
+.bc-menu a,.bc-menu button{color:#30465d!important;border:1px solid transparent!important;transition:background .18s,border-color .18s,color .18s,transform .18s}
+.bc-menu a i,.bc-menu button>i:first-child{color:#2c6ba8!important}
+.bc-menu a:hover,.bc-menu button:hover{background:#edf4fb!important;border-color:#dce8f4!important;color:#174675!important;transform:translateX(2px)}
+.bc-menu .bc-submenu{border-color:#c9dced!important}
+.bc-menu .bc-submenu a{background:rgba(255,255,255,.62)}
+.bc-menu .bc-submenu a:hover{background:#eaf2fa!important}
+.bc-nav-btn,.bc-icon-btn{background:#fffefa!important;border-color:#dfe4e8!important;color:#315878!important}
+.bc-nav-btn:hover,.bc-icon-btn:hover{background:#eef5fb!important;border-color:#b9d0e5!important}
+.bc-nav-shade{background:rgba(20,39,58,.42)!important}
+@media(prefers-color-scheme:dark){.bc-navbar{color-scheme:light}.bc-drawer{color-scheme:light}.bc-menu a,.bc-menu button{color:#30465d!important}}
