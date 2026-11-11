@@ -37,13 +37,18 @@ function thumbnailSource(value){
   if(yt)return `https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg`;
   const drive=raw.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([\w-]+)/i)||raw.match(/[?&]id=([\w-]+)/i);
   if(drive&&/drive\.google\.com/i.test(raw))return `https://drive.google.com/thumbnail?id=${drive[1]}&sz=w1200`;
-  if(/\.(mp4|webm|ogg|m4v)(?:[?#].*)?$/i.test(raw))return '';
+  
   return raw;
  }
  if(/^data:image\//i.test(raw))return raw;
  return '';
 }
-function imageMarkup(v){const src=thumbnailSource(v?.thumbnail_url)||thumbnailSource(v?.embed_url)||thumbnailSource(v?.video_url)||thumbnailSource(v?.poster_url);return src?`<img loading="lazy" src="${esc(src)}" alt="${esc(v?.title||'Video thumbnail')}" onerror="this.onerror=null;this.remove();this.parentElement.classList.add('thumb-failed')">`:`<div class="thumb-placeholder"><i class="fa-solid fa-circle-play"></i></div>`}
+function imageMarkup(v){
+ const src=thumbnailSource(v?.thumbnail_url)||thumbnailSource(v?.embed_url)||thumbnailSource(v?.video_url)||thumbnailSource(v?.poster_url);
+ if(!src)return `<div class="thumb-placeholder"><i class="fa-solid fa-circle-play"></i></div>`;
+ if(/\\.(mp4|webm|ogg|m4v)(?:[?#].*)?$/i.test(src))return `<video class="watch-history-thumb" src="${esc(src)}" muted playsinline autoplay loop preload="metadata"></video>`;
+ return `<img loading="lazy" src="${esc(src)}" alt="${esc(v?.title||'Video thumbnail')}" onerror="this.onerror=null;this.remove();this.parentElement.classList.add('thumb-failed')">`;
+}
 function linkify(text){const safe=esc(text);return safe.replace(/(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi,m=>{const href=m.toLowerCase().startsWith('www.')?'https://'+m:m;return `<a class="comment-link" href="${href}" target="_blank" rel="noopener noreferrer">${m}</a>`})}
 function cardMarkup(v){const vip=isVipVideo(v),orient=orientation(v);return `<article class="video-tile ${vip?'is-vip':''} ${orient==='vertical'?'is-vertical':''}"><button class="video-tile-link" data-video-id="${esc(v.id)}" data-vip="${vip?'1':'0'}">${imageMarkup(v)}<span class="video-type ${vip?'vip':'basic'}">${vip?'<i class="fa-solid fa-crown"></i> '+tr('vip'):tr('basic')}</span><span class="tile-play"><i class="fa-solid fa-play"></i></span></button><div class="tile-copy"><h3>${esc(v.title)}</h3><p>${esc(v.categories?.name||'BoxVidey')} <span>•</span> ${new Date(v.created_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US')}</p></div></article>`}
 function adMarkup(){return `<div class="adsterra-banner adsterra-banner-clean"><div class="ad-box ad-inline-native"></div></div>`}
@@ -103,7 +108,21 @@ function mountFloatingBanner(){
  slot.replaceChildren(frame);
  window.setTimeout(()=>{if(!isVip&&!sessionStorage.getItem('boxcellinkFloatingAdHidden')){wrap.hidden=false;wrap.classList.add('is-visible')}},7000);
  hide?.addEventListener('click',()=>{wrap.classList.remove('is-visible');wrap.hidden=true;show.hidden=false;sessionStorage.setItem('boxcellinkFloatingAdHidden','1')});
+ 
  show?.addEventListener('click',()=>{wrap.hidden=false;wrap.classList.add('is-visible');show.hidden=true;sessionStorage.removeItem('boxcellinkFloatingAdHidden')});
+ // Move the floating ad by dragging its compact toolbar; remember its position for this tab.
+ const handle=$('#floatingAdDragHandle');
+ if(handle&&!handle.dataset.dragBound){
+  handle.dataset.dragBound='1';let active=false,startX=0,startY=0,left=0,top=0;
+  const restore=()=>{try{const pos=JSON.parse(sessionStorage.getItem('boxcellinkFloatingAdPosition')||'null');if(pos&&Number.isFinite(pos.left)&&Number.isFinite(pos.top)){wrap.style.left=pos.left+'px';wrap.style.top=pos.top+'px';wrap.style.right='auto';wrap.style.bottom='auto';wrap.style.transform='none'}}catch{}};
+  restore();
+  handle.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;active=true;const rect=wrap.getBoundingClientRect();left=rect.left;top=rect.top;startX=e.clientX;startY=e.clientY;handle.setPointerCapture?.(e.pointerId);e.preventDefault()});
+  handle.addEventListener('pointermove',e=>{if(!active)return;const maxLeft=Math.max(8,innerWidth-wrap.offsetWidth-8),maxTop=Math.max(8,innerHeight-wrap.offsetHeight-8);const x=Math.max(8,Math.min(maxLeft,left+e.clientX-startX)),y=Math.max(8,Math.min(maxTop,top+e.clientY-startY));wrap.style.left=x+'px';wrap.style.top=y+'px';wrap.style.right='auto';wrap.style.bottom='auto';wrap.style.transform='none'});
+  const finish=()=>{if(!active)return;active=false;const rect=wrap.getBoundingClientRect();try{sessionStorage.setItem('boxcellinkFloatingAdPosition',JSON.stringify({left:rect.left,top:rect.top}))}catch{}};
+  handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish);
+  window.addEventListener('resize',()=>{if(wrap.style.left){const x=Math.max(8,Math.min(innerWidth-wrap.offsetWidth-8,parseFloat(wrap.style.left)||8));const y=Math.max(8,Math.min(innerHeight-wrap.offsetHeight-8,parseFloat(wrap.style.top)||8));wrap.style.left=x+'px';wrap.style.top=y+'px'}});
+ }
+
 }
 let videoPlaybackActive=false;
 function setupVideoAdPlayback(){
@@ -123,6 +142,7 @@ function setupGuestAds(){
  document.querySelectorAll('.ad-unit-728,.ad-unit-320,.ad-unit-468,#ad300x250,#ad160x300,#ad160x600').forEach(el=>el.hidden=true);
  // VIP membership is explicitly ad-free: do not mount any publisher unit.
  if(role==='vip'){$('#guestAdTop')?.remove();$('#floatingBannerAd')?.remove();$('#showFloatingBanner')?.remove();$('#guestPopunderSlot')?.remove();document.querySelectorAll('.guest-and-vip-banner,.ad-side-card').forEach(el=>el.hidden=true);return;}
+ const socialStack=$('#guestAdTop');if(socialStack){socialStack.hidden=false;socialStack.style.display='flex'}
  const banners=[['.ad-unit-728',AD_UNITS.banner728],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300]];
  banners.forEach(([sel,unit])=>document.querySelectorAll(sel).forEach(host=>{
   host.hidden=false;host.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px auto;max-width:100%';
@@ -130,6 +150,12 @@ function setupGuestAds(){
   mountAdUnit(host,unit);
  }));
  document.querySelectorAll('.ad-inline-300').forEach(mountInlineAd);
+ // Three independent compact banner frames create the requested vertical stack.
+ // The page-level Social Bar publisher script itself is intentionally loaded once.
+ document.querySelectorAll('#guestAdTop .adsterra-social-slot').forEach(slot=>{
+  slot.hidden=false;slot.style.cssText='display:flex;min-height:50px;padding:0;border:0;background:transparent;box-shadow:none;pointer-events:auto';
+  mountAdUnit(slot,AD_UNITS.banner320);
+ });
  setupSocialBars();setupPopunder();mountFloatingBanner();setupVideoAdPlayback();
 }
 async function showGuestWatchPreparation(){
@@ -143,7 +169,7 @@ async function showGuestWatchPreparation(){
  await new Promise(resolve=>window.setTimeout(resolve,3000));
  window.clearInterval(ticker);
 }
-function saveGuestHistory(v){try{const key='boxcellink_watch_history_guest';let a=JSON.parse(localStorage.getItem(key)||'[]');a=a.filter(x=>x.id!==v.id);a.unshift({id:v.id,title:v.title,slug:v.slug,thumbnail_url:v.thumbnail_url,watched_at:new Date().toISOString()});localStorage.setItem(key,JSON.stringify(a.slice(0,20)))}catch{}}
+function saveGuestHistory(v){try{const key='boxcellink_watch_history_guest';let a=JSON.parse(localStorage.getItem(key)||'[]');a=a.filter(x=>x.id!==v.id);a.unshift({id:v.id,title:v.title,slug:v.slug,thumbnail_url:v.thumbnail_url,embed_url:v.embed_url,watched_at:new Date().toISOString()});localStorage.setItem(key,JSON.stringify(a.slice(0,20)))}catch{}}
 async function load(){applyLang();try{const {data:{user},error:authErr}=await sb.auth.getUser();if(!authErr)currentUser=user||null;if(currentUser){const {data:p}=await sb.from('profiles').select('vip_expires_at').eq('id',currentUser.id).maybeSingle();isVip=!!p?.vip_expires_at&&new Date(p.vip_expires_at)>new Date()}if(!currentUser)await showGuestWatchPreparation();setupGuestAds();applyLang();
  const path=location.pathname.split('/').filter(Boolean),slug=(new URLSearchParams(location.search).get('slug')||path.at(-1)||'').trim();let q=sb.from('videos').select('*,categories(name)').eq('status','published');let {data:v,error}=await q.eq('slug',slug).maybeSingle();if(!v&&!error){const byId=await sb.from('videos').select('*,categories(name)').eq('id',slug).maybeSingle();v=byId.data;error=byId.error}
  let metadataOnly=false;
@@ -200,7 +226,7 @@ function renderVideos(){const filtered=allVideos.filter(v=>activeFilter==='all'|
 document.querySelectorAll('.filter-chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeFilter=b.dataset.filter;page=1;renderVideos()});
 async function loadCategories(){const {data,error}=await sb.from('categories').select('id,name').eq('status','published').order('name');const box=$('#categoryList');if(error||!data?.length){box.innerHTML=`<div class=\"empty-state\">${tr('categoriesEmpty')}</div>`;categories=[];return}categories=data;const results=await Promise.all([sb.from('videos').select('id',{count:'exact',head:true}).eq('status','published'),...data.map(c=>sb.from('videos').select('id',{count:'exact',head:true}).eq('status','published').eq('category_id',c.id))]);categoryCounts={};data.forEach((c,i)=>{categoryCounts[c.id]=results[i+1]?.count||0});if(results.some(r=>r.error))console.warn('One or more category counts could not be loaded.');const total=results[0]?.count||0;box.innerHTML=`<a href=\"/index.html\" class=\"category-link\"><span><i class=\"fa-solid fa-border-all\"></i> ${lang()==='id'?'Semua video':'All videos'}</span><b class=\"category-count\">${total} media</b></a>`+data.map(c=>`<a href=\"/index.html?category=${encodeURIComponent(c.id)}\" class=\"category-link\"><span><i class=\"fa-regular fa-folder\"></i> ${esc(c.name)}</span><b class=\"category-count\">${categoryCounts[c.id]||0} media</b></a>`).join('')}
 function renderCategoryVideos(){const box=$('#categoryVideoSections');if(!box)return;const cats=categories;if(!cats.length){box.innerHTML=`<div class="empty-state">${tr('categoriesEmpty')}</div>`;return}box.innerHTML=cats.map(c=>{const rows=allVideos.filter(v=>String(v.category_id||'')===String(c.id));return `<section class="category-video-block"><div class="category-video-head"><h3>${esc(c.name)} <span class="category-count">${categoryCounts[c.id]||0} ${lang()==='id'?'media':'media'}</span></h3><a href="/index.html?category=${encodeURIComponent(c.id)}">${tr('seeAll')} →</a></div><div class="category-video-rail">${rows.length?rows.slice(0,12).map(cardMarkup).join(''):`<div class="empty-state">${tr('emptyVideos')}</div>`}</div></section>`}).join('');box.querySelectorAll('[data-video-id]').forEach(btn=>btn.onclick=()=>{const found=allVideos.find(v=>v.id===btn.dataset.videoId);if(found)openVideoFromCard(found)})}
-async function loadHistory(){const box=$('#watchHistory');if(!currentUser){let a=[];try{a=JSON.parse(localStorage.getItem('boxcellink_watch_history_guest')||'[]')}catch{}box.innerHTML=a.length?a.map(x=>`<a class="rail-card" href="${videoUrl(x)}">${imageMarkup(x)}<b>${esc(x.title)}</b><small>${new Date(x.watched_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US')}</small></a>`).join(''):`<div class="empty-state">${tr('historyEmpty')}</div>`;return}const {data,error}=await sb.from('video_watch_history').select('watched_at,videos(id,title,slug,thumbnail_url)').eq('user_id',currentUser.id).order('watched_at',{ascending:false}).limit(15);if(error||!data?.length){box.innerHTML=`<div class="empty-state">${tr('historyEmpty')}</div>`;return}box.innerHTML=data.filter(x=>x.videos).map(x=>`<a class="rail-card" href="${videoUrl(x.videos)}">${imageMarkup(x.videos)}<b>${esc(x.videos.title)}</b><small>${new Date(x.watched_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US')}</small></a>`).join('')}
+async function loadHistory(){const box=$('#watchHistory');if(!currentUser){let a=[];try{a=JSON.parse(localStorage.getItem('boxcellink_watch_history_guest')||'[]')}catch{}box.innerHTML=a.length?a.map(x=>`<a class="rail-card" href="${videoUrl(x)}">${imageMarkup(x)}<b>${esc(x.title)}</b><small>${new Date(x.watched_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US')}</small></a>`).join(''):`<div class="empty-state">${tr('historyEmpty')}</div>`;return}const {data,error}=await sb.from('video_watch_history').select('watched_at,videos(id,title,slug,thumbnail_url,embed_url)').eq('user_id',currentUser.id).order('watched_at',{ascending:false}).limit(15);if(error||!data?.length){box.innerHTML=`<div class="empty-state">${tr('historyEmpty')}</div>`;return}box.innerHTML=data.filter(x=>x.videos).map(x=>`<a class="rail-card" href="${videoUrl(x.videos)}">${imageMarkup(x.videos)}<b>${esc(x.videos.title)}</b><small>${new Date(x.watched_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US')}</small></a>`).join('')}
 async function loadTelegram(){const box=$('#telegramRail');const {data,error}=await sb.from('telegram_items').select('*').eq('status','published').order('created_at',{ascending:false}).limit(12);if(error||!data?.length){box.innerHTML=`<div class="empty-state">${tr('telegramEmpty')}</div>`;return}box.innerHTML=data.map(x=>`<a class="rail-card telegram-rail-card" href="/telegram.html"><div class="telegram-card-icon"><i class="fa-brands fa-telegram"></i></div><b>${esc(x.title)}</b><small>${esc(x.type||'Telegram media')} · ${new Date(x.created_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US')}</small></a>`).join('')}
 document.addEventListener('boxcellink:language-change',()=>location.reload());load();
 })();

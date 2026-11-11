@@ -36,6 +36,29 @@ const copyA = {
 const t = key => copyA[langA()][key] || copyA.id[key] || key;
 const dateA = value => value ? new Date(value).toLocaleString(langA()==='en'?'en-US':'id-ID',{dateStyle:'medium',timeStyle:'short'}) : '—';
 const moneyA = value => 'Rp '+Number(value||0).toLocaleString('id-ID');
+const accountThumbUrl = value => {
+ let raw=typeof value==='string'?value.trim():String(value?.url||value?.src||value?.thumbnail_url||value?.embed_url||'').trim();
+ if(!raw)return '';
+ const iframe=raw.match(/<iframe[^>]+src=[\"']([^\"']+)/i),image=raw.match(/<img[^>]+src=[\"']([^\"']+)/i);
+ if(iframe)raw=iframe[1];else if(image)raw=image[1];
+ try{
+  const u=new URL(raw,location.origin);if(!['http:','https:'].includes(u.protocol))return '';
+  const driveId=u.pathname.match(/\/file\/d\/([^/]+)/)?.[1]||u.searchParams.get('id');
+  if(u.hostname.includes('drive.google.com')&&driveId)return `https://drive.google.com/thumbnail?id=${encodeURIComponent(driveId)}&sz=w1200`;
+  if(u.hostname.includes('youtube.com')||u.hostname==='youtu.be'){
+   const id=u.hostname==='youtu.be'?u.pathname.split('/').filter(Boolean)[0]:(u.searchParams.get('v')||u.pathname.match(/\/(?:embed|shorts|live)\/([^/]+)/)?.[1]);
+   if(id)return `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`;
+  }
+  return u.href;
+ }catch{return ''}
+};
+const accountThumbMarkup=(values,title,icon='fa-brands fa-telegram')=>{
+ const src=(Array.isArray(values)?values:[values]).map(accountThumbUrl).find(Boolean)||'';
+ if(!src)return `<i class="${icon}"></i>`;
+ if(/\\.(mp4|webm|ogg|m4v)(?:[?#].*)?$/i.test(src))return `<video class="account-thumb-media" src="${escA(src)}" muted playsinline autoplay loop preload="metadata" aria-label="${escA(title)}"></video>`;
+ return `<img src="${escA(src)}" alt="${escA(title)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.onerror=null;this.remove();this.parentElement.classList.add('thumb-unavailable')">`;
+};
+
 function showNotice(message,type='info'){
  const el=$('accountNotice'); if(!el)return;
  el.hidden=false;el.className='account-notice '+(type==='error'?'is-error':type==='success'?'is-success':'');
@@ -52,9 +75,9 @@ function renderPurchases(items,usingFallback=false){
  const draw=()=>{
   const slice=items.slice((page-1)*pageSize,page*pageSize);
   host.innerHTML=`<div class="account-library-grid">${slice.map(item=>{
-   const title=item.review_items?.title||item.title||'Media Telegram',slug=item.review_items?.slug||item.slug||'',thumb=item.review_items?.thumbnail_url||item.thumbnail_url||'',bought=item.created_at||item.settled_at,price=item.amount??item.price;
+   const title=item.review_items?.title||item.title||'Media Telegram',slug=item.review_items?.slug||item.slug||'',thumb=item.review_items?.thumbnail_url||item.thumbnail_url||'',gallery=item.review_items?.gallery_urls||item.gallery_urls||[],bought=item.created_at||item.settled_at,price=item.amount??item.price;
    const mediaUrl=slug?`/paste/${encodeURIComponent(slug)}`:'#',detailUrl=slug?`/r/${encodeURIComponent(slug)}`:'#';
-   return `<article class="library-item"><div class="library-thumb">${thumb?`<img src="${escA(thumb)}" alt="${escA(title)}" loading="lazy" onerror="this.remove();this.parentElement.innerHTML='<i class=&quot;fa-brands fa-telegram&quot;></i>'">`:'<i class="fa-brands fa-telegram"></i>'}<span class="library-check"><i class="fa-solid fa-check"></i></span></div><div class="library-info"><div class="library-tags"><span class="tag-purchased"><i class="fa-solid fa-circle-check"></i> ${escA(t('purchase_success'))}</span><span class="tag-access">${escA(t('verified'))}</span></div><h3>${escA(title)}</h3><p><i class="fa-regular fa-calendar-check"></i> ${escA(t('purchased'))} ${escA(dateA(bought))}</p>${price!=null?`<small class="library-price">${escA(t('price'))}: <b>${escA(moneyA(price))}</b></small>`:''}</div><div class="library-actions">${slug?`<a class="account-action" href="${mediaUrl}"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${escA(t('open_media'))}</a><a class="library-detail-link" href="${detailUrl}">${escA(t('details'))} <i class="fa-solid fa-arrow-right"></i></a>`:'<span class="expired-link">Review unavailable</span>'}</div></article>`;
+   return `<article class="library-item"><div class="library-thumb">${accountThumbMarkup([thumb,...(Array.isArray(gallery)?gallery:[])],title)}<span class="library-check"><i class="fa-solid fa-check"></i></span></div><div class="library-info"><div class="library-tags"><span class="tag-purchased"><i class="fa-solid fa-circle-check"></i> ${escA(t('purchase_success'))}</span><span class="tag-access">${escA(t('verified'))}</span></div><h3>${escA(title)}</h3><p><i class="fa-regular fa-calendar-check"></i> ${escA(t('purchased'))} ${escA(dateA(bought))}</p>${price!=null?`<small class="library-price">${escA(t('price'))}: <b>${escA(moneyA(price))}</b></small>`:''}</div><div class="library-actions">${slug?`<a class="account-action" href="${mediaUrl}"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${escA(t('open_media'))}</a><a class="library-detail-link" href="${detailUrl}">${escA(t('details'))} <i class="fa-solid fa-arrow-right"></i></a>`:'<span class="expired-link">Review unavailable</span>'}</div></article>`;
   }).join('')}</div>${items.length>pageSize?`<div class="account-pagination"><button type="button" data-page="prev" ${page===1?'disabled':''}>‹ ${escA(t('previous'))}</button><span>${page} / ${Math.ceil(items.length/pageSize)}</span><button type="button" data-page="next" ${page===Math.ceil(items.length/pageSize)?'disabled':''}>${escA(t('next'))} ›</button></div>`:''}`;
   host.querySelector('[data-page="prev"]')?.addEventListener('click',()=>{page--;draw()});host.querySelector('[data-page="next"]')?.addEventListener('click',()=>{page++;draw()});
  };
@@ -66,7 +89,7 @@ async function loadPurchasedMedia(user){
  // queried as a recovery path so a completed payment remains visible if an
  // older settlement missed creating its entitlement row.
  const [entRes,orderRes]=await Promise.all([
-  sb.from('review_entitlements').select('id,review_id,created_at,order_id,review_items(id,title,slug,thumbnail_url,price,access)').eq('user_id',user.id).order('created_at',{ascending:false}),
+  sb.from('review_entitlements').select('id,review_id,created_at,order_id,review_items(id,title,slug,thumbnail_url,gallery_urls,price,access)').eq('user_id',user.id).order('created_at',{ascending:false}),
   sb.from('cashi_orders').select('order_id,review_id,amount,created_at,settled_at,status').eq('user_id',user.id).eq('purpose','review_download').eq('status','SETTLED').order('settled_at',{ascending:false})
  ]);
  if(entRes.error && orderRes.error){
@@ -86,7 +109,7 @@ async function loadPurchasedMedia(user){
  }))];
  let missingItems=[];
  if(missingIds.length){
-  const {data,error}=await sb.from('review_items').select('id,title,slug,thumbnail_url,price,access').in('id',missingIds);
+  const {data,error}=await sb.from('review_items').select('id,title,slug,thumbnail_url,gallery_urls,price,access').in('id',missingIds);
   if(!error)missingItems=data||[];
  }
  const itemById=new Map(missingItems.map(x=>[x.id,x]));
@@ -167,12 +190,12 @@ $('passwordForm').onsubmit=async e=>{
  const successBox=$('groupPurchaseSuccess');
  if(freshGroup&&successBox){successBox.hidden=false;successBox.innerHTML=`<i class="fa-solid fa-circle-check"></i><div><b>${escA(t('group_notice'))}</b><span>${escA(freshGroup.group_name||'VIP Telegram')} · ${escA(t('link_updated'))}</span>${freshGroup.telegram_url?`<a class="account-action" href="${escA(freshGroup.telegram_url)}" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i> ${escA(t('join_group'))}</a>`:''}</div>`;}
 
- const {data:history,error:historyError}=await sb.from('video_watch_history').select('watched_at,videos(title,slug,thumbnail_url)').eq('user_id',user.id).order('watched_at',{ascending:false}).limit(50);
+ const {data:history,error:historyError}=await sb.from('video_watch_history').select('watched_at,videos(title,slug,thumbnail_url,embed_url)').eq('user_id',user.id).order('watched_at',{ascending:false}).limit(50);
  const historyHost=$('watchHistory');
  if(historyError){historyHost.innerHTML=emptyState('fa-clock',langA()==='en'?'Watch history unavailable':'Riwayat tonton belum tersedia',historyError.message);}
  else{
   const rows=history||[];
-  historyHost.innerHTML=rows.length?`<div class="watch-history-strip">${rows.map(x=>`<article class="history-card">${x.videos?.thumbnail_url?`<img src="${escA(x.videos.thumbnail_url)}" alt="" loading="lazy">`:'<div class="history-placeholder"><i class="fa-solid fa-play"></i></div>'}<div class="history-card-info"><b>${escA(x.videos?.title||'Video BoxVidey')}</b><small>${escA(t('watched'))} ${escA(dateA(x.watched_at))}</small>${x.videos?.slug?`<a href="/v/${encodeURIComponent(x.videos.slug)}">${escA(t('watch_again'))} <i class="fa-solid fa-arrow-right"></i></a>`:''}</div></article>`).join('')}</div>`:emptyState('fa-clock',t('no_history'));
+  historyHost.innerHTML=rows.length?`<div class="watch-history-strip">${rows.map(x=>`<article class="history-card">${accountThumbMarkup([x.videos?.thumbnail_url,x.videos?.embed_url],x.videos?.title||"Video BoxVidey","fa-solid fa-play")}<div class="history-card-info"><b>${escA(x.videos?.title||'Video BoxVidey')}</b><small>${escA(t('watched'))} ${escA(dateA(x.watched_at))}</small>${x.videos?.slug?`<a href="/v/${encodeURIComponent(x.videos.slug)}">${escA(t('watch_again'))} <i class="fa-solid fa-arrow-right"></i></a>`:''}</div></article>`).join('')}</div>`:emptyState('fa-clock',t('no_history'));
  }
 
 }
