@@ -354,6 +354,27 @@ function renderGallery(items, title) {
 }
 
 // =====================================================
+// TELEGRAM PREVIEW CONSENT GATE
+// =====================================================
+function setupTelegramPreviewGate() {
+  const gate = document.getElementById('reviewTelegramGate');
+  const content = document.getElementById('reviewGalleryAccess');
+  const confirm = document.getElementById('reviewTelegramConfirm');
+  if (!gate || !content || !confirm) return;
+  document.body.classList.add('review-telegram-gate-open');
+  const allowPreview = () => {
+    gate.hidden = true;
+    content.hidden = false;
+    document.body.classList.remove('review-telegram-gate-open');
+  };
+  confirm.addEventListener('click', allowPreview, { once: true });
+  gate.addEventListener('keydown', event => {
+    if (event.key === 'Escape') event.preventDefault();
+  });
+  confirm.focus({ preventScroll: true });
+}
+
+// =====================================================
 // GALLERY VIEWER FOR NORMAL IMAGES
 // =====================================================
 
@@ -643,7 +664,8 @@ async function load() {
       <div class="review-shell">
         <div class="review-topline"><span class="eyebrow"><i class="fa-solid fa-shield-halved"></i> BOXCELLINK MARKETPLACE</span><span class="review-live"><i class="fa-solid fa-circle"></i> ${v.access === 'paid' ? 'Premium content' : 'Free content'}</span></div>
         <header class="review-heading"><div><p class="review-kicker">DETAIL PRODUK</p><h1>${esc(v.title)}</h1><p class="review-lead">Cek review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.</p></div></header>
-        <section class="gallery-panel"><div class="gallery-head"><div><b><i class="fa-regular fa-images"></i> Preview media produk</b><small>Seluruh media ditampilkan di halaman ini agar bisa diperiksa sebelum membeli.</small></div><span class="gallery-count"><i class="fa-regular fa-images"></i> ${galleryImages.length} ${reviewText('media','items')}</span></div><div class="review-gallery">${galleryHTML}</div><div class="gallery-controls" aria-label="Kontrol galeri"><button type="button" id="galleryPrev" aria-label="Media sebelumnya"><i class="fa-solid fa-chevron-left"></i></button><span id="galleryCounter">1 / ${galleryImages.length}</span><button type="button" id="galleryNext" aria-label="Media berikutnya"><i class="fa-solid fa-chevron-right"></i></button><small>${reviewText("Geser ke samping untuk melihat semua media","Swipe sideways to view all media")}</small></div></section>
+        <section class="gallery-panel"><div class="gallery-head"><div><b><i class="fa-regular fa-images"></i> Preview media produk</b><small>${reviewText('Seluruh media ditampilkan di halaman ini agar bisa diperiksa sebelum membeli.','All media is displayed here so you can review it before purchasing.')}</small></div><span class="gallery-count"><i class="fa-regular fa-images"></i> ${galleryImages.length} ${reviewText('media','items')}</span></div><div id="reviewGalleryAccess" hidden><div class="review-gallery">${galleryHTML}</div><div class="gallery-controls" aria-label="Kontrol galeri"><button type="button" id="galleryPrev" aria-label="Media sebelumnya"><i class="fa-solid fa-chevron-left"></i></button><span id="galleryCounter">1 / ${galleryImages.length}</span><button type="button" id="galleryNext" aria-label="Media berikutnya"><i class="fa-solid fa-chevron-right"></i></button><small>${reviewText("Geser ke samping untuk melihat semua media","Swipe sideways to view all media")}</small></div></div></section>
+        <div class="review-telegram-gate" id="reviewTelegramGate" role="dialog" aria-modal="true" aria-labelledby="reviewTelegramGateTitle"><div class="review-telegram-gate-card"><span class="review-telegram-gate-icon"><i class="fa-brands fa-telegram"></i></span><span class="review-telegram-gate-kicker">BOXCELLINK MEDIA ACCESS</span><h2 id="reviewTelegramGateTitle">${reviewText('Media khusus pengguna Telegram','Media for Telegram users')}</h2><p>${reviewText('Semua media di halaman ini ditujukan khusus untuk pengguna Telegram. Apakah kamu sudah memiliki Telegram?','All media on this page is intended for Telegram users. Do you have Telegram?')}</p><div class="review-telegram-gate-actions"><a class="review-telegram-join" href="https://t.me/+03WCfVAwaWUzZTkx" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> ${reviewText('Gabung Grup Resmi','Join Official Group')}</a><button class="review-telegram-confirm" type="button" id="reviewTelegramConfirm">${reviewText('Ya, Punya Telegram','Yes, I Have Telegram')} <i class="fa-solid fa-arrow-right"></i></button></div><small class="review-telegram-gate-foot"><i class="fa-solid fa-shield-halved"></i> ${reviewText('Akses media tetap mengikuti ketentuan dan izin pembelian.','Media access remains subject to access and purchase permissions.')}</small></div></div>
         <div class="review-viewer" id="reviewViewer" hidden><button type="button" class="viewer-close" aria-label="Tutup">×</button><img alt="Pratinjau gambar"></div>
         <section class="product-info-panel"><div class="product-description"><span class="review-kicker">TENTANG PRODUK</span><h2>${esc(v.title)}</h2><p>${esc(v.description || 'Informasi produk belum ditambahkan oleh penjual.')}</p></div>
           <div class="product-stats product-stats-grid">
@@ -666,6 +688,7 @@ async function load() {
         </section>
       </div>`;
     applyReviewTranslations(box);
+    setupTelegramPreviewGate();
     setupGalleryViewer();
     setupGalleryControls();
     setupReviewSocial(v.id, v.title);

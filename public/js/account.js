@@ -53,10 +53,14 @@ const accountThumbUrl = value => {
  }catch{return ''}
 };
 const accountThumbMarkup=(values,title,icon='fa-brands fa-telegram')=>{
- const src=(Array.isArray(values)?values:[values]).map(accountThumbUrl).find(Boolean)||'';
- if(!src)return `<i class="${icon}"></i>`;
+ const candidates=(Array.isArray(values)?values:[values]).flatMap(value=>{
+  if(typeof value==='string'){try{const parsed=JSON.parse(value);if(Array.isArray(parsed))return parsed;}catch{}}
+  return [value];
+ });
+ const src=candidates.map(accountThumbUrl).find(Boolean)||'';
+ if(!src)return `<span class="thumb-unavailable"><i class="${icon}"></i></span>`;
  if(/\\.(mp4|webm|ogg|m4v)(?:[?#].*)?$/i.test(src))return `<video class="account-thumb-media" src="${escA(src)}" muted playsinline autoplay loop preload="metadata" aria-label="${escA(title)}"></video>`;
- return `<img src="${escA(src)}" alt="${escA(title)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.onerror=null;this.remove();this.parentElement.classList.add('thumb-unavailable')">`;
+ return `<img class="account-thumb-media" src="${escA(src)}" alt="${escA(title)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.onerror=null;this.remove();this.parentElement.classList.add('thumb-unavailable')">`;
 };
 
 function showNotice(message,type='info'){
@@ -75,9 +79,9 @@ function renderPurchases(items,usingFallback=false){
  const draw=()=>{
   const slice=items.slice((page-1)*pageSize,page*pageSize);
   host.innerHTML=`<div class="account-library-grid">${slice.map(item=>{
-   const title=item.review_items?.title||item.title||'Media Telegram',slug=item.review_items?.slug||item.slug||'',thumb=item.review_items?.thumbnail_url||item.thumbnail_url||'',gallery=item.review_items?.gallery_urls||item.gallery_urls||[],bought=item.created_at||item.settled_at,price=item.amount??item.price;
+   const title=item.review_items?.title||item.title||'Media Telegram',slug=item.review_items?.slug||item.slug||'',thumb=item.review_items?.thumbnail_url||item.thumbnail_url||'',embed=item.review_items?.review_embed_url||item.review_embed_url||'',gallery=item.review_items?.gallery_urls||item.gallery_urls||[],bought=item.created_at||item.settled_at,price=item.amount??item.price;
    const mediaUrl=slug?`/paste/${encodeURIComponent(slug)}`:'#',detailUrl=slug?`/r/${encodeURIComponent(slug)}`:'#';
-   return `<article class="library-item"><div class="library-thumb">${accountThumbMarkup([thumb,...(Array.isArray(gallery)?gallery:[])],title)}<span class="library-check"><i class="fa-solid fa-check"></i></span></div><div class="library-info"><div class="library-tags"><span class="tag-purchased"><i class="fa-solid fa-circle-check"></i> ${escA(t('purchase_success'))}</span><span class="tag-access">${escA(t('verified'))}</span></div><h3>${escA(title)}</h3><p><i class="fa-regular fa-calendar-check"></i> ${escA(t('purchased'))} ${escA(dateA(bought))}</p>${price!=null?`<small class="library-price">${escA(t('price'))}: <b>${escA(moneyA(price))}</b></small>`:''}</div><div class="library-actions">${slug?`<a class="account-action" href="${mediaUrl}"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${escA(t('open_media'))}</a><a class="library-detail-link" href="${detailUrl}">${escA(t('details'))} <i class="fa-solid fa-arrow-right"></i></a>`:'<span class="expired-link">Review unavailable</span>'}</div></article>`;
+   return `<article class="library-item"><div class="library-thumb">${accountThumbMarkup([thumb,embed,gallery],title)}<span class="library-check"><i class="fa-solid fa-check"></i></span></div><div class="library-info"><div class="library-tags"><span class="tag-purchased"><i class="fa-solid fa-circle-check"></i> ${escA(t('purchase_success'))}</span><span class="tag-access">${escA(t('verified'))}</span></div><h3>${escA(title)}</h3><p><i class="fa-regular fa-calendar-check"></i> ${escA(t('purchased'))} ${escA(dateA(bought))}</p>${price!=null?`<small class="library-price">${escA(t('price'))}: <b>${escA(moneyA(price))}</b></small>`:''}</div><div class="library-actions">${slug?`<a class="account-action" href="${mediaUrl}"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${escA(t('open_media'))}</a><a class="library-detail-link" href="${detailUrl}">${escA(t('details'))} <i class="fa-solid fa-arrow-right"></i></a>`:'<span class="expired-link">Review unavailable</span>'}</div></article>`;
   }).join('')}</div>${items.length>pageSize?`<div class="account-pagination"><button type="button" data-page="prev" ${page===1?'disabled':''}>‹ ${escA(t('previous'))}</button><span>${page} / ${Math.ceil(items.length/pageSize)}</span><button type="button" data-page="next" ${page===Math.ceil(items.length/pageSize)?'disabled':''}>${escA(t('next'))} ›</button></div>`:''}`;
   host.querySelector('[data-page="prev"]')?.addEventListener('click',()=>{page--;draw()});host.querySelector('[data-page="next"]')?.addEventListener('click',()=>{page++;draw()});
  };
@@ -89,7 +93,7 @@ async function loadPurchasedMedia(user){
  // queried as a recovery path so a completed payment remains visible if an
  // older settlement missed creating its entitlement row.
  const [entRes,orderRes]=await Promise.all([
-  sb.from('review_entitlements').select('id,review_id,created_at,order_id,review_items(id,title,slug,thumbnail_url,gallery_urls,price,access)').eq('user_id',user.id).order('created_at',{ascending:false}),
+  sb.from('review_entitlements').select('id,review_id,created_at,order_id,review_items(id,title,slug,thumbnail_url,review_embed_url,gallery_urls,price,access)').eq('user_id',user.id).order('created_at',{ascending:false}),
   sb.from('cashi_orders').select('order_id,review_id,amount,created_at,settled_at,status').eq('user_id',user.id).eq('purpose','review_download').eq('status','SETTLED').order('settled_at',{ascending:false})
  ]);
  if(entRes.error && orderRes.error){
@@ -109,7 +113,7 @@ async function loadPurchasedMedia(user){
  }))];
  let missingItems=[];
  if(missingIds.length){
-  const {data,error}=await sb.from('review_items').select('id,title,slug,thumbnail_url,gallery_urls,price,access').in('id',missingIds);
+  const {data,error}=await sb.from('review_items').select('id,title,slug,thumbnail_url,review_embed_url,gallery_urls,price,access').in('id',missingIds);
   if(!error)missingItems=data||[];
  }
  const itemById=new Map(missingItems.map(x=>[x.id,x]));
