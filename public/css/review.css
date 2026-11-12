@@ -308,3 +308,38 @@ body:has(.review-shell){background:#f4f1e8!important;color:#26364a!important;col
  .product-info-panel{padding:11px!important}
  .related-card-stats{gap:7px;font-size:9px}
 }
+
+
+/* Telegram confirmation shown before loading the review media preview. */
+#reviewGalleryAccess[hidden]{display:none!important}
+.review-telegram-gate{
+ position:fixed;inset:0;z-index:10050;display:grid;place-items:center;padding:22px;
+ background:rgba(8,20,36,.72);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)
+}
+.review-telegram-gate[hidden]{display:none!important}
+.review-telegram-gate-card{
+ width:min(470px,100%);padding:30px 28px 24px;border:1px solid rgba(220,232,247,.9);
+ border-radius:24px;background:linear-gradient(155deg,#fff 0%,#f7faff 100%);
+ box-shadow:0 28px 90px rgba(4,18,36,.34);text-align:center;color:#1a2c44
+}
+.review-telegram-gate-icon{
+ width:62px;height:62px;margin:0 auto 15px;display:grid;place-items:center;border-radius:19px;
+ background:linear-gradient(145deg,#e7f4ff,#d6eaff);color:#229ed9;font-size:30px;
+ box-shadow:inset 0 1px #fff,0 9px 24px rgba(40,120,190,.12)
+}
+.review-telegram-gate-kicker{font-size:9px;letter-spacing:.16em;font-weight:900;color:#6683a5}
+.review-telegram-gate-card h2{margin:10px 0 9px;font-size:clamp(21px,4vw,26px);letter-spacing:-.035em;color:#172b45}
+.review-telegram-gate-card p{margin:0 auto;max-width:370px;color:#64758b;font-size:13px;line-height:1.7}
+.review-telegram-gate-actions{display:grid;grid-template-columns:1fr;gap:9px;margin-top:22px}
+.review-telegram-join,.review-telegram-confirm{
+ min-height:46px;display:flex;align-items:center;justify-content:center;gap:9px;padding:11px 15px;
+ border-radius:12px;font:inherit;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer;transition:transform .18s,box-shadow .18s
+}
+.review-telegram-join{border:1px solid #cfe2f5;background:#eef7ff;color:#1769aa}
+.review-telegram-confirm{border:1px solid #15518a;background:linear-gradient(135deg,#237ac0,#15518a);color:#fff;box-shadow:0 8px 20px rgba(25,95,160,.2)}
+.review-telegram-join:hover,.review-telegram-confirm:hover{transform:translateY(-1px)}
+.review-telegram-gate-foot{display:block;margin-top:16px;color:#8492a4;font-size:10px;line-height:1.5}
+@media(max-width:480px){.review-telegram-gate{padding:16px}.review-telegram-gate-card{padding:25px 19px 20px;border-radius:20px}}
+
+
+body.review-telegram-gate-open{overflow:hidden!important}
