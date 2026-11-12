@@ -29,9 +29,32 @@
   document.body.appendChild(root);
 
   const toggle=$('#bcSupportToggle'), menu=$('#bcSupportMenu'), panel=$('#bcSupportPanel');
-  toggle.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')==='true';toggle.setAttribute('aria-expanded',String(!open));toggle.innerHTML=open?'<i class="fa-solid fa-comments"></i>':'<i class="fa-solid fa-xmark"></i>';toggle.setAttribute('aria-label',open?'Buka menu support':'Tutup menu support');menu.classList.toggle('is-open',!open);menu.setAttribute('aria-hidden',String(open));});
-  $('#bcSupportChat').addEventListener('click',async e=>{e.preventDefault();panel.hidden=false;menu.classList.remove('is-open');menu.setAttribute('aria-hidden','true');toggle.setAttribute('aria-expanded','false');toggle.innerHTML='<i class="fa-solid fa-comments"></i>';toggle.setAttribute('aria-label','Buka menu support');await loadChat();});
-  $('#bcSupportClose').addEventListener('click',()=>panel.hidden=true);
+  const closeMenu=()=>{
+    menu.classList.remove('is-open');
+    menu.setAttribute('aria-hidden','true');
+    toggle.setAttribute('aria-expanded','false');
+    toggle.innerHTML='<i class="fa-solid fa-comments"></i>';
+    toggle.setAttribute('aria-label','Buka menu support');
+  };
+  const closeChat=()=>{panel.hidden=true;closeMenu();};
+  toggle.addEventListener('click',()=>{
+    if(!panel.hidden){closeChat();return;}
+    const open=menu.classList.contains('is-open');
+    if(open)closeMenu();
+    else{
+      menu.classList.add('is-open');
+      menu.setAttribute('aria-hidden','false');
+      toggle.setAttribute('aria-expanded','true');
+      toggle.innerHTML='<i class="fa-solid fa-xmark"></i>';
+      toggle.setAttribute('aria-label','Tutup menu support');
+    }
+  });
+  $('#bcSupportChat').addEventListener('click',async e=>{e.preventDefault();closeMenu();panel.hidden=false;await loadChat();});
+  $('#bcSupportClose').addEventListener('click',closeChat);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!panel.hidden)closeChat();else closeMenu();}});
+  document.addEventListener('click',e=>{
+    if(!root.contains(e.target)&&menu.classList.contains('is-open'))closeMenu();
+  });
 
   let currentUser=null, conversation=null, busy=false, refreshTimer=null;
   const messagesEl=$('#bcSupportMessages'), foot=$('#bcSupportFoot');
