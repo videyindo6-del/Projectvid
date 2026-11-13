@@ -8,11 +8,10 @@ Deno.serve(async req=>{
  if(!secret||!signature) return new Response('Missing signature configuration',{status:401});
  let payload:any;
  try { payload=JSON.parse(raw); } catch { return new Response('Bad payload',{status:400}); }
- // Cashi's documentation signs JSON.stringify(req.body), so verify the parsed JSON
- // in the same canonical form rather than relying on incoming whitespace.
- const signedPayload=JSON.stringify(payload);
+ // Cashi signs the exact raw HTTP request body. Do not parse/stringify it
+ // before verification: whitespace and key ordering are part of the signed bytes.
  const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
- const expected=hex(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(signedPayload)));
+ const expected=hex(await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(raw)));
  if(!/^[a-f0-9]{64}$/.test(signature)) return new Response('Invalid signature',{status:401});
  const a=new TextEncoder().encode(expected),b=new TextEncoder().encode(signature);
  if(a.length!==b.length) return new Response('Invalid signature',{status:401});
