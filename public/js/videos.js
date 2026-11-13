@@ -45,7 +45,7 @@ window.deleteVideo=deleteVideo;
 
 document.getElementById('addVideo')?.addEventListener('click',async()=>{
   form.style.display='grid';
-  const {data,error}=await sb.from('categories').select('id,name').eq('status','published');
+  const {data,error}=await sb.from('categories').select('id,name').eq('status','published').eq('content_type','box_video');
   if(error){document.getElementById('videoMessage').textContent='Kategori gagal dimuat: '+error.message;return;}
   document.getElementById('videoCategory').innerHTML='<option value="">Pilih kategori</option>'+(data||[]).map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
 });
@@ -71,3 +71,10 @@ form?.addEventListener('submit',async e=>{
 });
 document.getElementById('logout')?.addEventListener('click',async()=>{await sb.auth.signOut();location.href='login.html';});
 load();
+
+document.getElementById('addVideoCategory')?.addEventListener('click',async()=>{
+  const name=prompt('Nama kategori Box Video baru:');if(name===null)return;if(!name.trim())return alert('Nama kategori wajib diisi.');
+  const {data,error}=await sb.from('categories').insert({name:name.trim(),status:'published',content_type:'box_video'}).select('id,name').single();
+  if(error){alert('Gagal membuat kategori: '+error.message);return;}
+  const select=document.getElementById('videoCategory');const option=new Option(data.name,data.id,true,true);select.add(option);
+});

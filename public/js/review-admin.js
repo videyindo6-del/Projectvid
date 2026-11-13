@@ -210,7 +210,7 @@ for (let i = 0; i < 3; i++) addGallery();
 async function loadReviewCategories(selectedId = '') {
   const select = document.getElementById('reviewCategory');
   if (!select) return;
-  const { data, error } = await sb.from('categories').select('id,name').order('name');
+  const { data, error } = await sb.from('categories').select('id,name').eq('content_type','media_telegram').order('name');
   if (error) { console.warn('Kategori review tidak dapat dimuat:', error); return; }
   select.innerHTML = '<option value="">Tanpa kategori</option>' +
     (data || []).map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
@@ -617,3 +617,11 @@ document.getElementById('logout')?.addEventListener('click', async () => {
 // =====================================================
 
 load();
+
+// Create a Media Telegram category directly while publishing a review.
+document.getElementById('addReviewCategory')?.addEventListener('click',async()=>{
+  const name=prompt('Nama kategori Media Telegram baru:');if(name===null)return;if(!name.trim())return alert('Nama kategori wajib diisi.');
+  const {data,error}=await sb.from('categories').insert({name:name.trim(),status:'published',content_type:'media_telegram'}).select('id').single();
+  if(error){alert('Gagal membuat kategori: '+error.message);return;}
+  await loadReviewCategories(data.id);
+});

@@ -144,7 +144,7 @@
     try {
       const [reviewsResult,categoriesResult] = await Promise.all([
         sb.from('review_items').select('id,slug,title,description,review_embed_url,thumbnail_url,gallery_urls,price,access,category_id,view_count,created_at').eq('status','published').order('created_at',{ascending:false}),
-        sb.from('categories').select('id,name,status').eq('status','published').order('name')
+        sb.from('categories').select('id,name,status').eq('status','published').eq('content_type','media_telegram').order('name')
       ]);
       if (reviewsResult.error) throw reviewsResult.error;
       if (categoriesResult.error) console.warn('Category list unavailable:',categoriesResult.error.message);
