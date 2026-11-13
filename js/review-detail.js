@@ -579,6 +579,25 @@ async function load() {
         </section>
       </div>`;
     applyReviewTranslations(box);
+    try {
+      const {data:{user}} = await sb.auth.getUser();
+      if(user){
+        const {data:affiliate} = await sb.from('profiles').select('affiliate_status,referral_code').eq('id',user.id).maybeSingle();
+        if(affiliate?.affiliate_status==='approved' && affiliate.referral_code){
+          const shareUrl = `${location.origin}/r/${encodeURIComponent(reviewSlug)}?ref=${encodeURIComponent(affiliate.referral_code)}`;
+          const strip = box.querySelector('.purchase-strip');
+          if(strip){
+            const share = document.createElement('button');share.type='button';share.className='btn share-to-earn-btn';
+            share.innerHTML='<i class="fa-solid fa-share-nodes"></i> Share to Earn';
+            share.style.cssText='margin-top:10px;width:100%;border:0;border-radius:12px;padding:12px;background:#176c51;color:#fff;font-weight:800;cursor:pointer';
+            share.addEventListener('click',async()=>{
+              try{if(navigator.share)await navigator.share({title:v.title,url:shareUrl});else{await navigator.clipboard.writeText(shareUrl);alert('Link afiliasi berhasil disalin. Bagikan ke media sosial kamu.')}}catch(err){if(err?.name!=='AbortError')prompt('Salin link afiliasi:',shareUrl)}
+            });
+            strip.insertAdjacentElement('afterend',share);
+          }
+        }
+      }
+    } catch(e){console.warn('Affiliate share button unavailable:',e)}
     setupTelegramPreviewGate();
     setupGalleryViewer();
     setupGalleryControls();

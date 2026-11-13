@@ -80,9 +80,12 @@ function renderPlans(plans){
   <div class="plan-price">${safe(money(v.price))}</div>
   <p class="plan-duration"><i class="fa-regular fa-calendar"></i> ${Number(v.duration_days)||0} ${safe(t('days'))}</p>
   <ul><li><i class="fa-solid fa-check"></i> ${safe(t('vipContent'))}</li><li><i class="fa-solid fa-check"></i> ${safe(t('discount'))}</li><li><i class="fa-solid fa-check"></i> ${safe(t('manage'))}</li></ul>
-  <label class="vip-coupon-field" style="display:grid;gap:6px;margin:12px 0;font-size:12px;font-weight:700">Kode diskon yang sudah di-claim<select data-vip-coupon="${safe(v.id)}" style="padding:10px;border:1px solid #dbe4ef;border-radius:10px;background:#fff"><option value="">Tanpa kode diskon</option>${vipCoupons.filter(c=>['all','vip_account'].includes(c.scope||'all')).map(c=>`<option value="${safe(c.code)}">${safe(c.code)} · ${Number(c.discount_percent)}%</option>`).join('')}</select></label><button class="btn primary vip-buy-button" type="button" data-buy-plan="${safe(v.id)}"><i class="fa-solid fa-lock"></i> ${safe(t('buy'))}</button>
+  <label class="vip-coupon-field" style="display:grid;gap:6px;margin:12px 0;font-size:12px;font-weight:700">Kode diskon yang sudah di-claim<select data-vip-coupon="${safe(v.id)}" style="padding:10px;border:1px solid #dbe4ef;border-radius:10px;background:#fff"><option value="">Tanpa kode diskon</option>${vipCoupons.filter(c=>['all','vip_account'].includes(c.scope||'all')).map(c=>`<option value="${safe(c.code)}">${safe(c.code)} · ${Number(c.discount_percent)}%</option>`).join('')}</select></label><button class="btn primary vip-buy-button" type="button" data-buy-plan="${safe(v.id)}"><i class="fa-solid fa-lock"></i> ${safe(t('buy'))}</button><button class="btn vip-wallet-button" type="button" data-wallet-plan="${safe(v.id)}" style="width:100%;margin-top:8px"><i class="fa-solid fa-wallet"></i> Bayar Saldo Deposit · Diskon 20%</button>
  </article>`}).join('')||`<div class="empty-state">${safe(t('noPlans'))}</div>`;
  plansBox.querySelectorAll('[data-buy-plan]').forEach(button=>button.addEventListener('click',()=>buyVip(button.dataset.buyPlan,button)));
+ plansBox.querySelectorAll('[data-wallet-plan]').forEach(button=>button.addEventListener('click',async()=>{
+  button.disabled=true;try{const {data,error}=await sb.rpc('buy_with_deposit_wallet',{p_purpose:'vip',p_plan_id:button.dataset.walletPlan,p_review_id:null,p_vip_group_id:null,p_affiliate_code:localStorage.getItem('boxcellink_affiliate_code')||null});if(error)throw error;if(!data?.ok)throw new Error(data?.reason||'Saldo deposit tidak cukup.');notice('Pembelian berhasil','VIP berhasil diaktifkan dengan saldo deposit.');await refreshMembership()}catch(e){notice('Pembelian gagal',e.message||'Saldo deposit tidak cukup.','error')}finally{button.disabled=false}
+ }));
 }
 async function loadPlans(){
  if(currentUser){const {data}=await sb.from('admin_discount_claims').select('used_at,admin_discount_codes(code,scope,discount_percent,expires_at)').eq('user_id',currentUser.id);vipCoupons=(data||[]).filter(x=>!x.used_at&&x.admin_discount_codes&&(!x.admin_discount_codes.expires_at||new Date(x.admin_discount_codes.expires_at)>new Date())).map(x=>x.admin_discount_codes)}
@@ -95,7 +98,7 @@ async function buyVip(id,button){
  const old=button?.innerHTML;if(button){button.disabled=true;button.innerHTML=`<i class="fa-solid fa-circle-notch fa-spin"></i> ${safe(t('processing'))}`}
  try{
   const coupon=document.querySelector(`[data-vip-coupon="${CSS.escape(String(id))}"]`)?.value||'';
-  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip',plan_id:id,coupon_code:coupon||undefined}});
+  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip',plan_id:id,coupon_code:coupon||undefined,affiliate_code:localStorage.getItem('boxcellink_affiliate_code')||null}});
   if(error)throw error;if(!data?.checkout_url||!data?.order_id)throw new Error(data?.error||t('checkoutError'));
   const plan=(window.__vipPlans||[]).find(x=>String(x.id)===String(id));
   localStorage.setItem('boxcellink_pending_vip',JSON.stringify({order_id:data.order_id,user_id:currentUser.id,plan_name:plan?.name||'',amount:data.amount,qr_url:data.qrUrl||null,checkout_url:data.checkout_url||null,expires_at:data.expires_at||null,created_at:new Date().toISOString()}));

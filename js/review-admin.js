@@ -207,6 +207,16 @@ for (let i = 0; i < 3; i++) addGallery();
 // ADMIN AUTHORIZATION
 // =====================================================
 
+async function loadReviewCategories(selectedId = '') {
+  const select = document.getElementById('reviewCategory');
+  if (!select) return;
+  const { data, error } = await sb.from('categories').select('id,name').order('name');
+  if (error) { console.warn('Kategori review tidak dapat dimuat:', error); return; }
+  select.innerHTML = '<option value="">Tanpa kategori</option>' +
+    (data || []).map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+  select.value = selectedId || '';
+}
+
 async function guard() {
   try {
     const { data: { user }, error: authError } = await sb.auth.getUser();
@@ -254,7 +264,7 @@ async function load() {
     // pada relasi nested PostgREST yang bisa tidak terdeteksi di project lama.
     const { data, error } = await sb
       .from('review_items')
-      .select('id,slug,title,price,access,status,review_embed_url')
+      .select('id,slug,title,price,access,status,review_embed_url,category_id,categories(name)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -274,7 +284,7 @@ async function load() {
       <table class="table review-admin-table">
         <thead><tr>
           <th>Judul</th><th>Link Review</th><th>Preview Embed</th><th>Link Telegram / Akses Privat</th>
-          <th>Harga</th><th>Akses</th><th>Status</th><th>Aksi</th>
+          <th>Kategori</th><th>Harga</th><th>Akses</th><th>Status</th><th>Aksi</th>
         </tr></thead>
         <tbody>${(data || []).map(x => {
           const reviewUrl = `${location.origin}/r/${encodeURIComponent(x.slug)}`;
@@ -284,7 +294,7 @@ async function load() {
             <td><div class="review-link-cell"><a href="${esc(reviewUrl)}" target="_blank" rel="noopener">${esc(reviewUrl)}</a><button type="button" class="copy-link-btn" data-copy="${esc(reviewUrl)}" title="Salin link review"><i class="fa-regular fa-copy"></i> Copy</button></div></td>
             <td>${x.review_embed_url ? `<a href="${esc(normalizeEmbed(x.review_embed_url)||x.review_embed_url)}" target="_blank" rel="noopener">Buka preview</a>` : '<span class="empty-link">Belum diatur</span>'}</td>
             <td>${downloadUrl ? `<div class="review-link-cell"><a href="${esc(downloadUrl)}" target="_blank" rel="noopener noreferrer">${esc(downloadUrl)}</a><button type="button" class="copy-link-btn" data-copy="${esc(downloadUrl)}"><i class="fa-regular fa-copy"></i> Copy</button></div>` : '<span class="empty-link">Belum diatur</span>'}</td>
-            <td>Rp ${Number(x.price || 0).toLocaleString('id-ID')}</td>
+            <td>${esc(x.categories?.name || '—')}</td><td>Rp ${Number(x.price || 0).toLocaleString('id-ID')}</td>
             <td><span class="review-pill">${esc(x.access)}</span></td>
             <td><span class="review-status ${x.status === 'published' ? 'is-published' : 'is-draft'}">${esc(x.status)}</span></td>
             <td><div class="review-actions"><button class="btn" data-edit="${esc(x.id)}">Edit</button><button class="btn danger" data-delete="${esc(x.id)}">Hapus</button></div></td>
@@ -337,6 +347,7 @@ async function editReview(id) {
     if (error) throw error;
 
     editingId = id;
+    await loadReviewCategories(x.category_id || '');
 
     form.elements.title.value = x.title || '';
     form.elements.description.value = x.description || '';
@@ -491,6 +502,7 @@ form?.addEventListener('submit', async e => {
       gallery_urls: images,
       price,
       access: v.access,
+      category_id: v.category_id || null,
       status: v.status
     };
 

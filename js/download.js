@@ -1,7 +1,7 @@
 const root=document.getElementById('downloadCheckout');
 function getRouteCode(prefix){const p=new URLSearchParams(location.search);const q=p.get('slug')||p.get('code')||'';if(q.trim())return q.trim();const a=location.pathname.split('/').filter(Boolean),i=a.findIndex(x=>x.toLowerCase()===prefix);if(i<0||!a[i+1])return'';try{return decodeURIComponent(a[i+1]).trim()}catch{return a[i+1].trim()}}
 const slug=getRouteCode('d'),rp=n=>'Rp '+Number(n||0).toLocaleString('id-ID'),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let item,order=null,couponOptions=[],vipActive=false,guestCheckout=false,lang=localStorage.getItem('boxcellink_lang')||'id',payTimer=null,lastPaymentData=null,polling=false;
+let item,order=null,couponOptions=[],vipActive=false,guestCheckout=false,depositBalance=0,lang=localStorage.getItem('boxcellink_lang')||'id',payTimer=null,lastPaymentData=null,polling=false;
 const PAYMENT_POLL_INTERVAL=10000; // Pemeriksaan otomatis setiap 10 detik.
 const words={
  id:{loading:'Menyiapkan halaman pembelian...',secure:'Checkout aman',guest:'Mode pembelian tamu aktif — tidak perlu login atau membuat akun.',title:'Konfirmasi pembelian',status:'Belum dibeli',normal:'Harga normal',vip:'Status VIP',active:'Aktif · Diskon 20%',inactive:'Tidak aktif',coupon:'Kode diskon referral (opsional)',none:'Tanpa kode diskon',buy:'Beli sekarang',agreeTitle:'Persetujuan pembelian',agreeText:'Pastikan produk dan nominal pembayaran sudah benar. Setelah pembayaran dilakukan, transaksi akan diproses sesuai ketentuan.',agree:'Saya setuju untuk melanjutkan pembelian dan melakukan pembayaran sesuai nominal yang ditampilkan.',cancel:'Kembali',continue:'Setuju & lanjutkan',preparing:'Menyiapkan pembayaran',preparingText:'Menghubungkan ke Cashi dan membuat QR pembayaran yang sesuai dengan nominal transaksi.',payment:'Pembayaran Cashi',amount:'Total pembayaran',waiting:'Menunggu pembayaran',check:'Cek pembayaran',auto:'Pengecekan otomatis setiap 10 detik.',how:'Cara pembayaran',step1:'Buka aplikasi pembayaran yang mendukung QRIS dan siapkan fitur pemindai QR.',step2:'Pindai QR pembayaran yang tampil pada halaman ini.',step3:'Bayar tepat sesuai nominal yang tertera.',step4:'Biarkan halaman ini terbuka. Status akan diperiksa otomatis setiap 10 detik.',support:'Bantuan pembayaran',supportText:'Jika pembayaran berhasil tetapi status belum berubah, tunggu sebentar lalu cek kembali. Simpan bukti pembayaran dan Order ID untuk bantuan.',open:'Buka halaman Cashi',guestWarn:'Selesaikan pembayaran dan buka akses download pada browser/perangkat yang sama. Jangan hapus data situs sebelum akses terbuka.',processing:'Memeriksa pembayaran...',paid:'Pembayaran berhasil! Membuka akses...',failed:'Belum dapat memeriksa pembayaran. Silakan coba lagi.',discount:'Diskon',total:'Total setelah diskon',free:'Konten ini gratis.'},
@@ -30,11 +30,11 @@ async function init(){
   const {data:owned}=await sb.from('review_entitlements').select('id').eq('review_id',item.id).eq('user_id',user.id).maybeSingle();
   if(owned){await unlock();return}
   const [profileRes,couponRes,claimRes]=await Promise.all([
-   sb.from('profiles').select('vip_expires_at').eq('id',user.id).maybeSingle(),
+   sb.from('profiles').select('vip_expires_at,deposit_balance').eq('id',user.id).maybeSingle(),
    guestCheckout?Promise.resolve({data:[]}):sb.from('discount_coupons').select('code,discount_percent,uses_total,uses_used,uses_reserved').eq('user_id',user.id),
    guestCheckout?Promise.resolve({data:[]}):sb.from('admin_discount_claims').select('used_at,admin_discount_codes(code,scope,discount_percent,min_purchase,expires_at)').eq('user_id',user.id)
   ]);
-  vipActive=!guestCheckout&&!!profileRes.data?.vip_expires_at&&new Date(profileRes.data.vip_expires_at)>new Date();
+  vipActive=!guestCheckout&&!!profileRes.data?.vip_expires_at&&new Date(profileRes.data.vip_expires_at)>new Date();depositBalance=Number(profileRes.data?.deposit_balance||0);
   couponOptions=guestCheckout?[]:(couponRes.data||[]).filter(c=>(c.uses_used||0)+(c.uses_reserved||0)<c.uses_total).concat((claimRes.data||[]).filter(x=>!x.used_at&&x.admin_discount_codes&&['all','telegram_review'].includes(x.admin_discount_codes.scope||'all')&&(!x.admin_discount_codes.expires_at||new Date(x.admin_discount_codes.expires_at)>new Date())).map(x=>({...x.admin_discount_codes,source:'admin'})));
   renderCheckout();
  }catch(e){root.innerHTML=`<div class="checkout-error"><i class="fa-solid fa-circle-exclamation"></i><h2>Gagal menyiapkan pembelian</h2><p>${esc(e.message||'Terjadi kesalahan.')}</p><button class="checkout-button" id="retryCheckout">Coba lagi</button></div>`;document.getElementById('retryCheckout')?.addEventListener('click',init)}
@@ -51,11 +51,19 @@ function renderCheckout(){
    <div class="checkout-field"><label for="couponCode"><i class="fa-solid fa-ticket"></i> ${t('coupon')}</label><select id="couponCode"><option value="">${t('none')}</option>${couponOptions.map(c=>`<option value="${esc(c.code)}">${esc(c.code)} — ${c.discount_percent}%</option>`).join('')}</select></div>
    <div class="checkout-total"><div><small id="discountLabel">${t('discount')} 0%</small><b>${t('total')}</b></div><strong id="totalAmount">${rp(item.price)}</strong></div>
    <button class="checkout-button" id="buyNow"><i class="fa-solid fa-shield-check"></i> ${t('buy')} · ${rp(item.price)} <i class="fa-solid fa-arrow-right"></i></button>
+   ${!guestCheckout?`<button class="checkout-button" id="buyWithDeposit" type="button" style="margin-top:9px;background:#147a58"><i class="fa-solid fa-wallet"></i> Bayar dari saldo deposit · ${rp(Math.round(Number(item.price)*.8))} (Diskon 20%)</button><small class="wallet-available">Saldo tersedia: ${rp(depositBalance)}</small>`:''}
    <div class="checkout-secure"><i class="fa-solid fa-shield-halved"></i> Transaksi diproses melalui Cashi · Secure payment</div>
   </section><div class="checkout-footnote"><i class="fa-solid fa-circle-info"></i> Pastikan nominal pembayaran sesuai dengan yang tertera sebelum menyelesaikan transaksi.</div>
   </div></div>`;
  document.getElementById('languageSwitch').onclick=()=>setLanguage(lang==='id'?'en':'id');
  document.getElementById('couponCode').onchange=updatePreview;updatePreview();document.getElementById('buyNow').onclick=confirmBuy;
+ document.getElementById('buyWithDeposit')?.addEventListener('click',async e=>{
+  const btn=e.currentTarget;btn.disabled=true;
+  try{const {data,error}=await sb.rpc('buy_with_deposit_wallet',{p_purpose:'review_download',p_review_id:item.id,p_plan_id:null,p_vip_group_id:null,p_affiliate_code:localStorage.getItem('boxcellink_affiliate_code')||null});
+   if(error)throw error;if(!data?.ok)throw new Error(data?.reason||'Saldo deposit tidak mencukupi.');
+   await unlock();
+  }catch(err){alert(err.message||'Pembelian dengan saldo gagal.');btn.disabled=false}
+ });
 }
 function updatePreview(){const {percent,amount}=calc();document.getElementById('discountLabel').textContent=`${t('discount')} ${percent}%`;document.getElementById('totalAmount').textContent=rp(amount);document.getElementById('buyNow').innerHTML=`<i class="fa-solid fa-shield-check"></i> ${t('buy')} · ${rp(amount)} <i class="fa-solid fa-arrow-right"></i>`}
 function confirmBuy(){
@@ -69,7 +77,7 @@ async function createOrder(){
  const modal=document.getElementById('confirmModal');if(modal)modal.remove();
  loadingView(t('preparing'),t('preparingText'));
  try{
-  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'review_download',review_id:item.id,coupon_code:document.getElementById('couponCode')?.value||null}});
+  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'review_download',review_id:item.id,coupon_code:document.getElementById('couponCode')?.value||null,affiliate_code:localStorage.getItem('boxcellink_affiliate_code')||null}});
   if(error)throw error;if(!data?.checkout_url)throw new Error(data?.error||'Cashi gagal membuat pembayaran.');
   order=data.order_id;renderPayment(data);
  }catch(e){root.innerHTML=`<div class="checkout-error"><i class="fa-solid fa-triangle-exclamation"></i><h2>Gagal membuat pembayaran</h2><p>${esc(e.message||'Silakan coba kembali.')}</p><button class="checkout-button" id="retryPayment">Coba lagi</button></div>`;document.getElementById('retryPayment').onclick=()=>{renderCheckout();confirmBuy()}}
