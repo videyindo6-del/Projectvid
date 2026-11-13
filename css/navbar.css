@@ -64,3 +64,9 @@
 .bc-notification-item{display:grid;gap:4px;padding:11px 8px;border-bottom:1px solid var(--line,#edf1f5);text-decoration:none;color:inherit}.bc-notification-item:last-child{border:0}.bc-notification-item b{font-size:12px}.bc-notification-item span{font-size:11px;color:var(--muted,#718096);line-height:1.45}.bc-notification-item.unread{background:color-mix(in srgb,#3478bd 7%,transparent);border-radius:9px}
 @keyframes bcDrop{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:620px){.bc-nav-inner{gap:5px}.bc-wallet-pill{gap:5px;padding:5px 6px}.bc-wallet-icon{width:25px;height:25px}.bc-wallet-values b{font-size:9px}.bc-wallet-values small{font-size:8px}.bc-wallet-divider{height:19px}.bc-wallet-shortcuts{display:none}.bc-brand-centered{font-size:12px}.bc-nav-actions{gap:5px}}
+
+/* Clean wordmark: no decorative box symbol, optimized for narrow Android screens. */
+.bc-brand,.bc-brand-centered{gap:0!important;font-size:clamp(15px,2vw,18px)!important;font-weight:850!important;letter-spacing:-.035em!important;text-transform:none!important;white-space:nowrap}
+.bc-brand-mark{display:none!important}
+.bc-brand-centered{color:#193a5b!important}
+@media(max-width:620px){.bc-brand-centered{font-size:15px!important;letter-spacing:-.04em!important}}
