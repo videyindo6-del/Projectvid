@@ -57,6 +57,8 @@
   checkHomeAuth();
 
   let videos = [], reviews = [];
+  const selectedVideoCategory = new URLSearchParams(location.search).get('category') || '';
+  const categoryFilter = (items) => selectedVideoCategory ? items.filter(v => v.category_id === selectedVideoCategory) : items;
   const lang = () => localStorage.getItem('boxcellink_lang') || 'id';
   const en = () => lang() === 'en';
   const t = (id, english) => en() ? english : id;
@@ -77,7 +79,7 @@
 
   function render() {
     const q = (search?.value || '').trim().toLocaleLowerCase(en() ? 'en' : 'id');
-    const foundVideos = videos.filter(v => !q || `${v.title || ''} ${v.provider || ''}`.toLocaleLowerCase().includes(q));
+    const foundVideos = categoryFilter(videos).filter(v => !q || `${v.title || ''} ${v.provider || ''}`.toLocaleLowerCase().includes(q));
     const foundReviews = reviews.filter(r => !q || `${r.title || ''} ${r.description || ''}`.toLocaleLowerCase().includes(q));
     if (count) count.textContent = t(`${foundVideos.length + foundReviews.length} konten ditemukan`, `${foundVideos.length + foundReviews.length} items found`);
     if (clear) clear.hidden = !(search?.value || '').length;
@@ -97,7 +99,7 @@
     if (!window.sb) { videoGrid.innerHTML = telegramGrid.innerHTML = `<div class="home-empty">${t('Layanan sementara tidak tersedia.','Service is temporarily unavailable.')}</div>`; return; }
     try {
       const [videoResult, reviewResult] = await Promise.all([
-        sb.from('videos').select('id,slug,title,provider,thumbnail_url,access,view_count,created_at').eq('status','published').eq('access','public').order('created_at',{ascending:false}).limit(40),
+        sb.from('videos').select('id,slug,title,provider,thumbnail_url,access,view_count,created_at,category_id').eq('status','published').eq('access','public').order('created_at',{ascending:false}).limit(40),
         sb.from('review_items').select('id,slug,title,description,thumbnail_url,gallery_urls,price,access,created_at').eq('status','published').order('created_at',{ascending:false}).limit(40)
       ]);
       if (videoResult.error) throw videoResult.error;

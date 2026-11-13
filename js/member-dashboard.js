@@ -155,7 +155,12 @@
     await sb.from('profiles').update({last_seen_at:new Date().toISOString()}).eq('id',user.id);
 
     const {data:ann} = await sb.from('announcements').select('title,body').eq('active',true).order('created_at',{ascending:false}).limit(1);
-    if (ann?.[0]) { $('announcement').querySelector('h2').textContent=ann[0].title; $('announcement').querySelector('p').textContent=ann[0].body; }
+    if (ann?.[0]) {
+      $('announcement').querySelector('h2').textContent=ann[0].title;
+      $('announcement').querySelector('p').textContent=ann[0].body;
+      const ticker=$('memberAnnouncementTicker');
+      if(ticker){const span=ticker.querySelector('span');if(span)span.textContent=`${ann[0].title} — ${ann[0].body}`;}
+    }
 
     const {data:cats,error:catError} = await sb.from('categories').select('id,name').eq('status','published').order('name');
     if (catError) console.warn('Dashboard categories:',catError.message);
