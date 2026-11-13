@@ -86,7 +86,7 @@ Deno.serve(async req=>{
   let response:Response;
   let result:any;
   try {
-   response=await fetch('https://cashi.id/api/create-order',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({amount,order_id,kode_channel:'QRIS_CUSTOM'}),signal:AbortSignal.timeout(20000)});
+   response=await fetch('https://cashi.id/api/create-order',{method:'POST',headers:{'x-api-key':apiKey,'Content-Type':'application/json'},body:JSON.stringify({amount,order_id,kode_channel:'CASHI'}),signal:AbortSignal.timeout(20000)});
    const raw=await response.text();
    try { result=raw ? JSON.parse(raw) : {}; } catch { throw new Error('Respons Cashi bukan JSON yang valid'); }
   } catch(gatewayError) {
