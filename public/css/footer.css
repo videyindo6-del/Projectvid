@@ -1,1 +1,12 @@
 /* Dedicated footer overrides */ .bc-footer{font-family:inherit}.bc-copy{font-size:13px;font-weight:650}.bc-footer i{margin-right:5px}.bc-cookie i{margin-right:2px}
+/* Premium, restrained footer treatment */
+.bc-footer{margin-top:64px;background:linear-gradient(135deg,#102b46 0%,#173c60 100%);border-top:1px solid rgba(255,255,255,.12)}
+.bc-footer-inner{padding:30px 22px;gap:18px 28px}
+.bc-copy{color:#c7d7e6;font-size:12px;letter-spacing:.01em}
+.bc-footer nav{gap:10px 22px}
+.bc-footer nav a{display:inline-flex;align-items:center;gap:7px;color:#e2edf7;font-size:12px;font-weight:650;transition:color .18s ease}
+.bc-footer nav a i{color:#9fc2e2;font-size:12px}
+.bc-footer nav a:hover{color:#fff}
+.bc-cookie{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.045);color:#d4e1ed}
+.bc-cookie button{background:#f4f7fa;color:#173b5e;box-shadow:0 3px 10px #071b2b33}
+@media(max-width:620px){.bc-footer{margin-top:42px}.bc-footer-inner{padding:24px 18px;gap:16px}.bc-footer nav{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}.bc-cookie{font-size:11px;line-height:1.5}}
