@@ -42,7 +42,7 @@ async function pay(){
   const {data:owned,error:ownedError}=await sb.from('vip_group_entitlements').select('id').eq('user_id',user.id).eq('group_id',selected.id).maybeSingle();
   if(ownedError)throw ownedError;if(owned)throw new Error(tr('owned'));
   const coupon=document.getElementById('groupCoupon')?.value||'';
-  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip_group',group_id:selected.id,coupon_code:coupon||undefined}});
+  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip_group',group_id:selected.id,coupon_code:coupon||undefined,affiliate_code:localStorage.getItem('boxcellink_affiliate_code')||null}});
   if(error)throw error;if(!data?.checkout_url)throw new Error(data?.error||tr('failed'));
   sessionStorage.setItem('boxcellink_pending_group_order',data.order_id||'');location.href=data.checkout_url;
  }catch(e){alert(e.message||tr('failed'))}
@@ -54,3 +54,13 @@ modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true});
 document.getElementById('groupPay').addEventListener('click',pay);
 applyLanguage();loadGroups();
 })();
+document.getElementById('groupWalletPay')?.addEventListener('click',async()=>{
+ if(!selected||busy)return;busy=true;const b=document.getElementById('groupWalletPay');b.disabled=true;
+ try{
+  const {data:{user},error:authError}=await sb.auth.getUser();if(authError)throw authError;if(!user)throw new Error(tr('login'));
+  const {data,error}=await sb.rpc('buy_with_deposit_wallet',{p_purpose:'vip_group',p_plan_id:null,p_review_id:null,p_vip_group_id:selected.id,p_affiliate_code:localStorage.getItem('boxcellink_affiliate_code')||null});
+  if(error)throw error;if(!data?.ok)throw new Error(data?.reason||'Saldo deposit tidak mencukupi.');
+  alert('Pembelian berhasil. Akses Group VIP tersedia di Akun Saya.');modal.hidden=true;await loadGroups();
+ }catch(e){alert(e.message||'Pembelian gagal.')}
+ finally{busy=false;b.disabled=false}
+});

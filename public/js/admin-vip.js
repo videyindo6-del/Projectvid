@@ -26,9 +26,9 @@ async function refresh(){
  $('planList').innerHTML=a.error?`<p class="error">${escV(a.error.message)}</p>`:(a.data||[]).map(x=>`<article class="manager-row"><div><b>${escV(x.name)}</b><small>${x.duration_days} hari · ${money(x.price)} · ${escV(x.status)}</small></div><div><button type="button" data-edit-plan="${x.id}">Edit</button><button type="button" data-del-plan="${x.id}" class="danger">Hapus</button></div></article>`).join('')||'<p>Belum ada paket VIP.</p>';
  $('groupList').innerHTML=b.error?`<p class="error">${escV(b.error.message)}</p>`:(b.data||[]).map(x=>`<article class="manager-row"><div><b>${escV(x.name)}</b><small>${money(x.price)} · ${x.member_count||0} member · ${escV(x.status)} · ${secretMap.has(x.id)?'Link: <a href="'+escV(secretMap.get(x.id))+'" target="_blank" rel="noopener">'+escV(secretMap.get(x.id))+'</a>':'Link belum diatur'}</small></div><div><button type="button" data-edit-group="${x.id}">Edit</button><button type="button" data-del-group="${x.id}" class="danger">Hapus</button></div></article>`).join('')||'<p>Belum ada group VIP.</p>';
  $('discountList').innerHTML=c.error?`<p class="error">${escV(c.error.message)}</p>`:(c.data||[]).map(x=>`<article class="manager-row"><div><b>${escV(x.code)} · Diskon ${x.discount_percent}%</b><small>${({'all':'Semua pembelian','vip_account':'VIP Akun','vip_group':'Group VIP','telegram_review':'Review Telegram'}[x.scope||'all'])} · ${money(x.min_purchase)} minimum · ${x.claimed_count||0}/${x.claim_limit} klaim · ${x.expires_at?'Expired '+new Date(x.expires_at).toLocaleString('id-ID'):'Tanpa batas waktu'}</small></div><div><button type="button" data-edit-discount="${x.id}">Edit</button><button type="button" data-del-discount="${x.id}" class="danger">Hapus</button></div></article>`).join('')||'<p>Belum ada kode diskon.</p>';
- (a.data||[]).forEach(x=>{$(`[data-edit-plan="${x.id}"]`)?.addEventListener('click',()=>openForm('plan',x));$(`[data-del-plan="${x.id}"]`)?.addEventListener('click',()=>remove('vip_plans',x.id,'plan'))});
- (b.data||[]).forEach(x=>{$(`[data-edit-group="${x.id}"]`)?.addEventListener('click',()=>openForm('group',{...x,telegram_url:secretMap.get(x.id)||''}));$(`[data-del-group="${x.id}"]`)?.addEventListener('click',()=>remove('vip_groups',x.id,'group'))});
- (c.data||[]).forEach(x=>{$(`[data-edit-discount="${x.id}"]`)?.addEventListener('click',()=>openForm('discount',x));$(`[data-del-discount="${x.id}"]`)?.addEventListener('click',()=>remove('admin_discount_codes',x.id,'discount'))});
+ // Click handlers are delegated from stable containers. This avoids querying
+ // CSS selectors through the ID-only helper `$` (the previous bug that made
+ // every Edit button inert) and survives list re-renders.
 }
 function openForm(type,x=null){
  current=type;$('managerModal').hidden=false;$('recordType').value=type;$('recordId').value=x?.id||'';
@@ -74,6 +74,26 @@ $('addGroup').onclick=()=>openForm('group');
 $('addDiscount').onclick=()=>openForm('discount');
 $('closeManager').onclick=()=>$('managerModal').hidden=true;
 $('logout').onclick=async()=>{await sb.auth.signOut();location.href='login.html'};
+function bindManagerActions(containerId){
+ const container=$(containerId);if(!container||container.dataset.actionsBound==='1')return;
+ container.dataset.actionsBound='1';
+ container.addEventListener('click',async event=>{
+  const button=event.target.closest('button');if(!button||!container.contains(button))return;
+  const planEdit=button.getAttribute('data-edit-plan');
+  const planDelete=button.getAttribute('data-del-plan');
+  const groupEdit=button.getAttribute('data-edit-group');
+  const groupDelete=button.getAttribute('data-del-group');
+  const discountEdit=button.getAttribute('data-edit-discount');
+  const discountDelete=button.getAttribute('data-del-discount');
+  if(planEdit){const item=(await sb.from('vip_plans').select('id,name,duration_days,price,status').eq('id',planEdit).maybeSingle());if(item.error||!item.data){notify('Data VIP gagal dibuka: '+(item.error?.message||'Data tidak ditemukan'));return}openForm('plan',item.data);}
+  else if(planDelete) await remove('vip_plans',planDelete,'plan');
+  else if(groupEdit){const [item,secret]=await Promise.all([sb.from('vip_groups').select('id,name,description,price,member_count,status').eq('id',groupEdit).maybeSingle(),sb.from('vip_group_secrets').select('telegram_url').eq('group_id',groupEdit).maybeSingle()]);if(item.error||!item.data){notify('Data Group VIP gagal dibuka: '+(item.error?.message||'Data tidak ditemukan'));return}if(secret.error){notify('Link undangan gagal dibaca: '+secret.error.message);return}openForm('group',{...item.data,telegram_url:secret.data?.telegram_url||''});}
+  else if(groupDelete) await remove('vip_groups',groupDelete,'group');
+  else if(discountEdit){const item=await sb.from('admin_discount_codes').select('*').eq('id',discountEdit).maybeSingle();if(item.error||!item.data){notify('Kode diskon gagal dibuka: '+(item.error?.message||'Data tidak ditemukan'));return}openForm('discount',item.data);}
+  else if(discountDelete) await remove('admin_discount_codes',discountDelete,'discount');
+ });
+}
+bindManagerActions('planList');bindManagerActions('groupList');bindManagerActions('discountList');
 $('managerForm').onsubmit=async e=>{
  e.preventDefault();if(busy)return;busy=true;
  const submit=$('managerForm').querySelector('[type="submit"]');if(submit){submit.disabled=true;submit.textContent='Menyimpan...'}
