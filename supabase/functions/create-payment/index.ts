@@ -9,11 +9,15 @@ Deno.serve(async req=>{
   const userClient=createClient(url,anon,{global:{headers:{Authorization:auth}}});
   const {data:{user}}=await userClient.auth.getUser(); if(!user) return reply({error:'Sesi tidak valid'},401);
   const admin=createClient(url,service); const apiKey=Deno.env.get('CASHI_API_KEY'); if(!apiKey) throw new Error('CASHI_API_KEY belum disetel'); const body=await req.json(); const purpose=body.purpose;
-  if(!['vip','review_download','vip_group'].includes(purpose)) return reply({error:'Jenis transaksi tidak valid'},400);
-  let baseAmount=0,plan_id=null,review_id=null,vip_group_id=null,vip_group_invite_url:string|null=null,discountPercent=0,couponCode:string|null=null;
-  const requestedCoupon=purpose==='review_download'&&body.coupon_code?String(body.coupon_code).trim():'';
+  if(!['vip','review_download','vip_group','wallet_topup'].includes(purpose)) return reply({error:'Jenis transaksi tidak valid'},400);
+  let baseAmount=0,plan_id=null,review_id=null,vip_group_id=null,vip_group_invite_url:string|null=null,discountPercent=0,couponCode:string|null=null,affiliateReferrerId:string|null=null;
+  const requestedCoupon=body.coupon_code?String(body.coupon_code).trim():'';
+  if(purpose==='wallet_topup' && requestedCoupon) return reply({error:'Kode diskon tidak berlaku untuk deposit saldo'},400);
   const order_id=`BC${Date.now()}${crypto.randomUUID().replaceAll('-','').slice(0,8).toUpperCase()}`;
-  if(purpose==='vip') {
+  if(purpose==='wallet_topup') {
+   baseAmount=Number(body.amount);
+   if(!Number.isSafeInteger(baseAmount)||baseAmount<10000||baseAmount>10000000) return reply({error:'Deposit minimal Rp10.000 dan maksimal Rp10.000.000'},400);
+  } else if(purpose==='vip') {
    const {data,error}=await admin.from('vip_plans').select('id,price,status').eq('id',body.plan_id).single();
    if(error||!data||data.status!=='published') return reply({error:'Paket VIP tidak ditemukan'},404);
    baseAmount=Number(data.price); plan_id=data.id;
@@ -38,12 +42,17 @@ Deno.serve(async req=>{
    const {data:profile}=await admin.from('profiles').select('vip_expires_at').eq('id',user.id).maybeSingle();
    if(profile?.vip_expires_at && new Date(profile.vip_expires_at)>new Date()) discountPercent=20;
   }
+  if(purpose==='vip' && !requestedCoupon){ /* VIP member benefit is applied below when eligible. */ }
   if(!Number.isSafeInteger(baseAmount)||baseAmount<2000||baseAmount>10000000) return reply({error:'Nominal harus antara Rp2.000 sampai Rp10.000.000'},400);
+  if(purpose!=='wallet_topup' && body.affiliate_code) {
+   const {data:affiliate}=await admin.from('profiles').select('id,affiliate_status,referral_code').ilike('referral_code',String(body.affiliate_code).trim()).maybeSingle();
+   if(affiliate?.affiliate_status==='approved' && affiliate.id!==user.id) affiliateReferrerId=affiliate.id;
+  }
 
   // Insert first: reserve_referral_coupon locks and updates this order row.
   const {error:ins}=await admin.from('cashi_orders').insert({
    order_id,user_id:user.id,purpose,plan_id,review_id,vip_group_id,vip_group_invite_url,
-   amount:baseAmount,base_amount:baseAmount,discount_percent:discountPercent
+   amount:baseAmount,base_amount:baseAmount,discount_percent:discountPercent,affiliate_referrer_id:affiliateReferrerId
   });
   if(ins) throw ins;
 
