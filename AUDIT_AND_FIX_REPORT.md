@@ -63,3 +63,30 @@ Jangan menyatakan semua fungsi produksi telah teruji hanya dari pemeriksaan stat
 - Belum ada kredensial Supabase pemilik atau akses deployment, sehingga CRUD produksi, RLS, fungsi Edge `download-link`, transaksi, dan data aktual tidak dapat dijalankan dari sini.
 - Provider pihak ketiga dapat memblokir iframe, meminta login, atau mengubah format URL. Untuk OneDrive, gunakan URL Embed resmi / kode iframe; tautan pendek `1drv.ms` saja tidak menjamin dapat diputar di iframe. Telegram hanya bisa di-embed untuk postingan publik.
 - Perubahan ini belum diuji pada perangkat Android/Samsung secara live; uji browser langsung tetap diperlukan setelah deploy.
+
+## Audit dan peningkatan Wallet / SaaS UI — 2026-11-13
+
+### Perubahan
+1. Navbar publik memakai wordmark `BoxCellink` tanpa ikon box; perubahan berlaku juga pada drawer dan fallback navbar. Styling wordmark dirapikan untuk lebar layar Android.
+2. Footer dirapikan dengan treatment premium, navigasi lebih terstruktur, dan cookie notice yang lebih ringkas di mobile.
+3. `wallet.html` dan `js/wallet.js` dibangun ulang: saldo deposit/affiliate, form alamat domisili accordion (desa, kecamatan, kabupaten/kota, provinsi), pilihan bank/e-wallet, opsi lainnya, nomor rekening, pemilik rekening, pengaturan rekening pencairan, tarik semua/manual, rincian fee/net, riwayat withdraw dengan ID dan status, total withdraw sukses, serta riwayat ledger.
+4. Menambahkan `topup-checkout.html` dan `js/topup-checkout.js`: order top up diarahkan ke halaman QRIS jika Cashi mengembalikan `qrUrl`, menyediakan fallback halaman Cashi, dan memeriksa status lewat Edge Function `payment-status` sampai settlement/expired.
+5. Panel admin affiliate/withdraw diperluas untuk menampilkan rekening dan rincian fee/net, serta aksi proses, sukses (dengan konfirmasi), kembalikan untuk revisi, dan reject dengan alasan.
+6. Tombol Share to Earn pada detail Media Telegram memakai warna emas. Video BoxCellink native HTML5 menyediakan Share to Earn dan sesi bonus Rp2 setelah minimal lima menit playback terukur; reward dibatasi satu kali per pasangan referrer/penonton/video untuk mencegah klaim berulang.
+7. Menambahkan migrasi `supabase/boxcellink_wallet_withdraw_v2.sql`. Jalankan setelah `BoxCellink-affiliate-wallet-notifications-FIXED.sql`; urutannya ditambahkan ke `SQL_RUN_ORDER.md`.
+
+### Pemeriksaan yang dilakukan
+- `npm run build`: lulus, 34 halaman HTML tersalin ke `public/`.
+- `node --check`: 84 file JavaScript lulus.
+- HTML parser: 34 halaman root lulus.
+- Pemeriksaan keseimbangan kurung kurawal: 68 stylesheet lulus.
+- Pemeriksaan referensi asset lokal dari HTML: 0 referensi hilang.
+- Sinkronisasi source/build untuk komponen navbar/footer, wallet, admin, checkout, dan watch: lulus.
+- Pemeriksaan ID DOM yang dipakai `js/wallet.js`: tidak ada ID yang hilang.
+
+### Batas verifikasi produksi
+- Migrasi SQL belum dieksekusi pada database Supabase pemilik; tidak tersedia akses/kredensial database atau PostgreSQL client pada lingkungan audit. Fungsi RPC baru perlu dijalankan melalui SQL Editor sesuai urutan dokumentasi.
+- Cashi QRIS/webhook dan settlement belum dapat diuji dengan transaksi nyata tanpa konfigurasi API key dan project Supabase aktif.
+- Bonus video hanya dapat mengukur elemen video HTML5 langsung. Iframe provider eksternal tidak mengekspos status playback yang dapat dipercaya sehingga tidak diberi reward.
+- Fee withdraw dibuat Rp7.000 tetap per pengajuan sesuai asumsi dari instruksi. Konfirmasi nominal fee sebelum produksi bila kebijakan platform berbeda.
+- Tidak dilakukan uji perangkat fisik Android atau deployment live; hasil mobile sudah ditangani secara responsif dan perlu smoke test setelah deploy.

@@ -1,7 +1,7 @@
 # Urutan SQL ProjectVID / BoxCellink
 
 ## Untuk Supabase BARU (belum ada tabel project)
-Jalankan hanya `supabase/PROJECTVID_MASTER.sql` satu kali dari Supabase Dashboard → SQL Editor. File ini sudah menggabungkan urutan instalasi di bawah. Jangan jalankan ulang pada database aktif karena `schema.sql` adalah schema dasar.
+Jalankan `supabase/PROJECTVID_MASTER.sql` satu kali dari Supabase Dashboard → SQL Editor, lalu jalankan langkah 24 dan 25 di bawah untuk modul wallet/affiliate. File master tidak memuat tabel wallet/affiliate tambahan. Jangan jalankan ulang pada database aktif karena `schema.sql` adalah schema dasar.
 
 ## Urutan file individual (jika memasang manual)
 
@@ -51,3 +51,11 @@ Jalankan hanya `supabase/PROJECTVID_MASTER.sql` satu kali dari Supabase Dashboar
 2. Hapus satu review percobaan dan pastikan row `review_items` serta child rows hilang.
 3. Pastikan `cashi_orders` tetap ada dan pending order terkait review berubah menjadi `EXPIRED`.
 4. Tes publikasi, edit, dan hapus dari panel admin; jangan hanya memeriksa pesan sukses di browser.
+
+
+## Modul Wallet & Affiliate (jalankan setelah langkah 23)
+
+24. `supabase/BoxCellink-affiliate-wallet-notifications-FIXED.sql` — tabel dasar saldo, aplikasi affiliate, withdraw, ledger, notifikasi, settlement deposit, dan pembelian saldo deposit.
+25. `supabase/boxcellink_wallet_withdraw_v2.sql` — alamat bertingkat, data bank/e-wallet, fee withdraw Rp7.000, net diterima, status revisi, notifikasi admin, dan bonus Share to Earn video Rp2.
+
+Jangan jalankan langkah 25 sebelum langkah 24. Migrasi ini bersifat additive dan harus diuji pada project Supabase target sebelum dipakai di produksi.
