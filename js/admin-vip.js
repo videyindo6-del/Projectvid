@@ -24,8 +24,8 @@ async function refresh(){
  if(secrets.error)notify('Link undangan tidak dapat dibaca: '+secrets.error.message+' — periksa SQL/RLS vip_group_secrets.');
  const secretMap=new Map((secrets.data||[]).map(x=>[x.group_id,x.telegram_url]));
  $('planList').innerHTML=a.error?`<p class="error">${escV(a.error.message)}</p>`:(a.data||[]).map(x=>`<article class="manager-row"><div><b>${escV(x.name)}</b><small>${x.duration_days} hari · ${money(x.price)} · ${escV(x.status)}</small></div><div><button type="button" data-edit-plan="${x.id}">Edit</button><button type="button" data-del-plan="${x.id}" class="danger">Hapus</button></div></article>`).join('')||'<p>Belum ada paket VIP.</p>';
- $('groupList').innerHTML=b.error?`<p class="error">${escV(b.error.message)}</p>`:(b.data||[]).map(x=>`<article class="manager-row"><div><b>${escV(x.name)}</b><small>${money(x.price)} · ${x.member_count||0} member · ${escV(x.status)} · ${secretMap.has(x.id)?'Link tersimpan':'Link belum diatur'}</small></div><div><button type="button" data-edit-group="${x.id}">Edit</button><button type="button" data-del-group="${x.id}" class="danger">Hapus</button></div></article>`).join('')||'<p>Belum ada group VIP.</p>';
- $('discountList').innerHTML=c.error?`<p class="error">${escV(c.error.message)}</p>`:(c.data||[]).map(x=>`<article class="manager-row"><div><b>${escV(x.code)} · Diskon ${x.discount_percent}%</b><small>${money(x.min_purchase)} minimum · ${x.claimed_count||0}/${x.claim_limit} klaim · ${x.expires_at?'Expired '+new Date(x.expires_at).toLocaleString('id-ID'):'Tanpa batas waktu'}</small></div><div><button type="button" data-edit-discount="${x.id}">Edit</button><button type="button" data-del-discount="${x.id}" class="danger">Hapus</button></div></article>`).join('')||'<p>Belum ada kode diskon.</p>';
+ $('groupList').innerHTML=b.error?`<p class="error">${escV(b.error.message)}</p>`:(b.data||[]).map(x=>`<article class="manager-row"><div><b>${escV(x.name)}</b><small>${money(x.price)} · ${x.member_count||0} member · ${escV(x.status)} · ${secretMap.has(x.id)?'Link: <a href="'+escV(secretMap.get(x.id))+'" target="_blank" rel="noopener">'+escV(secretMap.get(x.id))+'</a>':'Link belum diatur'}</small></div><div><button type="button" data-edit-group="${x.id}">Edit</button><button type="button" data-del-group="${x.id}" class="danger">Hapus</button></div></article>`).join('')||'<p>Belum ada group VIP.</p>';
+ $('discountList').innerHTML=c.error?`<p class="error">${escV(c.error.message)}</p>`:(c.data||[]).map(x=>`<article class="manager-row"><div><b>${escV(x.code)} · Diskon ${x.discount_percent}%</b><small>${({'all':'Semua pembelian','vip_account':'VIP Akun','vip_group':'Group VIP','telegram_review':'Review Telegram'}[x.scope||'all'])} · ${money(x.min_purchase)} minimum · ${x.claimed_count||0}/${x.claim_limit} klaim · ${x.expires_at?'Expired '+new Date(x.expires_at).toLocaleString('id-ID'):'Tanpa batas waktu'}</small></div><div><button type="button" data-edit-discount="${x.id}">Edit</button><button type="button" data-del-discount="${x.id}" class="danger">Hapus</button></div></article>`).join('')||'<p>Belum ada kode diskon.</p>';
  (a.data||[]).forEach(x=>{$(`[data-edit-plan="${x.id}"]`)?.addEventListener('click',()=>openForm('plan',x));$(`[data-del-plan="${x.id}"]`)?.addEventListener('click',()=>remove('vip_plans',x.id,'plan'))});
  (b.data||[]).forEach(x=>{$(`[data-edit-group="${x.id}"]`)?.addEventListener('click',()=>openForm('group',{...x,telegram_url:secretMap.get(x.id)||''}));$(`[data-del-group="${x.id}"]`)?.addEventListener('click',()=>remove('vip_groups',x.id,'group'))});
  (c.data||[]).forEach(x=>{$(`[data-edit-discount="${x.id}"]`)?.addEventListener('click',()=>openForm('discount',x));$(`[data-del-discount="${x.id}"]`)?.addEventListener('click',()=>remove('admin_discount_codes',x.id,'discount'))});
@@ -37,8 +37,8 @@ function openForm(type,x=null){
  $('recordDuration').value=x?.duration_days??1;$('recordPrice').value=x?.price??15000;
  $('groupPrice').value=x?.price??5000;$('groupUrl').value=x?.telegram_url||'';
  $('memberCount').value=x?.member_count??0;$('recordStatus').value=x?.status||'published';
- $('discountCode').value=x?.code||'';$('discountPercent').value=x?.discount_percent??20;
- $('discountMin').value=x?.min_purchase??7000;$('discountLimit').value=x?.claim_limit??2;
+ $('discountCode').value=x?.code||'';$('discountScope').value=x?.scope||'all';$('discountPercent').value=x?.discount_percent??20;
+ $('discountMin').value=x?.min_purchase??2000;$('discountLimit').value=x?.claim_limit??2;
  $('discountExpiry').value=x?.expires_at?new Date(new Date(x.expires_at).getTime()-new Date(x.expires_at).getTimezoneOffset()*60000).toISOString().slice(0,16):'';
  $('planFields').hidden=type!=='plan';$('groupFields').hidden=type!=='group';$('discountFields').hidden=type!=='discount';
  $('descriptionField').hidden=type!=='group';$('statusField').hidden=type==='discount';
@@ -89,11 +89,11 @@ $('managerForm').onsubmit=async e=>{
    if(!payload.name||!Number.isInteger(payload.price)||payload.price<2000||!Number.isInteger(payload.member_count)||payload.member_count<0)throw new Error('Nama, harga, atau jumlah member Group VIP tidak valid.');
   }else{
    table='admin_discount_codes';const cap=Number($('discountLimit').value);
-   if(cap<2||cap>10)throw new Error('Kapasitas klaim harus 2 sampai 10 member.');
-   payload={code:$('discountCode').value.trim().toUpperCase(),discount_percent:Number($('discountPercent').value),min_purchase:Number($('discountMin').value),claim_limit:cap,expires_at:$('discountExpiry').value?new Date($('discountExpiry').value).toISOString():null};
+   if(cap<1||cap>10000)throw new Error('Kapasitas klaim harus 1 sampai 10.000 member.');
+   payload={code:$('discountCode').value.trim().toUpperCase(),scope:$('discountScope').value,discount_percent:Number($('discountPercent').value),min_purchase:Number($('discountMin').value),claim_limit:cap,expires_at:$('discountExpiry').value?new Date($('discountExpiry').value).toISOString():null};
    if(!/^[A-Z0-9_-]{3,32}$/.test(payload.code))throw new Error('Kode diskon harus 3–32 karakter (huruf, angka, - atau _).');
-   if(payload.discount_percent<10||payload.discount_percent>75)throw new Error('Diskon harus 10–75%.');
-   if(!Number.isFinite(payload.min_purchase)||payload.min_purchase<7000)throw new Error('Minimal pembelian paling sedikit Rp7.000.');
+   if(payload.discount_percent<1||payload.discount_percent>75)throw new Error('Diskon harus 10–75%.');
+   if(!Number.isFinite(payload.min_purchase)||payload.min_purchase<2000)throw new Error('Minimal pembelian paling sedikit Rp2.000.');
   }
   let result;
   if(type==='group'){

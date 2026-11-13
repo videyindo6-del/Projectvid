@@ -29,9 +29,9 @@ async function loadGroups(){
  root.innerHTML=(data||[]).map(card).join('')||`<div class="vip-empty">${tr('empty')}</div>`;
  root.querySelectorAll('[data-group]').forEach(b=>b.addEventListener('click',()=>show((data||[]).find(g=>g.id===b.dataset.group))));
 }
-function show(g){
- if(!g)return;selected=g;
- document.getElementById('groupDetail').innerHTML=`<h2 id="groupModalTitle">${esc(g.name)}</h2><p>${esc(g.description||tr('description'))}</p><div class="vip-modal-price">${rp(g.price)}</div><ul><li>${tr('modal1')}</li><li>${tr('modal2')}</li><li>${tr('modal3')}</li></ul>`;
+async function show(g){
+ if(!g)return;selected=g;let coupons=[];const {data:{user}}=await sb.auth.getUser();if(user){const r=await sb.from('admin_discount_claims').select('used_at,admin_discount_codes(code,scope,discount_percent,expires_at)').eq('user_id',user.id);coupons=(r.data||[]).filter(x=>!x.used_at&&x.admin_discount_codes&&['all','vip_group'].includes(x.admin_discount_codes.scope||'all')&&(!x.admin_discount_codes.expires_at||new Date(x.admin_discount_codes.expires_at)>new Date())).map(x=>x.admin_discount_codes)}
+ document.getElementById('groupDetail').innerHTML=`<h2 id="groupModalTitle">${esc(g.name)}</h2><p>${esc(g.description||tr('description'))}</p><div class="vip-modal-price">${rp(g.price)}</div><label style="display:grid;gap:7px;margin:14px 0;font-weight:700;font-size:13px">Kode diskon yang sudah di-claim<select id="groupCoupon" style="padding:11px;border:1px solid #dbe4ef;border-radius:10px"><option value="">Tanpa kode diskon</option>${coupons.map(c=>`<option value="${esc(c.code)}">${esc(c.code)} · ${Number(c.discount_percent)}%</option>`).join('')}</select></label><ul><li>${tr('modal1')}</li><li>${tr('modal2')}</li><li>${tr('modal3')}</li></ul>`;
  document.getElementById('groupPay').hidden=false;document.getElementById('groupJoin').hidden=true;modal.hidden=false;
 }
 async function pay(){
@@ -41,7 +41,8 @@ async function pay(){
   if(!user){location.href='/login.html?next='+encodeURIComponent('/vip-groups.html');return}
   const {data:owned,error:ownedError}=await sb.from('vip_group_entitlements').select('id').eq('user_id',user.id).eq('group_id',selected.id).maybeSingle();
   if(ownedError)throw ownedError;if(owned)throw new Error(tr('owned'));
-  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip_group',group_id:selected.id}});
+  const coupon=document.getElementById('groupCoupon')?.value||'';
+  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip_group',group_id:selected.id,coupon_code:coupon||undefined}});
   if(error)throw error;if(!data?.checkout_url)throw new Error(data?.error||tr('failed'));
   sessionStorage.setItem('boxcellink_pending_group_order',data.order_id||'');location.href=data.checkout_url;
  }catch(e){alert(e.message||tr('failed'))}

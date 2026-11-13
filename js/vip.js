@@ -27,7 +27,7 @@ const t=k=>text[lang()][k]||text.id[k]||k;
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
 const date=v=>v?new Intl.DateTimeFormat(lang()==='en'?'en-US':'id-ID',{dateStyle:'long',timeStyle:'short',timeZone:'Asia/Jakarta'}).format(new Date(v)):'—';
-let currentUser=null,pollToken=0;
+let currentUser=null,pollToken=0,vipCoupons=[];
 function notice(title,message,type='success'){
  const box=$('vipNotice');if(!box)return;
  box.hidden=false;box.className='vip-notice '+(type==='error'?'is-error':'is-success');
@@ -80,11 +80,12 @@ function renderPlans(plans){
   <div class="plan-price">${safe(money(v.price))}</div>
   <p class="plan-duration"><i class="fa-regular fa-calendar"></i> ${Number(v.duration_days)||0} ${safe(t('days'))}</p>
   <ul><li><i class="fa-solid fa-check"></i> ${safe(t('vipContent'))}</li><li><i class="fa-solid fa-check"></i> ${safe(t('discount'))}</li><li><i class="fa-solid fa-check"></i> ${safe(t('manage'))}</li></ul>
-  <button class="btn primary vip-buy-button" type="button" data-buy-plan="${safe(v.id)}"><i class="fa-solid fa-lock"></i> ${safe(t('buy'))}</button>
+  <label class="vip-coupon-field" style="display:grid;gap:6px;margin:12px 0;font-size:12px;font-weight:700">Kode diskon yang sudah di-claim<select data-vip-coupon="${safe(v.id)}" style="padding:10px;border:1px solid #dbe4ef;border-radius:10px;background:#fff"><option value="">Tanpa kode diskon</option>${vipCoupons.filter(c=>['all','vip_account'].includes(c.scope||'all')).map(c=>`<option value="${safe(c.code)}">${safe(c.code)} · ${Number(c.discount_percent)}%</option>`).join('')}</select></label><button class="btn primary vip-buy-button" type="button" data-buy-plan="${safe(v.id)}"><i class="fa-solid fa-lock"></i> ${safe(t('buy'))}</button>
  </article>`}).join('')||`<div class="empty-state">${safe(t('noPlans'))}</div>`;
  plansBox.querySelectorAll('[data-buy-plan]').forEach(button=>button.addEventListener('click',()=>buyVip(button.dataset.buyPlan,button)));
 }
 async function loadPlans(){
+ if(currentUser){const {data}=await sb.from('admin_discount_claims').select('used_at,admin_discount_codes(code,scope,discount_percent,expires_at)').eq('user_id',currentUser.id);vipCoupons=(data||[]).filter(x=>!x.used_at&&x.admin_discount_codes&&(!x.admin_discount_codes.expires_at||new Date(x.admin_discount_codes.expires_at)>new Date())).map(x=>x.admin_discount_codes)}
  plansBox.innerHTML=`<div class="empty-state"><i class="fa-solid fa-circle-notch fa-spin"></i> ${safe(t('loadingPlans'))}</div>`;
  const {data,error}=await sb.from('vip_plans').select('id,name,duration_days,price').eq('status','published').order('price');
  if(error)throw error;renderPlans(data||[]);
@@ -93,7 +94,8 @@ async function buyVip(id,button){
  if(!currentUser){notice(t('signIn'),t('loginFirst'),'error');return}
  const old=button?.innerHTML;if(button){button.disabled=true;button.innerHTML=`<i class="fa-solid fa-circle-notch fa-spin"></i> ${safe(t('processing'))}`}
  try{
-  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip',plan_id:id}});
+  const coupon=document.querySelector(`[data-vip-coupon="${CSS.escape(String(id))}"]`)?.value||'';
+  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip',plan_id:id,coupon_code:coupon||undefined}});
   if(error)throw error;if(!data?.checkout_url||!data?.order_id)throw new Error(data?.error||t('checkoutError'));
   const plan=(window.__vipPlans||[]).find(x=>String(x.id)===String(id));
   localStorage.setItem('boxcellink_pending_vip',JSON.stringify({order_id:data.order_id,user_id:currentUser.id,plan_name:plan?.name||'',amount:data.amount,qr_url:data.qrUrl||null,checkout_url:data.checkout_url||null,expires_at:data.expires_at||null,created_at:new Date().toISOString()}));
@@ -134,6 +136,7 @@ async function init(){
   statusBox.innerHTML=`<span class="vip-status-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> ${safe(t('loading'))}</span>`;
   const {data:{user},error}=await sb.auth.getUser();if(error)throw error;currentUser=user||null;
   await refreshMembership();
+  if(currentUser){const {data:claims,error:claimError}=await sb.from('admin_discount_claims').select('used_at,admin_discount_codes(code,scope,discount_percent,expires_at)').eq('user_id',currentUser.id);if(claimError)console.warn('VIP discount list:',claimError.message);vipCoupons=(claims||[]).filter(x=>!x.used_at&&x.admin_discount_codes&&(!x.admin_discount_codes.expires_at||new Date(x.admin_discount_codes.expires_at)>new Date())).map(x=>x.admin_discount_codes)}
   const {data:plans,error:planError}=await sb.from('vip_plans').select('id,name,duration_days,price').eq('status','published').order('price');
   if(planError)throw planError;
   window.__vipPlans=plans||[];renderPlans(window.__vipPlans);

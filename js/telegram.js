@@ -23,23 +23,20 @@
   const money = v => 'Rp ' + Number(v || 0).toLocaleString('id-ID');
 
   function thumbnailSource(value) {
-    let raw = String(value ?? '').trim(); if (!raw) return '';
-    const iframe = raw.match(/<iframe[^>]+src=["']([^"']+)/i); if (iframe) raw = iframe[1];
-    try {
-      const u = new URL(raw, location.origin); if (!['http:','https:'].includes(u.protocol)) return '';
-      const driveId = u.pathname.match(/\/file\/d\/([^/]+)/)?.[1] || u.searchParams.get('id');
-      if (u.hostname.includes('drive.google.com') && driveId) return `https://drive.google.com/thumbnail?id=${encodeURIComponent(driveId)}&sz=w1200`;
-      if (u.hostname.includes('youtube.com') || u.hostname === 'youtu.be') {
-        const id = u.hostname === 'youtu.be' ? u.pathname.split('/').filter(Boolean)[0] : (u.searchParams.get('v') || u.pathname.match(/\/embed\/([^/]+)/)?.[1]);
-        if (id) return `https://i.ytimg.com/vi/${encodeURIComponent(id)}/maxresdefault.jpg`;
-      }
-      if (u.hostname.includes('dropbox.com')) { u.searchParams.set('raw','1'); return u.href; }
-      return u.href;
-    } catch { return ''; }
+    const info = window.ProjectVIDEmbed?.parse(value);
+    if (info?.thumbnail) return info.thumbnail;
+    if (!info) return '';
+    if (info.type === 'image') return info.src;
+    if (info.provider === 'YouTube') {
+      const id = info.src.match(/youtube-nocookie\.com\/embed\/([^?]+)/)?.[1];
+      return id ? `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg` : '';
+    }
+    return '';
   }
+
   function reviewThumbnail(item) {
     const gallery = Array.isArray(item.gallery_urls) ? item.gallery_urls : [];
-    for (const candidate of [item.thumbnail_url, ...gallery.map(x => typeof x === 'string' ? x : (x?.url || x?.src || x?.embed_url || x?.thumbnail_url))]) {
+    for (const candidate of [item.thumbnail_url, item.review_embed_url, ...gallery.map(x => typeof x === 'string' ? x : (x?.url || x?.src || x?.embed_url || x?.thumbnail_url))]) {
       const src = thumbnailSource(candidate); if (src) return src;
     }
     return '';
@@ -146,7 +143,7 @@
     grid.innerHTML=`<div class="telegram-loading"><span class="telegram-spinner"></span>${isEN()?'Loading published reviews…':'Memuat review yang dipublikasikan…'}</div>`;
     try {
       const [reviewsResult,categoriesResult] = await Promise.all([
-        sb.from('review_items').select('id,slug,title,description,thumbnail_url,gallery_urls,price,access,category_id,view_count,created_at').eq('status','published').order('created_at',{ascending:false}),
+        sb.from('review_items').select('id,slug,title,description,review_embed_url,thumbnail_url,gallery_urls,price,access,category_id,view_count,created_at').eq('status','published').order('created_at',{ascending:false}),
         sb.from('categories').select('id,name,status').eq('status','published').order('name')
       ]);
       if (reviewsResult.error) throw reviewsResult.error;

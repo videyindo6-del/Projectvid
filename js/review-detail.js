@@ -120,128 +120,14 @@ function containsExternalLink(value) { return /(?:https?:\/\/|www\.)/i.test(Stri
 // =====================================================
 
 function extractEmbedSource(value) {
-  let raw = String(value ?? '').trim();
-  if (!raw) return '';
-
-  // Jika database menyimpan kode iframe HTML.
-  if (/<iframe[\s>]/i.test(raw)) {
-    try {
-      const doc = new DOMParser().parseFromString(raw, 'text/html');
-      raw = doc.querySelector('iframe')?.getAttribute('src') || '';
-    } catch {
-      return '';
-    }
-  }
-
-  // Tolak javascript:, data:, dan URL berbahaya.
-  try {
-    const parsed = new URL(raw, location.origin);
-    if (!['http:', 'https:'].includes(parsed.protocol)) return '';
-    return parsed.href;
-  } catch {
-    return '';
-  }
+  return window.ProjectVIDEmbed?.extract(value) || '';
 }
-
-function getDriveId(url) {
-  const raw = extractEmbedSource(url);
-  if (!raw) return '';
-
-  try {
-    const u = new URL(raw);
-    if (!/(^|\.)drive\.google\.com$/i.test(u.hostname)) return '';
-
-    const patterns = [
-      /\/file\/d\/([^/]+)/i,
-      /\/document\/d\/([^/]+)/i,
-      /\/spreadsheets\/d\/([^/]+)/i,
-      /\/presentation\/d\/([^/]+)/i
-    ];
-
-    for (const pattern of patterns) {
-      const match = u.pathname.match(pattern);
-      if (match) return match[1];
-    }
-
-    return u.searchParams.get('id') || '';
-  } catch {
-    return '';
-  }
+function getDriveId(value) {
+  const info=window.ProjectVIDEmbed?.parse(value);
+  return info?.provider==='Google Drive'?(info.src.match(/\/file\/d\/([^/]+)/)?.[1]||''):'';
 }
-
 function getEmbedInfo(value) {
-  const raw = extractEmbedSource(value);
-  if (!raw) return null;
-
-  const driveId = getDriveId(raw);
-
-  if (driveId) {
-    return {
-      type: 'iframe',
-      src: `https://drive.google.com/file/d/${encodeURIComponent(driveId)}/preview`,
-      original: raw,
-      isDrive: true
-    };
-  }
-
-  try {
-    const u = new URL(raw);
-    const host = u.hostname.toLowerCase();
-
-    // URL embed yang memang sudah berupa iframe.
-    if (
-      host === 'drive.google.com' ||
-      host === 'docs.google.com'
-    ) {
-      return {
-        type: 'iframe',
-        src: raw,
-        original: raw,
-        isDrive: true
-      };
-    }
-
-    // Direct video/audio assets should use native media controls, not an image tag.
-    if (/\.(mp4|webm|ogv)(?:$|\?)/i.test(u.pathname + u.search)) {
-      return { type: 'video', src: raw, original: raw, isDrive: false };
-    }
-    if (/\.(mp3|m4a|ogg|wav)(?:$|\?)/i.test(u.pathname + u.search)) {
-      return { type: 'audio', src: raw, original: raw, isDrive: false };
-    }
-
-    // Embed video YouTube.
-    if (host.includes('youtube.com') || host === 'youtu.be') {
-      let id = '';
-
-      if (host === 'youtu.be') {
-        id = u.pathname.split('/').filter(Boolean)[0] || '';
-      } else {
-        id = u.searchParams.get('v') || '';
-        if (!id) {
-          const match = u.pathname.match(/\/embed\/([^/]+)/);
-          if (match) id = match[1];
-        }
-      }
-
-      if (id) {
-        return {
-          type: 'iframe',
-          src: `https://www.youtube.com/embed/${encodeURIComponent(id)}`,
-          original: raw,
-          isDrive: false
-        };
-      }
-    }
-
-    return {
-      type: 'image',
-      src: raw,
-      original: raw,
-      isDrive: false
-    };
-  } catch {
-    return null;
-  }
+  return window.ProjectVIDEmbed?.parse(value) || null;
 }
 
 function normalizeGalleryItem(item) {
@@ -337,6 +223,12 @@ function renderGallery(items, title) {
       <article class="review-gallery-item review-gallery-audio">
         <div class="media-item-head"><span class="media-index">MEDIA ${String(index + 1).padStart(2, '0')}</span><span>${esc(title)}</span></div>
         <audio src="${esc(info.src)}" controls preload="metadata"></audio>
+      </article>`;
+    if (info.type === 'link') return `
+      <article class="review-gallery-item review-gallery-error">
+        <div class="media-item-head"><span class="media-index">MEDIA ${String(index + 1).padStart(2, '0')}</span><span>${esc(info.provider)}</span></div>
+        <p>${reviewText('Provider ini memerlukan kode embed resmi.','This provider requires its official embed code.')}</p>
+        <a class="review-open-original" href="${esc(info.src)}" target="_blank" rel="noopener noreferrer">${reviewText('Buka sumber asli','Open original source')} ↗</a>
       </article>`;
     if (info.type === 'iframe') return `
       <article class="review-gallery-item review-gallery-embed">
@@ -644,8 +536,7 @@ async function load() {
 
     const extra = await getReviewExtra(v.id);
     const galleryImages = normalizeGallery(extra?.gallery_urls);
-    if (!galleryImages.length && v.review_embed_url) galleryImages.push(v.review_embed_url);
-    if (!galleryImages.length && v.thumbnail_url) galleryImages.push(v.thumbnail_url);
+    if (v.review_embed_url && !galleryImages.includes(v.review_embed_url)) galleryImages.unshift(v.review_embed_url);
     if (v.thumbnail_url && !galleryImages.includes(v.thumbnail_url)) galleryImages.unshift(v.thumbnail_url);
     v.view_count = Number(extra?.view_count || 0);
     const stats = await getPublicReviewStats(v.id);
@@ -675,7 +566,7 @@ async function load() {
             <div><i class="fa-regular fa-comments"></i><span><b>${totalComments.toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</b><small>Total komentar</small></span></div>
             <div><i class="fa-regular fa-calendar"></i><span><b>${v.created_at ? new Date(v.created_at).toLocaleDateString(reviewEN() ? 'en-US' : 'id-ID') : '-'}</b><small>Published</small></span></div>
           </div>
-          <div class="purchase-strip"><div><small>${v.access === 'paid' ? 'HARGA AKSES' : 'AKSES KONTEN'}</small><strong>${v.access === 'paid' ? rp(v.price) : 'Gratis'}</strong><span class="purchase-note">Pembayaran dan akses diproses melalui BoxCellink.</span></div><a class="btn primary purchase-btn" href="/d/${encodeURIComponent(reviewSlug)}"><i class="fa-solid fa-download"></i> ${esc(downloadLabel)}</a></div>
+          <div class="purchase-strip"><div><small>${v.access === 'paid' ? 'HARGA AKSES' : 'AKSES KONTEN'}</small><strong>${v.access === 'paid' ? rp(v.price) : 'Gratis'}</strong><span class="purchase-note">${reviewText('Link postingan asli Telegram dibuka setelah akses gratis atau pembayaran terverifikasi.','The original Telegram post link is revealed after free access or verified payment.')}</span></div><a class="btn primary purchase-btn" href="/d/${encodeURIComponent(reviewSlug)}"><i class="fa-solid fa-download"></i> ${esc(downloadLabel)}</a></div>
         </section>
         <section class="social-panel" id="reviewSocial"><div class="social-title"><div><span class="review-kicker">COMMUNITY</span><h2>Bagikan pengalamanmu</h2></div><span class="social-subtitle">Bantu pengguna lain menemukan konten menarik.</span></div>
           <div class="social-actions"><button type="button" id="reviewLike" class="social-action"><i class="fa-regular fa-heart"></i><span>Suka</span><b id="reviewLikeCount">${totalLikes}</b></button><button type="button" id="reviewCommentJump" class="social-action"><i class="fa-regular fa-comment"></i><span>Komentar</span></button><button type="button" id="reviewShare" class="social-action"><i class="fa-solid fa-share-nodes"></i><span>Bagikan</span></button></div>
@@ -719,9 +610,7 @@ async function loadMore(id) {
     target.innerHTML = rows.map(x => {
       const thumbnail = x.thumbnail_url ? getEmbedInfo(x.thumbnail_url) : null;
       const thumbUrl = thumbnail
-        ? thumbnail.isDrive
-          ? (() => { const driveId = getDriveId(x.thumbnail_url); return driveId ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(driveId)}&sz=w600` : ''; })()
-          : thumbnail.type === 'image' ? thumbnail.src : ''
+        ? (thumbnail.thumbnail || (thumbnail.type === 'image' ? thumbnail.src : ''))
         : '';
       return `
         <a class="video-card premium-related-card" href="/r/${encodeURIComponent(x.slug || '')}">

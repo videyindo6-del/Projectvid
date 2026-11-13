@@ -32,10 +32,10 @@ async function init(){
   const [profileRes,couponRes,claimRes]=await Promise.all([
    sb.from('profiles').select('vip_expires_at').eq('id',user.id).maybeSingle(),
    guestCheckout?Promise.resolve({data:[]}):sb.from('discount_coupons').select('code,discount_percent,uses_total,uses_used,uses_reserved').eq('user_id',user.id),
-   guestCheckout?Promise.resolve({data:[]}):sb.from('admin_discount_claims').select('used_at,admin_discount_codes(code,discount_percent,min_purchase,expires_at)').eq('user_id',user.id)
+   guestCheckout?Promise.resolve({data:[]}):sb.from('admin_discount_claims').select('used_at,admin_discount_codes(code,scope,discount_percent,min_purchase,expires_at)').eq('user_id',user.id)
   ]);
   vipActive=!guestCheckout&&!!profileRes.data?.vip_expires_at&&new Date(profileRes.data.vip_expires_at)>new Date();
-  couponOptions=guestCheckout?[]:(couponRes.data||[]).filter(c=>(c.uses_used||0)+(c.uses_reserved||0)<c.uses_total).concat((claimRes.data||[]).filter(x=>!x.used_at&&x.admin_discount_codes&&(!x.admin_discount_codes.expires_at||new Date(x.admin_discount_codes.expires_at)>new Date())).map(x=>({...x.admin_discount_codes,source:'admin'})));
+  couponOptions=guestCheckout?[]:(couponRes.data||[]).filter(c=>(c.uses_used||0)+(c.uses_reserved||0)<c.uses_total).concat((claimRes.data||[]).filter(x=>!x.used_at&&x.admin_discount_codes&&['all','telegram_review'].includes(x.admin_discount_codes.scope||'all')&&(!x.admin_discount_codes.expires_at||new Date(x.admin_discount_codes.expires_at)>new Date())).map(x=>({...x.admin_discount_codes,source:'admin'})));
   renderCheckout();
  }catch(e){root.innerHTML=`<div class="checkout-error"><i class="fa-solid fa-circle-exclamation"></i><h2>Gagal menyiapkan pembelian</h2><p>${esc(e.message||'Terjadi kesalahan.')}</p><button class="checkout-button" id="retryCheckout">Coba lagi</button></div>`;document.getElementById('retryCheckout')?.addEventListener('click',init)}
 }
