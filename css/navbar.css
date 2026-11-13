@@ -48,3 +48,19 @@
 .bc-menu .bc-submenu:not([hidden]){display:grid;gap:1px;margin:1px 0 6px 17px;padding:3px 0 3px 12px;visibility:visible}
 .bc-menu .bc-submenu:not([hidden]) a{min-height:34px;padding-top:5px;padding-bottom:5px;border-radius:8px}
 .bc-menu .bc-submenu-toggle[aria-expanded="false"]+.bc-submenu[hidden]{pointer-events:none}
+
+/* Wallet-centred premium navigation */
+.bc-nav-inner{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px}
+.bc-nav-left{justify-self:start;min-width:0}
+.bc-brand-centered{grid-column:2;justify-self:center}
+.bc-nav-actions{grid-column:3;justify-self:end}
+.bc-wallet-pill{display:flex;align-items:center;gap:8px;max-width:100%;padding:7px 10px;border:1px solid var(--line,#dce5ef);border-radius:14px;background:var(--surface,#fff);color:var(--text,#172b45);text-decoration:none;box-shadow:0 5px 18px #102b4909}
+.bc-wallet-icon{display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:#eaf3ff;color:#2867a7;flex:none}
+.bc-wallet-values{display:grid;gap:1px;min-width:0}.bc-wallet-values b{font-size:11px;white-space:nowrap}.bc-wallet-values small{font-size:9px;color:var(--muted,#73849a)}
+.bc-wallet-divider{height:24px;width:1px;background:var(--line,#dce5ef)}.bc-wallet-shortcuts{display:grid;gap:4px;color:#27845d;font-size:9px}.bc-wallet-shortcuts i:last-child{color:#b54708}
+.bc-notification-wrap{position:relative}.bc-notification-count{position:absolute;right:-3px;top:-3px;min-width:17px;height:17px;padding:0 4px;border-radius:20px;background:#d92d20;color:#fff;font-size:10px;line-height:17px;text-align:center;font-weight:800}
+.bc-notification-dropdown{position:absolute;right:0;top:calc(100% + 12px);width:min(360px,calc(100vw - 24px));max-height:420px;overflow:auto;z-index:120;background:var(--surface,#fff);border:1px solid var(--line,#dce5ef);border-radius:16px;box-shadow:0 18px 48px #102b4926;padding:12px;animation:bcDrop .18s ease-out}
+.bc-notification-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 10px;border-bottom:1px solid var(--line,#e5ebf2);font-size:13px}.bc-notification-head a{font-size:11px;color:var(--accent,#2867a7);text-decoration:none}
+.bc-notification-item{display:grid;gap:4px;padding:11px 8px;border-bottom:1px solid var(--line,#edf1f5);text-decoration:none;color:inherit}.bc-notification-item:last-child{border:0}.bc-notification-item b{font-size:12px}.bc-notification-item span{font-size:11px;color:var(--muted,#718096);line-height:1.45}.bc-notification-item.unread{background:color-mix(in srgb,#3478bd 7%,transparent);border-radius:9px}
+@keyframes bcDrop{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:620px){.bc-nav-inner{gap:5px}.bc-wallet-pill{gap:5px;padding:5px 6px}.bc-wallet-icon{width:25px;height:25px}.bc-wallet-values b{font-size:9px}.bc-wallet-values small{font-size:8px}.bc-wallet-divider{height:19px}.bc-wallet-shortcuts{display:none}.bc-brand-centered{font-size:12px}.bc-nav-actions{gap:5px}}
