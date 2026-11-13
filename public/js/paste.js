@@ -71,6 +71,10 @@ async function run() {
       throw new Error('Link download dari admin tidak valid. Periksa kembali pengaturan link di panel admin.');
     }
 
+    const destinationHost = downloadUrl.hostname.toLowerCase();
+    const isTelegramDestination = destinationHost === 't.me' || destinationHost.endsWith('.t.me') || destinationHost === 'telegram.me' || destinationHost.endsWith('.telegram.me');
+    const destinationTitle = isTelegramDestination ? 'LINK MEDIA ASLI TELEGRAM' : 'LINK AKSES / DOWNLOAD DARI PANEL ADMIN';
+    const destinationButton = isTelegramDestination ? 'Buka Media di Telegram' : 'Buka Link Sekarang';
     const accessLabel = data.is_admin
       ? 'AKSES ADMIN TERVERIFIKASI'
       : (String(item.access || '').trim().toLowerCase() === 'free' ? 'FREE ACCESS' : 'AKSES PEMBELIAN TERVERIFIKASI');
@@ -86,11 +90,11 @@ async function run() {
       <p>${accessMessage}</p>
       ${data.content_after_payment ? `<div class="watch-card"><p>${esc(data.content_after_payment)}</p></div>` : ''}
       <div class="paste-download-link" style="margin:18px 0;padding:16px;border:1px solid var(--border-color,#dbe2ea);border-radius:14px;background:var(--card-bg,#fff)">
-        <div style="font-size:12px;font-weight:700;letter-spacing:.06em;opacity:.7;margin-bottom:8px">LINK DOWNLOAD DARI PANEL ADMIN</div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:.06em;opacity:.7;margin-bottom:8px">${destinationTitle}</div>
         <a id="pasteDownloadUrl" href="${esc(downloadUrl.href)}" target="_blank" rel="noopener noreferrer" style="display:block;overflow-wrap:anywhere;word-break:break-word;margin-bottom:12px">${esc(downloadUrl.href)}</a>
         <button class="btn" type="button" id="copyPasteDownloadUrl">Salin Link</button>
       </div>
-      <a class="btn primary" href="${esc(downloadUrl.href)}" target="_blank" rel="noopener noreferrer">Download Sekarang</a>`;
+      <a class="btn primary" href="${esc(downloadUrl.href)}" target="_blank" rel="noopener noreferrer">${destinationButton}</a>`;
 
     document.getElementById('copyPasteDownloadUrl')?.addEventListener('click', async () => {
       const button = document.getElementById('copyPasteDownloadUrl');
