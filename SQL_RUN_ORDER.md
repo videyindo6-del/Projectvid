@@ -59,3 +59,13 @@ Jalankan `supabase/PROJECTVID_MASTER.sql` satu kali dari Supabase Dashboard → 
 25. `supabase/boxcellink_wallet_withdraw_v2.sql` — alamat bertingkat, data bank/e-wallet, fee withdraw Rp7.000, net diterima, status revisi, notifikasi admin, dan bonus Share to Earn video Rp2.
 
 Jangan jalankan langkah 25 sebelum langkah 24. Migrasi ini bersifat additive dan harus diuji pada project Supabase target sebelum dipakai di produksi.
+
+
+## Referral saldo deposit
+
+Setelah tabel `wallet_ledger`, `profiles`, dan `boxcellink_notifications` tersedia, jalankan `supabase/referral_deposit_reward_v1.sql` satu kali. Migration ini memberi Rp1.000 ke saldo deposit untuk setiap akun referral (termasuk backfill referral lama yang belum pernah mendapat hadiah), mencatat ledger dan membuat notifikasi. Unique index mencegah reward ganda.
+
+
+## Pemisahan kategori konten
+
+Jalankan `supabase/content_category_types_v1.sql` setelah schema kategori dan tabel `review_items` tersedia. Migration ini memisahkan namespace kategori Box Video dan Media Telegram serta memindahkan relasi kategori review ke salinan kategori Media Telegram. Setelah itu kategori baru dibuat di panel Admin → Kategori dengan memilih jenis kontennya.

@@ -105,3 +105,37 @@ Jangan menyatakan semua fungsi produksi telah teruji hanya dari pemeriksaan stat
 - Run one low-value test payment for each flow and verify `cashi_orders.status = 'SETTLED'` plus the corresponding wallet/VIP/review entitlement.
 
 Live payment and webhook delivery still require deployment and merchant credentials; they cannot be proven by local static tests.
+
+## UI, kategori terpisah, dan referral deposit — 2026-11-14
+
+### Perubahan source
+1. Navbar disusun ulang agar wordmark BoxCellink berada dekat saldo, bayangan navbar dibuat lebih ringan, dropdown notifikasi dibatasi terhadap viewport Android, dan menu member diberi pemisah bagian Dashboard, Media, Akun/Notifikasi/Saldo, serta VIP/Referral.
+2. Media Telegram kini memiliki submenu kategori di drawer bersama Box Video; submenu menampilkan jumlah konten per kategori.
+3. Form Wallet dirapikan menjadi grid responsif tiga kolom pada desktop, dua kolom pada tablet, dan satu kolom pada layar sempit. Nama lengkap, WhatsApp, dan jenis rekening disatukan dalam satu baris desktop. Tombol dan ringkasan withdraw diberi treatment konsisten. Anchor `#payoutForm` ditambahkan untuk tautan kelola rekening.
+4. Panel keuntungan VIP dirapikan menjadi empat kartu sejajar pada desktop dan dua kolom pada ponsel; panel ketentuan diskon dibuat lebih kecil dengan aksen merah.
+5. Halaman notifikasi diberi tampilan responsif dan pengumuman resmi dari tabel `announcements` ditampilkan di bagian paling atas bersama pengumuman yang dikirim sebagai notifikasi.
+6. Halaman utama mendapat copy hero baru, ticker ajakan VIP/affiliate, rail Box Video dan Media Telegram yang dapat digeser, serta ajakan referral.
+7. Dashboard member menampilkan ticker yang mengambil teks dari pengumuman admin yang sama dengan panel pengumuman.
+8. Kategori Box Video dan Media Telegram dipisahkan melalui kolom `categories.content_type`. Form admin masing-masing konten dapat membuat kategori sesuai tipe kontennya.
+9. Program referral menampilkan hadiah saldo deposit Rp1.000 per akun referral yang berhasil teratribusi. Migration mencatat hadiah ke `wallet_ledger`, menambah `profiles.deposit_balance`, membuat notifikasi, dan memakai unique index untuk mencegah pemberian ganda. Referral lama di-backfill satu kali.
+
+### Migration tambahan
+- `supabase/content_category_types_v1.sql`
+- `supabase/referral_deposit_reward_v1.sql`
+
+Jalankan migration ini pada project Supabase aktif setelah tabel terkait tersedia. Jangan menjalankan migration secara buta pada database produksi; backup dahulu dan periksa histori migration.
+
+### Pemeriksaan lokal
+- `npm run build`: berhasil; 34 halaman HTML disalin ke `public/`.
+- `node --check` untuk seluruh JavaScript source: lulus.
+- HTML parser untuk seluruh halaman root: lulus.
+- Pemeriksaan kurung kurawal seluruh stylesheet: lulus.
+- Pemeriksaan referensi asset lokal dari halaman HTML: tidak ditemukan asset yang hilang.
+- Source/build parity untuk `css/`, `js/`, dan `components/`: sama setelah build.
+
+### Belum dapat diverifikasi tanpa project Supabase / perangkat live
+- Migration SQL belum dieksekusi ke database pengguna; fungsi referral dan pemisahan kategori baru aktif setelah migration dijalankan.
+- Cashi, webhook, settlement, saldo, dan CRUD admin tidak dapat diuji terhadap merchant/database nyata dari arsip lokal.
+- Link komunitas Telegram resmi masih membutuhkan konfigurasi URL yang benar di `js/config.js`; kontrol pengaturan link dari panel admin belum ditambahkan.
+- Pengumuman admin untuk dashboard dan halaman notifikasi membaca tabel `announcements`; pengumuman personal tetap membaca `boxcellink_notifications`.
+- Belum dilakukan uji browser fisik Android atau deployment Cloudflare Pages.

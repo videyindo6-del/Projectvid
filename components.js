@@ -109,20 +109,30 @@ async function initNavbar(){
  // top-level navigation destination. Public categories are safe for guests too.
  if(window.sb?.from){
    try{
-     const {data:cats,error}=await window.sb.from('categories').select('id,name').eq('status','published').order('name');
-     if(!error){
+     const [{data:cats,error:catError},{data:reviews,error:reviewError},{data:videos,error:videoError}]=await Promise.all([
+       window.sb.from('categories').select('id,name,content_type').eq('status','published').order('name'),
+       window.sb.from('review_items').select('category_id').eq('status','published'),
+       window.sb.from('videos').select('category_id').eq('status','published')
+     ]);
+     if(!catError){
+       const counts=(rows)=>{const m=new Map();(rows||[]).forEach(r=>{if(r.category_id)m.set(r.category_id,(m.get(r.category_id)||0)+1)});return m};
+       const reviewCounts=counts(reviewError?[]:reviews),videoCounts=counts(videoError?[]:videos);
        document.querySelectorAll('.bc-submenu[id^="boxCategorySubmenu"]').forEach(target=>{
-         target.innerHTML='<a href="/index.html">Semua BoxVidey</a>'+(cats||[]).map(c=>`<a href="/index.html?category=${encodeURIComponent(c.id)}">${esc(c.name)}</a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>';
+         target.innerHTML='<a href="/index.html#boxvideySection">Semua Box Video</a>'+(cats||[]).filter(c=>!c.content_type||c.content_type==='box_video').map(c=>`<a href="/index.html?category=${encodeURIComponent(c.id)}">${esc(c.name)} <small>(${videoCounts.get(c.id)||0})</small></a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>';
+       });
+       document.querySelectorAll('.bc-submenu[id^="telegramCategorySubmenu"]').forEach(target=>{
+         target.innerHTML='<a href="/telegram.html">Semua Media Telegram</a>'+(cats||[]).filter(c=>c.content_type==='media_telegram').map(c=>`<a href="/telegram.html?category=${encodeURIComponent(c.id)}">${esc(c.name)} <small>(${reviewCounts.get(c.id)||0})</small></a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>';
        });
      }
-   }catch(e){console.warn('BoxVidey categories unavailable:',e);}
+   }catch(e){console.warn('Navigation categories unavailable:',e);}
  }
- document.querySelectorAll('.bc-submenu-toggle[id^="boxMenuToggle"]').forEach(boxToggle=>{
-   const boxSub=document.getElementById(boxToggle.getAttribute('aria-controls'));
-   boxToggle.addEventListener('click',()=>{
-     const expanded=boxToggle.getAttribute('aria-expanded')==='true';
-     boxToggle.setAttribute('aria-expanded',String(!expanded));
-     if(boxSub)boxSub.hidden=expanded;
+ document.querySelectorAll('.bc-submenu-toggle').forEach(toggle=>{
+   const submenu=document.getElementById(toggle.getAttribute('aria-controls'));
+   if(toggle.dataset.bound)return;toggle.dataset.bound='1';
+   toggle.addEventListener('click',()=>{
+     const expanded=toggle.getAttribute('aria-expanded')==='true';
+     toggle.setAttribute('aria-expanded',String(!expanded));
+     if(submenu)submenu.hidden=expanded;
    });
  });
 }
