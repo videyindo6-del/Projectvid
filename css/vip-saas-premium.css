@@ -92,3 +92,16 @@ html.dark .empty-state{background:#101e2d;border-color:#33475e;color:#a9bbd0}
 @media(prefers-reduced-motion:reduce){.premium-plan,.premium-plan:before,.premium-plan-icon,.is-gold .vip-buy-button{animation:none!important;transition:none!important}}
 html.dark .vip-benefits-panel{background:#111f30!important;border-color:#26384d!important}html.dark .vip-benefits-list p{color:#a9bbd0}
 html.dark .premium-plan.is-gold{background:linear-gradient(145deg,#342a15,#1d1b16)!important;border-color:#9b792e!important}html.dark .premium-plan.is-gold h3,html.dark .premium-plan.is-gold li{color:#f8e9c0!important}
+
+/* Four compact benefit tiles with tidy responsive wrapping */
+.vip-benefits-panel{grid-template-columns:1fr!important;align-items:start!important;gap:10px!important}
+.vip-benefits-heading h2{max-width:100%}
+.vip-benefits-list{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:9px!important}
+.vip-benefits-list article{grid-template-columns:1fr!important;align-content:start;padding:11px;border:1px solid var(--vip-line);border-radius:12px;background:rgba(255,255,255,.55);gap:7px!important}
+.vip-benefits-list article>i{width:30px;height:30px}
+.discount-explain{grid-template-columns:38px minmax(0,1fr)!important;padding:12px 14px!important;background:#fff5f5!important;border:1px solid #fecaca!important;color:#991b1b!important}
+.discount-explain h2{font-size:12px!important;color:#b42318!important}
+.discount-explain p{font-size:10px!important;color:#8f3a3a!important}
+.discount-icon{width:32px!important;height:32px!important;background:#fee2e2!important;color:#dc2626!important}
+@media(max-width:760px){.vip-benefits-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:390px){.vip-benefits-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}.vip-benefits-list article{padding:9px}.vip-benefits-list p{font-size:9px!important}}
