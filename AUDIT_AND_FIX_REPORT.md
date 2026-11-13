@@ -90,3 +90,18 @@ Jangan menyatakan semua fungsi produksi telah teruji hanya dari pemeriksaan stat
 - Bonus video hanya dapat mengukur elemen video HTML5 langsung. Iframe provider eksternal tidak mengekspos status playback yang dapat dipercaya sehingga tidak diberi reward.
 - Fee withdraw dibuat Rp7.000 tetap per pengajuan sesuai asumsi dari instruksi. Konfirmasi nominal fee sebelum produksi bila kebijakan platform berbeda.
 - Tidak dilakukan uji perangkat fisik Android atau deployment live; hasil mobile sudah ditangani secara responsif dan perlu smoke test setelah deploy.
+
+## Cashi QRIS Utama compatibility fix — 2026-11-13
+
+1. `supabase/functions/create-payment/index.ts`: QRIS Utama now calls `POST /api/create-order` with only `amount` and `order_id`; it no longer sends the invalid hard-coded `kode_channel: "CASHI"`. This follows Cashi's documentation, where `kode_channel` is optional and omitted for QRIS Utama.
+2. `supabase/functions/cashi-webhook/index.ts`: HMAC-SHA256 verification now uses the exact raw HTTP request body, as Cashi's PHP/Node examples require. It no longer parses and re-serializes JSON before signature verification.
+3. Review purchases, VIP purchases, VIP group purchases, and Wallet top-ups continue to share the same payment creation and settlement flow.
+
+### Deployment required
+- Deploy the updated `create-payment` and `cashi-webhook` Supabase Edge Functions.
+- Ensure Supabase Edge Function secrets include `CASHI_API_KEY` and `CASHI_SECRET_KEY` (plus the normal Supabase service environment provided by Supabase).
+- Configure Cashi webhook URL to the deployed `cashi-webhook` function URL.
+- Keep QRIS Utama selected in Cashi dashboard. Do not configure a `kode_channel` value in this code for the main QRIS channel.
+- Run one low-value test payment for each flow and verify `cashi_orders.status = 'SETTLED'` plus the corresponding wallet/VIP/review entitlement.
+
+Live payment and webhook delivery still require deployment and merchant credentials; they cannot be proven by local static tests.
