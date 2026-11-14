@@ -126,11 +126,11 @@ create policy "notifications read own or broadcast" on public.boxcellink_notific
 drop policy if exists "notifications update own" on public.boxcellink_notifications;
 create policy "notifications update own" on public.boxcellink_notifications
  for update to authenticated
- using(user_id=auth.uid() and user_id is not null and not is_admin_managed)
- with check(user_id=auth.uid() and user_id is not null and not is_admin_managed);
+ using(user_id=auth.uid() and user_id is not null)
+ with check(user_id=auth.uid() and user_id is not null);
 drop policy if exists "notifications delete own or admin" on public.boxcellink_notifications;
 create policy "notifications delete own or admin" on public.boxcellink_notifications
- for delete to authenticated using((user_id=auth.uid() and user_id is not null and not is_admin_managed) or public.is_admin());
+ for delete to authenticated using((user_id=auth.uid() and user_id is not null) or public.is_admin());
 drop policy if exists "notifications admin insert" on public.boxcellink_notifications;
 create policy "notifications admin insert" on public.boxcellink_notifications
  for insert to authenticated with check(public.is_admin());

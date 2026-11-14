@@ -4,7 +4,7 @@ create table if not exists public.site_nav_items (
  label text not null check(length(trim(label)) between 1 and 40),
  href text not null check(href ~ '^(https://[^[:space:]]+|/[^/][^[:space:]]*|/)$'),
  icon text not null default 'fa-solid fa-link' check(icon ~ '^(fa-solid|fa-regular|fa-brands) fa-[a-z0-9-]+$'),
- tag text check(tag is null or upper(tag) in ('NEW','TREND','BETA')),
+ tag text check(tag is null or upper(tag) in ('NEW','TREND','BETA','PROMO')),
  tag_color text not null default '#2563eb' check(tag_color ~ '^#[0-9a-fA-F]{6}$'),
  bg_color text not null default '#eff6ff' check(bg_color ~ '^#[0-9a-fA-F]{6}$'),
  text_color text not null default '#334155' check(text_color ~ '^#[0-9a-fA-F]{6}$'),
@@ -14,6 +14,8 @@ create table if not exists public.site_nav_items (
  created_at timestamptz not null default now(),
  updated_at timestamptz not null default now()
 );
+alter table public.site_nav_items drop constraint if exists site_nav_items_tag_check;
+alter table public.site_nav_items add constraint site_nav_items_tag_check check(tag is null or upper(tag) in ('NEW','TREND','BETA','PROMO'));
 alter table public.site_nav_items enable row level security;
 drop policy if exists "public active navbar items" on public.site_nav_items;
 create policy "public active navbar items" on public.site_nav_items for select using(active or public.is_admin());
@@ -51,3 +53,12 @@ end $$;
 drop trigger if exists announcements_to_notifications on public.announcements;
 create trigger announcements_to_notifications after insert or update or delete on public.announcements
 for each row execute function public.publish_announcement_notification();
+
+-- Allow each member to manage read state and delete their own announcement copies.
+drop policy if exists "notifications update own" on public.boxcellink_notifications;
+create policy "notifications update own" on public.boxcellink_notifications
+ for update to authenticated using(user_id=auth.uid() and user_id is not null)
+ with check(user_id=auth.uid() and user_id is not null);
+drop policy if exists "notifications delete own or admin" on public.boxcellink_notifications;
+create policy "notifications delete own or admin" on public.boxcellink_notifications
+ for delete to authenticated using((user_id=auth.uid() and user_id is not null) or public.is_admin());
