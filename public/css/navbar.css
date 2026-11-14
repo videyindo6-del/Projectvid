@@ -89,3 +89,6 @@
 @media(min-width:700px){.bc-drawer{width:min(420px,42vw)!important;max-width:420px!important}}
 
 .bc-custom-nav-item{display:flex!important;align-items:center;gap:10px;color:var(--bc-nav-text,#334155)!important;background:var(--bc-nav-bg,transparent);border-radius:10px;margin:3px 0;padding:11px 13px;text-decoration:none}.bc-custom-nav-item small{margin-left:auto;padding:3px 7px;border-radius:999px;background:color-mix(in srgb,var(--bc-nav-tag,#2563eb) 13%,white);color:var(--bc-nav-tag,#2563eb);font-size:9px;font-weight:900;letter-spacing:.04em}
+
+/* Compact icon-only language control and refined drawer width */
+#translateBtn{width:42px;min-width:42px;padding:0;gap:0}#translateBtn #translateLabel{display:none!important}.bc-drawer{width:min(310px,78vw)}@media(max-width:480px){.bc-drawer{width:min(290px,78vw)}}
