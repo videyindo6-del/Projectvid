@@ -62,3 +62,68 @@ create policy "notifications update own" on public.boxcellink_notifications
 drop policy if exists "notifications delete own or admin" on public.boxcellink_notifications;
 create policy "notifications delete own or admin" on public.boxcellink_notifications
  for delete to authenticated using((user_id=auth.uid() and user_id is not null) or public.is_admin());
+
+
+-- Members may delete only their own notifications after they have been read.
+-- Unread notifications remain protected even when the client sends a delete request.
+drop policy if exists "notifications delete own or admin" on public.boxcellink_notifications;
+create policy "notifications delete own or admin" on public.boxcellink_notifications
+ for delete to authenticated
+ using ((user_id=auth.uid() and user_id is not null and is_read=true) or public.is_admin());
+grant delete on public.boxcellink_notifications to authenticated;
+
+-- Notify the buyer after a verified Cashi settlement.
+-- Telegram purchases link directly to the purchased review; other purchase types
+-- keep their existing destinations. source_id prevents duplicate notices on retries.
+create unique index if not exists boxcellink_notifications_purchase_source_uidx
+ on public.boxcellink_notifications(source_id,user_id)
+ where kind='purchase' and source_id is not null;
+
+create or replace function public.notify_settled_purchase()
+returns trigger
+language plpgsql
+security definer
+set search_path=public
+as $$
+declare
+ v_title text;
+ v_body text;
+ v_href text;
+ v_review_title text;
+ v_review_slug text;
+begin
+ if old.status is distinct from new.status and new.status='SETTLED' then
+  if new.purpose='wallet_topup' then
+   v_title:='Deposit berhasil';
+   v_body:='Saldo deposit bertambah Rp'||to_char(new.amount,'FM999G999G999G990')||'.';
+   v_href:='/wallet.html';
+  elsif new.purpose='vip' then
+   v_title:='Pembelian VIP berhasil';
+   v_body:='Membership VIP berhasil diaktifkan.';
+   v_href:='/vip.html';
+  elsif new.purpose='vip_group' then
+   v_title:='Pembelian Group VIP berhasil';
+   v_body:='Akses Group VIP sudah tersedia di Akun Saya.';
+   v_href:='/account.html';
+  elsif new.purpose='review_download' then
+   select title,slug into v_review_title,v_review_slug
+   from public.review_items where id=new.review_id;
+   v_title:='Pembelian Media Telegram Berhasil';
+   v_body:='Pembayaran untuk "'||coalesce(v_review_title,'Media Telegram')||'" berhasil. Silakan buka media Telegram yang sudah dibeli.';
+   v_href:=case when nullif(v_review_slug,'') is not null then '/r/'||v_review_slug else '/telegram.html' end;
+  else
+   v_title:='Pembayaran berhasil';
+   v_body:='Transaksi Anda berhasil diselesaikan.';
+   v_href:='/notifications.html';
+  end if;
+
+  insert into public.boxcellink_notifications
+   (user_id,title,body,kind,href,source_id,is_admin_managed)
+  values(new.user_id,v_title,v_body,'purchase',v_href,new.id,false)
+  on conflict (source_id,user_id)
+   where kind='purchase' and source_id is not null
+  do nothing;
+ end if;
+ return new;
+end;
+$$;
