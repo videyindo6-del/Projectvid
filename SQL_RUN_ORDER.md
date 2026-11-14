@@ -1,7 +1,7 @@
 # Urutan SQL ProjectVID / BoxCellink
 
 ## Untuk Supabase BARU (belum ada tabel project)
-Jalankan `supabase/PROJECTVID_MASTER.sql` satu kali dari Supabase Dashboard → SQL Editor, lalu jalankan langkah 24 dan 25 di bawah untuk modul wallet/affiliate. File master tidak memuat tabel wallet/affiliate tambahan. Jangan jalankan ulang pada database aktif karena `schema.sql` adalah schema dasar.
+Jalankan `supabase/PROJECTVID_MASTER.sql` satu kali dari Supabase Dashboard → SQL Editor, lalu jalankan langkah 24, 25, dan 26 di bawah untuk modul wallet/affiliate serta pengaturan navbar. File master tidak memuat tabel wallet/affiliate tambahan. Jangan jalankan ulang pada database aktif karena `schema.sql` adalah schema dasar.
 
 ## Urutan file individual (jika memasang manual)
 
@@ -39,6 +39,7 @@ Jalankan `supabase/PROJECTVID_MASTER.sql` satu kali dari Supabase Dashboard → 
 - `supabase/ADMIN_SETUP.sql` — perintah khusus untuk menaikkan akun admin; isi UUID asli akun admin sebelum dijalankan.
 - `supabase/vip_admin_crud_premium_fix.sql` — migration VIP lama/duplikat; versi yang dipakai adalah `admin_vip_crud_fix.sql`.
 - `supabase/vip_membership_timeline_migration.sql` — migration timeline VIP lama yang fungsinya sudah disertakan/diperbarui dalam `boxcellink_premium_expansion.sql`.
+- `supabase/site_nav_items.sql` — jalankan setelah langkah 25 untuk mengaktifkan pengaturan menu navbar dan sinkronisasi notifikasi pengumuman; file ini tidak dijalankan oleh master SQL.
 
 ## Kebijakan penghapusan konten
 - Hapus video: baris video, likes, komentar, balasan, reaksi komentar, dan watch history ikut terhapus melalui foreign key `ON DELETE CASCADE`.
@@ -57,6 +58,7 @@ Jalankan `supabase/PROJECTVID_MASTER.sql` satu kali dari Supabase Dashboard → 
 
 24. `supabase/BoxCellink-affiliate-wallet-notifications-FIXED.sql` — tabel dasar saldo, aplikasi affiliate, withdraw, ledger, notifikasi, settlement deposit, dan pembelian saldo deposit.
 25. `supabase/boxcellink_wallet_withdraw_v2.sql` — alamat bertingkat, data bank/e-wallet, fee withdraw Rp7.000, net diterima, status revisi, notifikasi admin, dan bonus Share to Earn video Rp2.
+26. `supabase/site_nav_items.sql` — tabel pengaturan menu navbar, sinkronisasi pengumuman ke notifikasi member, dan policy agar member dapat mengatur status baca serta menghapus notifikasi miliknya.
 
 Jangan jalankan langkah 25 sebelum langkah 24. Migrasi ini bersifat additive dan harus diuji pada project Supabase target sebelum dipakai di produksi.
 
