@@ -92,3 +92,5 @@
 
 /* Compact icon-only language control and refined drawer width */
 #translateBtn{width:42px;min-width:42px;padding:0;gap:0}#translateBtn #translateLabel{display:none!important}.bc-drawer{width:min(310px,78vw)}@media(max-width:480px){.bc-drawer{width:min(290px,78vw)}}
+
+.bc-menu .bc-menu-box-link{min-height:46px;border-radius:12px;display:flex;align-items:center;gap:12px;padding:0 13px;color:#344b63;text-decoration:none;font-weight:800}.bc-menu .bc-menu-box-link i{width:20px;text-align:center;color:#2866ad}.bc-menu .bc-menu-box-link:hover{background:#f1f6fc;color:#205b9e}.bc-menu .bc-submenu-expand{min-height:34px!important;padding-left:45px!important;font-size:11px!important;color:#718096!important}.bc-menu .bc-submenu-expand .submenu-chevron{margin-left:auto}

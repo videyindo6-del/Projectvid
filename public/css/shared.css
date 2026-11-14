@@ -12,3 +12,20 @@
 /* Unified BoxCellink premium SaaS foundation */
 :root{--bc-bg:#f7f8fa;--bc-surface:#fffefa;--bc-ivory:#fbfaf6;--bc-primary:#245b96;--bc-primary-dark:#174675;--bc-text:#20364d;--bc-muted:#718096;--bc-border:#e4e8ed;--bc-shadow:0 12px 32px rgba(28,55,82,.07)}
 html{scroll-behavior:smooth}body{background:var(--bc-bg);color:var(--bc-text);font-family:Inter,"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif}button,a,input,select,textarea{font-family:inherit}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(56,132,201,.3);outline-offset:2px}
+
+/* Cross-page responsive safety: keep form controls and content inside mobile viewports. */
+*,*::before,*::after{box-sizing:border-box}
+img,video,iframe,svg{max-width:100%}
+input,select,textarea{max-width:100%;min-width:0;box-sizing:border-box}
+form>*{min-width:0}
+button{max-width:100%;overflow-wrap:anywhere}
+main,section,article,aside,.admin-main,.admin-content,.admin-hub,.container,.notice-page,.book-shell{min-width:0}
+.table-wrap,.admin-table-wrap,.wallet-history{max-width:100%;overflow-x:auto}
+input,select,textarea{overflow-wrap:anywhere}
+@media(max-width:560px){
+  form{max-width:100%}
+  form input:not([type=checkbox]):not([type=radio]):not([type=color]),form select,form textarea{width:100%}
+  .form-actions,.form-buttons,.notice-actions,.hub-nav-actions{flex-wrap:wrap;min-width:0}
+  .form-actions button,.form-buttons button{min-width:0;max-width:100%}
+  .admin-content,.admin-hub,.notice-page,.book-shell{padding-left:12px;padding-right:12px}
+}
