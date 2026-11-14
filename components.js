@@ -16,7 +16,7 @@ function isPublicRoute(){
   const page=currentPage();
   const path=(location.pathname||'/').toLowerCase();
   const publicPages=new Set([
-    'index','login','register','forgot-password','watch','review','review-detail','telegram','vip','vip-groups'
+    'index','login','register','forgot-password','watch','review','review-detail','telegram','book-video','vip','vip-groups'
   ]);
   return publicPages.has(page)||path.startsWith('/v/')||path.startsWith('/r/');
 }
