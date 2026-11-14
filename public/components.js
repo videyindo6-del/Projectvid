@@ -4,7 +4,7 @@ const getLang=()=>localStorage.getItem('boxcellink_lang')||'id';
 function applyLocal(l=getLang()){const d=translations[l]||translations.id;document.documentElement.lang=l;document.querySelectorAll('[data-nav]').forEach(e=>{if(d[e.dataset.nav])e.textContent=d[e.dataset.nav]});document.querySelectorAll('[data-footer]').forEach(e=>{if(d[e.dataset.footer])e.textContent=d[e.dataset.footer]});const b=document.getElementById('translateLabel');if(b)b.textContent=l==='id'?'ID':'ENG';}
 async function load(selector,url){const el=document.querySelector(selector);if(!el)return;try{const r=await fetch(url,{credentials:'same-origin',cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);el.innerHTML=await r.text();}catch(e){console.error('Component load failed',url,e);if(selector.includes('footer'))el.innerHTML='<footer class="bc-footer"><div class="bc-footer-inner"><div>© <span id="footerYear"></span> Boxcellink. All rights reserved.</div><nav><a href="/terms.html">Syarat & ketentuan</a><a href="/privacy.html">Kebijakan Dan Privasi</a><a href="/help.html">Bantuan</a></nav></div></footer>';else if(selector.includes('navbar'))el.innerHTML='<header class="bc-navbar"><div class="bc-nav-inner"><a class="bc-brand" href="/index.html">BoxCellink</a><div class="bc-nav-actions"><button id="translateBtn" class="bc-nav-btn" type="button"><span id="translateLabel">ID</span></button></div></div></header>';}}
 function setGoogleLanguage(lang){localStorage.setItem('boxcellink_lang',lang);applyLocal(lang);document.dispatchEvent(new CustomEvent('boxcellink:language-change',{detail:{lang}}));}
-function initTranslate(){const btn=document.getElementById('translateBtn');if(!btn)return;if(!btn.dataset.bound){btn.dataset.bound='1';btn.addEventListener('click',()=>setGoogleLanguage(getLang()==='id'?'en':'id'));}applyLocal();}
+function initTranslate(){const btn=document.getElementById('translateBtn');if(!btn)return;let icon=btn.querySelector('i');if(!icon){icon=document.createElement('i');btn.prepend(icon);}icon.className='fa-solid fa-language';icon.setAttribute('aria-hidden','true');btn.setAttribute('aria-label',getLang()==='id'?'Ganti bahasa ke Inggris':'Switch language to Indonesian');btn.title=btn.getAttribute('aria-label');if(!btn.dataset.bound){btn.dataset.bound='1';btn.addEventListener('click',()=>setGoogleLanguage(getLang()==='id'?'en':'id'));}applyLocal();}
 function currentPage(){
   const path=(location.pathname||'/').toLowerCase().replace(/\/+$/,'')||'/';
   return (path.split('/').pop()||'index').replace(/\.html$/,'');
@@ -16,7 +16,7 @@ function isPublicRoute(){
   const page=currentPage();
   const path=(location.pathname||'/').toLowerCase();
   const publicPages=new Set([
-    'index','login','register','forgot-password','watch','review','review-detail','telegram','vip','vip-groups'
+    'index','login','register','forgot-password','watch','review','review-detail','telegram','book-video','vip','vip-groups'
   ]);
   return publicPages.has(page)||path.startsWith('/v/')||path.startsWith('/r/');
 }
@@ -131,7 +131,7 @@ async function initNavbar(){
        const counts=(rows)=>{const m=new Map();(rows||[]).forEach(r=>{if(r.category_id)m.set(r.category_id,(m.get(r.category_id)||0)+1)});return m};
        const reviewCounts=counts(reviewError?[]:reviews),videoCounts=counts(videoError?[]:videos);
        document.querySelectorAll('.bc-submenu[id^="boxCategorySubmenu"]').forEach(target=>{
-         target.innerHTML='<a href="/watch.html">Semua Box Video</a>'+(cats||[]).filter(c=>!c.content_type||c.content_type==='box_video').map(c=>`<a href="/watch.html?category=${encodeURIComponent(c.id)}">${esc(c.name)} <small>(${videoCounts.get(c.id)||0})</small></a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>';
+         target.innerHTML='<a class="bc-box-video-all" href="/book-video.html">Semua Box Video</a>'+((cats||[]).filter(c=>!c.content_type||c.content_type==='box_video').map(c=>`<a class="bc-box-video-category" href="/book-video.html?category=${encodeURIComponent(c.id)}">${esc(c.name)} <small>(${videoCounts.get(c.id)||0})</small></a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>');
        });
        document.querySelectorAll('.bc-submenu[id^="telegramCategorySubmenu"]').forEach(target=>{
          target.innerHTML='<a href="/telegram.html">Semua Media Telegram</a>'+(cats||[]).filter(c=>c.content_type==='media_telegram').map(c=>`<a href="/telegram.html?category=${encodeURIComponent(c.id)}">${esc(c.name)} <small>(${reviewCounts.get(c.id)||0})</small></a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>';
@@ -139,6 +139,9 @@ async function initNavbar(){
      }
    }catch(e){console.warn('Navigation categories unavailable:',e);}
  }
+ document.querySelectorAll('.bc-submenu[id^="boxCategorySubmenu"] a').forEach(link=>{
+  try{const target=new URL(link.getAttribute('href')||'',location.origin);if(/\/(?:watch|videos?)(?:\.html)?$/i.test(target.pathname)){target.pathname='/book-video.html';link.href=target.pathname+target.search+target.hash;}}catch{}
+ });
  document.querySelectorAll('.bc-submenu-toggle').forEach(toggle=>{
    const submenu=document.getElementById(toggle.getAttribute('aria-controls'));
    if(toggle.dataset.bound)return;toggle.dataset.bound='1';
@@ -154,7 +157,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
  if(/^[A-Z0-9]{6,16}$/.test(sharedRef))localStorage.setItem('boxcellink_affiliate_code',sharedRef);
  // Load Support immediately; it no longer depends on navbar/footer network fetches.
  if(!document.getElementById('bcSupportWidgetScript')&&!window.__boxcellinkSupportLoaded){const supportScript=document.createElement('script');supportScript.id='bcSupportWidgetScript';supportScript.src='/js/support-widget.js';supportScript.async=false;supportScript.onerror=()=>console.error('Support widget failed to load:',supportScript.src);document.body.appendChild(supportScript);}
- await Promise.all([load('[data-component="navbar"]','/components/navbar.html'),load('[data-component="footer"]','/components/footer.html')]);
+ await Promise.all([load('[data-component="navbar"]','/components/navbar.html?v=20261114-2'),load('[data-component="footer"]','/components/footer.html')]);
  initTranslate();const y=document.getElementById('footerYear');if(y)y.textContent=new Date().getFullYear();const ca=document.getElementById('cookieAccept'),cn=document.getElementById('cookieNotice');if(ca)ca.onclick=()=>{localStorage.setItem('boxcellink_cookie_ok','1');cn?.classList.add('is-hidden')};if(localStorage.getItem('boxcellink_cookie_ok')==='1')cn?.classList.add('is-hidden');applyLocal();
  if(isAuthRoute()){const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');if(guest)guest.hidden=false;if(member)member.hidden=true;initDrawer();}else{await initNavbar();}await loadCustomNavItems();
 });
