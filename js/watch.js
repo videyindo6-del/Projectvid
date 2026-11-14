@@ -107,8 +107,13 @@ function setupSocialBars(){
 let popunderStarted=false;
 function setupPopunder(){
  if(isVip||popunderStarted)return;popunderStarted=true;
- // Load publisher popunder once. Its frequency/cooldown is governed by the ad network/browser.
- injectScript(document.body,'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js');
+ // Delay the first publisher request by account type. The ad network controls
+ // subsequent impressions/cooldowns; this page must not reload the popunder script.
+ const firstDelay=currentUser?6000:3000;
+ window.setTimeout(()=>{
+  if(isVip||!document.body.isConnected)return;
+  injectScript(document.body,'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js',{'data-cfasync':'false'});
+ },firstDelay);
 }
 function mountFloatingBanner(){
  const wrap=$('#floatingBannerAd'),slot=$('#floatingBannerAdSlot'),hide=$('#hideFloatingBanner'),show=$('#showFloatingBanner');
@@ -158,11 +163,15 @@ function setupInterstitial(){
  const modal=$('#videoInterstitialAd'),slot=$('#videoInterstitialSlot'),close=$('#closeVideoInterstitial');
  if(!modal||!slot||isVip||modal.dataset.scheduled==='1')return;
  modal.dataset.scheduled='1';
+ const interval=currentUser?15000:7000;
  let timer=null,tick=null,showing=false;
  const schedule=()=>{
-  if(isVip||document.visibilityState==='hidden') {timer=window.setTimeout(schedule,10000);return;}
+  if(isVip||showing)return;
+  if(timer)window.clearTimeout(timer);
   timer=window.setTimeout(()=>{
-   if(isVip||document.visibilityState==='hidden'){schedule();return;}
+   timer=null;
+   if(isVip)return;
+   if(document.visibilityState==='hidden'){schedule();return;}
    slot.replaceChildren();
    const unit=AD_UNITS.banner300,frame=document.createElement('iframe');
    frame.title='Advertisement';frame.width='300';frame.height='250';frame.scrolling='no';
@@ -170,14 +179,23 @@ function setupInterstitial(){
    frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:transparent}</style></head><body><script>var atOptions={key:'${unit.key}',format:'iframe',height:250,width:300,params:{}};<\/script><script src="https://www.highrevenueformat.com/${unit.key}/invoke.js"><\/script></body></html>`;
    slot.appendChild(frame);modal.hidden=false;showing=true;
    let remaining=3;close.disabled=true;close.textContent=`Lewati dalam ${remaining}`;
-   tick=window.setInterval(()=>{remaining--;if(remaining<=0){window.clearInterval(tick);tick=null;close.disabled=false;close.textContent='× Tutup iklan'}else close.textContent=`Lewati dalam ${remaining}`},1000);
-  },10000);
+   if(tick)window.clearInterval(tick);
+   tick=window.setInterval(()=>{
+    remaining--;
+    if(remaining<=0){window.clearInterval(tick);tick=null;close.disabled=false;close.textContent='× Tutup iklan';}
+    else close.textContent=`Lewati dalam ${remaining}`;
+   },1000);
+  },interval);
  };
  close.onclick=()=>{
+  if(close.disabled)return;
   if(tick){window.clearInterval(tick);tick=null;}
-  modal.hidden=true;showing=false;schedule();
+  modal.hidden=true;showing=false;slot.replaceChildren();schedule();
  };
- document.addEventListener('visibilitychange',()=>{if(!showing&&document.visibilityState==='visible'&&!timer)schedule()});
+ document.addEventListener('visibilitychange',()=>{
+  if(showing)return;
+  if(document.visibilityState==='visible'&&!timer)schedule();
+ });
  schedule();
 }
 function setupGuestAds(){
@@ -187,9 +205,10 @@ function setupGuestAds(){
  if(role==='vip'){
   $('#guestAdTop')?.remove();$('#floatingBannerAd')?.remove();$('#showFloatingBanner')?.remove();$('#guestPopunderSlot')?.remove();$('#videoInterstitialAd')?.remove();
   // VIP sees banner placements only; social bars, popunder, floating and interstitial ads stay off.
-  document.querySelectorAll('.ad-side-card').forEach(el=>el.hidden=true);
   document.querySelectorAll('.guest-and-vip-banner').forEach(el=>{el.hidden=false;el.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'});
   document.querySelectorAll('.ad-unit-728,.ad-unit-320,.ad-unit-468').forEach(host=>{host.hidden=false;host.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px auto;max-width:100%';mountAdUnit(host,host.classList.contains('ad-unit-728')?AD_UNITS.banner728:(host.classList.contains('ad-unit-320')?AD_UNITS.banner320:AD_UNITS.banner468))});
+  const vipBox=$('#ad300x250');if(vipBox){const wrap=vipBox.closest('.ad-side-card');if(wrap){wrap.hidden=false;wrap.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'}vipBox.hidden=false;mountAdUnit(vipBox,AD_UNITS.banner300)}
+  const vipInline=$('.ad-inline-300');if(vipInline)mountInlineAd(vipInline);
   return;
  }
  const socialStack=$('#guestAdTop');
@@ -210,9 +229,10 @@ function setupGuestAds(){
   mountAdUnit(host,unit);
  }));
  if(role!=='vip')setupSocialBars();
+ if(role!=='vip')setupPopunder();
  if(role==='guest'){
   document.querySelectorAll('.ad-inline-300').forEach(mountInlineAd);
-  setupPopunder();mountFloatingBanner();
+  mountFloatingBanner();
  }
  setupVideoAdPlayback();setupInterstitial();
 }
