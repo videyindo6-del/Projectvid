@@ -343,3 +343,5 @@ body:has(.review-shell){background:#f4f1e8!important;color:#26364a!important;col
 
 
 body.review-telegram-gate-open{overflow:hidden!important}
+
+.review-provider-poster{display:block;width:100%;height:100%;min-height:180px;object-fit:cover;border:0;pointer-events:none;background:#0f172a}

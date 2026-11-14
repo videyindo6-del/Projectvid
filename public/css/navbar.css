@@ -83,3 +83,9 @@
 .bc-notification-item{overflow-wrap:anywhere}
 @media(max-width:620px){.bc-nav-inner{grid-template-columns:auto minmax(0,1fr) auto!important;gap:6px!important}.bc-nav-left{grid-column:1;grid-row:1;max-width:48vw}.bc-brand-centered{grid-column:2;grid-row:1;justify-self:start!important;margin:0 0 0 2px!important;font-size:13px!important}.bc-nav-actions{grid-column:3;grid-row:1}.bc-wallet-pill{max-width:100%;padding:4px 6px;gap:5px}.bc-wallet-values b{font-size:9px}.bc-wallet-values small{font-size:8px}.bc-nav-actions .bc-nav-btn{min-width:36px;width:36px;padding:0}.bc-notification-dropdown{position:fixed;top:66px;right:8px;left:8px;width:auto;max-width:none}.bc-notification-head{position:sticky;top:-12px;background:#fffefa;z-index:1}}
 @media(max-width:390px){.bc-brand-centered{font-size:12px!important}.bc-wallet-values:nth-of-type(2){display:none}.bc-wallet-divider{display:none}.bc-nav-inner{min-height:62px}.bc-nav-left{max-width:46vw}.bc-nav-actions .bc-nav-btn{width:33px;min-width:33px}}
+
+/* Compact premium navigation drawer */
+.bc-drawer{width:min(390px,82vw)!important;max-width:82vw!important}
+@media(min-width:700px){.bc-drawer{width:min(420px,42vw)!important;max-width:420px!important}}
+
+.bc-custom-nav-item{display:flex!important;align-items:center;gap:10px;color:var(--bc-nav-text,#334155)!important;background:var(--bc-nav-bg,transparent);border-radius:10px;margin:3px 0;padding:11px 13px;text-decoration:none}.bc-custom-nav-item small{margin-left:auto;padding:3px 7px;border-radius:999px;background:color-mix(in srgb,var(--bc-nav-tag,#2563eb) 13%,white);color:var(--bc-nav-tag,#2563eb);font-size:9px;font-weight:900;letter-spacing:.04em}
