@@ -48,6 +48,7 @@
         <div><b><i class="fa-solid fa-headset" aria-hidden="true"></i> Chat Support Admin</b><small>Tim bantuan BoxCellink</small></div>
         <button type="button" id="bcSupportClose" aria-label="Tutup chat"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </header>
+      <div class="bc-support-faq" id="bcSupportFaq" aria-label="Panduan BoxCellink"><b><i class="fa-solid fa-circle-question"></i> Pusat bantuan cepat</b><div id="bcSupportFaqChoices"></div><div id="bcSupportFaqAnswer" aria-live="polite"></div></div>
       <div class="bc-support-messages" id="bcSupportMessages" aria-live="polite">
         <div class="bc-support-empty">Memuat percakapan...</div>
       </div>
@@ -68,6 +69,41 @@
   const input = $('#bcSupportInput', root);
   const messagesEl = $('#bcSupportMessages', root);
   const foot = $('#bcSupportFoot', root);
+  const faqChoices=$('#bcSupportFaqChoices',root),faqAnswer=$('#bcSupportFaqAnswer',root);
+  const faqGroups=[
+    {title:'Mulai menggunakan BoxCellink',items:[
+      ['Bagaimana cara bergabung BoxCellink?','Buka menu Daftar, isi data akun, lalu konfirmasi email jika diminta. Setelah berhasil, masuk menggunakan email dan kata sandi.'],
+      ['Bagaimana cara saya mendaftar?','Pilih tombol Daftar pada navbar atau halaman utama, lengkapi formulir, lalu ikuti instruksi konfirmasi yang tampil.'],
+      ['Bagaimana cara saya login?','Pilih Masuk, masukkan email dan kata sandi akun BoxCellink. Jika lupa kata sandi, gunakan tautan Lupa Kata Sandi.'],
+      ['Bagaimana cara melihat Box Video?','Buka menu BoxVidey atau Box Video. Pilih kategori atau gunakan pencarian, lalu buka video yang ingin ditonton. Video publik dapat ditonton tanpa login; konten login/VIP mengikuti aturan aksesnya.'],
+      ['Bagaimana cara mengakses Media Telegram?','Buka menu Media Telegram, cari judul atau kategori, lalu pilih Lihat Review. Ikuti informasi akses pada halaman review; tautan Telegram akan dibuka melalui alur yang tersedia.']
+    ]},
+    {title:'Penghasilan, referral & withdraw',items:[
+      ['Bagaimana cara menghasilkan uang di BoxCellink?','Gunakan fitur Referral & Hadiah atau program afiliasi jika tersedia pada akun. Bagikan link referral secara wajar dan ikuti ketentuan program untuk memperoleh saldo/komisi.'],
+      ['Bagaimana cara share referral?','Masuk ke menu Referral & Hadiah, salin link referral pribadi, lalu bagikan kepada teman. Perolehan hadiah mengikuti syarat referral yang ditampilkan di halaman tersebut.'],
+      ['Bagaimana cara saya withdraw?','Ajukan atau lengkapi data afiliasi terlebih dahulu. Setelah status afiliasi disetujui dan saldo memenuhi batas minimum, buka Saldo & Afiliasi lalu kirim pengajuan withdraw.'],
+      ['Bagaimana cara cek saldo referral?','Buka menu Saldo & Afiliasi atau Referral & Hadiah untuk melihat saldo, komisi, dan riwayat yang tersedia.']
+    ]},
+    {title:'Pembayaran & bantuan akun',items:[
+      ['Bagaimana cara saya membayar?','Pilih paket atau media yang ingin dibeli, lanjutkan ke checkout, lalu bayar menggunakan QR/metode yang ditampilkan. Tunggu status pembayaran terverifikasi sebelum menutup halaman.'],
+      ['Bagaimana cara konsultasi dengan admin?','Pilih Chat Support Admin pada tombol bantuan. Login diperlukan agar percakapan tersimpan dan admin dapat membalasnya.'],
+      ['Bagaimana cara support admin?','Gunakan Chat Support Admin untuk mengirim pertanyaan atau laporan. Sertakan judul halaman dan pesan error agar admin lebih mudah membantu.'],
+      ['Bagaimana cara gabung Telegram resmi?','Gunakan tautan Grup/Channel Telegram resmi yang tersedia di halaman Media Telegram atau pemberitahuan komunitas. Pastikan tautannya berasal dari website BoxCellink.']
+    ]}
+  ];
+  function renderFaq(groupIndex=null){
+    if(!faqChoices)return;
+    faqAnswer.textContent='';
+    if(groupIndex===null){faqChoices.innerHTML=faqGroups.map((g,i)=>`<button type="button" data-faq-group="${i}">${esc(g.title)} <i class="fa-solid fa-chevron-right"></i></button>`).join('');return;}
+    const g=faqGroups[groupIndex];faqChoices.innerHTML=`<button type="button" data-faq-back="1"><i class="fa-solid fa-arrow-left"></i> Kembali</button>`+g.items.map((item,i)=>`<button type="button" data-faq-question="${i}" data-faq-group="${groupIndex}">${esc(item[0])}</button>`).join('');
+  }
+  renderFaq();
+  faqChoices?.addEventListener('click',event=>{
+    const group=event.target.closest('[data-faq-group]'),question=event.target.closest('[data-faq-question]'),back=event.target.closest('[data-faq-back]');
+    if(back){renderFaq();return;}
+    if(question){const item=faqGroups[Number(question.dataset.faqGroup)]?.items[Number(question.dataset.faqQuestion)];if(item)faqAnswer.innerHTML=`<b>${esc(item[0])}</b><p>${esc(item[1])}</p><button type="button" data-faq-back="1">Pilih pertanyaan lain</button>`;return;}
+    if(group)renderFaq(Number(group.dataset.faqGroup));
+  });
 
   const closeMenu = () => {
     menu.classList.remove('is-open');

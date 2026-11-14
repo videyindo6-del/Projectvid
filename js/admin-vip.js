@@ -38,7 +38,7 @@ function openForm(type,x=null){
  $('groupPrice').value=x?.price??5000;$('groupUrl').value=x?.telegram_url||'';
  $('memberCount').value=x?.member_count??0;$('recordStatus').value=x?.status||'published';
  $('discountCode').value=x?.code||'';$('discountScope').value=x?.scope||'all';$('discountPercent').value=x?.discount_percent??20;
- $('discountMin').value=x?.min_purchase??2000;$('discountLimit').value=x?.claim_limit??2;
+ $('discountMin').value=x?.min_purchase??7000;$('discountLimit').value=x?.claim_limit??2;
  $('discountExpiry').value=x?.expires_at?new Date(new Date(x.expires_at).getTime()-new Date(x.expires_at).getTimezoneOffset()*60000).toISOString().slice(0,16):'';
  $('planFields').hidden=type!=='plan';$('groupFields').hidden=type!=='group';$('discountFields').hidden=type!=='discount';
  $('descriptionField').hidden=type!=='group';$('statusField').hidden=type==='discount';
@@ -109,11 +109,11 @@ $('managerForm').onsubmit=async e=>{
    if(!payload.name||!Number.isInteger(payload.price)||payload.price<2000||!Number.isInteger(payload.member_count)||payload.member_count<0)throw new Error('Nama, harga, atau jumlah member Group VIP tidak valid.');
   }else{
    table='admin_discount_codes';const cap=Number($('discountLimit').value);
-   if(cap<1||cap>10000)throw new Error('Kapasitas klaim harus 1 sampai 10.000 member.');
+   if(!Number.isInteger(cap)||cap<2||cap>10)throw new Error('Kapasitas klaim harus 2 sampai 10 member sesuai aturan kode diskon.');
    payload={code:$('discountCode').value.trim().toUpperCase(),scope:$('discountScope').value,discount_percent:Number($('discountPercent').value),min_purchase:Number($('discountMin').value),claim_limit:cap,expires_at:$('discountExpiry').value?new Date($('discountExpiry').value).toISOString():null};
    if(!/^[A-Z0-9_-]{3,32}$/.test(payload.code))throw new Error('Kode diskon harus 3–32 karakter (huruf, angka, - atau _).');
-   if(payload.discount_percent<1||payload.discount_percent>75)throw new Error('Diskon harus 10–75%.');
-   if(!Number.isFinite(payload.min_purchase)||payload.min_purchase<2000)throw new Error('Minimal pembelian paling sedikit Rp2.000.');
+   if(payload.discount_percent<10||payload.discount_percent>75)throw new Error('Diskon harus 10–75%.');
+   if(!Number.isFinite(payload.min_purchase)||payload.min_purchase<7000)throw new Error('Minimal pembelian paling sedikit Rp7.000.');
   }
   let result;
   if(type==='group'){

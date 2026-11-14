@@ -65,16 +65,22 @@
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = value => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
   const thumb = value => {
-    let raw = String(value || '').trim(); if (!raw) return '';
-    const iframe = raw.match(/<iframe[^>]+src=["']([^"']+)/i); if (iframe) raw = iframe[1];
-    try {
-      const u = new URL(raw, location.origin); if (!['http:','https:'].includes(u.protocol)) return '';
-      const id = u.pathname.match(/\/file\/d\/([^/]+)/)?.[1] || u.searchParams.get('id');
-      if (u.hostname.includes('drive.google.com') && id) return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w1000`;
-      if (u.hostname.includes('youtube.com') || u.hostname === 'youtu.be') { const vid = u.hostname === 'youtu.be' ? u.pathname.split('/').filter(Boolean)[0] : (u.searchParams.get('v') || u.pathname.match(/\/embed\/([^/]+)/)?.[1]); if (vid) return `https://i.ytimg.com/vi/${encodeURIComponent(vid)}/hqdefault.jpg`; }
-      return u.href;
-    } catch { return ''; }
+    let raw=String(value||'').trim();if(!raw)return '';
+    const iframe=raw.match(/<iframe[^>]+src=[\"']([^\"']+)/i);if(iframe)raw=iframe[1];
+    const image=raw.match(/<(?:img|source)[^>]+src=[\"']([^\"']+)/i);if(image)raw=image[1];
+    if(raw.startsWith('//'))raw='https:'+raw;
+    try{
+      const u=new URL(raw,location.origin);if(!['http:','https:'].includes(u.protocol))return '';
+      if(/\.(?:jpe?g|png|gif|webp|avif)(?:$|[?#])/i.test(u.href))return u.href;
+      const info=window.ProjectVIDEmbed?.parse(raw);
+      if(info?.thumbnail)return info.thumbnail;
+      if(info?.type==='image'||info?.type==='video')return info.src;
+      if(info?.provider==='YouTube'){const id=info.src.match(/youtube-nocookie\.com\/embed\/([^?]+)/)?.[1];if(id)return `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`;}
+      if(info?.provider==='Google Drive')return info.thumbnail||'';
+      return '';
+    }catch{return '';}
   };
+
   const placeholder = (icon, label) => `<div class="home-thumb-placeholder"><i class="${icon}"></i><span>${label}</span></div>`;
 
   function render() {
@@ -84,14 +90,14 @@
     if (count) count.textContent = t(`${foundVideos.length + foundReviews.length} konten ditemukan`, `${foundVideos.length + foundReviews.length} items found`);
     if (clear) clear.hidden = !(search?.value || '').length;
     videoGrid.innerHTML = foundVideos.length ? foundVideos.slice(0, 8).map(v => {
-      const image = thumb(v.thumbnail_url), href = `/v/${encodeURIComponent(v.slug || v.id)}`;
-      return `<article class="home-content-card"><a class="home-card-thumb" href="${href}">${image ? `<img src="${esc(image)}" alt="${esc(v.title)}" loading="lazy" onerror="this.remove()">` : placeholder('fa-solid fa-play','BOX VIDEY')}<span class="thumb-play"><i class="fa-solid fa-play"></i></span><span class="thumb-tag">BOX VIDEY</span></a><div class="home-card-body"><h3><a href="${href}">${esc(v.title)}</a></h3><div class="home-card-meta"><span><i class="fa-solid fa-circle-play"></i> ${esc(v.provider || 'Video')}</span><span>${Number(v.view_count || 0).toLocaleString(en()?'en-US':'id-ID')} ${t('views','views')}</span></div><a class="home-card-link" href="${href}">${t('Tonton video','Watch video')} <i class="fa-solid fa-arrow-right"></i></a></div></article>`;
+      const image = thumb(v.thumbnail_url), previewInfo=!image?(window.ProjectVIDEmbed?.parse(v.thumbnail_url)||window.ProjectVIDEmbed?.parse(v.embed_url)):null, href = `/v/${encodeURIComponent(v.slug || v.id)}`;
+      return `<article class="home-content-card"><a class="home-card-thumb" href="${href}">${image ? `<img src="${esc(image)}" alt="${esc(v.title)}" loading="lazy" onerror="this.remove()">` : previewInfo?.type==='iframe'?`<iframe class="home-provider-poster" src="${esc(previewInfo.src)}" title="${esc(v.title)}" loading="lazy" tabindex="-1"></iframe>`:placeholder('fa-solid fa-play','BOX VIDEY')}<span class="thumb-play"><i class="fa-solid fa-play"></i></span><span class="thumb-tag">BOX VIDEY</span></a><div class="home-card-body"><h3><a href="${href}">${esc(v.title)}</a></h3><div class="home-card-meta"><span><i class="fa-solid fa-circle-play"></i> ${esc(v.provider || 'Video')}</span><span>${Number(v.view_count || 0).toLocaleString(en()?'en-US':'id-ID')} ${t('views','views')}</span></div><a class="home-card-link" href="${href}">${t('Tonton video','Watch video')} <i class="fa-solid fa-arrow-right"></i></a></div></article>`;
     }).join('') : `<div class="home-empty">${t('Video tidak ditemukan.','No videos found.')}</div>`;
 
     telegramGrid.innerHTML = foundReviews.length ? foundReviews.slice(0, 8).map(r => {
-      const image = thumb(r.thumbnail_url) || thumb(Array.isArray(r.gallery_urls) ? (typeof r.gallery_urls[0] === 'string' ? r.gallery_urls[0] : r.gallery_urls[0]?.url) : ''), href = `/r/${encodeURIComponent(r.slug)}`;
+      const image = thumb(r.thumbnail_url) || thumb(Array.isArray(r.gallery_urls) ? (typeof r.gallery_urls[0] === 'string' ? r.gallery_urls[0] : r.gallery_urls[0]?.url) : ''), previewInfo=!image?(window.ProjectVIDEmbed?.parse(r.thumbnail_url)||window.ProjectVIDEmbed?.parse(r.review_embed_url)):null, href = `/r/${encodeURIComponent(r.slug)}`;
       const price = r.access === 'free' ? t('Gratis','Free') : money(r.price);
-      return `<article class="home-content-card"><a class="home-card-thumb" href="${href}">${image ? `<img src="${esc(image)}" alt="${esc(r.title)}" loading="lazy">` : placeholder('fa-brands fa-telegram','TELEGRAM MEDIA')}<span class="thumb-tag telegram-tag">TELEGRAM</span></a><div class="home-card-body"><div class="home-review-label">${t('REVIEW TELEGRAM','TELEGRAM REVIEW')}</div><h3><a href="${href}">${esc(r.title)}</a></h3><p class="home-review-description">${esc(r.description || t('Lihat detail review dan informasi akses media ini.','View the review details and access information for this media.')).slice(0,105)}</p><div class="home-card-meta"><span><i class="fa-solid fa-ticket"></i> ${t('Harga akses','Access price')}</span><strong>${price}</strong></div><a class="home-card-link" href="${href}">${t('Lihat review','View review')} <i class="fa-solid fa-arrow-right"></i></a></div></article>`;
+      return `<article class="home-content-card"><a class="home-card-thumb" href="${href}">${image ? `<img src="${esc(image)}" alt="${esc(r.title)}" loading="lazy">` : previewInfo?.type==='iframe'?`<iframe class="home-provider-poster" src="${esc(previewInfo.src)}" title="${esc(r.title)}" loading="lazy" tabindex="-1"></iframe>`:placeholder('fa-brands fa-telegram','TELEGRAM MEDIA')}<span class="thumb-tag telegram-tag">TELEGRAM</span></a><div class="home-card-body"><div class="home-review-label">${t('REVIEW TELEGRAM','TELEGRAM REVIEW')}</div><h3><a href="${href}">${esc(r.title)}</a></h3><p class="home-review-description">${esc(r.description || t('Lihat detail review dan informasi akses media ini.','View the review details and access information for this media.')).slice(0,105)}</p><div class="home-card-meta"><span><i class="fa-solid fa-ticket"></i> ${t('Harga akses','Access price')}</span><strong>${price}</strong></div><a class="home-card-link" href="${href}">${t('Lihat review','View review')} <i class="fa-solid fa-arrow-right"></i></a></div></article>`;
     }).join('') : `<div class="home-empty">${t('Review Telegram tidak ditemukan.','No Telegram reviews found.')}</div>`;
   }
 

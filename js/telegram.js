@@ -4,6 +4,7 @@
   const searchClear = document.getElementById('telegramSearchClear');
   const categoryRoot = document.getElementById('telegramCategories');
   const top10Root = document.getElementById('telegramTop10');
+  const boxTop10Root = document.getElementById('boxVideyTop10');
   if (!grid) return;
 
   const removeLegacyOverlays = () => document.querySelectorAll([
@@ -23,15 +24,23 @@
   const money = v => 'Rp ' + Number(v || 0).toLocaleString('id-ID');
 
   function thumbnailSource(value) {
-    const info = window.ProjectVIDEmbed?.parse(value);
-    if (info?.thumbnail) return info.thumbnail;
-    if (!info) return '';
-    if (info.type === 'image') return info.src;
-    if (info.provider === 'YouTube') {
-      const id = info.src.match(/youtube-nocookie\.com\/embed\/([^?]+)/)?.[1];
-      return id ? `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg` : '';
-    }
-    return '';
+    if (!value) return '';
+    let raw=String(value).trim();
+    const img=raw.match(/<(?:img|source)[^>]+src=[\"']([^\"']+)/i); if(img) raw=img[1];
+    const frame=raw.match(/<iframe[^>]+src=[\"']([^\"']+)/i); if(frame) raw=frame[1];
+    if(raw.startsWith('//'))raw='https:'+raw;
+    if(/^data:image\//i.test(raw))return raw;
+    try {
+      const u=new URL(raw,location.origin); if(!['http:','https:'].includes(u.protocol))return '';
+      if(/\.(?:jpe?g|png|gif|webp|avif)(?:$|[?#])/i.test(u.href))return u.href;
+      const info=window.ProjectVIDEmbed?.parse(raw);
+      if(info?.thumbnail)return info.thumbnail;
+      if(info?.type==='image')return info.src;
+      if(info?.provider==='YouTube'){const id=info.src.match(/youtube-nocookie\.com\/embed\/([^?]+)/)?.[1];return id?`https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`:'';}
+      if(info?.provider==='Google Drive')return info.thumbnail||'';
+      if(/videy\.co$/i.test(u.hostname)){const id=u.searchParams.get('id')||u.pathname.match(/\/v\/([^/]+)/)?.[1];if(id)return `https://cdn.videy.co/${encodeURIComponent(id)}.jpg`;}
+      return '';
+    } catch { return ''; }
   }
 
   function reviewThumbnail(item) {
@@ -39,6 +48,15 @@
     for (const candidate of [item.thumbnail_url, item.review_embed_url, ...gallery.map(x => typeof x === 'string' ? x : (x?.url || x?.src || x?.embed_url || x?.thumbnail_url))]) {
       const src = thumbnailSource(candidate); if (src) return src;
     }
+    return '';
+  }
+  function reviewPreviewMarkup(item, className='') {
+    const poster=reviewThumbnail(item);
+    if(poster)return `<img class="${className}" src="${esc(poster)}" alt="${esc(item.title||'Media preview')}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true">`;
+    const raw=item.thumbnail_url||item.review_embed_url||'';
+    const info=window.ProjectVIDEmbed?.parse(raw);
+    if(info?.type==='iframe')return `<iframe class="telegram-provider-poster ${className}" src="${esc(info.src)}" title="${esc(item.title||'Media preview')}" loading="lazy" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen tabindex="-1"></iframe>`;
+    if(info?.type==='video')return `<video class="telegram-provider-poster ${className}" src="${esc(info.src)}" muted autoplay loop playsinline preload="metadata"></video>`;
     return '';
   }
   function renderCategories() {
@@ -67,13 +85,24 @@
       const price=item.access==='free'?(isEN()?'Free':'Gratis'):money(item.price);
       return `<a class="telegram-top10-card" href="${href}">
         <span class="telegram-top10-rank">${String(index+1).padStart(2,'0')}</span>
-        <span class="telegram-top10-thumb${thumb?'':' no-image'}">${thumb?`<img src="${esc(thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true">`:'<i class="fa-brands fa-telegram"></i>'}</span>
+        <span class="telegram-top10-thumb${thumb?'':' no-image'}">${reviewPreviewMarkup(item)||'<i class="fa-brands fa-telegram"></i>'}</span>
         <span class="telegram-top10-info"><strong>${esc(item.title)}</strong><small><i class="fa-solid fa-eye"></i> ${number(item.view_count)} ${isEN()?'views':'views'}</small><b>${esc(price)}</b></span>
         <i class="fa-solid fa-arrow-up-right-from-square telegram-top10-open"></i>
       </a>`;
     }).join('');
   }
 
+
+  function renderBoxVideyTop10(items) {
+    if(!boxTop10Root)return;
+    const ranked=[...(items||[])].sort((a,b)=>Number(b.view_count||0)-Number(a.view_count||0)).slice(0,10);
+    if(!ranked.length){boxTop10Root.innerHTML='<div class="telegram-top10-empty">Belum ada video yang dipublikasikan.</div>';return;}
+    boxTop10Root.innerHTML=ranked.map((v,i)=>{
+      const poster=thumbnailSource(v.thumbnail_url),info=!poster?window.ProjectVIDEmbed?.parse(v.embed_url):null;
+      const visual=poster?`<img src="${esc(poster)}" alt="${esc(v.title)}" loading="lazy" onerror="this.hidden=true">`:info?.type==='iframe'?`<iframe src="${esc(info.src)}" title="${esc(v.title)}" loading="lazy" tabindex="-1"></iframe>`:'<span class="boxvidey-top10-fallback"><i class="fa-solid fa-play"></i></span>';
+      return `<a class="boxvidey-top10-card" href="/v/${encodeURIComponent(v.slug||v.id)}"><span class="boxvidey-top10-cover">${visual}<span class="boxvidey-top10-rank">${i+1}</span><span class="boxvidey-top10-play"><i class="fa-solid fa-play"></i></span></span><strong>${esc(v.title)}</strong><small><i class="fa-solid fa-eye"></i> ${number(v.view_count)} ${isEN()?'views':'tayangan'}</small></a>`;
+    }).join('');
+  }
   function applyFilters() {
     const q = (searchInput?.value || '').trim().toLocaleLowerCase(isEN()?'en':'id');
     visibleItems = allItems.filter(item => {
@@ -100,7 +129,7 @@
       const categoryName = categories.find(c => c.id === item.category_id)?.name || (isEN() ? 'Telegram media' : 'Media Telegram');
       return `<article class="telegram-review-card">
         <a class="telegram-review-cover${thumb?'':' no-image'}" href="${href}" aria-label="${esc(item.title)}">
-          ${thumb?`<img src="${esc(thumb)}" alt="${esc(item.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true;this.parentElement.classList.add('no-image');this.parentElement.querySelector('.telegram-cover-placeholder')?.remove()">`:`<span class="telegram-cover-placeholder"><i class="fa-brands fa-telegram" aria-hidden="true"></i><strong>BOXCELLINK</strong><small>${isEN()?'Preview unavailable':'Preview belum tersedia'}</small></span>`}
+          ${reviewPreviewMarkup(item)||`<span class="telegram-cover-placeholder"><i class="fa-brands fa-telegram" aria-hidden="true"></i><strong>BOXCELLINK</strong><small>${isEN()?'Preview unavailable':'Preview belum tersedia'}</small></span>`}
           <span class="telegram-cover-badge"><i class="fa-brands fa-telegram" aria-hidden="true"></i> TELEGRAM</span>
           <span class="telegram-cover-open"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></span>
         </a>
@@ -142,13 +171,16 @@
     if (!window.sb) { grid.innerHTML=`<div class="telegram-empty">${isEN()?'Service is temporarily unavailable.':'Layanan sementara tidak tersedia.'}</div>`; return; }
     grid.innerHTML=`<div class="telegram-loading"><span class="telegram-spinner"></span>${isEN()?'Loading published reviews…':'Memuat review yang dipublikasikan…'}</div>`;
     try {
-      const [reviewsResult,categoriesResult] = await Promise.all([
+      const [reviewsResult,categoriesResult,videosResult] = await Promise.all([
         sb.from('review_items').select('id,slug,title,description,review_embed_url,thumbnail_url,gallery_urls,price,access,category_id,view_count,created_at').eq('status','published').order('created_at',{ascending:false}),
-        sb.from('categories').select('id,name,status').eq('status','published').eq('content_type','media_telegram').order('name')
+        sb.from('categories').select('id,name,status').eq('status','published').eq('content_type','media_telegram').order('name'),
+        sb.from('videos').select('id,slug,title,thumbnail_url,embed_url,view_count,created_at').eq('status','published').order('view_count',{ascending:false}).limit(10)
       ]);
       if (reviewsResult.error) throw reviewsResult.error;
       if (categoriesResult.error) console.warn('Category list unavailable:',categoriesResult.error.message);
       allItems = reviewsResult.data || []; categories = categoriesResult.data || [];
+      if(videosResult.error)console.warn('BoxVidey Top 10 unavailable:',videosResult.error.message);
+      renderBoxVideyTop10(videosResult.data||[]);
       const urlCategory = new URLSearchParams(location.search).get('category');
       if(urlCategory && categories.some(c=>c.id===urlCategory)) selectedCategory=urlCategory;
       renderCategories();
