@@ -55,7 +55,9 @@
     if(poster)return `<img class="${className}" src="${esc(poster)}" alt="${esc(item.title||'Media preview')}" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true">`;
     const raw=item.thumbnail_url||item.review_embed_url||'';
     const info=window.ProjectVIDEmbed?.parse(raw);
-    if(info?.type==='iframe')return `<iframe class="telegram-provider-poster ${className}" src="${esc(info.src)}" title="${esc(item.title||'Media preview')}" loading="lazy" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen tabindex="-1"></iframe>`;
+    let frame=info?.type==='iframe'?info.src:'';
+    if(!frame&&info?.provider==='MEGA'){try{const u=new URL(info.original);if(u.pathname.startsWith('/file/'))u.pathname=u.pathname.replace('/file/','/embed/');if(u.pathname.startsWith('/embed/'))frame=u.href}catch{}}
+    if(frame)return `<iframe class="telegram-provider-poster ${className}" src="${esc(frame)}" title="${esc(item.title||'Media preview')}" loading="lazy" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen tabindex="-1"></iframe>`;
     if(info?.type==='video')return `<video class="telegram-provider-poster ${className}" src="${esc(info.src)}" muted autoplay loop playsinline preload="metadata"></video>`;
     return '';
   }
