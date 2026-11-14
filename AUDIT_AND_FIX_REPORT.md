@@ -139,3 +139,19 @@ Jalankan migration ini pada project Supabase aktif setelah tabel terkait tersedi
 - Link komunitas Telegram resmi masih membutuhkan konfigurasi URL yang benar di `js/config.js`; kontrol pengaturan link dari panel admin belum ditambahkan.
 - Pengumuman admin untuk dashboard dan halaman notifikasi membaca tabel `announcements`; pengumuman personal tetap membaca `boxcellink_notifications`.
 - Belum dilakukan uji browser fisik Android atau deployment Cloudflare Pages.
+
+
+## Perbaikan lanjutan — katalog Book Video dan navigasi
+
+1. Menambahkan halaman publik `book-video.html` sebagai katalog BoxVidey terpisah dari halaman `watch.html`.
+2. Halaman Book Video menampilkan Top 10 BoxVidey, pencarian, kategori, daftar video dengan pagination 10 item, dan Top 10 Media Telegram.
+3. Tombol Book Video di menu navigasi sekarang membuka `/book-video.html`; tombol pada kartu video membuka `/v/:slug` sehingga pemutaran tetap berada di halaman Watch.
+4. Link kategori dari halaman Watch diarahkan ke katalog Book Video, bukan beranda.
+5. Thumbnail katalog membaca kolom thumbnail/poster secara eksplisit, menangani thumbnail gambar langsung dan preview embed provider. URL MEGA file/share yang dapat diubah ke endpoint embed ditampilkan sebagai iframe preview. Provider tetap dapat membatasi akses melalui kebijakan iframe mereka.
+6. Rail Top 10 BoxVidey pada halaman Telegram dipindahkan ke bawah daftar review Telegram.
+7. Tombol lihat review dibuat responsif agar teks tidak terpotong pada kartu sempit.
+8. Kontrol bahasa navbar dibuat ikon saja (tanpa label ID/ENG); drawer dipersempit.
+9. Pengaturan navbar admin menggunakan pilihan halaman umum (Dashboard, Book Video, Media Telegram, Group VIP, Profil, Wallet, Referral, Notifikasi, Akun Saya), dengan pilihan URL khusus opsional.
+10. Pemeriksaan ulang: `node --check` seluruh JavaScript lulus dan `npm run build` berhasil.
+
+Catatan: preview MEGA pada kolom thumbnail menggunakan iframe embed; ini tidak menjamin frame bisa menampilkan gambar diam pada semua perangkat/provider. Agar thumbnail benar-benar berupa poster gambar yang konsisten, gunakan URL file gambar publik (JPG/PNG/WebP) pada kolom Thumbnail.
