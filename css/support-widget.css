@@ -78,3 +78,5 @@
   .bc-support-choice>span:last-child{padding:9px 11px;font-size:11px}
   .bc-support-chat{bottom:68px!important;width:min(365px,calc(100vw - 28px));height:min(520px,calc(100dvh - 96px))}
 }
+
+.bc-support-faq{padding:12px;border-bottom:1px solid #e8edf3;background:#f8fafc}.bc-support-faq>b{display:block;margin-bottom:9px;color:#1f3b5b;font-size:12px}.bc-support-faq #bcSupportFaqChoices{display:grid;gap:6px;max-height:142px;overflow:auto}.bc-support-faq button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:9px;background:#fff;color:#334155;text-align:left;font:600 11px/1.35 inherit;cursor:pointer}.bc-support-faq button:hover{border-color:#93bce8;background:#f1f7ff}.bc-support-faq #bcSupportFaqAnswer{margin-top:8px;color:#475569;font-size:11px;line-height:1.55}.bc-support-faq #bcSupportFaqAnswer p{margin:5px 0}.bc-support-faq #bcSupportFaqAnswer button{margin-top:7px}
