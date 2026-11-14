@@ -1,7 +1,8 @@
 const g=document.getElementById('reviewGrid'),pager=document.getElementById('reviewPagination');let page=1;
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function reviewThumb(item){
-  const raw=typeof item==='string'?item:(item?.thumbnail_url||item?.url||item?.src||'');
+  let raw=typeof item==='string'?item:(item?.thumbnail_url||item?.url||item?.src||'');
+  raw=String(raw||'').trim(); const imgTag=raw.match(/<(?:img|source)[^>]+src=[\"']([^\"']+)/i); if(imgTag)raw=imgTag[1]; const frameTag=raw.match(/<iframe[^>]+src=[\"']([^\"']+)/i); if(frameTag)raw=frameTag[1]; if(raw.startsWith('//'))raw='https:'+raw;
   if(!raw)return '';
   const iframe=raw.match(/<iframe[^>]+src=["']([^"']+)/i);const value=iframe?iframe[1]:raw;
   try{
@@ -9,7 +10,8 @@ function reviewThumb(item){
     if(!['http:','https:'].includes(u.protocol))return '';
     if(/drive\.google\.com$/i.test(u.hostname)){const id=u.pathname.match(/\/file\/d\/([^/]+)/)?.[1]||u.searchParams.get('id');if(id)return `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w900`;}
     if(/youtube\.com|youtu\.be/i.test(u.hostname)){const id=u.hostname==='youtu.be'?u.pathname.split('/').filter(Boolean)[0]:(u.searchParams.get('v')||u.pathname.match(/\/embed\/([^/]+)/)?.[1]);if(id)return `https://img.youtube.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`;}
-    if(/videy\.co$/i.test(u.hostname)){const id=u.searchParams.get('id')||u.pathname.match(/\/v\/([^/]+)/)?.[1];if(id)return `https://cdn.videy.co/${encodeURIComponent(id)}.jpg`;}
+    if(/videy\.co$/i.test(u.hostname)){const id=u.searchParams.get('id')||u.pathname.match(/\/v\/([^/]+)/)?.[1];if(id)return `https://cdn.videy.co/${encodeURIComponent(id)}.jpg`; }
+    if(/mega\.(?:nz|co\.nz)$/i.test(u.hostname))return ''; // MEGA requires an explicit image poster URL; the share URL is not an image.
     if(/\.(mp4|webm|m3u8)(?:$|\?)/i.test(value)){const id=u.pathname.split('/').pop().replace(/\.(mp4|webm|m3u8)$/i,'');if(/cdn\.videy\.co$/i.test(u.hostname))return `https://cdn.videy.co/${encodeURIComponent(id)}.jpg`;return '';}
     return value;
   }catch{return '';}

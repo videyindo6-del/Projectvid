@@ -23,30 +23,33 @@ function isVipVideo(v){return String(v.access||'').toLowerCase()==='vip'||String
 function isLoginVideo(v){return String(v.access_scope||'').toLowerCase()==='login'&&!isVipVideo(v)}
 function loginNextUrl(){const next=location.pathname+location.search;return '/login.html?next='+encodeURIComponent(next)}
 function videoUrl(v){return '/v/'+encodeURIComponent(v.slug||v.id)}
-function openVideoFromCard(v){if(!v)return;if(!currentUser){showVipModal(isVipVideo(v)?'vip':'login');return}if(isVipVideo(v)&&!isVip){showVipModal('vip');return}location.href=videoUrl(v)}
+function openVideoFromCard(v){if(!v)return;if(isVipVideo(v)&&!isVip){showVipModal('vip');return}if(!currentUser&&isLoginVideo(v)){showVipModal('login');return}location.href=videoUrl(v)}
 function orientation(v){const raw=String(v?.orientation||v?.video_orientation||'auto').toLowerCase();if(['vertical','portrait','9:16'].includes(raw))return 'vertical';if(['horizontal','landscape','16:9'].includes(raw))return 'horizontal';return 'auto'}
 function thumbnailSource(value){
  if(!value)return '';
- const raw=typeof value==='string'?value:(value.url||value.src||value.thumbnail_url||value.embed_url||value.embed||'');
- const info=window.ProjectVIDEmbed?.parse(raw);
- if(info?.thumbnail)return info.thumbnail;
- if(info?.type==='image'||info?.type==='video')return info.src;
- if(info?.provider==='YouTube'){
-  const id=info.src.match(/youtube-nocookie\.com\/embed\/([^?]+)/)?.[1];
-  return id?`https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`:'';
- }
- if(info?.provider==='Google Drive')return '';
- if(info)return '';
- let fallback=String(raw||'').trim();
- const iframe=fallback.match(/<iframe[^>]+src=["']([^"']+)/i);if(iframe)fallback=iframe[1];
- const img=fallback.match(/<img[^>]+src=["']([^"']+)/i);if(img)fallback=img[1];
- if(fallback.startsWith('//'))fallback='https:'+fallback;
- return /^https?:\/\//i.test(fallback)||/^data:image\//i.test(fallback)?fallback:'';
+ let raw=typeof value==='string'?value:(value.url||value.src||value.thumbnail_url||value.embed_url||value.embed||'');
+ raw=String(raw).trim();
+ // A thumbnail field is an explicit poster: don't reinterpret a provider URL as the video embed.
+ const imageMatch=raw.match(/<(?:img|source)[^>]+src=["']([^"']+)/i);
+ if(imageMatch)raw=imageMatch[1];
+ const iframeMatch=raw.match(/<iframe[^>]+src=["']([^"']+)/i);
+ if(iframeMatch)raw=iframeMatch[1];
+ if(raw.startsWith('//'))raw='https:'+raw;
+ if(/^data:image\//i.test(raw))return raw;
+ try{const u=new URL(raw,location.origin);if(!['http:','https:'].includes(u.protocol))return '';if(/\.(?:jpe?g|png|gif|webp|avif)(?:$|[?#])/i.test(u.href))return u.href;
+  const info=window.ProjectVIDEmbed?.parse(raw);
+  if(info?.thumbnail)return info.thumbnail;
+  if(info?.type==='image')return info.src;
+  if(info?.provider==='YouTube'){const id=info.src.match(/youtube-nocookie\.com\/embed\/([^?]+)/)?.[1];return id?`https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`:'';}
+  if(info?.provider==='Google Drive')return info.thumbnail||'';
+  return '';
+ }catch{return '';}
 }
 
 function imageMarkup(v){
- const src=thumbnailSource(v?.thumbnail_url)||thumbnailSource(v?.embed_url)||thumbnailSource(v?.video_url)||thumbnailSource(v?.poster_url);
- if(!src)return `<div class="thumb-placeholder"><i class="fa-solid fa-circle-play"></i></div>`;
+ const explicit=thumbnailSource(v?.thumbnail_url)||thumbnailSource(v?.poster_url);
+ const src=explicit||thumbnailSource(v?.embed_url)||thumbnailSource(v?.video_url);
+ if(!src){const raw=v?.embed_url||v?.video_url||'';const info=window.ProjectVIDEmbed?.parse(raw);if(info?.type==='iframe')return `<iframe class="watch-provider-poster" src="${esc(info.src)}" title="${esc(v?.title||'Video preview')}" loading="lazy" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen tabindex="-1"></iframe>`;return `<div class="thumb-placeholder"><i class="fa-solid fa-circle-play"></i></div>`;}
  if(/\.(mp4|webm|ogg|m4v|mov|m3u8|mpd)(?:[?#].*)?$/i.test(src))return `<video class="watch-history-thumb" src="${esc(src)}" muted playsinline autoplay loop preload="metadata"></video>`;
  return `<img loading="lazy" src="${esc(src)}" alt="${esc(v?.title||'Video thumbnail')}" onerror="this.onerror=null;this.remove();this.parentElement.classList.add('thumb-failed')">`;
 }
@@ -314,7 +317,7 @@ function renderVideos(){
 }
 document.querySelectorAll('.filter-chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeFilter=b.dataset.filter;page=1;renderVideos()});
 async function loadCategories(){const {data,error}=await sb.from('categories').select('id,name').eq('status','published').order('name');const box=$('#categoryList');if(error||!data?.length){box.innerHTML=`<div class=\"empty-state\">${tr('categoriesEmpty')}</div>`;categories=[];return}categories=data;const results=await Promise.all([sb.from('videos').select('id',{count:'exact',head:true}).eq('status','published'),...data.map(c=>sb.from('videos').select('id',{count:'exact',head:true}).eq('status','published').eq('category_id',c.id))]);categoryCounts={};data.forEach((c,i)=>{categoryCounts[c.id]=results[i+1]?.count||0});if(results.some(r=>r.error))console.warn('One or more category counts could not be loaded.');const total=results[0]?.count||0;box.innerHTML=`<a href=\"/index.html\" class=\"category-link\"><span><i class=\"fa-solid fa-border-all\"></i> ${lang()==='id'?'Semua video':'All videos'}</span><b class=\"category-count\">${total} media</b></a>`+data.map(c=>`<a href=\"/index.html?category=${encodeURIComponent(c.id)}\" class=\"category-link\"><span><i class=\"fa-regular fa-folder\"></i> ${esc(c.name)}</span><b class=\"category-count\">${categoryCounts[c.id]||0} media</b></a>`).join('')}
-function renderCategoryVideos(){const box=$('#categoryVideoSections');if(!box)return;const cats=categories;if(!cats.length){box.innerHTML=`<div class="empty-state">${tr('categoriesEmpty')}</div>`;return}box.innerHTML=cats.map(c=>{const rows=allVideos.filter(v=>String(v.category_id||'')===String(c.id));return `<section class="category-video-block"><div class="category-video-head"><h3>${esc(c.name)} <span class="category-count">${categoryCounts[c.id]||0} ${lang()==='id'?'media':'media'}</span></h3><a href="/index.html?category=${encodeURIComponent(c.id)}">${tr('seeAll')} →</a></div><div class="category-video-rail">${rows.length?rows.slice(0,12).map(cardMarkup).join(''):`<div class="empty-state">${tr('emptyVideos')}</div>`}</div></section>`}).join('');box.querySelectorAll('[data-video-id]').forEach(btn=>btn.onclick=()=>{const found=allVideos.find(v=>v.id===btn.dataset.videoId);if(found)openVideoFromCard(found)})}
+function renderCategoryVideos(){const box=$('#categoryVideoSections');if(!box)return;const cats=categories;if(!cats.length){box.innerHTML=`<div class="empty-state">${tr('categoriesEmpty')}</div>`;return}box.innerHTML=cats.map(c=>{const rows=allVideos.filter(v=>String(v.category_id||'')===String(c.id));return `<section class="category-video-block"><div class="category-video-head"><h3>${esc(c.name)} <span class="category-count">${categoryCounts[c.id]||0} ${lang()==='id'?'media':'media'}</span></h3><a href="/watch.html?category=${encodeURIComponent(c.id)}">${tr('seeAll')} →</a></div><div class="category-video-rail">${rows.length?rows.slice(0,12).map(cardMarkup).join(''):`<div class="empty-state">${tr('emptyVideos')}</div>`}</div></section>`}).join('');box.querySelectorAll('[data-video-id]').forEach(btn=>btn.onclick=()=>{const found=allVideos.find(v=>v.id===btn.dataset.videoId);if(found)openVideoFromCard(found)})}
 function renderVipRail(){
  const box=$('#vipVideoRail');if(!box)return;const rows=allVideos.filter(isVipVideo).slice(0,12);
  if(!rows.length){box.innerHTML=`<div class="empty-state">Belum ada video VIP yang dipublikasikan.</div>`;return;}
