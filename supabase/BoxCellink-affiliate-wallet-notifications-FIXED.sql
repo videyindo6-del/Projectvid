@@ -290,7 +290,7 @@ declare n integer;
 begin
  delete from public.admin_discount_claims cl where cl.expires_at is not null and cl.expires_at<=now() and not exists(select 1 from public.admin_discount_reservations r where r.claim_id=cl.id and r.state='reserved');
  get diagnostics n=row_count;
- update public.admin_discount_codes c set claimed_count=(select count(*) from public.admin_discount_claims cl where cl.code_id=c.id);
+ update public.admin_discount_codes c set claimed_count=(select count(*) from public.admin_discount_claims cl where cl.code_id=c.id) where c.id is not null;
  return n;
 end $$;
 revoke all on function public.cleanup_expired_admin_discount_claims() from public,anon,authenticated;
@@ -318,7 +318,7 @@ returns jsonb language plpgsql security definer set search_path=public as $$
 begin
  delete from public.admin_discount_claims cl where cl.id=p_claim_id and cl.user_id=auth.uid() and not exists(select 1 from public.admin_discount_reservations r where r.claim_id=cl.id and r.state='reserved');
  if not found then return jsonb_build_object('ok',false,'reason','CLAIM_NOT_FOUND_OR_RESERVED'); end if;
- update public.admin_discount_codes c set claimed_count=(select count(*) from public.admin_discount_claims cl where cl.code_id=c.id);
+ update public.admin_discount_codes c set claimed_count=(select count(*) from public.admin_discount_claims cl where cl.code_id=c.id) where c.id is not null;
  return jsonb_build_object('ok',true);
 end $$;
 revoke all on function public.delete_own_discount_claim(uuid) from public,anon;
@@ -647,7 +647,7 @@ begin
  where cl.user_id=auth.uid() and cl.expires_at is not null and cl.expires_at<=now()
  and not exists(select 1 from public.admin_discount_reservations r where r.claim_id=cl.id and r.state='reserved');
  get diagnostics n=row_count;
- update public.admin_discount_codes c set claimed_count=(select count(*) from public.admin_discount_claims cl where cl.code_id=c.id);
+ update public.admin_discount_codes c set claimed_count=(select count(*) from public.admin_discount_claims cl where cl.code_id=c.id) where c.id is not null;
  return n;
 end $$;
 revoke all on function public.cleanup_my_expired_discount_claims() from public,anon;

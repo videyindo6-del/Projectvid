@@ -2,7 +2,7 @@
 -- Ensure VIP group pricing exists.
 alter table public.vip_groups add column if not exists price bigint not null default 5000 check(price>=2000);
 -- Admin-created promo codes are claimable by 2-10 distinct members.
-update public.admin_discount_codes set claim_limit=greatest(2,least(10,claim_limit));
+update public.admin_discount_codes set claim_limit=greatest(2,least(10,claim_limit)) where id is not null;
 alter table public.admin_discount_codes drop constraint if exists admin_discount_codes_claim_limit_check;
 alter table public.admin_discount_codes add constraint admin_discount_codes_claim_limit_check check(claim_limit between 2 and 10);
 alter table public.admin_discount_codes alter column claim_limit set default 2;
