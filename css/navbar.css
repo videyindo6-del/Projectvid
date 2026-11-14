@@ -94,3 +94,24 @@
 #translateBtn{width:42px;min-width:42px;padding:0;gap:0}#translateBtn #translateLabel{display:none!important}.bc-drawer{width:min(310px,78vw)}@media(max-width:480px){.bc-drawer{width:min(290px,78vw)}}
 
 .bc-menu .bc-menu-box-link{min-height:46px;border-radius:12px;display:flex;align-items:center;gap:12px;padding:0 13px;color:#344b63;text-decoration:none;font-weight:800}.bc-menu .bc-menu-box-link i{width:20px;text-align:center;color:#2866ad}.bc-menu .bc-menu-box-link:hover{background:#f1f6fc;color:#205b9e}.bc-menu .bc-submenu-expand{min-height:34px!important;padding-left:45px!important;font-size:11px!important;color:#718096!important}.bc-menu .bc-submenu-expand .submenu-chevron{margin-left:auto}
+
+/* Navbar category totals and functional notification inbox dropdown */
+.bc-menu .bc-submenu-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;margin:2px 0 5px;border-radius:9px;background:#edf4fb;color:#244c72}
+.bc-menu .bc-submenu-summary b{font-size:11px;font-weight:900}
+.bc-menu .bc-submenu-summary small{font-size:10px;color:#607b96;white-space:nowrap}
+.bc-notification-dropdown[hidden]{display:none!important}
+.bc-notification-dropdown{display:block;max-height:min(72vh,470px);overflow-y:auto;overscroll-behavior:contain}
+.bc-notification-items{display:grid;gap:2px;max-height:310px;overflow-y:auto;overscroll-behavior:contain}
+.bc-notification-item{display:grid;gap:4px;padding:12px 9px;border-bottom:1px solid #edf1f5;text-decoration:none;color:#263d54;border-radius:9px}
+.bc-notification-item b{font-size:12px;font-weight:600;line-height:1.4}
+.bc-notification-item.unread b{font-weight:900;color:#173b5d}
+.bc-notification-item.unread{background:#edf5ff;border-left:3px solid #3478bd}
+.bc-notification-item span{font-size:11px;color:#64748b;line-height:1.45}
+.bc-notification-item small{font-size:10px;color:#8998a8}
+.bc-notification-empty{padding:18px 10px;text-align:center;color:#8190a1;font-size:12px;margin:0}
+.bc-notification-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:10px 2px 2px;border-top:1px solid #e9eef4;margin-top:5px}
+.bc-notification-actions button{min-height:36px;border:1px solid #d8e4f0;border-radius:9px;background:#f3f8fd;color:#245b96;font-size:10px;font-weight:800;padding:6px;cursor:pointer}
+.bc-notification-actions button:last-child{border-color:#f0d7d7;background:#fff5f5;color:#b42318}
+.bc-notification-actions button:disabled{opacity:.45;cursor:not-allowed}
+#navNotificationBtn{position:relative}
+@media(max-width:620px){.bc-notification-dropdown{position:fixed;top:66px;right:8px;left:8px;width:auto;max-width:none;max-height:72vh}.bc-notification-items{max-height:48vh}.bc-notification-head{position:sticky;top:-12px;background:#fffefa;z-index:2;padding:8px 4px 10px}}
