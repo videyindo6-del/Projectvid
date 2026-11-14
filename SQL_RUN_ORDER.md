@@ -58,7 +58,7 @@ Jalankan `supabase/PROJECTVID_MASTER.sql` satu kali dari Supabase Dashboard → 
 
 24. `supabase/BoxCellink-affiliate-wallet-notifications-FIXED.sql` — tabel dasar saldo, aplikasi affiliate, withdraw, ledger, notifikasi, settlement deposit, dan pembelian saldo deposit.
 25. `supabase/boxcellink_wallet_withdraw_v2.sql` — alamat bertingkat, data bank/e-wallet, fee withdraw Rp7.000, net diterima, status revisi, notifikasi admin, dan bonus Share to Earn video Rp2.
-26. `supabase/site_nav_items.sql` — tabel pengaturan menu navbar, sinkronisasi pengumuman ke notifikasi member, dan policy agar member dapat mengatur status baca serta menghapus notifikasi miliknya.
+26. `supabase/site_nav_items.sql` — tabel pengaturan menu navbar, sinkronisasi pengumuman, notifikasi otomatis setelah pembelian Media Telegram berstatus SETTLED, serta policy agar member hanya dapat menghapus notifikasi miliknya yang sudah dibaca.
 
 Jangan jalankan langkah 25 sebelum langkah 24. Migrasi ini bersifat additive dan harus diuji pada project Supabase target sebelum dipakai di produksi.
 

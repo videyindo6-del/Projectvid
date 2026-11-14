@@ -1,5 +1,5 @@
 (() => {
-const translations={id:{admin:'Panel Admin',dashboard:'Dashboard',account:'Akun Saya',box:'BoxVidey',telegram:'Media Telegram',review:'Review & Download',vip:'VIP',groups:'Group VIP Telegram',discount:'Kode Diskon Saya',referral:'Referral & Hadiah',notifications:'Notifikasi',wallet:'Saldo & Afiliasi',categories:'Kategori',payments:'Pembayaran',login:'Masuk',register:'Daftar',logout:'Keluar',terms:'Syarat & ketentuan',privacy:'Kebijakan Dan Privasi',help:'Bantuan',cookies:'Kami menggunakan cookie untuk pengalaman yang lebih baik.',accept:'Setujui'},en:{admin:'Admin Panel',dashboard:'Dashboard',account:'My Account',box:'BoxVidey',telegram:'Telegram Media',review:'Review & Download',vip:'VIP',groups:'VIP Telegram Groups',discount:'My Discount Codes',referral:'Referral & Rewards',notifications:'Notifications',wallet:'Wallet & Affiliate',categories:'Categories',payments:'Payments',login:'Sign in',register:'Sign up',logout:'Sign out',terms:'Terms & Conditions',privacy:'Privacy Policy',help:'Help',cookies:'We use cookies for a better experience.',accept:'Accept'}};
+const translations={id:{admin:'Panel Admin',dashboard:'Dashboard',account:'Akun Saya',box:'Box Video',telegram:'Media Telegram',review:'Review & Download',vip:'VIP',groups:'Group VIP Telegram',discount:'Kode Diskon Saya',referral:'Referral & Hadiah',notifications:'Notifikasi',wallet:'Saldo & Afiliasi',categories:'Kategori',payments:'Pembayaran',login:'Masuk',register:'Daftar',logout:'Keluar',terms:'Syarat & ketentuan',privacy:'Kebijakan Dan Privasi',help:'Bantuan',cookies:'Kami menggunakan cookie untuk pengalaman yang lebih baik.',accept:'Setujui'},en:{admin:'Admin Panel',dashboard:'Dashboard',account:'My Account',box:'Box Video',telegram:'Telegram Media',review:'Review & Download',vip:'VIP',groups:'VIP Telegram Groups',discount:'My Discount Codes',referral:'Referral & Rewards',notifications:'Notifications',wallet:'Wallet & Affiliate',categories:'Categories',payments:'Payments',login:'Sign in',register:'Sign up',logout:'Sign out',terms:'Terms & Conditions',privacy:'Privacy Policy',help:'Help',cookies:'We use cookies for a better experience.',accept:'Accept'}};
 const getLang=()=>localStorage.getItem('boxcellink_lang')||'id';
 function applyLocal(l=getLang()){const d=translations[l]||translations.id;document.documentElement.lang=l;document.querySelectorAll('[data-nav]').forEach(e=>{if(d[e.dataset.nav])e.textContent=d[e.dataset.nav]});document.querySelectorAll('[data-footer]').forEach(e=>{if(d[e.dataset.footer])e.textContent=d[e.dataset.footer]});const b=document.getElementById('translateLabel');if(b)b.textContent=l==='id'?'ID':'ENG';}
 async function load(selector,url){const el=document.querySelector(selector);if(!el)return;try{const r=await fetch(url,{credentials:'same-origin',cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);el.innerHTML=await r.text();}catch(e){console.error('Component load failed',url,e);if(selector.includes('footer'))el.innerHTML='<footer class="bc-footer"><div class="bc-footer-inner"><div>© <span id="footerYear"></span> Boxcellink. All rights reserved.</div><nav><a href="/terms.html">Syarat & ketentuan</a><a href="/privacy.html">Kebijakan Dan Privasi</a><a href="/help.html">Bantuan</a></nav></div></footer>';else if(selector.includes('navbar'))el.innerHTML='<header class="bc-navbar"><div class="bc-nav-inner"><a class="bc-brand" href="/index.html">BoxCellink</a><div class="bc-nav-actions"><button id="translateBtn" class="bc-nav-btn" type="button"><span id="translateLabel">ID</span></button></div></div></header>';}}
@@ -46,28 +46,64 @@ async function loadCustomNavItems(){
 async function initMemberNavExtras(user){
  const wallet=document.getElementById('navWallet'),notifyWrap=document.getElementById('navNotificationWrap');
  const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
- const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
  if(wallet){
-  try{
-   const {data:p,error}=await window.sb.from('profiles').select('deposit_balance,affiliate_balance').eq('id',user.id).maybeSingle();
-   if(!error&&p){document.getElementById('navDepositBalance').textContent=money(p.deposit_balance);document.getElementById('navAffiliateBalance').textContent=money(p.affiliate_balance);wallet.hidden=false;}
-  }catch(e){console.warn('Wallet summary unavailable:',e);}
+  try{const {data:p,error}=await window.sb.from('profiles').select('deposit_balance,affiliate_balance').eq('id',user.id).maybeSingle();if(!error&&p){document.getElementById('navDepositBalance').textContent=money(p.deposit_balance);document.getElementById('navAffiliateBalance').textContent=money(p.affiliate_balance);wallet.hidden=false;}}catch(e){console.warn('Wallet summary unavailable:',e);}
  }
  if(!notifyWrap)return;
  notifyWrap.hidden=false;
- const dropdown=document.getElementById('navNotificationDropdown'),button=document.getElementById('navNotificationBtn'),items=document.getElementById('navNotificationItems'),badge=document.getElementById('navNotificationCount');
- const refresh=async()=>{
-  try{
-   const {data,error}=await window.sb.from('boxcellink_notifications').select('id,title,body,href,is_read,created_at').order('created_at',{ascending:false}).limit(20);
-   if(error)throw error;
-   const rows=data||[],unread=rows.filter(x=>!x.is_read).length;
-   badge.textContent=unread>99?'99+':String(unread);badge.hidden=!unread;
-   items.innerHTML=rows.slice(0,6).map(n=>`<a class="bc-notification-item ${n.is_read?'':'unread'}" href="${escapeHtml((n.href||'/notifications.html').startsWith('/')?n.href:'/notifications.html')}" data-notification-id="${escapeHtml(n.id)}"><b>${escapeHtml(n.title)}</b><span>${escapeHtml(n.body)}</span><small>${new Date(n.created_at).toLocaleString('id-ID')}</small></a>`).join('')||'<p class="bc-notification-empty">Belum ada notifikasi.</p>';
-   items.querySelectorAll('[data-notification-id]').forEach(a=>a.addEventListener('click',async()=>{const id=a.dataset.notificationId;await window.sb.from('boxcellink_notifications').update({is_read:true}).eq('id',id);}));
-  }catch(e){items.innerHTML='<p class="bc-notification-empty">Notifikasi belum tersedia.</p>';console.warn('Notification dropdown unavailable:',e);}
- };
+ const badge=document.getElementById('navNotificationCount'),btn=document.getElementById('navNotificationBtn'),panel=document.getElementById('navNotificationDropdown'),list=document.getElementById('navNotificationItems');
+ const markBtn=document.getElementById('navMarkAllRead'),deleteBtn=document.getElementById('navDeleteAllRead');
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const safeHref=v=>String(v||'').startsWith('/')&&!String(v).startsWith('//')?v:'/notifications.html';
+ let rows=[];
+ const render=()=>{if(!list)return;list.innerHTML=rows.length?rows.map(n=>`<a class="bc-notification-item ${n.is_read?'':'unread'}" href="${esc(safeHref(n.href))}" data-nav-notice="${esc(n.id)}"><b>${esc(n.title||'Notifikasi')}</b><span>${esc(n.body||'')}</span><small>${new Date(n.created_at).toLocaleString('id-ID')}</small></a>`).join(''):'<p class="bc-notification-empty">Belum ada notifikasi.</p>';const unread=rows.filter(n=>!n.is_read).length;if(badge){badge.textContent=unread>99?'99+':String(unread);badge.hidden=!unread;}if(markBtn)markBtn.disabled=!unread;if(deleteBtn)deleteBtn.disabled=!rows.some(n=>n.is_read);};
+ const load=async()=>{const {data,error}=await window.sb.from('boxcellink_notifications').select('id,title,body,href,is_read,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(5);if(error)throw error;rows=data||[];render();};
+ const refresh=async()=>{try{await load();}catch(e){if(list)list.innerHTML='<p class="bc-notification-empty">Notifikasi belum dapat dimuat.</p>';if(badge)badge.hidden=true;console.warn('Notification preview unavailable:',e);}};
  await refresh();
- if(button&&!button.dataset.bound){button.dataset.bound='1';button.addEventListener('click',()=>{dropdown.hidden=!dropdown.hidden;if(!dropdown.hidden)refresh()});document.addEventListener('click',e=>{if(!e.target.closest('#navNotificationWrap'))dropdown.hidden=true});}
+ if(btn&&!btn.dataset.bound){btn.dataset.bound='1';btn.addEventListener('click',async()=>{const open=panel?.hidden!==false;if(panel)panel.hidden=!open;btn.setAttribute('aria-expanded',String(open));if(open)await refresh();});}
+ if(panel&&!panel.dataset.bound){panel.dataset.bound='1';panel.addEventListener('click',async e=>{const link=e.target.closest('[data-nav-notice]');if(!link)return;e.preventDefault();const id=link.dataset.navNotice,href=link.href;const row=rows.find(x=>String(x.id)===String(id));if(row&&!row.is_read){const {error}=await window.sb.from('boxcellink_notifications').update({is_read:true}).eq('id',id).eq('user_id',user.id);if(error){console.warn('Mark notification read failed:',error);return;}}location.assign(href);});}
+ if(markBtn&&!markBtn.dataset.bound){markBtn.dataset.bound='1';markBtn.addEventListener('click',async()=>{if(!rows.some(n=>!n.is_read))return;markBtn.disabled=true;const {error}=await window.sb.from('boxcellink_notifications').update({is_read:true}).eq('user_id',user.id).eq('is_read',false);if(error){console.warn('Mark all notifications failed:',error);return;}await refresh();});}
+ if(deleteBtn&&!deleteBtn.dataset.bound){deleteBtn.dataset.bound='1';deleteBtn.addEventListener('click',async()=>{if(!rows.some(n=>n.is_read)||!confirm('Hapus semua notifikasi yang sudah dibaca?'))return;deleteBtn.disabled=true;const {error}=await window.sb.from('boxcellink_notifications').delete().eq('user_id',user.id).eq('is_read',true);if(error){console.warn('Delete read notifications failed:',error);return;}await refresh();});}
+ if(!document.body.dataset.noticeOutsideBound){document.body.dataset.noticeOutsideBound='1';document.addEventListener('click',e=>{if(!notifyWrap.contains(e.target)){if(panel)panel.hidden=true;btn?.setAttribute('aria-expanded','false');}});}
+}
+async function initNavCategoryMenus(){
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ // BoxVidey categories are nested under one compact accordion, not a separate
+ // top-level navigation destination. Public categories are safe for guests too.
+ if(window.sb?.from){
+   try{
+     const {data:cats,error:catError}=await window.sb.from('categories').select('id,name,content_type').eq('status','published').order('name');
+     if(!catError){
+       const boxCats=(cats||[]).filter(c=>c.content_type==='box_video'),tgCats=(cats||[]).filter(c=>c.content_type==='media_telegram');
+       const countByCategory=async(table,items)=>{const pairs=await Promise.all(items.map(async c=>{const {count,error}=await window.sb.from(table).select('id',{count:'exact',head:true}).eq('status','published').eq('category_id',c.id);if(error)console.warn(`Category count ${table}/${c.id}:`,error.message);return [c.id,error?0:(count||0)];}));return new Map(pairs);};
+       const [videoCounts,reviewCounts,videoTotalResult,reviewTotalResult]=await Promise.all([
+         countByCategory('videos',boxCats),countByCategory('review_items',tgCats),
+         window.sb.from('videos').select('id',{count:'exact',head:true}).eq('status','published'),
+         window.sb.from('review_items').select('id',{count:'exact',head:true}).eq('status','published')
+       ]);
+       const boxTotal=videoTotalResult.error?0:(videoTotalResult.count||0),tgTotal=reviewTotalResult.error?0:(reviewTotalResult.count||0);
+       document.querySelectorAll('.bc-submenu[id^="boxCategorySubmenu"]').forEach(target=>{
+         target.innerHTML=`<div class="bc-submenu-summary"><b>${boxTotal.toLocaleString('id-ID')} BoxVidey</b><small>${boxCats.length} kategori</small></div><a class="bc-box-video-all" href="/book-video.html">Lihat semuanya <small>(${boxTotal})</small></a>`+(boxCats.map(c=>`<a class="bc-box-video-category" href="/book-video.html?category=${encodeURIComponent(c.id)}">${esc(c.name)} <small>(${videoCounts.get(c.id)||0})</small></a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>');
+       });
+       document.querySelectorAll('.bc-submenu[id^="telegramCategorySubmenu"]').forEach(target=>{
+         target.innerHTML=`<div class="bc-submenu-summary"><b>${tgTotal.toLocaleString('id-ID')} Media Telegram</b><small>${tgCats.length} kategori</small></div><a href="/telegram.html">Lihat semuanya <small>(${tgTotal})</small></a>`+(tgCats.map(c=>`<a href="/telegram.html?category=${encodeURIComponent(c.id)}">${esc(c.name)} <small>(${reviewCounts.get(c.id)||0})</small></a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>');
+       });
+     }
+   }catch(e){console.warn('Navigation categories unavailable:',e);}
+ }
+ document.querySelectorAll('.bc-submenu[id^="boxCategorySubmenu"] a').forEach(link=>{
+  try{const target=new URL(link.getAttribute('href')||'',location.origin);if(/\/(?:watch|videos?)(?:\.html)?$/i.test(target.pathname)){target.pathname='/book-video.html';link.href=target.pathname+target.search+target.hash;}}catch{}
+ });
+ document.querySelectorAll('.bc-submenu-toggle').forEach(toggle=>{
+   const submenu=document.getElementById(toggle.getAttribute('aria-controls'));
+   if(toggle.dataset.bound)return;toggle.dataset.bound='1';
+   toggle.addEventListener('click',()=>{
+     const expanded=toggle.getAttribute('aria-expanded')==='true';
+     toggle.setAttribute('aria-expanded',String(!expanded));
+     if(submenu)submenu.hidden=expanded;
+     if(!expanded&&submenu)setTimeout(()=>submenu.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
+   });
+ });
 }
 
 async function initNavbar(){
@@ -118,47 +154,15 @@ async function initNavbar(){
  }
 
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- // BoxVidey categories are nested under one compact accordion, not a separate
- // top-level navigation destination. Public categories are safe for guests too.
- if(window.sb?.from){
-   try{
-     const [{data:cats,error:catError},{data:reviews,error:reviewError},{data:videos,error:videoError}]=await Promise.all([
-       window.sb.from('categories').select('id,name,content_type').eq('status','published').order('name'),
-       window.sb.from('review_items').select('category_id').eq('status','published'),
-       window.sb.from('videos').select('category_id').eq('status','published')
-     ]);
-     if(!catError){
-       const counts=(rows)=>{const m=new Map();(rows||[]).forEach(r=>{if(r.category_id)m.set(r.category_id,(m.get(r.category_id)||0)+1)});return m};
-       const reviewCounts=counts(reviewError?[]:reviews),videoCounts=counts(videoError?[]:videos);
-       document.querySelectorAll('.bc-submenu[id^="boxCategorySubmenu"]').forEach(target=>{
-         target.innerHTML='<a class="bc-box-video-all" href="/book-video.html">Semua Box Video</a>'+((cats||[]).filter(c=>!c.content_type||c.content_type==='box_video').map(c=>`<a class="bc-box-video-category" href="/book-video.html?category=${encodeURIComponent(c.id)}">${esc(c.name)} <small>(${videoCounts.get(c.id)||0})</small></a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>');
-       });
-       document.querySelectorAll('.bc-submenu[id^="telegramCategorySubmenu"]').forEach(target=>{
-         target.innerHTML='<a href="/telegram.html">Semua Media Telegram</a>'+(cats||[]).filter(c=>c.content_type==='media_telegram').map(c=>`<a href="/telegram.html?category=${encodeURIComponent(c.id)}">${esc(c.name)} <small>(${reviewCounts.get(c.id)||0})</small></a>`).join('')||'<span class="submenu-loading">Belum ada kategori aktif</span>';
-       });
-     }
-   }catch(e){console.warn('Navigation categories unavailable:',e);}
- }
- document.querySelectorAll('.bc-submenu[id^="boxCategorySubmenu"] a').forEach(link=>{
-  try{const target=new URL(link.getAttribute('href')||'',location.origin);if(/\/(?:watch|videos?)(?:\.html)?$/i.test(target.pathname)){target.pathname='/book-video.html';link.href=target.pathname+target.search+target.hash;}}catch{}
- });
- document.querySelectorAll('.bc-submenu-toggle').forEach(toggle=>{
-   const submenu=document.getElementById(toggle.getAttribute('aria-controls'));
-   if(toggle.dataset.bound)return;toggle.dataset.bound='1';
-   toggle.addEventListener('click',()=>{
-     const expanded=toggle.getAttribute('aria-expanded')==='true';
-     toggle.setAttribute('aria-expanded',String(!expanded));
-     if(submenu)submenu.hidden=expanded;
-   });
- });
+ await initNavCategoryMenus();
 }
 document.addEventListener('DOMContentLoaded',async()=>{
  const sharedRef=(new URLSearchParams(location.search).get('ref')||'').trim().toUpperCase();
  if(/^[A-Z0-9]{6,16}$/.test(sharedRef))localStorage.setItem('boxcellink_affiliate_code',sharedRef);
  // Load Support immediately; it no longer depends on navbar/footer network fetches.
  if(!document.getElementById('bcSupportWidgetScript')&&!window.__boxcellinkSupportLoaded){const supportScript=document.createElement('script');supportScript.id='bcSupportWidgetScript';supportScript.src='/js/support-widget.js';supportScript.async=false;supportScript.onerror=()=>console.error('Support widget failed to load:',supportScript.src);document.body.appendChild(supportScript);}
- await Promise.all([load('[data-component="navbar"]','/components/navbar.html?v=20261114-2'),load('[data-component="footer"]','/components/footer.html')]);
+ await Promise.all([load('[data-component="navbar"]','/components/navbar.html?v=20261114-4'),load('[data-component="footer"]','/components/footer.html')]);
  initTranslate();const y=document.getElementById('footerYear');if(y)y.textContent=new Date().getFullYear();const ca=document.getElementById('cookieAccept'),cn=document.getElementById('cookieNotice');if(ca)ca.onclick=()=>{localStorage.setItem('boxcellink_cookie_ok','1');cn?.classList.add('is-hidden')};if(localStorage.getItem('boxcellink_cookie_ok')==='1')cn?.classList.add('is-hidden');applyLocal();
- if(isAuthRoute()){const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');if(guest)guest.hidden=false;if(member)member.hidden=true;initDrawer();}else{await initNavbar();}await loadCustomNavItems();
+ if(isAuthRoute()){const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');if(guest)guest.hidden=false;if(member)member.hidden=true;initDrawer();await initNavCategoryMenus();}else{await initNavbar();}await loadCustomNavItems();
 });
 })();
