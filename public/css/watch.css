@@ -360,3 +360,135 @@ body{background:#f7f5ef;color:#233b57}
 #floatingBannerAd{will-change:transform,opacity}
 #floatingBannerAd .floating-ad-close{display:grid;place-items:center}
 #videoInterstitialAd .interstitial-close{min-width:132px}
+
+
+/* WATCH ADS — compact placement, scrolling ticker, frameless slide/interstitial */
+#guestAdTop.guest-ad-stack{
+  position:static!important;display:contents!important;width:auto!important;
+  height:0!important;min-height:0!important;margin:0!important;padding:0!important;
+  transform:none!important;pointer-events:none!important;background:transparent!important;
+}
+#guestAdTop .adsterra-social-slot{
+  box-sizing:border-box!important;width:min(320px,calc(100vw - 20px))!important;
+  min-height:50px!important;height:50px!important;margin:0!important;padding:0!important;
+  overflow:visible!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;pointer-events:auto!important;
+}
+#guestAdTop .adsterra-social-slot iframe{
+  display:block!important;width:100%!important;max-width:320px!important;
+  height:50px!important;min-height:50px!important;margin:0!important;padding:0!important;
+  border:0!important;background:transparent!important;
+}
+#guestAdTop .social-slot-close{
+  position:absolute!important;top:50%!important;left:50%!important;right:auto!important;
+  transform:translate(-50%,-50%)!important;width:30px!important;height:30px!important;
+  display:grid!important;place-items:center!important;padding:0!important;
+  border:2px solid #fff!important;border-radius:50%!important;
+  background:rgba(14,28,45,.88)!important;color:#fff!important;
+  font:700 22px/1 Arial,sans-serif!important;box-shadow:0 2px 9px #0006!important;
+  z-index:100!important;cursor:pointer!important;
+}
+#guestAdTop .adsterra-social-slot[hidden]{display:none!important}
+@media(max-width:600px){
+  #guestAdTop .adsterra-social-slot{width:min(300px,calc(100vw - 16px))!important}
+}
+
+/* Ticker text moves continuously without pushing the layout wider. */
+.watch-telegram-ticker{
+  display:block!important;position:relative!important;width:100%!important;
+  max-width:100%!important;overflow:hidden!important;white-space:nowrap!important;
+  border-radius:12px!important;
+}
+.watch-telegram-ticker>a{
+  display:flex!important;align-items:center!important;gap:10px!important;
+  width:100%!important;min-width:0!important;overflow:hidden!important;
+  padding:11px 14px!important;white-space:nowrap!important;
+}
+.watch-telegram-ticker>a>i{flex:0 0 auto!important}
+.watch-telegram-ticker>a>span{
+  display:block!important;flex:1 1 auto!important;min-width:0!important;
+  width:max-content!important;max-width:none!important;overflow:visible!important;
+  white-space:nowrap!important;text-overflow:clip!important;
+  will-change:transform!important;animation:watchTickerMarquee 22s linear infinite!important;
+}
+.watch-telegram-ticker:hover>a>span{animation-play-state:paused!important}
+@keyframes watchTickerMarquee{
+  0%{transform:translateX(100%)}
+  100%{transform:translateX(-110%)}
+}
+
+/* Slide ad: no white card/frame; X sits just above the ad itself. */
+#floatingBannerAd{
+  box-sizing:border-box!important;top:auto!important;left:50%!important;right:auto!important;
+  bottom:12px!important;width:min(320px,calc(100vw - 18px))!important;
+  min-height:0!important;margin:0!important;padding:0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;transform:translate(-50%,calc(100% + 40px))!important;
+  opacity:0!important;visibility:hidden!important;
+  transition:transform .35s ease,opacity .25s ease,visibility .25s ease!important;
+  z-index:10020!important;overflow:visible!important;
+}
+#floatingBannerAd.is-visible{
+  transform:translate(-50%,0)!important;opacity:1!important;visibility:visible!important;
+}
+#floatingBannerAd .floating-ad-toolbar{
+  display:block!important;position:absolute!important;top:-34px!important;right:0!important;
+  width:34px!important;height:30px!important;margin:0!important;padding:0!important;
+  border:0!important;border-radius:9px 9px 0 0!important;
+  background:transparent!important;box-shadow:none!important;cursor:default!important;
+}
+#floatingBannerAd .floating-ad-toolbar>span{display:none!important}
+#floatingBannerAd .floating-ad-close{
+  position:static!important;display:grid!important;place-items:center!important;
+  width:30px!important;height:30px!important;margin:0 0 0 auto!important;padding:0!important;
+  border:1px solid #fff!important;border-radius:50%!important;
+  background:rgba(15,29,46,.92)!important;color:#fff!important;
+  font:700 22px/1 Arial,sans-serif!important;box-shadow:0 2px 9px #0007!important;
+}
+#floatingBannerAdSlot{
+  display:block!important;width:300px!important;max-width:100%!important;
+  min-height:0!important;margin:0 auto!important;padding:0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;overflow:hidden!important;
+}
+#floatingBannerAdSlot iframe{
+  display:block!important;width:300px!important;max-width:100%!important;
+  height:250px!important;margin:0 auto!important;border:0!important;background:transparent!important;
+}
+#showFloatingBanner{display:none!important}
+
+/* Interstitial contains only the ad and the skip control; remove the white panel. */
+#videoInterstitialAd{
+  position:fixed!important;inset:0!important;z-index:10050!important;
+  display:grid!important;place-items:center!important;padding:12px!important;
+  background:rgba(5,12,22,.34)!important;backdrop-filter:none!important;
+}
+#videoInterstitialAd[hidden]{display:none!important}
+#videoInterstitialAd .video-interstitial-inner{
+  position:relative!important;display:block!important;
+  width:min(300px,calc(100vw - 24px))!important;height:250px!important;
+  min-height:250px!important;max-height:250px!important;margin:0!important;padding:0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;overflow:visible!important;
+}
+#videoInterstitialSlot{
+  display:block!important;width:100%!important;height:250px!important;
+  min-height:0!important;margin:0!important;padding:0!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;overflow:hidden!important;
+}
+#videoInterstitialSlot iframe{
+  display:block!important;width:300px!important;max-width:100%!important;
+  height:250px!important;margin:0 auto!important;border:0!important;background:transparent!important;
+}
+#closeVideoInterstitial{
+  position:absolute!important;top:-39px!important;right:0!important;z-index:5!important;
+  min-width:116px!important;height:32px!important;padding:7px 12px!important;
+  border:1px solid rgba(255,255,255,.9)!important;border-radius:18px!important;
+  background:rgba(15,29,46,.94)!important;color:#fff!important;
+  font:800 11px "DM Sans",sans-serif!important;box-shadow:0 2px 9px #0006!important;
+}
+@media(max-width:600px){
+  #floatingBannerAd{bottom:10px!important;width:min(320px,calc(100vw - 16px))!important}
+  #videoInterstitialAd .video-interstitial-inner{width:min(300px,calc(100vw - 24px))!important}
+}
