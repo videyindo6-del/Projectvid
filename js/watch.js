@@ -3,6 +3,7 @@
 const $=s=>document.querySelector(s),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const lang=()=>localStorage.getItem('boxcellink_lang')||'id';
 const TELEGRAM_GROUP='https://t.me/+03WCfVAwaWUzZTkx';
+const WATCH_PAGE_STARTED_AT=Date.now();
 const T={
 id:{watchHub:'Watch & Discover',watchIntro:'Temukan video Basic dan konten eksklusif VIP dalam satu tempat.',upgradeVip:'Upgrade VIP',loading:'Memuat video...',notFound:'Video tidak ditemukan.',watchError:'Tidak dapat memuat video. Coba muat ulang halaman.',views:'tayangan',published:'Dipublikasikan',like:'Like',comment:'Komentar',share:'Share',community:'Community',download:'Download',commentsTitle:'Komentar & Diskusi',commentsLoading:'Memuat komentar...',noComments:'Belum ada komentar. Jadilah yang pertama berdiskusi.',writeComment:'Tulis komentar',commentPlaceholder:'Bagikan pendapat kamu...',sendComment:'Kirim komentar',loginComment:'Nama wajib diisi untuk komentar pengunjung.',commentFailed:'Komentar gagal dikirim: ',yourActivity:'YOUR ACTIVITY',historyTitle:'Riwayat tontonan',historySub:'Video yang terakhir kamu tonton.',historyEmpty:'Belum ada riwayat tontonan.',telegramCollection:'TELEGRAM COLLECTION',telegramTitle:'Review Media Telegram',telegramSub:'Temukan media terbaru dari koleksi Telegram.',seeAll:'Lihat semua',telegramLoading:'Memuat media...',telegramEmpty:'Belum ada media yang dipublikasikan.',vipMembership:'VIP MEMBERSHIP',vipSideTitle:'Buka pengalaman tanpa batas',vipSideDesc:'Tonton semua video VIP dan nikmati diskon 20% untuk pembelian media Telegram.',upgradeNow:'Upgrade Now',categoriesTitle:'Kategori video',categoriesLoading:'Memuat kategori...',categoriesEmpty:'Belum ada kategori aktif.',discover:'DISCOVER',moreVideos:'Jelajahi video lainnya',moreVideosSub:'Pilih video Basic atau lihat cuplikan konten VIP.',filterAll:'Semua',filterBasic:'Basic',filterVip:'VIP',basic:'BASIC',vip:'VIP',vipOnly:'VIP EXCLUSIVE',loginOnly:'LOGIN REQUIRED',loginRequiredTitle:'Konten khusus member',loginRequiredText:'Silakan masuk ke akun BoxCellink untuk menonton video ini.',loginButton:'Masuk sekarang',vipModalTitle:'Video khusus member VIP',vipModalText:'Upgrade akun sekarang untuk menonton semua fitur VIP dan mendapatkan potongan 20% untuk pembelian media Telegram.',cancel:'Batal',emptyVideos:'Belum ada video lain.',pagePrev:'Sebelumnya',pageNext:'Berikutnya',teaser:'Cuplikan VIP',teaserNote:'Upgrade VIP untuk menonton video lengkap.',shareCopied:'Link video disalin.',shareError:'Tidak dapat membagikan link.',adLabel:'ADVERTISEMENT',historyLogin:'Riwayat tontonan tersimpan di perangkat ini.',allCategoriesEyebrow:'CATEGORIES',allCategoriesTitle:'Kategori dan video',allCategoriesSub:'Jelajahi video berdasarkan kategori.',guestName:'Nama kamu',reply:'Balas',sendReply:'Kirim balasan',commentLike:'Suka',replyPlaceholder:'Tulis balasan...',commentNameRequired:'Masukkan nama untuk berkomentar.',guestLinkDenied:'Pengunjung belum login tidak boleh memasukkan tautan.',commentAction:'Bergabung ke komunitas Telegram untuk Like, Comment, Share, dan Community.'},
 en:{watchHub:'Watch & Discover',watchIntro:'Explore Basic videos and exclusive VIP content in one place.',upgradeVip:'Upgrade VIP',loading:'Loading video...',notFound:'Video not found.',watchError:'Unable to load this video. Please refresh.',views:'views',published:'Published',like:'Like',comment:'Comment',share:'Share',community:'Community',download:'Download',commentsTitle:'Comments & Discussion',commentsLoading:'Loading comments...',noComments:'No comments yet. Start the conversation.',writeComment:'Write a comment',commentPlaceholder:'Share your thoughts...',sendComment:'Post comment',loginComment:'Enter a name to post as a guest.',commentFailed:'Could not post comment: ',yourActivity:'YOUR ACTIVITY',historyTitle:'Watch history',historySub:'Videos you watched recently.',historyEmpty:'No watch history yet.',telegramCollection:'TELEGRAM COLLECTION',telegramTitle:'Telegram Media Reviews',telegramSub:'Discover the latest items from the Telegram collection.',seeAll:'View all',telegramLoading:'Loading media...',telegramEmpty:'No media published yet.',vipMembership:'VIP MEMBERSHIP',vipSideTitle:'Unlock the full experience',vipSideDesc:'Watch all VIP videos and get 20% off Telegram media purchases.',upgradeNow:'Upgrade Now',categoriesTitle:'Video categories',categoriesLoading:'Loading categories...',categoriesEmpty:'No active categories yet.',discover:'DISCOVER',moreVideos:'Explore more videos',moreVideosSub:'Choose a Basic video or preview VIP content.',filterAll:'All',filterBasic:'Basic',filterVip:'VIP',basic:'BASIC',vip:'VIP',vipOnly:'VIP EXCLUSIVE',loginOnly:'LOGIN REQUIRED',loginRequiredTitle:'Members-only content',loginRequiredText:'Please sign in to your BoxCellink account to watch this video.',loginButton:'Sign in now',vipModalTitle:'Exclusive VIP video',vipModalText:'Upgrade now to unlock all VIP features and get 20% off Telegram media purchases.',cancel:'Cancel',emptyVideos:'No more videos available.',pagePrev:'Previous',pageNext:'Next',teaser:'VIP preview',teaserNote:'Upgrade to VIP to watch the full video.',shareCopied:'Video link copied.',shareError:'Unable to share this link.',adLabel:'ADVERTISEMENT',historyLogin:'Watch history is saved on this device.',allCategoriesEyebrow:'CATEGORIES',allCategoriesTitle:'Categories and videos',allCategoriesSub:'Explore videos by category.',guestName:'Your name',reply:'Reply',sendReply:'Send reply',commentLike:'Like',replyPlaceholder:'Write a reply...',commentNameRequired:'Enter your name to comment.',guestLinkDenied:'Guests cannot include links in comments.',commentAction:'Join the Telegram community for Like, Comment, Share, and Community.'}
@@ -65,7 +66,6 @@ function imageMarkup(v){
 function linkify(text){const safe=esc(text);return safe.replace(/(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi,m=>{const href=m.toLowerCase().startsWith('www.')?'https://'+m:m;return `<a class="comment-link" href="${href}" target="_blank" rel="noopener noreferrer">${m}</a>`})}
 function cardMarkup(v){const vip=isVipVideo(v),orient=orientation(v);return `<article class="video-tile ${vip?'is-vip':''} ${orient==='vertical'?'is-vertical':''}"><button class="video-tile-link" data-video-id="${esc(v.id)}" data-vip="${vip?'1':'0'}">${imageMarkup(v)}<span class="video-type ${vip?'vip':'basic'}">${vip?'<i class="fa-solid fa-crown"></i> '+tr('vip'):tr('basic')}</span><span class="tile-play"><i class="fa-solid fa-play"></i></span></button><div class="tile-copy"><h3>${esc(v.title)}</h3><p>${esc(v.categories?.name||'BoxVidey')} <span>•</span> ${new Date(v.created_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US')}</p></div></article>`}
 function adMarkup(){return `<div class="adsterra-banner adsterra-banner-clean related-ad-placement"><div class="ad-box ad-inline-native"></div><span class="ad-caption">ADVERTISEMENT</span></div>`}
-const AD_DIRECT_LINK='https://www.profitableratecpmnetwork.com/vw721j6q?key=e997cbbb9bbee0de7820bd0c98fc8351';
 const AD_UNITS={
  banner728:{width:728,height:90,key:'b5df562e06e9e080a144e679bdd04b11'},
  banner320:{width:320,height:50,key:'e48004340d99ba399e04e57dd40239fa'},
@@ -95,21 +95,19 @@ function mountInlineAd(host){
  host.replaceChildren(frame);
 }
 function setupSocialBars(){
- // Adsterra Social Bar is a page-level floating format: load its publisher code once,
- // near the end of body. The three visual slots remain in the markup for the requested
- // stacked layout, but must not each execute the same publisher script.
- if(isVip||document.querySelector('script[data-boxcellink-socialbar="1"]'))return;
- const script=document.createElement('script');
- script.src='https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js';
- script.async=true;script.setAttribute('data-cfasync','false');script.dataset.boxcellinkSocialbar='1';
- document.body.appendChild(script);
+ // The three visible placements are mounted individually as 320x50 banner units.
+ // Do not load the page-level Social Bar script here; it creates floating overlays.
+ return;
 }
 let popunderStarted=false;
 function setupPopunder(){
- if(isVip||popunderStarted)return;popunderStarted=true;
- // Adsterra popunder is a publisher script. Load it once after 7 seconds;
- // repeat frequency/cooldown must be configured in the Adsterra publisher dashboard.
- window.setTimeout(()=>{if(!isVip&&document.body.isConnected)injectScript(document.body,'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js',{'data-cfasync':'false'});},7000);
+ if(isVip||popunderStarted)return;
+ popunderStarted=true;
+ window.setTimeout(()=>{
+  if(!isVip&&document.body.isConnected){
+   injectScript(document.body,'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js',{'data-cfasync':'false'});
+  }
+ },Math.max(0,5000-(Date.now()-WATCH_PAGE_STARTED_AT)));
 }
 function mountFloatingBanner(){
  const wrap=$('#floatingBannerAd'),slot=$('#floatingBannerAdSlot'),hide=$('#hideFloatingBanner'),show=$('#showFloatingBanner');
@@ -121,8 +119,8 @@ function mountFloatingBanner(){
  frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:300px;height:250px;overflow:hidden;background:transparent}</style></head><body><script>var atOptions={key:'896ad8ddb5ea1d057ac6d61226e3f54d',format:'iframe',height:250,width:300,params:{}};<\/script><script src="https://www.highrevenueformat.com/896ad8ddb5ea1d057ac6d61226e3f54d/invoke.js"><\/script></body></html>`;
  slot.replaceChildren(frame);
  let autoHideTimer=null,revealTimer=null;
- const conceal=()=>{if(autoHideTimer){window.clearTimeout(autoHideTimer);autoHideTimer=null;}wrap.classList.remove('is-visible');window.setTimeout(()=>{wrap.hidden=true;},450);if(show)show.hidden=false;if(revealTimer)window.clearTimeout(revealTimer);revealTimer=window.setTimeout(()=>{revealTimer=null;reveal();},currentUser?7000:4000);};
- const reveal=()=>{if(isVip)return;if(revealTimer){window.clearTimeout(revealTimer);revealTimer=null;}wrap.hidden=false;requestAnimationFrame(()=>wrap.classList.add('is-visible'));if(show)show.hidden=true;if(autoHideTimer)window.clearTimeout(autoHideTimer);autoHideTimer=window.setTimeout(conceal,currentUser?7000:5000);};
+ const conceal=()=>{if(autoHideTimer){window.clearTimeout(autoHideTimer);autoHideTimer=null;}wrap.classList.remove('is-visible');window.setTimeout(()=>{wrap.hidden=true;},450);if(show)show.hidden=false;if(revealTimer)window.clearTimeout(revealTimer);revealTimer=window.setTimeout(()=>{revealTimer=null;reveal();},10000);};
+ const reveal=()=>{if(isVip)return;if(revealTimer){window.clearTimeout(revealTimer);revealTimer=null;}wrap.hidden=false;requestAnimationFrame(()=>wrap.classList.add('is-visible'));if(show)show.hidden=true;if(autoHideTimer)window.clearTimeout(autoHideTimer);autoHideTimer=window.setTimeout(conceal,10000);};
  hide?.addEventListener('click',conceal);
  show?.addEventListener('click',reveal);
  wrap.dataset.reveal='ready';
@@ -158,41 +156,52 @@ function addSocialClose(slot){
 }
 function setupInterstitial(){
  const modal=$('#videoInterstitialAd'),slot=$('#videoInterstitialSlot'),close=$('#closeVideoInterstitial');
- if(!modal||!slot||isVip||modal.dataset.scheduled==='1')return;
+ if(!modal||!slot||!close||isVip||modal.dataset.scheduled==='1')return;
  modal.dataset.scheduled='1';
- const guest=!currentUser,interval=guest?5000:10000;
- let timer=null,tick=null,showing=false,impressions=0;
- const schedule=(delay=interval)=>{
+ const interval=10000;
+ let timer=null,tick=null,durationTimer=null,showing=false;
+ function clearAdTimers(){
+  if(timer){window.clearTimeout(timer);timer=null;}
+  if(tick){window.clearInterval(tick);tick=null;}
+  if(durationTimer){window.clearTimeout(durationTimer);durationTimer=null;}
+ }
+ function schedule(delay=interval){
   if(isVip||showing)return;
   if(timer)window.clearTimeout(timer);
   timer=window.setTimeout(()=>{
-   timer=null;if(isVip)return;
+   timer=null;
+   if(isVip)return;
    if(document.visibilityState==='hidden'){schedule(2000);return;}
    slot.replaceChildren();
    const unit=AD_UNITS.banner300,frame=document.createElement('iframe');
    frame.title='Advertisement';frame.width='300';frame.height='250';frame.scrolling='no';
    frame.style.cssText='display:block;width:min(300px,90vw);height:250px;border:0;margin:auto';
    frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:transparent}</style></head><body><script>var atOptions={key:'${unit.key}',format:'iframe',height:250,width:300,params:{}};<\/script><script src="https://www.highrevenueformat.com/${unit.key}/invoke.js"><\/script></body></html>`;
-   slot.appendChild(frame);modal.hidden=false;showing=true;impressions++;
+   slot.appendChild(frame);modal.hidden=false;showing=true;
    let remaining=3;close.disabled=true;close.textContent=`Lewati dalam ${remaining}`;
-   if(tick)window.clearInterval(tick);
-   tick=window.setInterval(()=>{remaining--;if(remaining<=0){window.clearInterval(tick);tick=null;close.disabled=false;close.textContent='Lewati iklan';}else close.textContent=`Lewati dalam ${remaining}`;},1000);
+   tick=window.setInterval(()=>{
+    remaining--;
+    if(remaining<=0){window.clearInterval(tick);tick=null;close.disabled=false;close.textContent='Lewati iklan';}
+    else close.textContent=`Lewati dalam ${remaining}`;
+   },1000);
+   durationTimer=window.setTimeout(hideAd,10000);
   },delay);
- };
- close.onclick=()=>{
-  if(close.disabled)return;
-  if(tick){window.clearInterval(tick);tick=null;}
-  modal.hidden=true;showing=false;slot.replaceChildren();
-  if(impressions>=2){window.setTimeout(()=>window.boxcellinkRevealFloatingAd?.(),5000);}
+ }
+ function hideAd(){
+  if(!showing)return;
+  clearAdTimers();modal.hidden=true;showing=false;slot.replaceChildren();
   schedule(interval);
- };
- document.addEventListener('visibilitychange',()=>{if(!showing&&document.visibilityState==='visible'&&!timer)schedule(interval);});
- // Guest countdowns begin five seconds after the Telegram prompt; member starts at 10 seconds.
- if(guest)schedule(15000);else schedule(10000);
+ }
+ close.onclick=()=>{if(!close.disabled)hideAd();};
+ document.addEventListener('visibilitychange',()=>{
+  if(!showing&&document.visibilityState==='visible'&&!timer)schedule(5000);
+ });
+ // Both logged-in non-VIP members and guests see the first timed ad after 5 seconds.
+ schedule(Math.max(0,5000-(Date.now()-WATCH_PAGE_STARTED_AT)));
 }
 function setupGuestAds(){
  const role=isVip?'vip':(currentUser?'member':'guest');
- setupTelegramNotice();
+ // The scrolling Telegram ticker replaces the old timed Telegram modal.
  document.querySelectorAll('.adsterra-wide-wrap,.ad-side-card').forEach(el=>{el.hidden=true;el.style.cssText='background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'});
  document.querySelectorAll('.ad-unit-728,.ad-unit-320,.ad-unit-468,#ad300x250,#ad160x300,#ad160x600').forEach(el=>el.hidden=true);
  if(role==='vip'){
@@ -204,15 +213,28 @@ function setupGuestAds(){
   return;
  }
  const socialStack=$('#guestAdTop');
- if(socialStack){socialStack.hidden=false;socialStack.style.display='flex';const slots=[...socialStack.querySelectorAll('.adsterra-social-slot')];slots.forEach((host,i)=>{const allowed=role==='guest'||i<2;host.hidden=!allowed;if(!allowed)return;host.style.cssText='display:block;position:relative;min-height:50px;padding:0;border:0;background:transparent;box-shadow:none;pointer-events:auto';mountAdUnit(host,AD_UNITS.banner320);});}
- const banners=role==='guest'?
-  [['.ad-unit-728',AD_UNITS.banner728],['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300]]:
-  [['.ad-unit-728',AD_UNITS.banner728],['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300]];
+ if(socialStack){
+  socialStack.hidden=false;
+  socialStack.style.cssText='position:fixed;top:88px;right:14px;left:auto;bottom:auto;z-index:9500;width:min(320px,calc(100vw - 24px));display:flex;flex-direction:column;gap:10px;margin:0;padding:0;pointer-events:none';
+  const slots=[...socialStack.querySelectorAll('.adsterra-social-slot')];
+  slots.forEach((host,i)=>{
+   const allowed=role==='guest'||i<2;
+   host.hidden=true;host.dataset.dismissed='0';host.style.cssText='display:none;position:relative;width:100%;height:50px;min-height:50px;margin:0;padding:0;border:0;background:transparent;box-shadow:none;pointer-events:auto';
+   if(!allowed)return;
+   window.setTimeout(()=>{
+    if(isVip||host.dataset.dismissed==='1'||!host.isConnected)return;
+    host.hidden=false;host.style.display='block';
+    mountAdUnit(host,AD_UNITS.banner320);addSocialClose(host);
+   },Math.max(0,[3000,5000,7000][i]-(Date.now()-WATCH_PAGE_STARTED_AT)));
+  });
+ }
+ const banners=[['.ad-unit-728',AD_UNITS.banner728],['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300]];
  banners.forEach(([sel,unit])=>document.querySelectorAll(sel).forEach(host=>{host.hidden=false;host.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px auto;max-width:100%';const wrapper=host.closest('.ad-side-card,.adsterra-wide-wrap');if(wrapper){wrapper.hidden=false;wrapper.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'}mountAdUnit(host,unit);}));
  if(role==='guest')document.querySelectorAll('.ad-inline-300').forEach(mountInlineAd);
- setupSocialBars();setupPopunder();setupVideoAdPlayback();
+ setupPopunder();setupVideoAdPlayback();
  mountFloatingBanner();setupInterstitial();
 }
+
 async function showGuestWatchPreparation(){
  const host=$('#watchContent');if(!host)return;
  const messages=lang()==='en'
@@ -277,7 +299,7 @@ const orientationTools=`<div class="watch-orientation-tools" role="group" aria-l
 player=orientationTools+player;
  $('#watchContent').innerHTML=`${player}<div class="main-video-details"><div class="main-title-row"><div><div class="main-video-badges"><span class="video-type ${vipVideo?'vip':'basic'}">${vipVideo?'<i class="fa-solid fa-crown"></i> '+tr('vip'):tr('basic')}</span>${isVip?'<span class="member-active"><i class="fa-solid fa-shield-check"></i> VIP ACTIVE</span>':''}</div><h2>${esc(v.title)}</h2><div class="watch-meta"><span><i class="fa-regular fa-eye"></i> ${Number(v.view_count||0)+1} ${tr('views')}</span><span><i class="fa-regular fa-calendar"></i> ${tr('published')} ${new Date(v.created_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US')}</span><span><i class="fa-solid fa-folder"></i> ${esc(v.categories?.name||'BoxVidey')}</span></div></div></div><div class="watch-actions"><a class="watch-action" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-regular fa-heart"></i><span>${tr('like')}</span><b>${likes}</b></a><a class="watch-action" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-regular fa-comment"></i><span>${tr('comment')}</span></a><a class="watch-action" id="shareBtn" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-from-bracket"></i><span>${tr('share')}</span></a><a class="watch-action" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i><span>${tr('community')}</span></a>${v.download_enabled&&v.download_url&&!locked?`<a class="watch-action download-action" href="${esc(v.download_url)}" target="_blank" rel="noopener" data-download-ad="1"><i class="fa-solid fa-download"></i><span>${tr('download')}</span></a>`:''}</div></div>`;
  const playerEl=$('#watchContent .watch-player');document.querySelectorAll('#watchContent [data-watch-orientation]').forEach(btn=>btn.addEventListener('click',()=>{const mode=btn.dataset.watchOrientation;playerEl?.classList.toggle('is-vertical',mode==='vertical');playerEl?.classList.toggle('is-horizontal',mode==='horizontal');$('#watchContent [data-watch-orientation].active')?.classList.remove('active');btn.classList.add('active')}));const mainVid=$('#watchContent video');if(mainVid&&orient==='auto')mainVid.addEventListener('loadedmetadata',()=>{const vertical=mainVid.videoHeight>mainVid.videoWidth;mainVid.closest('.watch-player')?.classList.toggle('is-vertical',vertical);mainVid.closest('.watch-player')?.classList.toggle('is-horizontal',!vertical)},{once:true});$('#mainVipUpgrade')?.addEventListener('click',showVipModal);
- const downloadLink=$('[data-download-ad]');if(downloadLink&&!isVip)downloadLink.addEventListener('click',()=>{window.open(AD_DIRECT_LINK,'_blank','noopener,noreferrer')});if(orient==='auto'&&(thumbnailSource(v.thumbnail_url)||thumbnailSource(v.embed_url))){const probe=new Image();probe.onload=()=>{const vertical=probe.naturalHeight>probe.naturalWidth;const playerEl=$('#watchContent .watch-player');playerEl?.classList.toggle('is-vertical',vertical);playerEl?.classList.toggle('is-horizontal',!vertical)};probe.src=thumbnailSource(v.thumbnail_url)||thumbnailSource(v.embed_url)}const list=$('#commentList');renderComments(comments);
+if(orient==='auto'&&(thumbnailSource(v.thumbnail_url)||thumbnailSource(v.embed_url))){const probe=new Image();probe.onload=()=>{const vertical=probe.naturalHeight>probe.naturalWidth;const playerEl=$('#watchContent .watch-player');playerEl?.classList.toggle('is-vertical',vertical);playerEl?.classList.toggle('is-horizontal',!vertical)};probe.src=thumbnailSource(v.thumbnail_url)||thumbnailSource(v.embed_url)}const list=$('#commentList');renderComments(comments);
  $('#commentForm').onsubmit=async e=>{e.preventDefault();const field=$('#commentText'),body=field.value.trim(),name=$('#guestCommentName')?.value.trim()||'';if(!body)return;if(!currentUser&&!name){alert(tr('commentNameRequired'));$('#guestCommentName')?.focus();return}if(!currentUser&&/(https?:\/\/|www\.)/i.test(body)){alert(tr('guestLinkDenied'));return}
  const btn=e.submitter;btn.disabled=true;let payload={video_id:v.id,user_id:currentUser?.id||null,body};if(!currentUser)payload.guest_name=name;
  const {error}=await sb.from('video_comments').insert(payload);btn.disabled=false;if(error){alert(tr('commentFailed')+error.message);return}field.value='';if(!currentUser&&$('#guestCommentName'))$('#guestCommentName').value='';await refreshComments(v.id);
