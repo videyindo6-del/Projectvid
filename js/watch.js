@@ -95,18 +95,36 @@ function mountInlineAd(host){
  host.replaceChildren(frame);
 }
 function setupSocialBars(){
- // Tampilkan tiga placement secara bertahap: 2, 4, dan 6 detik.
- // Setiap placement tetap tampil sampai pengguna menutupnya dengan tombol X.
+ // Social Bar asli Adsterra adalah script publisher level halaman, cukup dimuat satu kali.
  if(isVip)return;
- const stack=$('#guestAdTop');if(!stack||stack.dataset.staged==='1')return;
- stack.dataset.staged='1';stack.hidden=false;stack.style.display='flex';
+ const stack=$('#guestAdTop');
+ if(!stack||stack.dataset.staged==='1')return;
+ stack.dataset.staged='1';
+ const publisherSrc='https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js';
+ if(!document.querySelector('script[data-boxcellink-socialbar="1"]')){
+  const publisher=document.createElement('script');
+  publisher.src=publisherSrc;publisher.async=true;
+  publisher.setAttribute('data-cfasync','false');
+  publisher.dataset.boxcellinkSocialbar='1';
+  document.body.appendChild(publisher);
+ }
+ stack.hidden=false;
+ stack.style.display='contents';
  const slots=[...stack.querySelectorAll('.adsterra-social-slot')];
+ const positions=[
+  {top:'28%',left:'auto',right:'10px'},
+  {top:'43%',left:'10px',right:'auto'},
+  {top:'58%',left:'auto',right:'10px'}
+ ];
  slots.forEach((host,i)=>{
   host.hidden=true;host.dataset.dismissed='0';
-  host.style.cssText='display:block;position:relative;min-height:50px;padding:0;border:0;background:transparent;box-shadow:none;pointer-events:auto';
+  host.style.cssText='display:none;position:fixed;z-index:10030;width:min(320px,calc(100vw - 20px));min-height:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;pointer-events:auto;'+
+   `top:${positions[i].top};left:${positions[i].left};right:${positions[i].right};`;
   window.setTimeout(()=>{
    if(isVip||host.dataset.dismissed==='1')return;
-   host.hidden=false;mountAdUnit(host,AD_UNITS.banner320);addSocialClose(host);
+   host.hidden=false;host.style.display='block';
+   mountAdUnit(host,AD_UNITS.banner320);
+   addSocialClose(host);
   },(i+1)*2000);
  });
 }
@@ -121,7 +139,7 @@ function mountFloatingBanner(){
  const wrap=$('#floatingBannerAd'),slot=$('#floatingBannerAdSlot'),hide=$('#hideFloatingBanner'),show=$('#showFloatingBanner');
  if(!wrap||!slot||wrap.dataset.loaded==='1'||isVip)return;
  wrap.dataset.loaded='1';
- slot.style.cssText='width:300px;max-width:100%;min-height:250px;margin:0;padding:0;background:transparent;border:0;box-shadow:none';
+ slot.style.cssText='width:300px;max-width:100%;min-height:0;margin:0;padding:0;background:transparent;border:0;box-shadow:none';
  const frame=document.createElement('iframe');frame.title='Iklan mengambang';frame.width='300';frame.height='250';frame.loading='eager';frame.scrolling='no';
  frame.style.cssText='display:block;width:300px;max-width:100%;height:250px;border:0;margin:0 auto;background:transparent';
  frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:300px;height:250px;overflow:hidden;background:transparent}</style></head><body><script>var atOptions={key:'896ad8ddb5ea1d057ac6d61226e3f54d',format:'iframe',height:250,width:300,params:{}};<\/script><script src="https://www.highrevenueformat.com/896ad8ddb5ea1d057ac6d61226e3f54d/invoke.js"><\/script></body></html>`;
