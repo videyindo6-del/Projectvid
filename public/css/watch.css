@@ -492,3 +492,152 @@ body{background:#f7f5ef;color:#233b57}
   #floatingBannerAd{bottom:10px!important;width:min(320px,calc(100vw - 16px))!important}
   #videoInterstitialAd .video-interstitial-inner{width:min(300px,calc(100vw - 24px))!important}
 }
+
+
+/* FINAL WATCH ADS OVERRIDES — floating social placements and user-controlled slide */
+#guestAdTop.guest-ad-stack{
+ position:static!important;display:block!important;width:0!important;height:0!important;
+ min-height:0!important;margin:0!important;padding:0!important;overflow:visible!important;
+ background:transparent!important;border:0!important;box-shadow:none!important;
+ pointer-events:none!important;
+}
+#guestAdTop .adsterra-social-slot{
+ box-sizing:border-box!important;position:fixed!important;display:block!important;
+ width:min(320px,calc(100vw - 24px))!important;height:50px!important;min-height:50px!important;
+ margin:0!important;padding:0!important;overflow:visible!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+ box-shadow:none!important;pointer-events:auto!important;
+}
+#guestAdTop .adsterra-social-slot:nth-child(1){top:24%!important;left:auto!important;right:12px!important;z-index:10033!important}
+#guestAdTop .adsterra-social-slot:nth-child(2){top:43%!important;left:12px!important;right:auto!important;z-index:10034!important}
+#guestAdTop .adsterra-social-slot:nth-child(3){top:62%!important;left:auto!important;right:12px!important;z-index:10035!important}
+#guestAdTop .adsterra-social-slot iframe{
+ display:block!important;width:100%!important;max-width:320px!important;
+ height:50px!important;min-height:50px!important;margin:0!important;padding:0!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+}
+#guestAdTop .social-slot-close{
+ position:absolute!important;top:50%!important;left:50%!important;right:auto!important;
+ transform:translate(-50%,-50%)!important;width:30px!important;height:30px!important;
+ display:grid!important;place-items:center!important;padding:0!important;
+ border:2px solid #fff!important;border-radius:50%!important;
+ background:rgba(15,29,46,.94)!important;color:#fff!important;
+ font:700 22px/1 Arial,sans-serif!important;box-shadow:0 2px 9px #0007!important;
+ z-index:100!important;cursor:pointer!important;
+}
+#guestAdTop .adsterra-social-slot[hidden]{display:none!important}
+@media(max-width:600px){
+ #guestAdTop .adsterra-social-slot{width:min(300px,calc(100vw - 20px))!important}
+ #guestAdTop .adsterra-social-slot:nth-child(1){right:8px!important}
+ #guestAdTop .adsterra-social-slot:nth-child(2){left:8px!important}
+ #guestAdTop .adsterra-social-slot:nth-child(3){right:8px!important}
+}
+
+/* Premium Telegram update ticker: structured capsule, clear label and smooth marquee. */
+.watch-telegram-ticker{
+ position:relative!important;display:block!important;width:100%!important;max-width:100%!important;
+ margin:18px 0 22px!important;overflow:hidden!important;white-space:nowrap!important;
+ border:1px solid rgba(92,130,177,.24)!important;border-radius:14px!important;
+ background:linear-gradient(105deg,#101f35 0%,#17395b 48%,#10283f 100%)!important;
+ box-shadow:0 8px 24px rgba(15,35,60,.14)!important;color:#f7fbff!important;
+}
+.watch-telegram-ticker>a{
+ position:relative!important;display:flex!important;align-items:center!important;gap:12px!important;
+ width:100%!important;min-width:0!important;min-height:54px!important;padding:9px 16px!important;
+ color:inherit!important;text-decoration:none!important;overflow:hidden!important;
+}
+.watch-telegram-ticker>a>i:first-child{
+ flex:0 0 34px!important;width:34px!important;height:34px!important;display:grid!important;
+ place-items:center!important;border-radius:10px!important;
+ background:rgba(55,166,232,.18)!important;color:#65c7ff!important;font-size:19px!important;
+}
+.watch-telegram-ticker>a::before{
+ content:"INFO TERBARU";flex:0 0 auto!important;display:inline-flex!important;
+ align-items:center!important;justify-content:center!important;height:27px!important;
+ padding:0 10px!important;border:1px solid rgba(120,199,255,.35)!important;
+ border-radius:7px!important;background:rgba(63,164,225,.15)!important;
+ color:#a9ddff!important;font:800 9px/1 "DM Sans",sans-serif!important;
+ letter-spacing:1.1px!important;
+}
+.watch-telegram-ticker>a>span{
+ display:block!important;flex:1 1 auto!important;min-width:0!important;width:max-content!important;
+ max-width:none!important;overflow:visible!important;white-space:nowrap!important;
+ color:#f5f9ff!important;font:600 12px/1.5 "DM Sans",sans-serif!important;
+ letter-spacing:.12px!important;will-change:transform!important;
+ animation:watchTickerPremium 25s linear infinite!important;
+}
+.watch-telegram-ticker>a>i:last-child{
+ flex:0 0 auto!important;color:#91c9f0!important;font-size:12px!important;
+}
+.watch-telegram-ticker:hover>a>span{animation-play-state:paused!important}
+@keyframes watchTickerPremium{
+ 0%{transform:translateX(100%)}
+ 100%{transform:translateX(-110%)}
+}
+@media(max-width:600px){
+ .watch-telegram-ticker{margin:14px 0 18px!important;border-radius:12px!important}
+ .watch-telegram-ticker>a{gap:8px!important;min-height:50px!important;padding:8px 10px!important}
+ .watch-telegram-ticker>a::before{height:24px!important;padding:0 7px!important;font-size:8px!important;letter-spacing:.7px!important}
+ .watch-telegram-ticker>a>i:first-child{flex-basis:30px!important;width:30px!important;height:30px!important}
+ .watch-telegram-ticker>a>span{font-size:11px!important;animation-duration:22s!important}
+}
+
+/* Slide banner remains visible until the visitor presses X. */
+#floatingBannerAd{
+ position:fixed!important;top:auto!important;left:50%!important;right:auto!important;
+ bottom:12px!important;width:min(320px,calc(100vw - 18px))!important;
+ min-height:0!important;margin:0!important;padding:0!important;border:0!important;
+ border-radius:0!important;background:transparent!important;box-shadow:none!important;
+ transform:translate(-50%,calc(100% + 40px))!important;opacity:0!important;
+ visibility:hidden!important;transition:transform .35s ease,opacity .25s ease,visibility .25s ease!important;
+ z-index:10040!important;overflow:visible!important;
+}
+#floatingBannerAd.is-visible{
+ transform:translate(-50%,0)!important;opacity:1!important;visibility:visible!important;
+}
+#floatingBannerAd .floating-ad-toolbar{
+ display:block!important;position:absolute!important;top:-35px!important;right:0!important;
+ width:34px!important;height:32px!important;margin:0!important;padding:0!important;
+ border:0!important;background:transparent!important;box-shadow:none!important;
+}
+#floatingBannerAd .floating-ad-toolbar>span{display:none!important}
+#floatingBannerAd .floating-ad-close{
+ display:grid!important;place-items:center!important;width:30px!important;height:30px!important;
+ margin:0 0 0 auto!important;padding:0!important;border:1px solid #fff!important;
+ border-radius:50%!important;background:rgba(15,29,46,.95)!important;color:#fff!important;
+ font:700 22px/1 Arial,sans-serif!important;box-shadow:0 2px 9px #0007!important;
+}
+#floatingBannerAdSlot{
+ display:block!important;width:300px!important;max-width:100%!important;min-height:0!important;
+ margin:0 auto!important;padding:0!important;border:0!important;border-radius:0!important;
+ background:transparent!important;box-shadow:none!important;overflow:hidden!important;
+}
+#floatingBannerAdSlot iframe{display:block!important;width:300px!important;max-width:100%!important;
+ height:250px!important;margin:0 auto!important;border:0!important;background:transparent!important}
+#showFloatingBanner{display:none!important}
+
+/* Interstitial: appears after 3s and skip unlocks after 7s; no white ad card. */
+#videoInterstitialAd{
+ position:fixed!important;inset:0!important;z-index:10060!important;
+ display:grid!important;place-items:center!important;padding:12px!important;
+ background:rgba(5,12,22,.34)!important;backdrop-filter:none!important;
+}
+#videoInterstitialAd[hidden]{display:none!important}
+#videoInterstitialAd .video-interstitial-inner{
+ position:relative!important;display:block!important;width:min(300px,calc(100vw - 24px))!important;
+ height:250px!important;min-height:250px!important;margin:0!important;padding:0!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+ box-shadow:none!important;overflow:visible!important;
+}
+#videoInterstitialSlot{display:block!important;width:100%!important;height:250px!important;
+ min-height:0!important;margin:0!important;padding:0!important;border:0!important;
+ border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:hidden!important}
+#videoInterstitialSlot iframe{display:block!important;width:300px!important;max-width:100%!important;
+ height:250px!important;margin:0 auto!important;border:0!important;background:transparent!important}
+#closeVideoInterstitial{
+ position:absolute!important;top:-39px!important;right:0!important;z-index:5!important;
+ min-width:116px!important;height:32px!important;padding:7px 12px!important;
+ border:1px solid rgba(255,255,255,.9)!important;border-radius:18px!important;
+ background:rgba(15,29,46,.95)!important;color:#fff!important;
+ font:800 11px "DM Sans",sans-serif!important;box-shadow:0 2px 9px #0006!important;
+}
