@@ -13,11 +13,11 @@
   <div data-component="navbar"></div>
   <main class="watch-shell">
     <div class="watch-topline"><div><span class="eyebrow"><i class="fa-solid fa-play"></i> BOXCELLINK VIDEO</span><h1 data-wt="watchHub">Watch & Discover</h1><p data-wt="watchIntro">Temukan video Basic dan konten eksklusif VIP dalam satu tempat.</p></div><a class="vip-top-link" href="/vip.html"><i class="fa-solid fa-crown"></i><span data-wt="upgradeVip">Upgrade VIP</span></a></div>
-    <!-- Social Bar overlay. Keep the three visual layers; the publisher script is loaded once by watch.js. -->
+    <!-- Three stacked 320x50 banner placements; the Adsterra Social Bar publisher script is loaded once by watch.js. -->
     <div id="guestAdTop" class="guest-ad-stack" hidden aria-label="Iklan mengambang bertumpuk">
-      <div class="adsterra-social-slot" data-adsterra-slot="socialbar-1"></div>
-      <div class="adsterra-social-slot" data-adsterra-slot="socialbar-2"></div>
-      <div class="adsterra-social-slot" data-adsterra-slot="socialbar-3"></div>
+      <div class="adsterra-social-slot" data-adsterra-slot="stacked-banner-1"></div>
+      <div class="adsterra-social-slot" data-adsterra-slot="stacked-banner-2"></div>
+      <div class="adsterra-social-slot" data-adsterra-slot="stacked-banner-3"></div>
     </div>
     <div id="guestPopunderSlot" class="ad-code-slot" data-adsterra-slot="popunder" hidden></div>
     <div id="floatingBannerAd" class="floating-banner-ad" hidden aria-label="Iklan mengambang">
@@ -31,6 +31,10 @@
         <div id="videoInterstitialSlot"></div>
       </div>
     </div>
+    <div id="watchBannerTop" class="adsterra-wide-wrap guest-and-vip-banner watch-ad-before-video">
+      <div class="adsterra-wide-slot ad-unit-728" data-adsterra-slot="banner-728-above-video"></div>
+      <div class="adsterra-wide-slot ad-unit-320" data-adsterra-slot="banner-320-above-video"></div>
+    </div>
     <div id="watchContent" class="watch-main-card"><div class="watch-loading"><span class="loading-orb"></span><span data-wt="loading">Memuat video...</span></div></div>
     <div id="watchBannerTop" class="adsterra-wide-wrap guest-and-vip-banner">
       <div class="adsterra-wide-slot ad-unit-728" data-adsterra-slot="banner-728-top"></div>
@@ -42,6 +46,7 @@
           <div class="section-heading"><div><span class="eyebrow" data-wt="community">COMMUNITY</span><h2 data-wt="commentsTitle">Komentar & Diskusi</h2></div><span class="section-icon"><i class="fa-regular fa-comments"></i></span></div>
           <div id="commentList" class="comment-list"><div class="empty-state" data-wt="commentsLoading">Memuat komentar...</div></div>
           <form id="commentForm" class="comment-form"><label for="commentText" data-wt="writeComment">Tulis komentar</label><input id="guestCommentName" class="guest-name-input" maxlength="40" placeholder="Nama kamu" aria-label="Nama kamu"><textarea id="commentText" maxlength="1500" placeholder="Bagikan pendapat kamu..." required></textarea><div class="comment-form-bottom"><button class="action-primary" type="submit"><i class="fa-solid fa-paper-plane"></i><span data-wt="sendComment">Kirim komentar</span></button></div></form>
+          <div id="watchCommentAd" class="watch-comment-ad adsterra-wide-wrap guest-and-vip-banner"><div class="adsterra-wide-slot ad-unit-468" data-adsterra-slot="banner-below-comments"></div></div>
         </section>
         <section class="section-panel vip-video-panel" id="vipVideoSection"><div class="vip-rail-heading"><div><span class="eyebrow">VIP COLLECTION</span><h2>Video VIP eksklusif</h2><p>Join VIP sekarang juga untuk melihat video full durasi dan video menarik lainnya.</p></div><a class="vip-gold-cta" href="/vip.html"><i class="fa-solid fa-crown"></i> Join VIP Sekarang</a></div><div id="vipVideoRail" class="horizontal-rail vip-video-rail"><div class="empty-state">Memuat koleksi VIP...</div></div></section>
         <section class="section-panel" id="historySection"><div class="section-heading"><div><span class="eyebrow" data-wt="yourActivity">YOUR ACTIVITY</span><h2 data-wt="historyTitle">Riwayat tontonan</h2><p data-wt="historySub">Video yang terakhir kamu tonton.</p></div><i class="fa-solid fa-clock-rotate-left section-icon"></i></div><div id="watchHistory" class="horizontal-rail"><div class="empty-state" data-wt="historyEmpty">Login untuk menyimpan riwayat tontonan.</div></div></section>
@@ -60,11 +65,22 @@
     </section>
     <section class="section-panel video-discovery"><div class="section-heading"><div><span class="eyebrow" data-wt="discover">DISCOVER</span><h2 data-wt="moreVideos">Jelajahi video lainnya</h2><p data-wt="moreVideosSub">Pilih video Basic atau lihat cuplikan konten VIP.</p></div><div class="video-filters"><button class="filter-chip active" data-filter="all" data-wt="filterAll">Semua</button><button class="filter-chip" data-filter="basic" data-wt="filterBasic">Basic</button><button class="filter-chip" data-filter="vip" data-wt="filterVip">VIP</button></div></div><div id="relatedVideos" class="video-grid"></div><div id="watchPages" class="pagination"></div></section>
   </main>
+  <div class="watch-telegram-notice" id="watchTelegramNotice" hidden role="dialog" aria-modal="true" aria-labelledby="watchTelegramTitle">
+    <section class="watch-telegram-card">
+      <span class="watch-telegram-icon"><i class="fa-brands fa-telegram"></i></span>
+      <span class="watch-telegram-kicker">BOXCELLINK COMMUNITY</span>
+      <h2 id="watchTelegramTitle">Gabung Telegram untuk akses lebih lengkap</h2>
+      <p>Gabung komunitas untuk update media terbaru dan info video viral. Login untuk akses member dengan iklan lebih sedikit, atau upgrade VIP untuk menikmati tontonan tanpa iklan.</p>
+      <div class="watch-telegram-benefits"><span><i class="fa-solid fa-circle-check"></i> Update media dan video terbaru</span><span><i class="fa-solid fa-circle-check"></i> Info akses konten lebih lengkap</span></div>
+      <div class="watch-telegram-actions"><a id="watchTelegramJoin" href="https://t.me/+03WCfVAwaWUzZTkx" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> Gabung Telegram</a><a class="watch-telegram-check-link" href="https://t.me/+03WCfVAwaWUzZTkx" target="_blank" rel="noopener noreferrer">Cek sekarang</a><button type="button" id="watchTelegramCheck">Saya sudah join</button></div>
+      <button type="button" class="watch-telegram-dismiss" id="watchTelegramDismiss">Nanti saja</button>
+    </section>
+  </div>
   <div class="vip-modal-backdrop" id="vipModal" hidden><section class="vip-modal access-modal" role="dialog" aria-modal="true" aria-labelledby="vipModalTitle"><button class="modal-close" id="vipModalClose" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button><div class="modal-crown" id="accessModalIcon"><i class="fa-brands fa-telegram"></i></div><span class="eyebrow" id="accessModalEyebrow">AKSES MEMBER</span><h2 id="vipModalTitle">Gabung komunitas resmi kami</h2><p id="vipModalText">Gabung grup Telegram resmi, lalu login untuk menonton video dengan sedikit iklan.</p><div class="access-modal-benefits" id="accessModalBenefits"><span><i class="fa-solid fa-circle-check"></i> Akses video Basic setelah login</span><span><i class="fa-solid fa-circle-check"></i> Pengalaman menonton dengan iklan terbatas</span></div><div class="vip-modal-actions access-modal-actions"><a href="https://t.me/+03WCfVAwaWUzZTkx" target="_blank" rel="noopener noreferrer" class="action-secondary" id="accessTelegramGroup"><i class="fa-brands fa-telegram"></i> Gabung Grup</a><a href="/login.html" class="action-primary" id="accessLogin">Login untuk Menonton</a><a href="/vip.html" class="action-primary" id="accessUpgrade" hidden>Upgrade ke VIP <i class="fa-solid fa-arrow-right"></i></a><button id="vipModalCancel" class="action-secondary" type="button" data-wt="cancel">Nanti</button></div></section></div>
   <div id="watchBannerBottom" class="adsterra-wide-wrap guest-and-vip-banner">
       <div class="adsterra-wide-slot ad-unit-468" data-adsterra-slot="banner-468-bottom"></div>
     </div>
     <div id="adInline300" class="adsterra-wide-wrap guest-and-vip-banner"><div class="ad-box ad-inline-300"></div></div>
     <div data-component="footer"></div>
-  <script src="/components.js?v=20261114-4"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/js/embed-support.js"></script><script src="/js/watch.js"></script><script src="/js/page-i18n.js"></script>
+  <script src="/components.js?v=20261115-1"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/js/embed-support.js"></script><script src="/js/watch.js"></script><script src="/js/page-i18n.js"></script>
 </body></html>
