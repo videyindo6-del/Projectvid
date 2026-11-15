@@ -1,5 +1,5 @@
 (() => {
-const translations={id:{admin:'Panel Admin',dashboard:'Dashboard',account:'Akun Saya',box:'Box Video',telegram:'Media Telegram',review:'Review & Download',vip:'VIP',groups:'Group VIP Telegram',discount:'Kode Diskon Saya',referral:'Referral & Hadiah',notifications:'Notifikasi',wallet:'Saldo & Afiliasi',categories:'Kategori',payments:'Pembayaran',login:'Masuk',register:'Daftar',logout:'Keluar',terms:'Syarat & ketentuan',privacy:'Kebijakan Dan Privasi',help:'Bantuan',cookies:'Kami menggunakan cookie untuk pengalaman yang lebih baik.',accept:'Setujui'},en:{admin:'Admin Panel',dashboard:'Dashboard',account:'My Account',box:'Box Video',telegram:'Telegram Media',review:'Review & Download',vip:'VIP',groups:'VIP Telegram Groups',discount:'My Discount Codes',referral:'Referral & Rewards',notifications:'Notifications',wallet:'Wallet & Affiliate',categories:'Categories',payments:'Payments',login:'Sign in',register:'Sign up',logout:'Sign out',terms:'Terms & Conditions',privacy:'Privacy Policy',help:'Help',cookies:'We use cookies for a better experience.',accept:'Accept'}};
+const translations={id:{admin:'Panel Admin',dashboard:'Dashboard',account:'Akun Saya',box:'Box Video',telegram:'Media Telegram',review:'Review & Download',vip:'VIP',groups:'Group VIP Telegram',discount:'Kode Diskon Saya',referral:'Referral & Hadiah',notifications:'Notifikasi',wallet:'Saldo & Afiliasi',categories:'Kategori',payments:'Pembayaran',login:'Masuk',register:'Daftar',logout:'Keluar',terms:'Syarat & ketentuan',privacy:'Kebijakan Dan Privasi',help:'Bantuan',cookies:'Kami menggunakan cookie untuk pengalaman yang lebih baik.',accept:'Setujui',posts:'Postingan',friends:'Teman',feed:'Feed',profile:'Profil',seeAll:'Lihat semua',markAllRead:'Tandai semua sudah dibaca',deleteAll:'Hapus semuanya',pasteLink:'Buat postingan',pasteIntro:'Bagikan detail dan tautan publik ke komunitas BoxCellink.',publicLink:'Link publik',caption:'Detail postingan',optional:'opsional',publish:'Publikasikan'},en:{admin:'Admin Panel',dashboard:'Dashboard',account:'My Account',box:'Box Video',telegram:'Telegram Media',review:'Review & Download',vip:'VIP',groups:'VIP Telegram Groups',discount:'My Discount Codes',referral:'Referral & Rewards',notifications:'Notifications',wallet:'Wallet & Affiliate',categories:'Categories',payments:'Payments',login:'Sign in',register:'Sign up',logout:'Sign out',terms:'Terms & Conditions',privacy:'Privacy Policy',help:'Help',cookies:'We use cookies for a better experience.',accept:'Accept',posts:'Posts',friends:'Friends',feed:'Feed',profile:'Profile',seeAll:'See all',markAllRead:'Mark all as read',deleteAll:'Delete all',pasteLink:'Create a post',pasteIntro:'Share details and a public link with the BoxCellink community.',publicLink:'Public link',caption:'Post details',optional:'optional',publish:'Publish'}};
 const getLang=()=>localStorage.getItem('boxcellink_lang')||'id';
 function applyLocal(l=getLang()){const d=translations[l]||translations.id;document.documentElement.lang=l;document.querySelectorAll('[data-nav]').forEach(e=>{if(d[e.dataset.nav])e.textContent=d[e.dataset.nav]});document.querySelectorAll('[data-footer]').forEach(e=>{if(d[e.dataset.footer])e.textContent=d[e.dataset.footer]});const b=document.getElementById('translateLabel');if(b)b.textContent=l==='id'?'ID':'ENG';}
 async function load(selector,url){const el=document.querySelector(selector);if(!el)return;try{const r=await fetch(url,{credentials:'same-origin',cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);el.innerHTML=await r.text();}catch(e){console.error('Component load failed',url,e);if(selector.includes('footer'))el.innerHTML='<footer class="bc-footer"><div class="bc-footer-inner"><div>© <span id="footerYear"></span> Boxcellink. All rights reserved.</div><nav><a href="/terms.html">Syarat & ketentuan</a><a href="/privacy.html">Kebijakan Dan Privasi</a><a href="/help.html">Bantuan</a></nav></div></footer>';else if(selector.includes('navbar'))el.innerHTML='<header class="bc-navbar"><div class="bc-nav-inner"><a class="bc-brand" href="/index.html">BoxCellink</a><div class="bc-nav-actions"><button id="translateBtn" class="bc-nav-btn" type="button"><span id="translateLabel">ID</span></button></div></div></header>';}}
@@ -16,7 +16,7 @@ function isPublicRoute(){
   const page=currentPage();
   const path=(location.pathname||'/').toLowerCase();
   const publicPages=new Set([
-    'index','login','register','forgot-password','watch','review','review-detail','telegram','book-video','vip','vip-groups'
+    'index','login','register','forgot-password','watch','review','review-detail','telegram','book-video','vip','vip-groups','posts','member-profile'
   ]);
   return publicPages.has(page)||path.startsWith('/v/')||path.startsWith('/r/');
 }
@@ -43,6 +43,61 @@ async function loadCustomNavItems(){
  }catch(error){console.warn('Custom navbar load failed:',error);}
 }
 
+function initMemberBottomNav(){
+ const nav=document.getElementById('bcMemberBottomNav');
+ if(!nav)return;
+ nav.hidden=false;
+ document.body.classList.add('bc-has-member-bottom-nav');
+ const composer=document.getElementById('bcPasteComposer');
+ const openButton=document.getElementById('bcOpenPasteComposer');
+ const linkInput=document.getElementById('bcPasteLinkInput');
+ const detailInput=document.getElementById('bcPasteCaptionInput');
+ const publishButton=document.getElementById('bcPublishPost');
+ const toast=document.getElementById('bcSocialToast');
+ let toastTimer;
+ const showToast=message=>{
+  if(!toast)return;
+  toast.textContent=message;toast.hidden=false;
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>{toast.hidden=true;},2800);
+ };
+ const closeComposer=()=>{if(composer)composer.hidden=true;document.body.classList.remove('bc-paste-open');};
+ const openComposer=()=>{if(!composer)return;composer.hidden=false;document.body.classList.add('bc-paste-open');setTimeout(()=>linkInput?.focus(),80);};
+ openButton?.addEventListener('click',openComposer);
+ composer?.querySelectorAll('[data-close-paste]').forEach(button=>button.addEventListener('click',closeComposer));
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&composer&&!composer.hidden)closeComposer();});
+ publishButton?.addEventListener('click',async()=>{
+  if(!window.sb?.auth||!window.sb?.from){showToast('Layanan posting belum siap. Muat ulang halaman.');return;}
+  const rawUrl=String(linkInput?.value||'').trim();
+  const detail=String(detailInput?.value||'').trim();
+  let parsed;
+  try{parsed=new URL(rawUrl);if(!['http:','https:'].includes(parsed.protocol))throw new Error('protocol');}
+  catch{showToast('Masukkan link publik yang valid (https:// atau http://).');linkInput?.focus();return;}
+  if(detail.length>1500){showToast('Detail maksimal 1.500 karakter.');detailInput?.focus();return;}
+  publishButton.disabled=true;publishButton.classList.add('is-loading');
+  const oldText=publishButton.innerHTML;publishButton.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Mengirim...';
+  try{
+   const {data:{user},error:authError}=await window.sb.auth.getUser();
+   if(authError||!user)throw new Error('Silakan masuk untuk membuat postingan.');
+   const {data:profile,error:profileError}=await window.sb.from('profiles').select('username').eq('id',user.id).maybeSingle();
+   if(profileError)throw profileError;
+   if(!profile?.username)throw new Error('Atur username publik terlebih dahulu di halaman Akun Saya.');
+   const {data:post,error}=await window.sb.from('social_posts').insert({user_id:user.id,detail:detail||null,public_url:parsed.href}).select('id').single();
+   if(error)throw error;
+   if(linkInput)linkInput.value='';if(detailInput)detailInput.value='';closeComposer();
+   location.assign('/posts.html?new='+encodeURIComponent(post.id));
+  }catch(error){console.error('Publish social post failed:',error);showToast(error.message||'Postingan gagal dikirim. Coba lagi.');}
+  finally{publishButton.disabled=false;publishButton.classList.remove('is-loading');publishButton.innerHTML=oldText;}
+ });
+ const page=(location.pathname.split('/').pop()||'dashboard.html').toLowerCase();
+ nav.querySelector('[data-social-tab="friends"]')?.addEventListener('click',()=>showToast('Fitur Teman akan hadir pada pembaruan berikutnya.'));
+ nav.querySelectorAll('[data-social-tab]').forEach(item=>{
+  const tab=item.dataset.socialTab;
+  const active=(tab==='feed'&&['dashboard.html','index.html'].includes(page))||(tab==='posts'&&page==='posts.html')||(tab==='profile'&&['account.html','member-profile.html'].includes(page));
+  item.classList.toggle('is-active',active);
+  if(active)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');
+ });
+}
+
 async function initMemberNavExtras(user){
  const wallet=document.getElementById('navWallet'),notifyWrap=document.getElementById('navNotificationWrap');
  const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
@@ -56,15 +111,16 @@ async function initMemberNavExtras(user){
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const safeHref=v=>String(v||'').startsWith('/')&&!String(v).startsWith('//')?v:'/notifications.html';
  let rows=[];
- const render=()=>{if(!list)return;list.innerHTML=rows.length?rows.map(n=>`<a class="bc-notification-item ${n.is_read?'':'unread'}" href="${esc(safeHref(n.href))}" data-nav-notice="${esc(n.id)}"><b>${esc(n.title||'Notifikasi')}</b><span>${esc(n.body||'')}</span><small>${new Date(n.created_at).toLocaleString('id-ID')}</small></a>`).join(''):'<p class="bc-notification-empty">Belum ada notifikasi.</p>';const unread=rows.filter(n=>!n.is_read).length;if(badge){badge.textContent=unread>99?'99+':String(unread);badge.hidden=!unread;}if(markBtn)markBtn.disabled=!unread;if(deleteBtn)deleteBtn.disabled=!rows.some(n=>n.is_read);};
- const load=async()=>{const {data,error}=await window.sb.from('boxcellink_notifications').select('id,title,body,href,is_read,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(5);if(error)throw error;rows=data||[];render();};
+ const render=()=>{if(!list)return;list.innerHTML=rows.length?rows.map(n=>`<a class="bc-notification-item ${n.is_read?'':'unread'}" href="${esc(safeHref(n.href))}" data-nav-notice="${esc(n.id)}"><b>${esc(n.title||'Notifikasi')}</b><span>${esc(n.body||'')}</span><small>${new Date(n.created_at).toLocaleString('id-ID')}</small></a>`).join(''):'<p class="bc-notification-empty">Belum ada notifikasi.</p>';const unread=rows.filter(n=>!n.is_read).length;if(badge){badge.textContent=unread>99?'99+':String(unread);badge.hidden=!unread;}if(markBtn)markBtn.disabled=!unread;if(deleteBtn)deleteBtn.disabled=!rows.length;};
+ const load=async()=>{const {data,error}=await window.sb.from('boxcellink_notifications').select('id,title,body,href,is_read,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(20);if(error)throw error;rows=data||[];render();};
  const refresh=async()=>{try{await load();}catch(e){if(list)list.innerHTML='<p class="bc-notification-empty">Notifikasi belum dapat dimuat.</p>';if(badge)badge.hidden=true;console.warn('Notification preview unavailable:',e);}};
  await refresh();
  if(btn&&!btn.dataset.bound){btn.dataset.bound='1';btn.addEventListener('click',async()=>{const open=panel?.hidden!==false;if(panel)panel.hidden=!open;btn.setAttribute('aria-expanded',String(open));if(open)await refresh();});}
  if(panel&&!panel.dataset.bound){panel.dataset.bound='1';panel.addEventListener('click',async e=>{const link=e.target.closest('[data-nav-notice]');if(!link)return;e.preventDefault();const id=link.dataset.navNotice,href=link.href;const row=rows.find(x=>String(x.id)===String(id));if(row&&!row.is_read){const {error}=await window.sb.from('boxcellink_notifications').update({is_read:true}).eq('id',id).eq('user_id',user.id);if(error){console.warn('Mark notification read failed:',error);return;}}location.assign(href);});}
  if(markBtn&&!markBtn.dataset.bound){markBtn.dataset.bound='1';markBtn.addEventListener('click',async()=>{if(!rows.some(n=>!n.is_read))return;markBtn.disabled=true;const {error}=await window.sb.from('boxcellink_notifications').update({is_read:true}).eq('user_id',user.id).eq('is_read',false);if(error){console.warn('Mark all notifications failed:',error);return;}await refresh();});}
- if(deleteBtn&&!deleteBtn.dataset.bound){deleteBtn.dataset.bound='1';deleteBtn.addEventListener('click',async()=>{if(!rows.some(n=>n.is_read)||!confirm('Hapus semua notifikasi yang sudah dibaca?'))return;deleteBtn.disabled=true;const {error}=await window.sb.from('boxcellink_notifications').delete().eq('user_id',user.id).eq('is_read',true);if(error){console.warn('Delete read notifications failed:',error);return;}await refresh();});}
+ if(deleteBtn&&!deleteBtn.dataset.bound){deleteBtn.dataset.bound='1';deleteBtn.addEventListener('click',async()=>{if(!rows.length||!confirm('Hapus SEMUA notifikasi dari akun ini? Tindakan ini tidak dapat dibatalkan.'))return;deleteBtn.disabled=true;try{const {error}=await window.sb.from('boxcellink_notifications').delete().eq('user_id',user.id);if(error)throw error;await refresh();}catch(error){console.warn('Delete all notifications failed:',error);alert('Notifikasi gagal dihapus. Silakan coba lagi.');}finally{deleteBtn.disabled=!rows.length;}});}
  if(!document.body.dataset.noticeOutsideBound){document.body.dataset.noticeOutsideBound='1';document.addEventListener('click',e=>{if(!notifyWrap.contains(e.target)){if(panel)panel.hidden=true;btn?.setAttribute('aria-expanded','false');}});}
+ initMemberBottomNav();
 }
 async function initNavCategoryMenus(){
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -161,7 +217,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
  if(/^[A-Z0-9]{6,16}$/.test(sharedRef))localStorage.setItem('boxcellink_affiliate_code',sharedRef);
  // Load Support immediately; it no longer depends on navbar/footer network fetches.
  if(!document.getElementById('bcSupportWidgetScript')&&!window.__boxcellinkSupportLoaded){const supportScript=document.createElement('script');supportScript.id='bcSupportWidgetScript';supportScript.src='/js/support-widget.js';supportScript.async=false;supportScript.onerror=()=>console.error('Support widget failed to load:',supportScript.src);document.body.appendChild(supportScript);}
- await Promise.all([load('[data-component="navbar"]','/components/navbar.html?v=20261114-4'),load('[data-component="footer"]','/components/footer.html')]);
+ await Promise.all([load('[data-component="navbar"]','/components/navbar.html?v=20261115-2'),load('[data-component="footer"]','/components/footer.html')]);
  initTranslate();const y=document.getElementById('footerYear');if(y)y.textContent=new Date().getFullYear();const ca=document.getElementById('cookieAccept'),cn=document.getElementById('cookieNotice');if(ca)ca.onclick=()=>{localStorage.setItem('boxcellink_cookie_ok','1');cn?.classList.add('is-hidden')};if(localStorage.getItem('boxcellink_cookie_ok')==='1')cn?.classList.add('is-hidden');applyLocal();
  if(isAuthRoute()){const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');if(guest)guest.hidden=false;if(member)member.hidden=true;initDrawer();await initNavCategoryMenus();}else{await initNavbar();}await loadCustomNavItems();
 });
