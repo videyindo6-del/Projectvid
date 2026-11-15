@@ -66,7 +66,7 @@ function initMemberBottomNav(){
  const openComposer=()=>{if(!composer)return;composer.hidden=false;document.body.classList.add('bc-paste-open');setTimeout(()=>linkInput?.focus(),80);};
  const openChoice=()=>{if(addChoice)addChoice.hidden=false;};
  const closeChoice=()=>{if(addChoice)addChoice.hidden=true;};
- openButton?.addEventListener('click',openChoice);
+ if(openButton&&!openButton.dataset.addChoiceBound){openButton.dataset.addChoiceBound='1';openButton.addEventListener('click',openChoice);}
  addChoice?.querySelectorAll('[data-close-add]').forEach(b=>b.addEventListener('click',closeChoice));
  document.getElementById('bcChoosePastelink')?.addEventListener('click',()=>{closeChoice();openComposer();});
  composer?.querySelectorAll('[data-close-paste]').forEach(button=>button.addEventListener('click',closeComposer));
@@ -126,7 +126,6 @@ async function initMemberNavExtras(user){
  if(markBtn&&!markBtn.dataset.bound){markBtn.dataset.bound='1';markBtn.addEventListener('click',async()=>{if(!rows.some(n=>!n.is_read))return;markBtn.disabled=true;const {error}=await window.sb.from('boxcellink_notifications').update({is_read:true}).eq('user_id',user.id).eq('is_read',false);if(error){console.warn('Mark all notifications failed:',error);return;}await refresh();});}
  if(deleteBtn&&!deleteBtn.dataset.bound){deleteBtn.dataset.bound='1';deleteBtn.addEventListener('click',async()=>{if(!rows.some(n=>n.is_read)||!confirm('Hapus semua notifikasi yang sudah dibaca? Notifikasi yang belum dibaca tetap tersimpan.'))return;deleteBtn.disabled=true;try{const {error}=await window.sb.from('boxcellink_notifications').delete().eq('user_id',user.id).eq('is_read',true);if(error)throw error;await refresh();}catch(error){console.warn('Delete all notifications failed:',error);alert('Notifikasi gagal dihapus. Silakan coba lagi.');}finally{deleteBtn.disabled=!rows.some(n=>n.is_read);}});}
  if(!document.body.dataset.noticeOutsideBound){document.body.dataset.noticeOutsideBound='1';document.addEventListener('click',e=>{if(!notifyWrap.contains(e.target)){if(panel)panel.hidden=true;btn?.setAttribute('aria-expanded','false');}});}
- initMemberBottomNav();
 }
 async function initNavCategoryMenus(){
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -184,6 +183,9 @@ async function initNavbar(){
  const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');
  if(guest)guest.hidden=!!user;
  if(member)member.hidden=!user;
+ // Initialize the member bottom navigation independently from notification loading.
+ // The Add chooser must remain functional even if notification markup/data is unavailable.
+ if(user)initMemberBottomNav();
  // Admin entry is visible only after Supabase confirms profiles.role === 'admin'.
  // A failed profile lookup fails closed: ordinary members never see admin navigation.
  const adminLink=document.getElementById('navAdmin');
@@ -223,7 +225,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
  if(/^[A-Z0-9]{6,16}$/.test(sharedRef))localStorage.setItem('boxcellink_affiliate_code',sharedRef);
  // Load Support immediately; it no longer depends on navbar/footer network fetches.
  if(!document.getElementById('bcSupportWidgetScript')&&!window.__boxcellinkSupportLoaded){const supportScript=document.createElement('script');supportScript.id='bcSupportWidgetScript';supportScript.src='/js/support-widget.js';supportScript.async=false;supportScript.onerror=()=>console.error('Support widget failed to load:',supportScript.src);document.body.appendChild(supportScript);}
- await Promise.all([load('[data-component="navbar"]','/components/navbar.html?v=20261115-4'),load('[data-component="footer"]','/components/footer.html')]);
+ await Promise.all([load('[data-component="navbar"]','/components/navbar.html?v=20261116-addmenu-fix'),load('[data-component="footer"]','/components/footer.html')]);
  initTranslate();const y=document.getElementById('footerYear');if(y)y.textContent=new Date().getFullYear();const ca=document.getElementById('cookieAccept'),cn=document.getElementById('cookieNotice');if(ca)ca.onclick=()=>{localStorage.setItem('boxcellink_cookie_ok','1');cn?.classList.add('is-hidden')};if(localStorage.getItem('boxcellink_cookie_ok')==='1')cn?.classList.add('is-hidden');applyLocal();
  if(isAuthRoute()){const guest=document.getElementById('navGuest'),member=document.getElementById('navMember');if(guest)guest.hidden=false;if(member)member.hidden=true;initDrawer();await initNavCategoryMenus();}else{await initNavbar();}await loadCustomNavItems();
 });
