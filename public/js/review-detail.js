@@ -399,9 +399,12 @@ async function setupReviewSocial(reviewId, title) {
       document.getElementById('commentCount').textContent = reviewText('0 komentar','0 comments'); return;
     }
     const rows = comments.data || [];
+    const publicIds=[...new Set(rows.map(c=>c.user_id).filter(Boolean))];
+    let publicNames=new Map();
+    if(publicIds.length){try{const {data}=await sb.rpc('get_public_usernames',{p_user_ids:publicIds});(data||[]).forEach(x=>publicNames.set(x.user_id,x.username));}catch(e){console.warn('Public usernames unavailable:',e.message);}}
     document.getElementById('commentCount').textContent = `${rows.length} ${reviewText('komentar','comments')}`;
     commentBox.innerHTML = rows.length ? rows.map(c => {
-      const name = c.guest_name || (c.user_id ? 'Member BoxCellink' : 'Pengunjung');
+      const name = c.guest_name || (c.user_id ? (publicNames.get(c.user_id) ? '@'+publicNames.get(c.user_id) : 'Member BoxCellink') : 'Pengunjung');
       const del = isAdmin ? `<button type="button" class="comment-delete" data-comment-delete="${esc(c.id)}" title="Hapus komentar" aria-label="Hapus komentar"><i class="fa-solid fa-trash-can"></i></button>` : '';
       return `<article class="review-comment"><div class="comment-avatar"><i class="fa-solid fa-user"></i></div><div class="comment-body"><div class="comment-meta"><b>${esc(name)}</b><time>${new Date(c.created_at).toLocaleString(reviewEN() ? 'en-US' : 'id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</time>${del}</div><p>${formatCommentContent(c.content)}</p></div></article>`;
     }).join('') : '<div class="comment-empty">Belum ada komentar. Jadilah yang pertama berkomentar.</div>';
