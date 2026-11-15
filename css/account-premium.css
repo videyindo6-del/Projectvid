@@ -169,3 +169,71 @@ body:has(.account-page){background:#f7f8fc!important;color:#243047!important}
  .history-card>img,.history-card>video,.history-card>.history-placeholder{height:178px!important}
 }
 
+
+
+/* Account Center v2 — public profile, payout, history and security */
+.account-profile-section,.payout-section,.account-security-section{margin-top:26px}
+.account-profile-section .profile-editor-panel,.payout-panel{padding:clamp(17px,3vw,25px)}
+.profile-public-preview{display:flex;align-items:center;gap:14px;padding:3px 0 18px;margin-bottom:18px;border-bottom:1px solid #eee9df}
+.profile-avatar{width:52px;height:52px;display:grid;place-items:center;flex:0 0 52px;border-radius:17px;background:linear-gradient(145deg,#244f7b,#477fb0);color:#fff;font-size:21px;font-weight:850;box-shadow:0 8px 20px #315d8528}
+.profile-public-preview>div{display:grid;gap:4px;min-width:0}
+.profile-public-preview small,.account-current-value small,.payout-saved-card small{font-size:10px;color:#8a8d94;font-weight:750;letter-spacing:.04em;text-transform:uppercase}
+.profile-public-preview b{font-size:16px;color:#293b50;overflow-wrap:anywhere}
+.profile-public-preview span:last-child{font-size:12px;color:#557da2;font-weight:750}
+.account-form-grid{display:grid;grid-template-columns:1fr;gap:9px}
+.account-form-grid>label,.account-panel form>label{font-size:12px;font-weight:750;color:#536273;margin-top:4px}
+.account-form-grid input,.account-form-grid select,.account-panel form input,.account-panel form select{width:100%;min-height:45px;padding:11px 13px;border:1px solid #e1e6ec;border-radius:12px;background:#fff;color:#293b50;font:inherit;font-size:13px;outline:none;transition:border-color .18s,box-shadow .18s}
+.account-form-grid input:focus,.account-form-grid select:focus,.account-panel form input:focus,.account-panel form select:focus{border-color:#7ba4ca;box-shadow:0 0 0 3px #2c70b018}
+.username-input-wrap{display:flex;align-items:center;min-height:45px;border:1px solid #e1e6ec;border-radius:12px;background:#fff;overflow:hidden}
+.username-input-wrap>span{padding:0 12px;color:#7290ad;font-weight:850}
+.username-input-wrap input{border:0!important;box-shadow:none!important;min-width:0}
+.account-field-hint{display:block;color:#8a929b;font-size:11px;line-height:1.55;margin-top:4px}
+.account-current-value{display:grid;gap:5px;padding:12px 14px;margin:0 0 14px;border:1px solid #e9edf1;border-radius:12px;background:#f8fafc}
+.account-current-value b{font-size:13px;color:#30465c;overflow-wrap:anywhere}
+.payout-eligibility-note{display:flex;align-items:flex-start;gap:9px;padding:12px 13px;margin-bottom:16px;border-radius:12px;background:#f2f7fb;color:#55718d;font-size:11px;line-height:1.55}
+.payout-eligibility-note i{color:#477ba8;margin-top:1px}
+.payout-saved-card{display:flex;align-items:center;gap:13px;padding:15px;margin-bottom:17px;border:1px solid #e5eaf0;border-radius:14px;background:linear-gradient(135deg,#fbfdff,#f4f8fc)}
+.payout-saved-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:#e8f0f8;color:#315f89;flex:0 0 42px}
+.payout-saved-card>div{display:grid;gap:4px;min-width:0;flex:1}
+.payout-saved-card b{font-size:14px;color:#2e4358}
+.payout-saved-card span:not(.payout-saved-icon){font-size:11px;color:#758294;overflow-wrap:anywhere}
+.payout-saved-card button{white-space:nowrap}
+.account-current-value+form{display:grid;gap:9px}
+.account-panel form{display:grid;gap:9px}
+.account-panel form small{color:#8a929b;font-size:11px;line-height:1.5}
+.account-panel form .account-action,.account-form-grid>.account-action{margin-top:7px;width:fit-content;min-width:180px}
+.history-sort-label{display:flex;align-items:center;gap:8px;color:#7b8794;font-size:11px;font-weight:700}
+.history-sort-label select{min-height:37px;max-width:180px;padding:7px 10px;border:1px solid #e4e9ef;border-radius:10px;background:#fff;color:#3c5369;font:inherit;font-size:11px}
+.history-duration{display:block;color:#527da2!important;font-weight:750}
+.vip-history-row{align-items:center}
+.vip-history-price{margin-left:auto;color:#315f89;font-size:13px;white-space:nowrap}
+.login-device-list{display:grid;gap:0}
+.login-device-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #edf0f3}
+.login-device-row:last-child{border-bottom:0}
+.device-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:#f0f5fa;color:#47769f;flex:0 0 40px}
+.device-main{display:grid;gap:4px;min-width:0;flex:1}
+.device-main b{font-size:12px;color:#33495e;overflow-wrap:anywhere}
+.device-main small{font-size:10px;color:#8a929b}
+.device-current{display:inline-flex;margin-left:5px;padding:3px 6px;border-radius:6px;background:#eaf5ee;color:#34764b;font-size:9px;vertical-align:middle}
+.device-state{font-size:10px;font-weight:750;white-space:nowrap}
+.device-state.is-current{color:#34764b}.device-state.is-other{color:#9a8052}
+.security-actions{display:flex;gap:9px;flex-wrap:wrap;margin:17px 0 10px}
+.secondary-action{background:#eef4f9!important;color:#315f89!important;border:1px solid #dce7f0!important}
+.danger-action{background:#fff4f2!important;color:#a7483c!important;border:1px solid #f1d9d4!important}
+.payout-section .section-heading,.account-security-section .section-heading{align-items:center}
+.account-section .section-heading{gap:14px}
+.account-section .section-heading>div{min-width:0}
+.account-section .section-heading-icon{flex:0 0 auto}
+@media(max-width:640px){
+ .profile-public-preview{align-items:flex-start}
+ .payout-saved-card{align-items:flex-start;flex-wrap:wrap}
+ .payout-saved-card button{margin-left:55px}
+ .history-sort-label{width:100%;justify-content:space-between;margin-top:7px}
+ .history-sort-label select{max-width:60%}
+ .vip-history-price{font-size:11px}
+ .login-device-row{align-items:flex-start}
+ .device-state{font-size:9px}
+ .security-actions{display:grid}
+ .security-actions .account-action{width:100%;justify-content:center}
+ .account-panel form .account-action,.account-form-grid>.account-action{width:100%}
+}
