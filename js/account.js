@@ -361,6 +361,24 @@ async function initAccount(){
   try{const {error}=await sb.auth.signOut();if(error)throw error;location.replace('/login.html');}
   catch(err){showNotice(err.message||'Logout failed','error');btn.disabled=false;}
  });
+ // Load and save public bio/social links. Data is intentionally limited to public fields.
+ const socialFields={instagram:'socialInstagram',facebook:'socialFacebook',youtube:'socialYoutube',telegram:'socialTelegram',whatsapp:'socialWhatsapp',x:'socialX',other:'socialOther'};
+ try{
+  const {data:pub,error:pubError}=await sb.from('profiles').select('bio,social_links').eq('id',user.id).maybeSingle();
+  if(pubError)throw pubError;
+  $('profileBio').value=pub?.bio||'';
+  Object.entries(socialFields).forEach(([key,id])=>{const el=$(id);if(el)el.value=pub?.social_links?.[key]||'';});
+ }catch(err){console.warn('Public profile fields unavailable:',err);}
+ $('socialProfileForm')?.addEventListener('submit',async event=>{
+  event.preventDefault();const form=event.currentTarget,button=form.querySelector('button[type="submit"]');button.disabled=true;
+  try{
+   const links={};for(const [key,id] of Object.entries(socialFields)){const value=String($(id)?.value||'').trim();if(!value)continue;const url=new URL(value);if(!['http:','https:'].includes(url.protocol))throw new Error('Gunakan tautan https:// atau http:// untuk '+key+'.');links[key]=url.href;}
+   const bio=String($('profileBio').value||'').trim();if(bio.length>500)throw new Error('Bio maksimal 500 karakter.');
+   const {error}=await sb.from('profiles').update({bio,social_links:links}).eq('id',user.id);if(error)throw error;
+   showNotice('Bio dan tautan sosial berhasil disimpan.','success');
+  }catch(err){showNotice('Gagal menyimpan profil: '+(err.message||'Periksa kembali tautan.'),'error');}
+  finally{button.disabled=false;}
+ });
 }
 document.addEventListener('DOMContentLoaded',()=>{applyAccountLanguage();initAccount().catch(error=>{
  console.error('BoxCellink account:',error);
