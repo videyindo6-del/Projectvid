@@ -584,6 +584,22 @@ async function load() {
     applyReviewTranslations(box);
     try {
       const {data:{user}} = await sb.auth.getUser();
+      if(user && v.access === 'paid'){
+        const {data:publisherWallet}=await sb.from('publisher_balances').select('available_balance').eq('publisher_id',user.id).maybeSingle();
+        if(Number(publisherWallet?.available_balance||0)>=Number(v.price||0)){
+          const purchaseStrip=box.querySelector('.purchase-strip');
+          if(purchaseStrip){
+            const publisherBuy=document.createElement('button');publisherBuy.type='button';publisherBuy.className='btn';publisherBuy.textContent=reviewText('Beli dengan saldo publisher','Buy with publisher balance');
+            publisherBuy.style.cssText='margin-top:10px;width:100%;border:1px solid #c9d9e9;border-radius:12px;padding:12px;background:#edf4fb;color:#245f96;font-weight:800;cursor:pointer';
+            publisherBuy.addEventListener('click',async()=>{
+              publisherBuy.disabled=true;
+              try{const {data,error}=await sb.rpc('buy_review_with_publisher_balance',{p_review_id:v.id});if(error)throw error;if(!data?.ok)throw new Error(data?.reason||'Pembelian gagal');reviewToast(reviewText('Pembelian berhasil menggunakan saldo publisher.','Purchase completed using publisher balance.'),'success');location.href='/d/'+encodeURIComponent(reviewSlug);}
+              catch(err){reviewToast(err.message||reviewText('Pembelian gagal.','Purchase failed.'),'error');publisherBuy.disabled=false;}
+            });
+            purchaseStrip.appendChild(publisherBuy);
+          }
+        }
+      }
       if(user){
         const {data:affiliate} = await sb.from('profiles').select('affiliate_status,referral_code').eq('id',user.id).maybeSingle();
         if(affiliate?.affiliate_status==='approved' && affiliate.referral_code){

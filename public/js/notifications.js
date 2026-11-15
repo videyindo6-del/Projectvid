@@ -33,8 +33,8 @@ async function load(){
   user=authData?.user||null;
   if(!user){location.replace('/login.html?next=%2Fnotifications.html');return;}
   const {data,error}=await sb.from('boxcellink_notifications')
-   .select('id,user_id,title,body,kind,href,is_read,is_admin_managed,created_at')
-   .eq('user_id',user.id).order('created_at',{ascending:false}).limit(200);
+   .select('id,user_id,title,body,kind,href,is_read,is_admin_managed,created_at,expires_at')
+   .eq('user_id',user.id).or('expires_at.is.null,expires_at.gt.'+new Date().toISOString()).order('created_at',{ascending:false}).limit(200);
   if(error)throw error;
   notificationRows=data||[];
   const announcements=notificationRows.filter(n=>n.kind==='announcement');
