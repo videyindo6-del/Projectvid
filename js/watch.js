@@ -95,7 +95,6 @@ function mountInlineAd(host){
  host.replaceChildren(frame);
 }
 function setupSocialBars(){
- // Social Bar asli Adsterra adalah script publisher level halaman, cukup dimuat satu kali.
  if(isVip)return;
  const stack=$('#guestAdTop');
  if(!stack||stack.dataset.staged==='1')return;
@@ -109,20 +108,19 @@ function setupSocialBars(){
   document.body.appendChild(publisher);
  }
  stack.hidden=false;
- stack.style.display='contents';
  const slots=[...stack.querySelectorAll('.adsterra-social-slot')];
  const positions=[
-  {top:'28%',left:'auto',right:'10px'},
-  {top:'43%',left:'10px',right:'auto'},
-  {top:'58%',left:'auto',right:'10px'}
+  {top:'24%',left:'auto',right:'12px'},
+  {top:'43%',left:'12px',right:'auto'},
+  {top:'62%',left:'auto',right:'12px'}
  ];
  slots.forEach((host,i)=>{
   host.hidden=true;host.dataset.dismissed='0';
-  host.style.cssText='display:none;position:fixed;z-index:10030;width:min(320px,calc(100vw - 20px));min-height:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;pointer-events:auto;'+
+  host.style.cssText='display:none!important;position:fixed!important;z-index:10030;width:min(320px,calc(100vw - 24px));height:50px;min-height:50px;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;pointer-events:auto;'+
    `top:${positions[i].top};left:${positions[i].left};right:${positions[i].right};`;
   window.setTimeout(()=>{
    if(isVip||host.dataset.dismissed==='1')return;
-   host.hidden=false;host.style.display='block';
+   host.hidden=false;host.style.setProperty('display','block','important');
    mountAdUnit(host,AD_UNITS.banner320);
    addSocialClose(host);
   },(i+1)*2000);
@@ -133,7 +131,7 @@ function setupPopunder(){
  if(isVip||popunderStarted)return;popunderStarted=true;
  // Sinkron dengan impresi iklan pertama (detik ke-10). Script popunder
  // publisher hanya dimuat sekali; frekuensi popup selanjutnya dikendalikan jaringan iklan.
- window.setTimeout(()=>{if(!isVip&&document.body.isConnected)injectScript(document.body,'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js',{'data-cfasync':'false'});},10000);
+ window.setTimeout(()=>{if(!isVip&&document.body.isConnected)injectScript(document.body,'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js',{'data-cfasync':'false'});},3000);
 }
 function mountFloatingBanner(){
  const wrap=$('#floatingBannerAd'),slot=$('#floatingBannerAdSlot'),hide=$('#hideFloatingBanner'),show=$('#showFloatingBanner');
@@ -144,11 +142,11 @@ function mountFloatingBanner(){
  frame.style.cssText='display:block;width:300px;max-width:100%;height:250px;border:0;margin:0 auto;background:transparent';
  frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:300px;height:250px;overflow:hidden;background:transparent}</style></head><body><script>var atOptions={key:'896ad8ddb5ea1d057ac6d61226e3f54d',format:'iframe',height:250,width:300,params:{}};<\/script><script src="https://www.highrevenueformat.com/896ad8ddb5ea1d057ac6d61226e3f54d/invoke.js"><\/script></body></html>`;
  slot.replaceChildren(frame);
- let autoHideTimer=null,revealTimer=null,hideTransition=null;
+ let revealTimer=null,hideTransition=null;
  const conceal=()=>{
-  if(autoHideTimer){window.clearTimeout(autoHideTimer);autoHideTimer=null;}
-  wrap.classList.remove('is-visible');if(hideTransition)window.clearTimeout(hideTransition);
-  hideTransition=window.setTimeout(()=>{wrap.hidden=true;},250);
+  wrap.classList.remove('is-visible');
+  if(hideTransition)window.clearTimeout(hideTransition);
+  hideTransition=window.setTimeout(()=>{wrap.hidden=true;},350);
   if(show)show.hidden=false;
   if(revealTimer)window.clearTimeout(revealTimer);
   revealTimer=window.setTimeout(()=>{revealTimer=null;reveal();},5000);
@@ -157,14 +155,15 @@ function mountFloatingBanner(){
   if(isVip)return;
   if(revealTimer){window.clearTimeout(revealTimer);revealTimer=null;}
   if(hideTransition)window.clearTimeout(hideTransition);
-  wrap.hidden=false;requestAnimationFrame(()=>wrap.classList.add('is-visible'));
+  wrap.hidden=false;
+  requestAnimationFrame(()=>wrap.classList.add('is-visible'));
   if(show)show.hidden=true;
-  if(autoHideTimer)window.clearTimeout(autoHideTimer);
-  autoHideTimer=window.setTimeout(conceal,5000);
  };
- hide?.addEventListener('click',conceal);show?.addEventListener('click',reveal);
- wrap.dataset.reveal='ready';window.boxcellinkRevealFloatingAd=reveal;
- // Social bar ketiga dan floating banner dimulai bersamaan pada detik ke-6.
+ hide?.addEventListener('click',conceal);
+ show?.addEventListener('click',reveal);
+ wrap.dataset.reveal='ready';
+ window.boxcellinkRevealFloatingAd=reveal;
+ // Muncul bersamaan dengan social slot ketiga pada detik ke-6.
  window.setTimeout(()=>{if(!isVip)reveal();},6000);
 }
 function setupTelegramNotice(){
@@ -212,7 +211,7 @@ function setupInterstitial(){
    frame.style.cssText='display:block;width:min(300px,90vw);height:250px;border:0;margin:auto';
    frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:transparent}</style></head><body><script>var atOptions={key:'${unit.key}',format:'iframe',height:250,width:300,params:{}};<\/script><script src="https://www.highrevenueformat.com/${unit.key}/invoke.js"><\/script></body></html>`;
    slot.appendChild(frame);modal.hidden=false;showing=true;
-   let remaining=5;close.disabled=true;close.textContent=`Lewati dalam ${remaining}`;
+   let remaining=7;close.disabled=true;close.textContent=`Lewati dalam ${remaining}`;
    if(tick)window.clearInterval(tick);
    tick=window.setInterval(()=>{remaining--;if(remaining<=0){window.clearInterval(tick);tick=null;close.disabled=false;close.textContent='Lewati iklan';}else close.textContent=`Lewati dalam ${remaining}`;},1000);
   },delay);
@@ -224,7 +223,7 @@ function setupInterstitial(){
  document.addEventListener('visibilitychange',()=>{if(!showing&&document.visibilityState==='visible'&&!timer)schedule(interval);});
  // Impresi pertama pada detik ke-10; impresi berikutnya setiap 10 detik
  // setelah pengguna menekan tombol Lewati.
- schedule(interval);
+ schedule(3000);
 }
 function setupGuestAds(){
  const role=isVip?'vip':(currentUser?'member':'guest');
