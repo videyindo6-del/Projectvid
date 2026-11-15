@@ -87,55 +87,52 @@ function mountAdUnit(host,unit){
  host.replaceChildren(frame);
 }
 function mountInlineAd(host){
- if(!host||host.dataset.loaded==='1')return;host.dataset.loaded='1';
- host.style.cssText='display:block;width:100%;min-height:250px;margin:12px 0;padding:0;background:transparent;border:0;box-shadow:none;border-radius:0';
- const frame=document.createElement('iframe');frame.title='Advertisement';frame.loading='lazy';frame.scrolling='no';
- frame.style.cssText='display:block;width:100%;min-height:250px;height:300px;border:0;background:transparent';
- frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;min-height:250px;background:transparent}</style></head><body><script async="async" data-cfasync="false" src="https://pl32231888.profitableratecpmnetwork.com/d0c4535d3914ad4b2c4e09c4aa337646/invoke.js"><\/script><div id="container-d0c4535d3914ad4b2c4e09c4aa337646"></div></body></html>';
- host.replaceChildren(frame);
+ if(!host||host.dataset.loaded==='1'||host.dataset.scheduled==='1')return;
+ host.dataset.scheduled='1';
+ window.setTimeout(()=>{
+  if(!host.isConnected||host.dataset.loaded==='1')return;
+  host.dataset.loaded='1';
+  host.style.cssText='display:block;width:100%;min-height:250px;margin:12px 0;padding:0;background:transparent;border:0;box-shadow:none;border-radius:0';
+  const frame=document.createElement('iframe');frame.title='Advertisement';frame.loading='lazy';frame.scrolling='no';
+  frame.style.cssText='display:block;width:100%;min-height:250px;height:300px;border:0;background:transparent;box-shadow:none';
+  frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;min-height:250px;background:transparent;border:0;box-shadow:none}</style></head><body><script async="async" data-cfasync="false" src="https://pl32231888.profitableratecpmnetwork.com/d0c4535d3914ad4b2c4e09c4aa337646/invoke.js"><\/script><div id="container-d0c4535d3914ad4b2c4e09c4aa337646"></div></body></html>';
+  host.replaceChildren(frame);
+ },5000);
 }
 function setupSocialBars(){
- if(isVip)return;
  const stack=$('#guestAdTop');
  if(!stack||stack.dataset.staged==='1')return;
- stack.dataset.staged='1';
- const publisherSrc='https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js';
- if(!document.querySelector('script[data-boxcellink-socialbar="1"]')){
-  const publisher=document.createElement('script');
-  publisher.src=publisherSrc;publisher.async=true;
-  publisher.setAttribute('data-cfasync','false');
-  publisher.dataset.boxcellinkSocialbar='1';
-  document.body.appendChild(publisher);
- }
- stack.hidden=false;
+ stack.dataset.staged='1';stack.hidden=false;
  const slots=[...stack.querySelectorAll('.adsterra-social-slot')];
- const positions=[
-  {top:'24%',left:'auto',right:'12px'},
-  {top:'43%',left:'12px',right:'auto'},
-  {top:'62%',left:'auto',right:'12px'}
- ];
- slots.forEach((host,i)=>{
+ const nativeSlot=slots[0],bannerSlots=slots.slice(1);
+ if(nativeSlot){nativeSlot.hidden=true;nativeSlot.style.display='none';}
+ const publisherSrc='https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js';
+ // Social Bar is a page-level Adsterra format; the network controls its final placement and frequency.
+ window.setTimeout(()=>{
+  if(!document.querySelector('script[data-boxcellink-socialbar="1"]')){
+   const publisher=document.createElement('script');publisher.src=publisherSrc;publisher.async=true;
+   publisher.setAttribute('data-cfasync','false');publisher.dataset.boxcellinkSocialbar='1';document.body.appendChild(publisher);
+  }
+ },2000);
+ const positions=[{top:'36%',left:'auto',right:'10px'},{top:'52%',left:'10px',right:'auto'}];
+ bannerSlots.forEach((host,i)=>{
   host.hidden=true;host.dataset.dismissed='0';
-  host.style.cssText='display:none!important;position:fixed!important;z-index:10030;width:min(320px,calc(100vw - 24px));height:50px;min-height:50px;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;pointer-events:auto;'+
-   `top:${positions[i].top};left:${positions[i].left};right:${positions[i].right};`;
+  host.style.cssText='display:none!important;position:fixed!important;z-index:10030;width:min(320px,calc(100vw - 20px));height:50px;min-height:50px;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;pointer-events:auto;'+`top:${positions[i].top};left:${positions[i].left};right:${positions[i].right};`;
   window.setTimeout(()=>{
-   if(isVip||host.dataset.dismissed==='1')return;
-   host.hidden=false;host.style.setProperty('display','block','important');
-   mountAdUnit(host,AD_UNITS.banner320);
-   addSocialClose(host);
-  },(i+1)*2000);
+   if(host.dataset.dismissed==='1'||!host.isConnected)return;
+   host.hidden=false;host.style.setProperty('display','block','important');mountAdUnit(host,AD_UNITS.banner320);addSocialClose(host);
+  },(i+2)*2000);
  });
 }
 let popunderStarted=false;
 function setupPopunder(){
- if(isVip||popunderStarted)return;popunderStarted=true;
- // Sinkron dengan impresi iklan pertama (detik ke-10). Script popunder
- // publisher hanya dimuat sekali; frekuensi popup selanjutnya dikendalikan jaringan iklan.
- window.setTimeout(()=>{if(!isVip&&document.body.isConnected)injectScript(document.body,'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js',{'data-cfasync':'false'});},3000);
+ if(popunderStarted)return;popunderStarted=true;
+ // Script popunder dimuat satu kali pada detik ke-3; frekuensi tayang selanjutnya dikendalikan jaringan iklan.
+ window.setTimeout(()=>{if(document.body.isConnected&&!document.querySelector('script[data-boxcellink-popunder="1"]'))injectScript(document.body,'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js',{'data-cfasync':'false','data-boxcellink-popunder':'1'});},3000);
 }
 function mountFloatingBanner(){
  const wrap=$('#floatingBannerAd'),slot=$('#floatingBannerAdSlot'),hide=$('#hideFloatingBanner'),show=$('#showFloatingBanner');
- if(!wrap||!slot||wrap.dataset.loaded==='1'||isVip)return;
+ if(!wrap||!slot||wrap.dataset.loaded==='1')return;
  wrap.dataset.loaded='1';
  slot.style.cssText='width:300px;max-width:100%;min-height:0;margin:0;padding:0;background:transparent;border:0;box-shadow:none';
  const frame=document.createElement('iframe');frame.title='Iklan mengambang';frame.width='300';frame.height='250';frame.loading='eager';frame.scrolling='no';
@@ -152,7 +149,6 @@ function mountFloatingBanner(){
   revealTimer=window.setTimeout(()=>{revealTimer=null;reveal();},5000);
  };
  const reveal=()=>{
-  if(isVip)return;
   if(revealTimer){window.clearTimeout(revealTimer);revealTimer=null;}
   if(hideTransition)window.clearTimeout(hideTransition);
   wrap.hidden=false;
@@ -163,8 +159,8 @@ function mountFloatingBanner(){
  show?.addEventListener('click',reveal);
  wrap.dataset.reveal='ready';
  window.boxcellinkRevealFloatingAd=reveal;
- // Muncul bersamaan dengan social slot ketiga pada detik ke-6.
- window.setTimeout(()=>{if(!isVip)reveal();},6000);
+ // Slide pertama muncul pada detik ke-5; setelah ditutup, muncul kembali 5 detik kemudian.
+ window.setTimeout(()=>{reveal();},5000);
 }
 function setupTelegramNotice(){
  if(currentUser&&!isVip)return; // Only guests and VIP accounts receive the Telegram community prompt.
@@ -196,22 +192,21 @@ function addSocialClose(slot){
 }
 function setupInterstitial(){
  const modal=$('#videoInterstitialAd'),slot=$('#videoInterstitialSlot'),close=$('#closeVideoInterstitial');
- if(!modal||!slot||isVip||modal.dataset.scheduled==='1')return;
+ if(!modal||!slot||modal.dataset.scheduled==='1')return;
  modal.dataset.scheduled='1';
  const interval=10000;
  let timer=null,tick=null,showing=false;
  const schedule=(delay=interval)=>{
-  if(isVip||showing)return;if(timer)window.clearTimeout(timer);
+  if(showing)return;if(timer)window.clearTimeout(timer);
   timer=window.setTimeout(()=>{
-   timer=null;if(isVip)return;
-   if(document.visibilityState==='hidden'){schedule(1000);return;}
+   timer=null;if(document.visibilityState==='hidden'){schedule(1000);return;}
    slot.replaceChildren();
    const unit=AD_UNITS.banner300,frame=document.createElement('iframe');
    frame.title='Advertisement';frame.width='300';frame.height='250';frame.scrolling='no';
    frame.style.cssText='display:block;width:min(300px,90vw);height:250px;border:0;margin:auto';
    frame.srcdoc=`<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;background:transparent}</style></head><body><script>var atOptions={key:'${unit.key}',format:'iframe',height:250,width:300,params:{}};<\/script><script src="https://www.highrevenueformat.com/${unit.key}/invoke.js"><\/script></body></html>`;
    slot.appendChild(frame);modal.hidden=false;showing=true;
-   let remaining=7;close.disabled=true;close.textContent=`Lewati dalam ${remaining}`;
+   let remaining=5;close.disabled=true;close.textContent=`Lewati dalam ${remaining}`;
    if(tick)window.clearInterval(tick);
    tick=window.setInterval(()=>{remaining--;if(remaining<=0){window.clearInterval(tick);tick=null;close.disabled=false;close.textContent='Lewati iklan';}else close.textContent=`Lewati dalam ${remaining}`;},1000);
   },delay);
@@ -221,31 +216,19 @@ function setupInterstitial(){
   modal.hidden=true;showing=false;slot.replaceChildren();schedule(interval);
  };
  document.addEventListener('visibilitychange',()=>{if(!showing&&document.visibilityState==='visible'&&!timer)schedule(interval);});
- // Impresi pertama pada detik ke-10; impresi berikutnya setiap 10 detik
- // setelah pengguna menekan tombol Lewati.
- schedule(3000);
+ // Impresi pertama pada detik ke-5; tombol Lewati aktif setelah 5 detik. Siklus berikutnya 10 detik setelah dilewati.
+ schedule(5000);
 }
 function setupGuestAds(){
- const role=isVip?'vip':(currentUser?'member':'guest');
  setupTelegramNotice();
- document.querySelectorAll('.adsterra-wide-wrap,.ad-side-card').forEach(el=>{el.hidden=true;el.style.cssText='background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'});
- document.querySelectorAll('.ad-unit-728,.ad-unit-320,.ad-unit-468,#ad300x250,#ad160x300,#ad160x600').forEach(el=>el.hidden=true);
- if(role==='vip'){
-  $('#guestAdTop')?.remove();$('#floatingBannerAd')?.remove();$('#showFloatingBanner')?.remove();$('#guestPopunderSlot')?.remove();$('#videoInterstitialAd')?.remove();
-  document.querySelectorAll('.guest-and-vip-banner').forEach(el=>{el.hidden=false;el.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'});
-  document.querySelectorAll('.ad-unit-728,.ad-unit-320,.ad-unit-468').forEach(host=>{host.hidden=false;host.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px auto;max-width:100%';mountAdUnit(host,host.classList.contains('ad-unit-728')?AD_UNITS.banner728:(host.classList.contains('ad-unit-320')?AD_UNITS.banner320:AD_UNITS.banner468));});
-  const vipBox=$('#ad300x250');if(vipBox){const wrap=vipBox.closest('.ad-side-card');if(wrap){wrap.hidden=false;wrap.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'}vipBox.hidden=false;mountAdUnit(vipBox,AD_UNITS.banner300);}
-  const vipInline=$('.ad-inline-300');if(vipInline)mountInlineAd(vipInline);
-  return;
- }
- setupSocialBars();
- const banners=role==='guest'?
-  [['.ad-unit-728',AD_UNITS.banner728],['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300]]:
-  [['.ad-unit-728',AD_UNITS.banner728],['.ad-unit-320',AD_UNITS.banner320],['.ad-unit-468',AD_UNITS.banner468],['#ad300x250',AD_UNITS.banner300]];
- banners.forEach(([sel,unit])=>document.querySelectorAll(sel).forEach(host=>{host.hidden=false;host.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px auto;max-width:100%';const wrapper=host.closest('.ad-side-card,.adsterra-wide-wrap');if(wrapper){wrapper.hidden=false;wrapper.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'}mountAdUnit(host,unit);}));
- if(role==='guest')document.querySelectorAll('.ad-inline-300').forEach(mountInlineAd);
- setupPopunder();setupVideoAdPlayback();
- mountFloatingBanner();setupInterstitial();
+ document.querySelectorAll('.adsterra-wide-wrap,.ad-side-card').forEach(el=>{el.hidden=false;el.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px 0'});
+ document.querySelectorAll('.ad-unit-728,.ad-unit-320,.ad-unit-468,#ad300x250,#ad160x300,#ad160x600').forEach(el=>{
+  el.hidden=false;el.style.cssText='display:block;background:transparent;border:0;box-shadow:none;padding:0;margin:12px auto;max-width:100%';
+  const unit=el.classList.contains('ad-unit-728')?AD_UNITS.banner728:(el.classList.contains('ad-unit-320')?AD_UNITS.banner320:(el.classList.contains('ad-unit-468')?AD_UNITS.banner468:(el.id==='ad160x300'?{width:160,height:300,key:'a658feb34047aeb8881f5e3dba68dd7d'}:(el.id==='ad160x600'?{width:160,height:600,key:'596986d6909968eec943bfa00d2ad02b'}:AD_UNITS.banner300))));
+  mountAdUnit(el,unit);
+ });
+ document.querySelectorAll('.ad-inline-300,.ad-inline-native').forEach(mountInlineAd);
+ setupSocialBars();setupPopunder();setupVideoAdPlayback();mountFloatingBanner();setupInterstitial();
 }
 async function showGuestWatchPreparation(){
  const host=$('#watchContent');if(!host)return;
@@ -259,7 +242,7 @@ async function showGuestWatchPreparation(){
  window.clearInterval(ticker);
 }
 function saveGuestHistory(v){try{const key='boxcellink_watch_history_guest';let a=JSON.parse(localStorage.getItem(key)||'[]');a=a.filter(x=>x.id!==v.id);a.unshift({id:v.id,title:v.title,slug:v.slug,thumbnail_url:v.thumbnail_url,embed_url:v.embed_url,watched_at:new Date().toISOString()});localStorage.setItem(key,JSON.stringify(a.slice(0,20)))}catch{}}
-async function load(){applyLang();try{const {data:{user},error:authErr}=await sb.auth.getUser();if(!authErr)currentUser=user||null;if(currentUser){const {data:p}=await sb.from('profiles').select('vip_expires_at').eq('id',currentUser.id).maybeSingle();isVip=!!p?.vip_expires_at&&new Date(p.vip_expires_at)>new Date()}if(!currentUser)await showGuestWatchPreparation();setupGuestAds();applyLang();
+async function load(){applyLang();try{const {data:{user},error:authErr}=await sb.auth.getUser();if(!authErr)currentUser=user||null;if(currentUser){const {data:p}=await sb.from('profiles').select('vip_expires_at').eq('id',currentUser.id).maybeSingle();isVip=!!p?.vip_expires_at&&new Date(p.vip_expires_at)>new Date()}setupGuestAds();if(!currentUser)await showGuestWatchPreparation();applyLang();
  const path=location.pathname.split('/').filter(Boolean),slug=(new URLSearchParams(location.search).get('slug')||path.at(-1)||'').trim();let q=sb.from('videos').select('*,categories(name)').eq('status','published');let {data:v,error}=await q.eq('slug',slug).maybeSingle();if(!v&&!error){const byId=await sb.from('videos').select('*,categories(name)').eq('id',slug).maybeSingle();v=byId.data;error=byId.error}
  let metadataOnly=false;
  if(!v){
@@ -309,8 +292,8 @@ async function setupVideoAffiliateTools(v){
 function renderMain(v,likes,comments,liked){const vipVideo=isVipVideo(v),loginVideo=isLoginVideo(v),lockedVip=vipVideo&&!isVip,lockedLogin=loginVideo&&!currentUser,locked=lockedVip||lockedLogin,orient=orientation(v);let player='';const initialOrient=orient==='vertical'?'vertical':'horizontal';if(locked){const noticeTitle=lockedLogin?tr('loginRequiredTitle'):tr('vipModalTitle'),noticeText=lockedLogin?tr('loginRequiredText'):tr('teaserNote'),noticeIcon=lockedLogin?'fa-lock':'fa-crown',action=lockedLogin?`<a class="action-secondary" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener">Gabung Grup Telegram</a><a class="action-primary" href="${esc(loginNextUrl())}">${tr('loginButton')}</a>`:(!currentUser?`<a class="action-secondary" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener">Gabung Grup Telegram</a><a class="action-secondary" href="${esc(loginNextUrl())}">Login</a><a class="action-primary" href="/vip.html">Upgrade ke VIP</a>`:`<a class="action-primary" href="/vip.html">Upgrade ke VIP</a>`);player=`<div class="watch-player vip-preview-placeholder ${initialOrient==='vertical'?'is-vertical':'is-horizontal'}">${v.thumbnail_url?imageMarkup(v):'<div class="vip-no-thumbnail"><i class="fa-solid fa-circle-play"></i></div>'}<div class="vip-player-notice" id="vipPlayerNotice"><div class="vip-notice-icon"><i class="fa-solid ${noticeIcon}"></i></div><b>${noticeTitle}</b><p>${noticeText}</p><div class="vip-notice-actions">${action}</div></div></div>`}else{player=renderEmbedPlayer(v,initialOrient)}
 const orientationTools=`<div class="watch-orientation-tools" role="group" aria-label="Video orientation"><span>${lang()==='id'?'Tampilan video':'Video layout'}</span><button type="button" class="${initialOrient==='horizontal'?'active':''}" data-watch-orientation="horizontal"><i class="fa-solid fa-tv"></i> ${lang()==='id'?'Horizontal':'Horizontal'} 16:9</button><button type="button" class="${initialOrient==='vertical'?'active':''}" data-watch-orientation="vertical"><i class="fa-solid fa-mobile-screen"></i> ${lang()==='id'?'Vertikal':'Vertical'} 9:16</button></div>`;
 player=orientationTools+player;
- $('#watchContent').innerHTML=`${player}<div class="main-video-details"><div class="main-title-row"><div><div class="main-video-badges"><span class="video-type ${vipVideo?'vip':'basic'}">${vipVideo?'<i class="fa-solid fa-crown"></i> '+tr('vip'):tr('basic')}</span>${isVip?'<span class="member-active"><i class="fa-solid fa-shield-check"></i> VIP ACTIVE</span>':''}</div><h2>${esc(v.title)}</h2><div class="watch-meta"><span><i class="fa-regular fa-eye"></i> ${Number(v.view_count||0)+1} ${tr('views')}</span><span><i class="fa-regular fa-calendar"></i> ${tr('published')} ${new Date(v.created_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US')}</span><span><i class="fa-solid fa-folder"></i> ${esc(v.categories?.name||'BoxVidey')}</span></div></div></div><div class="watch-actions"><a class="watch-action" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-regular fa-heart"></i><span>${tr('like')}</span><b>${likes}</b></a><a class="watch-action" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-regular fa-comment"></i><span>${tr('comment')}</span></a><a class="watch-action" id="shareBtn" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-from-bracket"></i><span>${tr('share')}</span></a><a class="watch-action" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i><span>${tr('community')}</span></a>${v.download_enabled&&v.download_url&&!locked?`<a class="watch-action download-action" href="${esc(v.download_url)}" target="_blank" rel="noopener" data-download-ad="1"><i class="fa-solid fa-download"></i><span>${tr('download')}</span></a>`:''}</div></div>`;
- const playerEl=$('#watchContent .watch-player');document.querySelectorAll('#watchContent [data-watch-orientation]').forEach(btn=>btn.addEventListener('click',()=>{const mode=btn.dataset.watchOrientation;playerEl?.classList.toggle('is-vertical',mode==='vertical');playerEl?.classList.toggle('is-horizontal',mode==='horizontal');$('#watchContent [data-watch-orientation].active')?.classList.remove('active');btn.classList.add('active')}));const mainVid=$('#watchContent video');if(mainVid&&orient==='auto')mainVid.addEventListener('loadedmetadata',()=>{const vertical=mainVid.videoHeight>mainVid.videoWidth;mainVid.closest('.watch-player')?.classList.toggle('is-vertical',vertical);mainVid.closest('.watch-player')?.classList.toggle('is-horizontal',!vertical)},{once:true});$('#mainVipUpgrade')?.addEventListener('click',showVipModal);
+ $('#watchContent').innerHTML=`${player}<div class="watch-player-ad adsterra-wide-wrap"><div class="adsterra-wide-slot ad-unit-468" data-adsterra-slot="banner-below-embed"></div></div><div class="main-video-details"><div class="main-title-row"><div><div class="main-video-badges"><span class="video-type ${vipVideo?'vip':'basic'}">${vipVideo?'<i class="fa-solid fa-crown"></i> '+tr('vip'):tr('basic')}</span>${isVip?'<span class="member-active"><i class="fa-solid fa-shield-check"></i> VIP ACTIVE</span>':''}</div><h2>${esc(v.title)}</h2><div class="watch-meta"><span><i class="fa-regular fa-eye"></i> ${Number(v.view_count||0)+1} ${tr('views')}</span><span><i class="fa-regular fa-calendar"></i> ${tr('published')} ${new Date(v.created_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US')}</span><span><i class="fa-solid fa-folder"></i> ${esc(v.categories?.name||'BoxVidey')}</span></div></div></div><div class="watch-actions"><a class="watch-action" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-regular fa-heart"></i><span>${tr('like')}</span><b>${likes}</b></a><a class="watch-action" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-regular fa-comment"></i><span>${tr('comment')}</span></a><a class="watch-action" id="shareBtn" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-from-bracket"></i><span>${tr('share')}</span></a><a class="watch-action" href="${TELEGRAM_GROUP}" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i><span>${tr('community')}</span></a>${v.download_enabled&&v.download_url&&!locked?`<a class="watch-action download-action" href="${esc(v.download_url)}" target="_blank" rel="noopener" data-download-ad="1"><i class="fa-solid fa-download"></i><span>${tr('download')}</span></a>`:''}</div></div>`;
+ const playerAd=$('#watchContent .watch-player-ad .ad-unit-468');if(playerAd)mountAdUnit(playerAd,AD_UNITS.banner468);const playerEl=$('#watchContent .watch-player');document.querySelectorAll('#watchContent [data-watch-orientation]').forEach(btn=>btn.addEventListener('click',()=>{const mode=btn.dataset.watchOrientation;playerEl?.classList.toggle('is-vertical',mode==='vertical');playerEl?.classList.toggle('is-horizontal',mode==='horizontal');$('#watchContent [data-watch-orientation].active')?.classList.remove('active');btn.classList.add('active')}));const mainVid=$('#watchContent video');if(mainVid&&orient==='auto')mainVid.addEventListener('loadedmetadata',()=>{const vertical=mainVid.videoHeight>mainVid.videoWidth;mainVid.closest('.watch-player')?.classList.toggle('is-vertical',vertical);mainVid.closest('.watch-player')?.classList.toggle('is-horizontal',!vertical)},{once:true});$('#mainVipUpgrade')?.addEventListener('click',showVipModal);
  const downloadLink=$('[data-download-ad]');if(downloadLink&&!isVip)downloadLink.addEventListener('click',()=>{window.open(AD_DIRECT_LINK,'_blank','noopener,noreferrer')});if(orient==='auto'&&(thumbnailSource(v.thumbnail_url)||thumbnailSource(v.embed_url))){const probe=new Image();probe.onload=()=>{const vertical=probe.naturalHeight>probe.naturalWidth;const playerEl=$('#watchContent .watch-player');playerEl?.classList.toggle('is-vertical',vertical);playerEl?.classList.toggle('is-horizontal',!vertical)};probe.src=thumbnailSource(v.thumbnail_url)||thumbnailSource(v.embed_url)}const list=$('#commentList');renderComments(comments);
  $('#commentForm').onsubmit=async e=>{e.preventDefault();const field=$('#commentText'),body=field.value.trim(),name=$('#guestCommentName')?.value.trim()||'';if(!body)return;if(!currentUser&&!name){alert(tr('commentNameRequired'));$('#guestCommentName')?.focus();return}if(!currentUser&&/(https?:\/\/|www\.)/i.test(body)){alert(tr('guestLinkDenied'));return}
  const btn=e.submitter;btn.disabled=true;let payload={video_id:v.id,user_id:currentUser?.id||null,body};if(!currentUser)payload.guest_name=name;
