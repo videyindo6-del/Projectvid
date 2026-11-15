@@ -273,6 +273,30 @@ function renderEmbedPlayer(v,initialOrient){
 }
 async function setupVideoAffiliateTools(v){
  const player=document.querySelector('#watchContent video');
+ // Only native video elements expose playback time reliably. Store watch duration
+ // in small server-validated increments; third-party iframes are not measurable.
+ if(currentUser&&player){
+  let lastTime=Number(player.currentTime||0),pendingSeconds=0,flushing=false;
+  const flushWatchSeconds=async()=>{
+   const seconds=Math.min(30,Math.floor(pendingSeconds));
+   if(!seconds||flushing)return;
+   pendingSeconds-=seconds;flushing=true;
+   try{const {error}=await sb.rpc('add_video_watch_seconds',{p_video_id:v.id,p_seconds:seconds});if(error)throw error;}
+   catch(err){pendingSeconds=Math.min(30,pendingSeconds+seconds);console.warn('Watch duration could not be saved:',err.message);}
+   finally{flushing=false;}
+  };
+  player.addEventListener('timeupdate',()=>{
+   if(player.paused||player.seeking)return;
+   const current=Number(player.currentTime||0),delta=current-lastTime;
+   if(delta>0&&delta<=2.5)pendingSeconds+=delta;
+   lastTime=current;
+   if(pendingSeconds>=15)void flushWatchSeconds();
+  });
+  player.addEventListener('seeking',()=>{lastTime=Number(player.currentTime||0);});
+  player.addEventListener('pause',()=>void flushWatchSeconds());
+  player.addEventListener('ended',()=>void flushWatchSeconds());
+  window.addEventListener('pagehide',()=>void flushWatchSeconds(),{once:true});
+ }
  if(!currentUser||!player)return; // third-party iframes cannot expose trustworthy playback progress
  try{
   const {data:profile}=await sb.from('profiles').select('affiliate_status,referral_code').eq('id',currentUser.id).maybeSingle();
@@ -302,8 +326,12 @@ player=orientationTools+player;
 }
 async function refreshComments(videoId){const {data,error}=await sb.from('video_comments').select('id,body,created_at,user_id,guest_name').eq('video_id',videoId).order('created_at',{ascending:false}).limit(50);if(error){console.warn(error);return}renderComments(data||[])}
 async function renderComments(comments){const list=$('#commentList');if(!list)return;if(!comments.length){list.innerHTML=`<div class="empty-state">${tr('noComments')}</div>`;return}
- const ids=comments.map(c=>c.id);let repliesBy={};let likesBy={};try{const [{data:replies},{data:likes}]=await Promise.all([sb.from('video_comment_replies').select('id,comment_id,body,created_at,user_id,guest_name').in('comment_id',ids).order('created_at',{ascending:true}),sb.from('video_comment_likes').select('comment_id,user_id,guest_token').in('comment_id',ids)]);(replies||[]).forEach(r=>(repliesBy[r.comment_id]??=[]).push(r));(likes||[]).forEach(l=>(likesBy[l.comment_id]??=[]).push(l))}catch(e){console.warn('Comment reactions/replies:',e)}
- list.innerHTML=comments.map(c=>{const likes=likesBy[c.id]||[],mine=likes.some(x=>currentUser?x.user_id===currentUser.id:x.guest_token===guestToken),replies=repliesBy[c.id]||[],author=c.guest_name||'BoxCellink member';return `<article class="comment-item" data-comment-id="${esc(c.id)}"><div class="comment-avatar">${esc((author||'?').trim().charAt(0).toUpperCase())}</div><div class="comment-body"><div class="comment-byline"><b>${esc(author)}</b><time>${new Date(c.created_at).toLocaleString(lang()==='id'?'id-ID':'en-US',{dateStyle:'medium',timeStyle:'short'})}</time></div><p>${linkify(c.body)}</p><div class="comment-tools"><button class="comment-tool ${mine?'is-liked':''}" data-comment-like="${esc(c.id)}">♡ ${tr('commentLike')} (${likes.length})</button><button class="comment-tool" data-comment-reply="${esc(c.id)}">↳ ${tr('reply')} (${replies.length})</button></div><div class="comment-replies">${replies.map(r=>`<div class="comment-reply"><b>${esc(r.guest_name||'BoxCellink member')}</b><p>${linkify(r.body)}</p></div>`).join('')}</div><div class="reply-form-wrap" id="replyWrap-${esc(c.id)}"></div></div></article>`}).join('');
+ const ids=comments.map(c=>c.id);let repliesBy={},likesBy={},replies=[];
+ try{const [{data:replyRows},{data:likes}]=await Promise.all([sb.from('video_comment_replies').select('id,comment_id,body,created_at,user_id,guest_name').in('comment_id',ids).order('created_at',{ascending:true}),sb.from('video_comment_likes').select('comment_id,user_id,guest_token').in('comment_id',ids)]);replies=replyRows||[];(replies).forEach(r=>(repliesBy[r.comment_id]??=[]).push(r));(likes||[]).forEach(l=>(likesBy[l.comment_id]??=[]).push(l))}catch(e){console.warn('Comment reactions/replies:',e)}
+ const userIds=[...new Set([...comments.map(c=>c.user_id),...replies.map(r=>r.user_id)].filter(Boolean))];let usernames=new Map();
+ if(userIds.length){try{const {data}=await sb.rpc('get_public_usernames',{p_user_ids:userIds});(data||[]).forEach(x=>usernames.set(x.user_id,x.username));}catch(e){console.warn('Public usernames unavailable:',e.message)}}
+ const memberName=id=>usernames.get(id)?`@${usernames.get(id)}`:'BoxCellink member';
+ list.innerHTML=comments.map(c=>{const likes=likesBy[c.id]||[],mine=likes.some(x=>currentUser?x.user_id===currentUser.id:x.guest_token===guestToken),replyRows=repliesBy[c.id]||[],author=c.guest_name||(c.user_id?memberName(c.user_id):'BoxCellink member');return `<article class="comment-item" data-comment-id="${esc(c.id)}"><div class="comment-avatar">${esc((author||'?').trim().charAt(0).toUpperCase())}</div><div class="comment-body"><div class="comment-byline"><b>${esc(author)}</b><time>${new Date(c.created_at).toLocaleString(lang()==='id'?'id-ID':'en-US',{dateStyle:'medium',timeStyle:'short'})}</time></div><p>${linkify(c.body)}</p><div class="comment-tools"><button class="comment-tool ${mine?'is-liked':''}" data-comment-like="${esc(c.id)}">♡ ${tr('commentLike')} (${likes.length})</button><button class="comment-tool" data-comment-reply="${esc(c.id)}">↳ ${tr('reply')} (${replyRows.length})</button></div><div class="comment-replies">${replyRows.map(r=>`<div class="comment-reply"><b>${esc(r.guest_name||(r.user_id?memberName(r.user_id):'BoxCellink member'))}</b><p>${linkify(r.body)}</p></div>`).join('')}</div><div class="reply-form-wrap" id="replyWrap-${esc(c.id)}"></div></div></article>`}).join('');
  list.querySelectorAll('[data-comment-like]').forEach(btn=>btn.onclick=()=>toggleCommentLike(btn.dataset.commentLike));
  list.querySelectorAll('[data-comment-reply]').forEach(btn=>btn.onclick=()=>openReplyForm(btn.dataset.commentReply));
 }
