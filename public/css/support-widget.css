@@ -1,6 +1,6 @@
 /* BoxCellink Support widget — fixed, high-priority and mobile-safe. */
 #bc-support-root{
-  position:fixed!important;right:22px!important;bottom:22px!important;
+  position:fixed!important;right:22px!important;bottom:96px!important;
   z-index:2147483000!important;font-family:inherit;isolation:isolate;
   width:62px;height:62px;pointer-events:auto!important;
 }
@@ -47,7 +47,7 @@
 .bc-support-choice[aria-disabled=true]{opacity:.55!important;cursor:not-allowed}
 .bc-support-chat{
   position:absolute!important;right:0!important;bottom:76px!important;z-index:5!important;
-  width:min(365px,calc(100vw - 28px));height:min(520px,calc(100dvh - 110px));
+  width:min(365px,calc(100vw - 28px));height:min(520px,calc(100dvh - 190px));
   background:#fff;border:1px solid #dce7f1;border-radius:20px;
   box-shadow:0 18px 55px #0b27452b;overflow:hidden;display:flex;flex-direction:column;color:#17324d;
 }
@@ -71,12 +71,12 @@
 .bc-support-foot{font-size:10px;color:#8290a0;text-align:center;padding:0 10px 9px}
 .bc-support-foot a{color:#1769aa;font-weight:700}
 @media(max-width:520px){
-  #bc-support-root{right:14px!important;bottom:14px!important;width:56px;height:56px}
+  #bc-support-root{right:14px!important;bottom:88px!important;width:56px;height:56px}
   .bc-support-toggle{width:56px;height:56px;font-size:22px}
   .bc-support-menu{bottom:calc(100% + 10px)!important;gap:7px!important}
   .bc-support-choice-icon{width:38px;height:38px;flex-basis:38px;font-size:17px}
   .bc-support-choice>span:last-child{padding:9px 11px;font-size:11px}
-  .bc-support-chat{bottom:68px!important;width:min(365px,calc(100vw - 28px));height:min(520px,calc(100dvh - 96px))}
+  .bc-support-chat{bottom:68px!important;width:min(365px,calc(100vw - 28px));height:min(520px,calc(100dvh - 174px))}
 }
 
 .bc-support-faq{padding:12px;border-bottom:1px solid #e8edf3;background:#f8fafc}.bc-support-faq>b{display:block;margin-bottom:9px;color:#1f3b5b;font-size:12px}.bc-support-faq #bcSupportFaqChoices{display:grid;gap:6px;max-height:142px;overflow:auto}.bc-support-faq button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:9px;background:#fff;color:#334155;text-align:left;font:600 11px/1.35 inherit;cursor:pointer}.bc-support-faq button:hover{border-color:#93bce8;background:#f1f7ff}.bc-support-faq #bcSupportFaqAnswer{margin-top:8px;color:#475569;font-size:11px;line-height:1.55}.bc-support-faq #bcSupportFaqAnswer p{margin:5px 0}.bc-support-faq #bcSupportFaqAnswer button{margin-top:7px}

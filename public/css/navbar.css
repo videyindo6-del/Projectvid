@@ -124,3 +124,35 @@
 @media(max-width:620px){.bc-notification-dropdown{max-height:72vh!important}.bc-notification-items{max-height:48vh!important}}
 .bc-member-bottom-nav{position:fixed!important;left:0;right:0;bottom:0;z-index:1800;display:grid!important;align-items:center;min-height:64px;padding-top:7px!important;padding-bottom:calc(7px + env(safe-area-inset-bottom))!important}.bc-member-bottom-nav[hidden]{display:none!important}.bc-has-member-bottom-nav{padding-bottom:calc(82px + env(safe-area-inset-bottom))!important}
 .bc-bottom-nav-item{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-decoration:none!important}.bc-bottom-nav-item i{font-size:17px!important}.bc-bottom-nav-add{justify-self:center;display:grid!important;place-items:center!important;border:0!important;color:#fff!important;cursor:pointer}
+
+
+/* Premium post composer — polished mobile-first bottom sheet */
+.bc-paste-composer{position:fixed!important;inset:0!important;z-index:2147482000!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;padding:20px 14px max(14px,env(safe-area-inset-bottom))!important}
+.bc-paste-composer[hidden]{display:none!important}
+.bc-paste-backdrop{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;border:0!important;background:rgba(8,23,40,.56)!important;backdrop-filter:blur(5px)!important;cursor:pointer!important}
+.bc-paste-sheet{position:relative!important;z-index:1!important;width:min(100%,540px)!important;max-height:min(88dvh,760px)!important;overflow-y:auto!important;overscroll-behavior:contain!important;padding:12px 22px 22px!important;border:1px solid rgba(222,232,243,.95)!important;border-radius:25px!important;background:#fff!important;box-shadow:0 24px 80px rgba(7,24,44,.28)!important;color:#20364d!important;animation:bcPasteIn .22s ease-out}
+.bc-paste-sheet-handle{width:42px!important;height:4px!important;margin:0 auto 18px!important;border-radius:99px!important;background:#d9e2ec!important}
+.bc-paste-sheet-head{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:14px!important;margin:0 0 23px!important}
+.bc-paste-sheet-head h2{margin:0!important;color:#142f4b!important;font-size:23px!important;line-height:1.2!important;letter-spacing:-.045em!important;font-weight:850!important}
+.bc-paste-sheet-head p{margin:7px 0 0!important;color:#718196!important;font-size:12px!important;line-height:1.55!important}
+.bc-paste-close{flex:0 0 36px!important;width:36px!important;height:36px!important;display:grid!important;place-items:center!important;border:1px solid #e5ebf2!important;border-radius:12px!important;background:#f7f9fc!important;color:#53677c!important;font-size:15px!important;cursor:pointer!important}
+.bc-paste-field{display:grid!important;gap:9px!important;margin:0 0 19px!important}
+.bc-paste-field label{display:flex!important;align-items:center!important;gap:8px!important;margin:0!important;color:#263f59!important;font-size:12px!important;font-weight:800!important}
+.bc-paste-label-icon{width:27px!important;height:27px!important;display:grid!important;place-items:center!important;border-radius:9px!important;background:#edf5fc!important;color:#2869a5!important;font-size:12px!important}
+.bc-paste-field label em{font-style:normal!important;color:#9aa7b5!important;font-size:10px!important;font-weight:600!important}
+.bc-paste-field input,.bc-paste-field textarea{width:100%!important;min-width:0!important;box-sizing:border-box!important;border:1px solid #dce5ef!important;border-radius:13px!important;background:#fbfcfe!important;color:#1e344a!important;padding:13px 14px!important;font:inherit!important;font-size:13px!important;line-height:1.55!important;outline:none!important;transition:border-color .18s,box-shadow .18s,background .18s!important}
+.bc-paste-field input{height:48px!important}
+.bc-paste-field textarea{min-height:112px!important;resize:vertical!important}
+.bc-paste-field input:focus,.bc-paste-field textarea:focus{border-color:#78a9d6!important;background:#fff!important;box-shadow:0 0 0 4px rgba(52,119,180,.10)!important}
+.bc-paste-field input::placeholder,.bc-paste-field textarea::placeholder{color:#a0adba!important}
+.bc-paste-field>small{color:#8795a5!important;font-size:10px!important;line-height:1.4!important}
+.bc-paste-field-foot{text-align:right!important;margin-top:-4px!important}
+.bc-paste-note{display:flex!important;align-items:flex-start!important;gap:8px!important;margin:1px 0 17px!important;padding:11px 12px!important;border:1px solid #e5edf5!important;border-radius:12px!important;background:#f6f9fc!important;color:#687d92!important;font-size:10px!important;line-height:1.5!important}
+.bc-paste-note i{flex:none!important;margin-top:1px!important;color:#3979b3!important}
+.bc-paste-submit{width:100%!important;min-height:49px!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;border:0!important;border-radius:13px!important;background:linear-gradient(135deg,#245f99,#347fbd)!important;color:#fff!important;font:inherit!important;font-size:13px!important;font-weight:850!important;box-shadow:0 8px 20px rgba(37,99,157,.22)!important;cursor:pointer!important;transition:transform .18s,box-shadow .18s,opacity .18s!important}
+.bc-paste-submit:hover{transform:translateY(-1px)!important;box-shadow:0 11px 25px rgba(37,99,157,.28)!important}
+.bc-paste-submit:disabled{opacity:.58!important;cursor:wait!important;transform:none!important}
+.bc-paste-open{overflow:hidden!important}
+@keyframes bcPasteIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:560px){.bc-paste-composer{padding:8px 8px max(8px,env(safe-area-inset-bottom))!important}.bc-paste-sheet{padding:10px 17px 18px!important;border-radius:22px 22px 18px 18px!important;max-height:91dvh!important}.bc-paste-sheet-head{margin-bottom:19px!important}.bc-paste-sheet-head h2{font-size:21px!important}.bc-paste-field{margin-bottom:16px!important}.bc-paste-field textarea{min-height:100px!important}}
+@media(prefers-reduced-motion:reduce){.bc-paste-sheet,.bc-paste-submit{animation:none!important;transition:none!important}}
