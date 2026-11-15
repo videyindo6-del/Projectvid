@@ -641,3 +641,20 @@ body{background:#f7f5ef;color:#233b57}
  background:rgba(15,29,46,.95)!important;color:#fff!important;
  font:800 11px "DM Sans",sans-serif!important;box-shadow:0 2px 9px #0006!important;
 }
+
+
+/* BoxCellink Adsterra placements: transparent containers and separated mobile overlays. */
+#guestAdTop.guest-ad-stack{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;margin:0!important;padding:0!important;pointer-events:none!important;z-index:10020!important;transform:none!important;overflow:visible!important}
+#guestAdTop.guest-ad-stack[hidden]{display:none!important}
+#guestAdTop .adsterra-social-slot{position:fixed!important;width:min(320px,calc(100vw - 20px))!important;height:50px!important;min-height:50px!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;pointer-events:auto!important;overflow:visible!important}
+#guestAdTop .adsterra-social-slot[hidden]{display:none!important}
+#guestAdTop .adsterra-social-slot iframe{display:block!important;width:100%!important;height:50px!important;border:0!important;background:transparent!important;box-shadow:none!important}
+#guestAdTop .adsterra-social-slot:nth-child(2){top:36%!important;right:10px!important;left:auto!important}
+#guestAdTop .adsterra-social-slot:nth-child(3){top:52%!important;left:10px!important;right:auto!important}
+#guestAdTop .adsterra-social-slot .social-slot-close{position:absolute!important;right:-5px!important;top:-10px!important;z-index:3!important}
+.watch-feature-ad,.watch-player-ad{display:block!important;width:100%;margin:14px auto!important;padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+.watch-feature-ad .adsterra-wide-slot,.watch-player-ad .adsterra-wide-slot{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+.adsterra-banner-clean,.related-ad-placement,.ad-inline-native{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+.adsterra-banner-clean .ad-caption{background:transparent!important}
+#watchBannerBottom{margin-top:14px!important}
+@media(max-width:480px){#guestAdTop .adsterra-social-slot:nth-child(2){right:8px!important}#guestAdTop .adsterra-social-slot:nth-child(3){left:8px!important}.watch-feature-ad,.watch-player-ad{margin:10px auto!important}}
