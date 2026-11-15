@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/member-pages.css">
 <link rel="stylesheet" href="css/upgrade-pages.css">
-<link rel="stylesheet" href="css/account-premium.css?v=20261115-account-v2">
+<link rel="stylesheet" href="css/account-premium.css?v=20261115-social-v1">
 <link rel="stylesheet" href="/css/navbar.css">
 <link rel="stylesheet" href="/css/footer.css"></head>
 <body>
@@ -66,6 +66,24 @@
         <button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="save_username">Simpan username</span></button>
       </form>
     </article>
+  </section>
+
+  <section class="account-section" id="socialProfileSection">
+    <div class="section-heading"><div><span class="section-eyebrow">SOCIAL PROFILE</span><h2>Bio & tautan sosial</h2><p>Informasi ini akan terlihat pada halaman profil publikmu.</p></div><span class="section-heading-icon"><i class="fa-solid fa-share-nodes"></i></span></div>
+    <article class="account-panel"><form id="socialProfileForm" class="account-form-grid">
+      <label for="profileBio">Bio</label><textarea id="profileBio" maxlength="500" rows="4" placeholder="Ceritakan sedikit tentang dirimu..."></textarea>
+      <small class="account-field-hint">Maksimal 500 karakter.</small>
+      <div class="bc-social-links-editor">
+        <label for="socialInstagram">Instagram</label><input id="socialInstagram" type="url" placeholder="https://instagram.com/username">
+        <label for="socialFacebook">Facebook</label><input id="socialFacebook" type="url" placeholder="https://facebook.com/username">
+        <label for="socialYoutube">YouTube</label><input id="socialYoutube" type="url" placeholder="https://youtube.com/@channel">
+        <label for="socialTelegram">Telegram</label><input id="socialTelegram" type="url" placeholder="https://t.me/username">
+        <label for="socialWhatsapp">WhatsApp</label><input id="socialWhatsapp" type="url" placeholder="https://wa.me/628123456789">
+        <label for="socialX">X</label><input id="socialX" type="url" placeholder="https://x.com/username">
+        <label for="socialOther">Link lainnya</label><input id="socialOther" type="url" placeholder="https://website.com">
+      </div>
+      <button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan bio & tautan sosial</button>
+    </form></article>
   </section>
 
   <section class="account-upgrade">
@@ -189,8 +207,8 @@
 <div data-component="footer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
-<script src="components.js?v=20261114-4"></script>
-<script src="js/account.js?v=20261115-account-v2"></script>
+<script src="components.js?v=20261115-4"></script>
+<script src="js/account.js?v=20261115-social-v1"></script>
 <script src="js/page-i18n.js"></script>
 </body>
 </html>
