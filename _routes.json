@@ -3,7 +3,12 @@
   "include": [
     "/r/*",
     "/d/*",
-    "/paste/*"
+    "/paste/*",
+    "/x/*",
+    "/api/autolink",
+    "/dashboard",
+    "/withdraw",
+    "/endorse"
   ],
   "exclude": []
 }

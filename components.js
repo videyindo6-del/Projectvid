@@ -1,5 +1,5 @@
 (() => {
-const translations={id:{admin:'Panel Admin',dashboard:'Dashboard',account:'Akun Saya',box:'Box Video',telegram:'Media Telegram',review:'Review & Download',vip:'VIP',groups:'Group VIP Telegram',discount:'Kode Diskon Saya',referral:'Referral & Hadiah',notifications:'Notifikasi',wallet:'Saldo & Afiliasi',categories:'Kategori',payments:'Pembayaran',login:'Masuk',register:'Daftar',logout:'Keluar',terms:'Syarat & ketentuan',privacy:'Kebijakan Dan Privasi',help:'Bantuan',cookies:'Kami menggunakan cookie untuk pengalaman yang lebih baik.',accept:'Setujui',posts:'Postingan',friends:'Teman',feed:'Feed',profile:'Profil',seeAll:'Lihat semua',markAllRead:'Tandai semua sudah dibaca',deleteAll:'Hapus dibaca',pasteLink:'Buat postingan',pasteIntro:'Bagikan detail dan tautan publik ke komunitas BoxCellink.',publicLink:'Link publik',caption:'Detail postingan',optional:'opsional',publish:'Publikasikan'},en:{admin:'Admin Panel',dashboard:'Dashboard',account:'My Account',box:'Box Video',telegram:'Telegram Media',review:'Review & Download',vip:'VIP',groups:'VIP Telegram Groups',discount:'My Discount Codes',referral:'Referral & Rewards',notifications:'Notifications',wallet:'Wallet & Affiliate',categories:'Categories',payments:'Payments',login:'Sign in',register:'Sign up',logout:'Sign out',terms:'Terms & Conditions',privacy:'Privacy Policy',help:'Help',cookies:'We use cookies for a better experience.',accept:'Accept',posts:'Posts',friends:'Friends',feed:'Feed',profile:'Profile',seeAll:'See all',markAllRead:'Mark all as read',deleteAll:'Delete read',pasteLink:'Create a post',pasteIntro:'Share details and a public link with the BoxCellink community.',publicLink:'Public link',caption:'Post details',optional:'optional',publish:'Publish'}};
+const translations={id:{admin:'Panel Admin',dashboard:'Dashboard',account:'Akun Saya',box:'Box Video',telegram:'Media Telegram',review:'Review & Download',vip:'VIP',groups:'Group VIP Telegram',discount:'Kode Diskon Saya',referral:'Referral & Hadiah',notifications:'Notifikasi',wallet:'Saldo & Afiliasi',categories:'Kategori',payments:'Pembayaran',login:'Masuk',register:'Daftar',logout:'Keluar',terms:'Syarat & ketentuan',privacy:'Kebijakan Dan Privasi',help:'Bantuan',cookies:'Kami menggunakan cookie untuk pengalaman yang lebih baik.',accept:'Setujui',posts:'Postingan',friends:'Teman',add:'Tambah',endorse:'Endorse',feed:'Feed',profile:'Profil',seeAll:'Lihat semua',markAllRead:'Tandai semua sudah dibaca',deleteAll:'Hapus dibaca',pasteLink:'Buat postingan',pasteIntro:'Bagikan tautan menarik kepada komunitas.',publicLink:'Link publik',caption:'Detail postingan',optional:'opsional',publish:'Publikasikan postingan',linkHint:'Pastikan tautan dapat dibuka oleh siapa saja.',captionHint:'Ceritakan sedikit agar orang lain memahami tautan yang kamu bagikan.',usernameNotice:'Username akunmu akan ditampilkan pada postingan.'},en:{admin:'Admin Panel',dashboard:'Dashboard',account:'My Account',box:'Box Video',telegram:'Telegram Media',review:'Review & Download',vip:'VIP',groups:'VIP Telegram Groups',discount:'My Discount Codes',referral:'Referral & Rewards',notifications:'Notifications',wallet:'Wallet & Affiliate',categories:'Categories',payments:'Payments',login:'Sign in',register:'Sign up',logout:'Sign out',terms:'Terms & Conditions',privacy:'Privacy Policy',help:'Help',cookies:'We use cookies for a better experience.',accept:'Accept',posts:'Posts',friends:'Friends',add:'Add',endorse:'Endorse',feed:'Feed',profile:'Profile',seeAll:'See all',markAllRead:'Mark all as read',deleteAll:'Delete read',pasteLink:'Create a post',pasteIntro:'Share a useful link with the community.',publicLink:'Public link',caption:'Post details',optional:'optional',publish:'Publish post',linkHint:'Make sure the link is publicly accessible.',captionHint:'Add a little context so people know what you are sharing.',usernameNotice:'Your username will appear with this post.'}};
 const getLang=()=>localStorage.getItem('boxcellink_lang')||'id';
 function applyLocal(l=getLang()){const d=translations[l]||translations.id;document.documentElement.lang=l;document.querySelectorAll('[data-nav]').forEach(e=>{if(d[e.dataset.nav])e.textContent=d[e.dataset.nav]});document.querySelectorAll('[data-footer]').forEach(e=>{if(d[e.dataset.footer])e.textContent=d[e.dataset.footer]});const b=document.getElementById('translateLabel');if(b)b.textContent=l==='id'?'ID':'ENG';}
 async function load(selector,url){const el=document.querySelector(selector);if(!el)return;try{const r=await fetch(url,{credentials:'same-origin',cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);el.innerHTML=await r.text();}catch(e){console.error('Component load failed',url,e);if(selector.includes('footer'))el.innerHTML='<footer class="bc-footer"><div class="bc-footer-inner"><div>© <span id="footerYear"></span> Boxcellink. All rights reserved.</div><nav><a href="/terms.html">Syarat & ketentuan</a><a href="/privacy.html">Kebijakan Dan Privasi</a><a href="/help.html">Bantuan</a></nav></div></footer>';else if(selector.includes('navbar'))el.innerHTML='<header class="bc-navbar"><div class="bc-nav-inner"><a class="bc-brand" href="/index.html">BoxCellink</a><div class="bc-nav-actions"><button id="translateBtn" class="bc-nav-btn" type="button"><span id="translateLabel">ID</span></button></div></div></header>';}}
@@ -16,9 +16,9 @@ function isPublicRoute(){
   const page=currentPage();
   const path=(location.pathname||'/').toLowerCase();
   const publicPages=new Set([
-    'index','login','register','forgot-password','watch','review','review-detail','telegram','book-video','vip','vip-groups','posts','member-profile'
+    'index','login','register','forgot-password','watch','review','review-detail','telegram','book-video','vip','vip-groups','posts','member-profile','go','task1','task2','task3','final','endorse'
   ]);
-  return publicPages.has(page)||path.startsWith('/v/')||path.startsWith('/r/');
+  return publicPages.has(page)||path.startsWith('/v/')||path.startsWith('/r/')||path.startsWith('/x/');
 }
 function initDrawer(){
  const drawer=document.getElementById('navDrawer'),shade=document.getElementById('navShade'),open=document.getElementById('navOpen');
@@ -49,6 +49,8 @@ function initMemberBottomNav(){
  nav.hidden=false;
  document.body.classList.add('bc-has-member-bottom-nav');
  const composer=document.getElementById('bcPasteComposer');
+ const addChoice=document.getElementById('bcAddChoice');
+ const captionCounter=document.getElementById('bcPasteCount');const captionInput=document.getElementById('bcPasteCaptionInput');if(captionCounter&&captionInput){const updateCaptionCount=()=>{captionCounter.textContent=String(captionInput.value.length);};captionInput.addEventListener('input',updateCaptionCount);updateCaptionCount();}
  const openButton=document.getElementById('bcOpenPasteComposer');
  const linkInput=document.getElementById('bcPasteLinkInput');
  const detailInput=document.getElementById('bcPasteCaptionInput');
@@ -62,7 +64,11 @@ function initMemberBottomNav(){
  };
  const closeComposer=()=>{if(composer)composer.hidden=true;document.body.classList.remove('bc-paste-open');};
  const openComposer=()=>{if(!composer)return;composer.hidden=false;document.body.classList.add('bc-paste-open');setTimeout(()=>linkInput?.focus(),80);};
- openButton?.addEventListener('click',openComposer);
+ const openChoice=()=>{if(addChoice)addChoice.hidden=false;};
+ const closeChoice=()=>{if(addChoice)addChoice.hidden=true;};
+ openButton?.addEventListener('click',openChoice);
+ addChoice?.querySelectorAll('[data-close-add]').forEach(b=>b.addEventListener('click',closeChoice));
+ document.getElementById('bcChoosePastelink')?.addEventListener('click',()=>{closeChoice();openComposer();});
  composer?.querySelectorAll('[data-close-paste]').forEach(button=>button.addEventListener('click',closeComposer));
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&composer&&!composer.hidden)closeComposer();});
  publishButton?.addEventListener('click',async()=>{
@@ -92,7 +98,7 @@ function initMemberBottomNav(){
 
  nav.querySelectorAll('[data-social-tab]').forEach(item=>{
   const tab=item.dataset.socialTab;
-  const active=(tab==='posts'&&page==='posts.html')||(tab==='friends'&&page==='friends.html')||(tab==='vip'&&['vip.html','vip-groups.html'].includes(page))||(tab==='profile'&&['account.html','member-profile.html'].includes(page));
+  const active=(tab==='posts'&&page==='posts.html')||(tab==='dashboard'&&['dashboard','publisher-dashboard.html'].includes(page))||(tab==='vip'&&['vip.html','vip-groups.html'].includes(page))||(tab==='profile'&&['account.html','member-profile.html'].includes(page));
   item.classList.toggle('is-active',active);
   if(active)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');
  });
@@ -112,7 +118,7 @@ async function initMemberNavExtras(user){
  const safeHref=v=>String(v||'').startsWith('/')&&!String(v).startsWith('//')?v:'/notifications.html';
  let rows=[];
  const render=()=>{if(!list)return;list.innerHTML=rows.length?rows.map(n=>`<div class="bc-notification-row"><a class="bc-notification-item ${n.is_read?'':'unread'}" href="${esc(safeHref(n.href))}" data-nav-notice="${esc(n.id)}"><b>${esc(n.title||'Notifikasi')}</b><span>${esc(n.body||'')}</span><small>${new Date(n.created_at).toLocaleString('id-ID')} · ${n.is_read?'Dibaca':'Belum dibaca'}</small></a>${n.is_read?`<button class="bc-notification-delete-one" type="button" data-nav-delete="${esc(n.id)}" aria-label="Hapus notifikasi"><i class="fa-regular fa-trash-can"></i></button>`:''}</div>`).join(''):'<p class="bc-notification-empty">Belum ada notifikasi.</p>';const unread=rows.filter(n=>!n.is_read).length;if(badge){badge.textContent=unread>99?'99+':String(unread);badge.hidden=!unread;}if(markBtn)markBtn.disabled=!unread;if(deleteBtn)deleteBtn.disabled=!rows.some(n=>n.is_read);};
- const load=async()=>{const {data,error}=await window.sb.from('boxcellink_notifications').select('id,title,body,href,is_read,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(20);if(error)throw error;rows=data||[];render();};
+ const load=async()=>{const {data,error}=await window.sb.from('boxcellink_notifications').select('id,title,body,href,is_read,created_at,expires_at').eq('user_id',user.id).or('expires_at.is.null,expires_at.gt.'+new Date().toISOString()).order('created_at',{ascending:false}).limit(20);if(error)throw error;rows=data||[];render();};
  const refresh=async()=>{try{await load();}catch(e){if(list)list.innerHTML='<p class="bc-notification-empty">Notifikasi belum dapat dimuat.</p>';if(badge)badge.hidden=true;console.warn('Notification preview unavailable:',e);}};
  await refresh();
  if(btn&&!btn.dataset.bound){btn.dataset.bound='1';btn.addEventListener('click',async()=>{const open=panel?.hidden!==false;if(panel)panel.hidden=!open;btn.setAttribute('aria-expanded',String(open));if(open)await refresh();});}
