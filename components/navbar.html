@@ -31,12 +31,10 @@
   <button class="bc-paste-backdrop" type="button" data-close-paste aria-label="Tutup"></button>
   <section class="bc-paste-sheet" role="dialog" aria-modal="true" aria-labelledby="bcPasteTitle">
     <div class="bc-paste-sheet-handle"></div>
-    <div class="bc-paste-sheet-head"><div><span class="bc-paste-eyebrow">BOXCELLINK SOCIAL</span><h2 id="bcPasteTitle" data-nav="pasteLink">Buat postingan</h2><p data-nav="pasteIntro">Bagikan detail dan tautan publik ke komunitas BoxCellink.</p></div><button type="button" class="bc-paste-close" data-close-paste aria-label="Tutup panel"><i class="fa-solid fa-xmark"></i></button></div>
-    <label for="bcPasteLinkInput" data-nav="publicLink">Link publik</label>
-    <input id="bcPasteLinkInput" type="url" inputmode="url" placeholder="https://contoh.com/link" autocomplete="url">
-    <label for="bcPasteCaptionInput"><span data-nav="caption">Detail postingan</span> <span>(<span data-nav="optional">opsional</span>)</span></label>
-    <textarea id="bcPasteCaptionInput" rows="3" placeholder="Tulis keterangan singkat..."></textarea>
-    <p class="bc-paste-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Pastikan tautan dapat dibuka secara publik. Username akun akan tampil pada postingan.</p>
+    <div class="bc-paste-sheet-head"><div><h2 id="bcPasteTitle" data-nav="pasteLink">Buat postingan</h2><p data-nav="pasteIntro">Bagikan tautan atau media menarik kepada teman-temanmu.</p></div><button type="button" class="bc-paste-close" data-close-paste aria-label="Tutup panel"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="bc-paste-field"><label for="bcPasteLinkInput"><span class="bc-paste-label-icon"><i class="fa-solid fa-link" aria-hidden="true"></i></span><span data-nav="publicLink">Tautan publik</span></label><input id="bcPasteLinkInput" type="url" inputmode="url" placeholder="Tempel tautan https:// di sini" autocomplete="url"><small>Gunakan tautan yang bisa dibuka oleh siapa saja.</small></div>
+    <div class="bc-paste-field"><label for="bcPasteCaptionInput"><span class="bc-paste-label-icon"><i class="fa-regular fa-pen-to-square" aria-hidden="true"></i></span><span data-nav="caption">Cerita atau keterangan</span> <em>(<span data-nav="optional">opsional</span>)</em></label><textarea id="bcPasteCaptionInput" rows="4" maxlength="1500" placeholder="Ceritakan sesuatu tentang tautan ini..."></textarea><small class="bc-paste-field-foot">Maksimal 1.500 karakter</small></div>
+    <p class="bc-paste-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Username akunmu akan ditampilkan bersama postingan.</p>
     <button type="button" class="bc-paste-submit" id="bcPublishPost"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> <span data-nav="publish">Publikasikan</span></button>
   </section>
 </div>
