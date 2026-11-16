@@ -38,3 +38,56 @@
 @keyframes alRegisterShake{0%,76%,100%{transform:translateX(0)}79%{transform:translateX(-4px)}82%{transform:translateX(4px)}85%{transform:translateX(-3px)}88%{transform:translateX(3px)}91%{transform:translateX(0)}}
 @media(max-width:560px){.al-join-benefits{grid-template-columns:1fr}.al-join-cta{grid-template-columns:1fr}.al-join-card{padding:17px}.al-join-heading{align-items:flex-start}.al-join-icon{width:46px;height:46px;flex-basis:46px;border-radius:14px}}
 @media(prefers-reduced-motion:reduce){.al-login-wobble,.al-register-shake{animation:none}}
+
+
+/* GO page: clean endorsement inventory and premium access panel */
+.al-wrap[style*="max-width:760px"]{max-width:790px!important}
+.al-endorse-empty{position:relative;display:flex;flex-direction:column;gap:5px;min-height:126px;margin:15px 0;padding:17px 18px;text-align:center;border:1px dashed #a9bfd6;border-radius:17px;background:linear-gradient(135deg,#f9fcff,#f1f7fd);color:#294866;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s}
+.al-endorse-empty:hover{transform:translateY(-2px);border-color:#397fca;box-shadow:0 10px 25px rgba(35,91,145,.09)}
+.al-endorse-empty-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:#e4f0fc;color:#2869a8;font-size:15px}
+.al-endorse-empty strong{font-size:13px;font-weight:800;color:#244461}
+.al-endorse-empty small{font-size:11.5px;color:#7a8da2;line-height:1.45}
+.al-endorse-cta{display:inline-flex;align-items:center;gap:7px;margin-top:4px;color:#2463a5;font-size:11px;font-weight:800}
+.al-access-card{position:relative;overflow:hidden;padding:clamp(20px,4vw,32px);border:1px solid #dce7f2;border-radius:24px;background:linear-gradient(150deg,#fff 0%,#fbfdff 65%,#f2f8ff 100%);box-shadow:0 18px 48px rgba(26,58,91,.09)}
+.al-access-card:before{content:"";position:absolute;width:250px;height:250px;right:-130px;top:-150px;border-radius:50%;background:rgba(53,125,194,.075);pointer-events:none}
+.al-access-top{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.al-access-label{display:inline-flex;align-items:center;gap:6px;margin-left:10px;color:#64809a;font-size:10px;font-weight:700}
+.al-access-label i{color:#168b63}
+.al-free-badge{padding:7px 10px;border:1px solid #d7e8f8;border-radius:99px;background:#eff7ff;color:#28669f;font-size:9px;font-weight:850;letter-spacing:.08em;white-space:nowrap}
+.al-access-heading{position:relative;display:flex;align-items:center;gap:15px;margin:25px 0 22px}
+.al-access-mark{width:54px;height:54px;flex:0 0 54px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(145deg,#245f9c,#4c91d2);color:white;font-size:22px;box-shadow:0 10px 22px rgba(36,99,165,.2)}
+.al-access-heading h1{margin:0;color:#183653;font-size:clamp(23px,4vw,32px);line-height:1.2;letter-spacing:-.045em;overflow-wrap:anywhere}
+.al-access-heading p{margin:7px 0 0;color:#70849a;font-size:13px;line-height:1.65}
+.al-access-note{display:flex;align-items:flex-start;gap:12px;padding:15px;border:1px solid #dceaf7;border-radius:15px;background:rgba(239,247,255,.82)}
+.al-note-icon{width:37px;height:37px;flex:0 0 37px;display:grid;place-items:center;border-radius:12px;background:#e0efff;color:#2775b8;font-size:17px}
+.al-access-note strong{display:block;margin:1px 0 4px;color:#244765;font-size:13px}
+.al-access-note small{display:block;color:#71869b;font-size:11.5px;line-height:1.6}
+.al-access-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:19px}
+.al-access-actions .al-btn{min-height:66px;justify-content:flex-start;padding:12px 15px;border-radius:15px;text-align:left}
+.al-access-actions .al-btn>span{display:grid;gap:3px;flex:1}
+.al-access-actions .al-btn>span strong{font-size:13px}
+.al-access-actions .al-btn>span small{font-size:10.5px;font-weight:500;opacity:.82}
+.al-access-actions .al-btn.secondary{border:1px solid #dce7f2;background:#fff;color:#285c91}
+.al-access-actions .al-btn.secondary:hover{background:#f2f7fc}
+.al-action-arrow{margin-left:auto;font-size:12px;opacity:.8}
+.al-access-secure{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:17px;color:#8a9aab;font-size:10px}
+.al-access-secure i{color:#26946c}
+.al-modal{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;padding:18px;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s}
+.al-modal.is-open{opacity:1;visibility:visible}
+.al-modal-backdrop{position:absolute;inset:0;background:rgba(12,28,46,.62);backdrop-filter:blur(5px)}
+.al-modal-panel{position:relative;width:min(460px,100%);max-height:calc(100vh - 36px);overflow:auto;padding:27px;border:1px solid rgba(255,255,255,.8);border-radius:22px;background:#fff;box-shadow:0 25px 80px rgba(0,0,0,.22);text-align:center;transform:translateY(12px);transition:transform .2s}
+.al-modal.is-open .al-modal-panel{transform:translateY(0)}
+.al-modal-close{position:absolute;right:13px;top:13px;width:34px;height:34px;border:0;border-radius:10px;background:#f0f4f8;color:#62768a;cursor:pointer}
+.al-modal-icon{width:54px;height:54px;display:grid;place-items:center;margin:0 auto 14px;border-radius:17px;background:#eaf4fe;color:#286ba9;font-size:22px}
+.al-modal-panel h2{margin:7px 0 9px;color:#193854;font-size:23px;letter-spacing:-.04em}
+.al-modal-copy{margin:0 auto 17px;color:#718399;font-size:12.5px;line-height:1.7}
+.al-modal-steps{display:grid;gap:10px;margin:18px 0;text-align:left}
+.al-modal-steps>div{display:flex;align-items:flex-start;gap:11px;padding:11px;border:1px solid #e7edf4;border-radius:13px;background:#fbfdff}
+.al-modal-steps b{width:26px;height:26px;flex:0 0 26px;display:grid;place-items:center;border-radius:9px;background:#eaf3fc;color:#286ba9;font-size:12px}
+.al-modal-steps strong,.al-modal-steps small{display:block}
+.al-modal-steps strong{color:#2b4661;font-size:12px;margin:1px 0 3px}
+.al-modal-steps small{color:#7b8da0;font-size:10.5px;line-height:1.5}
+.al-modal-login{width:100%;min-height:48px;margin-top:3px}
+.al-modal-foot{margin:12px 0 0;color:#9aa7b5;font-size:10px}
+@media(max-width:560px){.al-access-actions{grid-template-columns:1fr}.al-access-top{align-items:flex-start}.al-access-label{display:flex;margin:7px 0 0}.al-access-heading{align-items:flex-start}.al-access-mark{width:47px;height:47px;flex-basis:47px;border-radius:14px}.al-access-card{border-radius:19px}.al-modal-panel{padding:24px 18px}}
+@media(prefers-reduced-motion:reduce){.al-endorse-empty,.al-modal,.al-modal-panel{transition:none}}
