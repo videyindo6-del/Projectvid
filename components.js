@@ -98,7 +98,7 @@ function initMemberBottomNav(){
 
  nav.querySelectorAll('[data-social-tab]').forEach(item=>{
   const tab=item.dataset.socialTab;
-  const active=(tab==='posts'&&page==='posts.html')||(tab==='dashboard'&&['dashboard','publisher-dashboard.html'].includes(page))||(tab==='vip'&&['vip.html','vip-groups.html'].includes(page))||(tab==='profile'&&['account.html','member-profile.html'].includes(page));
+  const active=(tab==='feed'&&page==='posts.html')||(tab==='dashboard'&&['dashboard.html'].includes(page))||(tab==='vip'&&['vip.html','vip-groups.html'].includes(page))||(tab==='account'&&['account.html','member-profile.html'].includes(page));
   item.classList.toggle('is-active',active);
   if(active)item.setAttribute('aria-current','page');else item.removeAttribute('aria-current');
  });
