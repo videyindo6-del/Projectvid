@@ -1,6 +1,6 @@
 /**
  * Internal asset renderer for parameterized Cloudflare Pages routes.
- * The browser URL stays /r/:slug, /d/:slug, or /paste/:slug.
+ * The browser URL stays /r/:slug, /d/:slug, /paste/:slug, or /z/:slug.
  * The HTML asset is fetched internally; the original slug is also forwarded
  * as ?slug= for diagnostics/fallbacks.
  */
