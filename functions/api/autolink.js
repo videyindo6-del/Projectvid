@@ -1,10 +1,13 @@
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','access-control-allow-origin':'*','access-control-allow-headers':'authorization,content-type','access-control-allow-methods':'GET,POST,OPTIONS'}});
 const b64url=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const hash=async s=>b64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)));
+const SUPABASE_URL_FALLBACK='https://djxcdwnpheufoojfzorx.supabase.co';
+const SUPABASE_ANON_KEY_FALLBACK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeGNkd25waGV1Zm9vamZ6b3J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MDUxNTQsImV4cCI6MjEwOTI4MTE1NH0.FjWsw4XWoHvjUiFR7zmXMKNHBTZAxr8Sct8SKnrdFsQ';
+const supabaseUrl=env=>String(env.SUPABASE_URL||env.BOXCELLINK_SUPABASE_URL||SUPABASE_URL_FALLBACK).replace(/\/$/,'');
 const randomToken=()=>b64url(crypto.getRandomValues(new Uint8Array(32)));
 const cleanUrl=value=>{try{const u=new URL(String(value||''));if(!['http:','https:'].includes(u.protocol)||u.username||u.password) return null;return u.href;}catch{return null;}};
 async function db(env,path,opts={}){const base=String(env.SUPABASE_URL||'').replace(/\/$/,'');const key=env.SUPABASE_SERVICE_ROLE_KEY;if(!base||!key)throw new Error('Server Supabase environment is not configured');const r=await fetch(base+'/rest/v1/'+path,{...opts,headers:{apikey:key,authorization:'Bearer '+key,'content-type':'application/json',...(opts.headers||{})}});const t=await r.text();let d;try{d=t?JSON.parse(t):null}catch{d=t}if(!r.ok)throw new Error(typeof d==='string'?d:(d?.message||d?.hint||'Database request failed'));return d;}
-async function userFrom(req,env){const token=(req.headers.get('authorization')||'').replace(/^Bearer\s+/i,'');if(!token)return null;const r=await fetch(env.SUPABASE_URL+'/auth/v1/user',{headers:{apikey:env.SUPABASE_ANON_KEY||env.SUPABASE_SERVICE_ROLE_KEY,authorization:'Bearer '+token}});if(!r.ok)return null;return await r.json();}
+async function userFrom(req,env){const token=(req.headers.get('authorization')||'').replace(/^Bearer\s+/i,'');if(!token)return null;const r=await fetch(supabaseUrl(env)+'/auth/v1/user',{headers:{apikey:env.SUPABASE_ANON_KEY||SUPABASE_ANON_KEY_FALLBACK,authorization:'Bearer '+token}});if(!r.ok)return null;return await r.json();}
 const code=()=>{const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';let out='';const bytes=crypto.getRandomValues(new Uint8Array(5));for(let i=0;i<5;i++)out+=chars[bytes[i]%chars.length];return out;};
 export async function onRequest({request,env}) {
  if(request.method==='OPTIONS')return new Response(null,{status:204,headers:{'access-control-allow-origin':'*','access-control-allow-headers':'authorization,content-type','access-control-allow-methods':'GET,POST,OPTIONS'}});
@@ -33,7 +36,7 @@ export async function onRequest({request,env}) {
     let inserted=null;
     for(let n=0;n<5&&!inserted;n++){const short_code=code();try{const rows=await db(env,'autolinks?select=id,short_code,title,description,status,total_wif,created_at',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify({publisher_id:user.id,short_code,target_url:target,title,description,status:'published'})});inserted=rows?.[0]||null;}catch(e){if(!/duplicate|unique/i.test(e.message)||n===4)throw e;}}
     if(!inserted)throw new Error('Tidak berhasil membuat kode pendek unik');
-    return json({success:true,autolink:inserted,url:new URL('/x/'+inserted.short_code,url.origin).href});
+    return json({success:true,autolink:inserted,url:new URL('/z/'+inserted.short_code,url.origin).href});
    }
    const id=String(body.id||'');if(!/^[0-9a-f-]{36}$/i.test(id))return json({error:'ID tidak valid'},400);
    const owned=await db(env,`autolinks?select=id,publisher_id& id=eq.${id}`.replace('& id','&id'));
