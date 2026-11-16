@@ -24,3 +24,5 @@ Untuk hasil paling stabil, isi kolom Thumbnail dengan URL gambar langsung (`.jpg
 - Proyek memakai `npm run build` untuk menyalin sumber root ke folder `public/`.
 - Build sudah dijalankan setelah perubahan.
 - Deploy melalui Cloudflare Pages seperti biasa setelah perubahan diunggah ke GitHub.
+
+\n## 2026-11-16 — AutoLink, PasteLink, publisher withdrawal, and language\n- Fixed the AutoLink Pages Function Supabase URL fallback and auth user lookup so the URL cannot become `undefined/auth/v1/user`. The service-role key remains a server-only Cloudflare secret for database writes.\n- Added `/z/:code` short-link routing: AutoLinks continue through the AutoLink flow; PasteLinks redirect to the public URL they contain.\n- Added PasteLink short-code creation, success notice, and copy-link action.\n- Added the additive SQL repair migration for publisher balance/withdraw read grants and RLS policies, plus PasteLink short codes.\n- Improved the AutoLink community list and swipeable dashboard media rails.\n- Extended the bilingual page dictionary and ensured Posts/Profile/Friends load the language helper.\n

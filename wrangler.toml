@@ -4,3 +4,4 @@ pages_build_output_dir = "./public"
 
 # Root /functions contains Cloudflare Pages Functions.
 # Supabase Edge Functions in /supabase/functions are deployed separately.
+\n[vars]\nSUPABASE_URL = "https://djxcdwnpheufoojfzorx.supabase.co"\n

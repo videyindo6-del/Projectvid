@@ -71,3 +71,16 @@ Setelah tabel `wallet_ledger`, `profiles`, dan `boxcellink_notifications` tersed
 ## Pemisahan kategori konten
 
 Jalankan `supabase/content_category_types_v1.sql` setelah schema kategori dan tabel `review_items` tersedia. Migration ini memisahkan namespace kategori Box Video dan Media Telegram serta memindahkan relasi kategori review ke salinan kategori Media Telegram. Setelah itu kategori baru dibuat di panel Admin → Kategori dengan memilih jenis kontennya.
+
+
+## Perbaikan AutoLink dashboard dan Withdraw (tambahan)
+
+Setelah `supabase/autolink_publisher_monetization_v1.sql` berhasil dijalankan, jalankan `supabase/autolink_dashboard_withdraw_fix.sql`. Migration ini memulihkan grant SELECT yang sebelumnya ikut ter-revoke pada `publisher_balances` (dengan RLS tetap membatasi data per pemilik), dan memastikan policy baca statistik serta riwayat withdraw aktif.
+
+
+## Social Posts / PasteLink
+
+Jalankan `supabase/social_posts_v1.sql` setelah `supabase/account_center_v1.sql` (username publik harus sudah tersedia). Migration `supabase/autolink_dashboard_withdraw_fix.sql` juga menyiapkan kolom kode pendek PasteLink; jalankan setelah Social Posts v1 dan AutoLink Monetization v1.
+
+## Deploy Cloudflare Pages untuk AutoLink
+Pastikan Environment Variables / Secrets pada Cloudflare Pages memiliki `SUPABASE_SERVICE_ROLE_KEY` (Production dan Preview jika keduanya dipakai). Jangan menaruh service-role key di file frontend atau membagikannya. `SUPABASE_URL` sudah diberi fallback di Pages Function dan dicantumkan pada `wrangler.toml`; anon key dipakai hanya untuk verifikasi sesi dan query publik.
