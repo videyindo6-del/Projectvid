@@ -2,3 +2,5 @@
 # Review/download/paste ditangani Pages Functions: functions/r/[slug].js,
 # functions/d/[slug].js, dan functions/paste/[slug].js.
 /v/*      /watch          200
+# AutoLink fallback: preserve /z/:code in browser path; go.html reads the final path segment.
+/z/*      /go.html  200
