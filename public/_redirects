@@ -1,4 +1,1 @@
-# Video route tetap menggunakan proxy rewrite lama.
-# Review/download/paste ditangani Pages Functions: functions/r/[slug].js,
-# functions/d/[slug].js, dan functions/paste/[slug].js.
-/v/*      /watch          200
+/v/*      /watch               200
