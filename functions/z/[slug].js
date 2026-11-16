@@ -8,11 +8,11 @@ export async function onRequest(context) {
   const headers={apikey:context.env?.SUPABASE_ANON_KEY||SUPABASE_ANON_KEY};
   try {
     const [auto,paste]=await Promise.all([
-      fetch(base+'/rest/v1/autolinks?select=id&short_code=eq.'+encodeURIComponent(code)+'&status=eq.published&limit=1',{headers}),
+      fetch(base+'/rest/v1/autolink_public?select=id&short_code=eq.'+encodeURIComponent(code)+'&status=eq.published&limit=1',{headers}),
       fetch(base+'/rest/v1/social_posts?select=public_url&short_code=eq.'+encodeURIComponent(code)+'&status=eq.published&limit=1',{headers})
     ]);
     if(auto.ok){const rows=await auto.json();if(rows?.length)return serveSlugPage(context,'/go.html');}
-    if(paste.ok){const rows=await paste.json();if(rows?.[0]?.public_url){const dest=new URL(rows[0].public_url);if(['http:','https:'].includes(dest.protocol))return Response.redirect(dest.href,302);}}
+    if(paste.ok){const rows=await paste.json();if(rows?.[0]?.public_url){const dest=new URL(rows[0].public_url);if(['http:','https:'].includes(dest.protocol))return new Response(null,{status:302,headers:{'Location':dest.href,'Cache-Control':'no-store','Referrer-Policy':'no-referrer'}});}}
     return new Response('Link tidak ditemukan atau sudah tidak tersedia.',{status:404,headers:{'Cache-Control':'no-store'}});
   } catch(e) { return new Response('Gagal memuat link. Silakan coba lagi.',{status:502,headers:{'Cache-Control':'no-store'}}); }
 }
