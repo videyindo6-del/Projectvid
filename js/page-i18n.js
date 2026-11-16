@@ -18,6 +18,13 @@ Object.assign(dict.en, {
  'Review Media Telegram':'Telegram Media Reviews','Baca review dan lihat preview media. Tautan postingan asli Telegram tersedia melalui alur akses yang terverifikasi.':'Read the review and view its media preview. The original Telegram post link is provided through the verified access flow.','Top 10 Review Telegram':'Top 10 Telegram Reviews','Review Telegram paling diminati berdasarkan aktivitas pengguna.':'The most popular Telegram reviews based on user activity.','Buka Media di Telegram':'Open Media in Telegram','LINK MEDIA ASLI TELEGRAM':'ORIGINAL TELEGRAM MEDIA LINK','LINK AKSES / DOWNLOAD DARI PANEL ADMIN':'ACCESS / DOWNLOAD LINK FROM ADMIN','Link berhasil disalin ✓':'Link copied ✓','Akses pembelian terverifikasi':'Purchase access verified'
 });
 Object.assign(dict.en,{
+ 'Suka':'Like','Komentar':'Comments','Tulis komentar...':'Write a comment...','Kirim komentar':'Send comment',
+ 'Belum ada komentar. Mulai percakapan.':'No comments yet. Start the conversation.',
+ 'Masuk untuk menyukai postingan.':'Sign in to like this post.','Masuk untuk mengirim komentar.':'Sign in to comment.',
+ 'Link PasteLink disalin.':'PasteLink copied.','Postingan berhasil dipublikasikan.':'Post published successfully.',
+ 'PasteLink berhasil dibuat.':'PasteLink created successfully.','Salin link':'Copy link','Bagikan':'Share',
+ 'Belum ada postingan dari member ini.':'This member has no posts yet.','Belum ada postingan. Jadilah yang pertama membagikan tautan!':'No posts yet. Be the first to share a link!',
+
  'Kategori Box Video':'Box Video Categories','Pengaturan Menu Navbar':'Navbar Menu Settings','Pilih halaman tujuan dari daftar, lalu atur ikon, tag NEW/TREND/BETA, dan warna menu.':'Choose a destination page, then configure the icon, badge, and menu colors.',
  'Nama menu navbar':'Navbar menu name','Tujuan menu':'Menu destination','Masukkan URL tujuan':'Enter destination URL','Pilih ikon Font Awesome':'Choose a Font Awesome icon','Cari / ketik: fa-solid fa-fire':'Search / type: fa-solid fa-fire','Gunakan kelas ikon Font Awesome 6. Ikon lain juga bisa dimasukkan manual.':'Use Font Awesome 6 icon classes. Other icons can also be entered manually.',
  'Label / badge':'Badge label','Tanpa badge':'No badge','PROMO':'PROMO','Tampilkan untuk':'Show to','Semua pengunjung':'All visitors','Belum login':'Guests','Member login':'Signed-in members','Warna badge':'Badge color','Warna latar menu':'Menu background color','Warna teks menu':'Menu text color','Urutan tampil':'Display order','Simpan menu':'Save menu','Simpan perubahan':'Save changes','Batal edit':'Cancel edit','URL khusus...':'Custom URL...','URL khusus, contoh: /vip.html':'Custom URL, e.g. /vip.html',
@@ -26,6 +33,13 @@ Object.assign(dict.en,{
  'Nama menu wajib diisi dan tujuan harus berupa path website atau URL HTTPS.':'A menu name and a valid website path or HTTPS URL are required.','Format ikon tidak valid. Contoh: fa-solid fa-fire.':'Invalid icon format. Example: fa-solid fa-fire.','Menyimpan menu...':'Saving menu...','Menu navbar berhasil disimpan.':'Navbar menu saved successfully.','Gagal menyimpan menu:':'Could not save menu:','Aksi menu gagal:':'Navbar menu action failed:','Menu navbar belum dapat dimuat:':'Could not load navbar menu:','Belum ada menu tambahan.':'No additional menu items yet.','Aktif':'Active','Nonaktif':'Inactive','Nonaktifkan':'Deactivate','Aktifkan':'Activate','Hapus menu navbar ini?':'Delete this navbar menu?'
 });
 Object.assign(dict.en,{
+ 'Suka':'Like','Komentar':'Comments','Tulis komentar...':'Write a comment...','Kirim komentar':'Send comment',
+ 'Belum ada komentar. Mulai percakapan.':'No comments yet. Start the conversation.',
+ 'Masuk untuk menyukai postingan.':'Sign in to like this post.','Masuk untuk mengirim komentar.':'Sign in to comment.',
+ 'Link PasteLink disalin.':'PasteLink copied.','Postingan berhasil dipublikasikan.':'Post published successfully.',
+ 'PasteLink berhasil dibuat.':'PasteLink created successfully.','Salin link':'Copy link','Bagikan':'Share',
+ 'Belum ada postingan dari member ini.':'This member has no posts yet.','Belum ada postingan. Jadilah yang pertama membagikan tautan!':'No posts yet. Be the first to share a link!',
+
  'Publisher Studio':'Publisher Studio','Buat AutoLink':'Create AutoLink','Publikasikan tautan dan bagikan ke komunitas untuk memperoleh WIF valid.':'Publish a link and share it with the community to earn valid WIF.',
  'Kembali ke Postingan':'Back to Posts','Link asli':'Original URL','Judul AutoLink':'AutoLink title','Masukkan judul yang menarik':'Enter an engaging title','Deskripsi':'Description','Jelaskan isi tautan ini...':'Describe this link...','Publish AutoLink':'Publish AutoLink','Dashboard Publisher':'Publisher Dashboard','Ringkasan performa AutoLink dan pendapatan publisher kamu.':'Overview of your AutoLink performance and publisher earnings.',
  'Total AutoLink':'Total AutoLinks','Total WIF valid':'Total valid WIF','Pendapatan hari ini':'Today’s earnings','CPM saat ini':'Current CPM','Statistik 7 Hari':'7-Day Statistics','Pendapatan 7 Hari':'7-Day Earnings','Pendapatan Free':'Free earnings','Langsung Akses':'Direct Access','Total Pastelink':'Total Pastelink','Statistik Pastelink':'Pastelink Statistics','AutoLink Saya':'My AutoLinks','Buat AutoLink':'Create AutoLink',
@@ -33,6 +47,26 @@ Object.assign(dict.en,{
  'Endorse sedang dikembangkan':'Endorse is under development','Halaman kerja sama promosi dan kampanye brand akan tersedia pada pembaruan berikutnya.':'Brand promotion and campaign collaboration will be available in a future update.',
  'Informasi Backlink & Website':'Backlink & Website Information','Mengenal Backlink dan Manfaatnya':'Understanding Backlinks and Their Benefits','Download Pertama':'First Download','Scroll Down':'Scroll Down','Download Kedua':'Second Download','Lanjutkan':'Continue','Tahap 1 dari 3':'Stage 1 of 3','Proses hampir selesai':'Almost finished','Redirect':'Redirect',
  'Pembayaran Langsung Akses':'Direct Access Payment','Harga tetap Rp3.500.':'Fixed price Rp3,500.','Buat Pembayaran Cashi QRIS · Rp3.500':'Create Cashi QRIS Payment · Rp3,500','Saya sudah membayar · Periksa status':'I have paid · Check status'
+});
+Object.assign(dict.en,{
+ 'Suka':'Like','Komentar':'Comments','Tulis komentar...':'Write a comment...','Kirim komentar':'Send comment',
+ 'Belum ada komentar. Mulai percakapan.':'No comments yet. Start the conversation.',
+ 'Masuk untuk menyukai postingan.':'Sign in to like this post.','Masuk untuk mengirim komentar.':'Sign in to comment.',
+ 'Link PasteLink disalin.':'PasteLink copied.','Postingan berhasil dipublikasikan.':'Post published successfully.',
+ 'PasteLink berhasil dibuat.':'PasteLink created successfully.','Salin link':'Copy link','Bagikan':'Share',
+ 'Belum ada postingan dari member ini.':'This member has no posts yet.','Belum ada postingan. Jadilah yang pertama membagikan tautan!':'No posts yet. Be the first to share a link!',
+
+ 'Postingan komunitas':'Community posts','Temukan dan bagikan tautan publik bersama komunitas.':'Discover and share public links with the community.',
+ 'Buat postingan':'Create post','Memuat postingan...':'Loading posts...','Belum ada postingan. Jadilah yang pertama membagikan tautan!':'No posts yet. Be the first to share a link!',
+ 'Semua AutoLink':'All AutoLinks','AutoLink publik dari seluruh member akan tampil di sini.':'Public AutoLinks from all members appear here.',
+ 'Memuat daftar AutoLink...':'Loading AutoLinks...','Belum ada AutoLink yang dipublikasikan.':'No AutoLinks have been published yet.',
+ 'Link pendek kamu':'Your short link','Salin Link':'Copy link','Bagikan':'Share','Buka Link':'Open link',
+ 'AutoLink berhasil dibuat dan dipublikasikan!':'AutoLink created and published successfully!','Link berhasil disalin.':'Link copied successfully.',
+ 'Permintaan withdraw berhasil diajukan.':'Withdrawal request submitted successfully.',
+ 'Belum ada riwayat withdraw.':'No withdrawal history yet.','Metode':'Method','Bank / E-Wallet':'Bank / E-Wallet',
+ 'Tanggal':'Date','Nominal':'Amount','Tujuan':'Destination','Status':'Status','Catatan':'Notes',
+ 'Publisher Studio':'Publisher Studio','Dashboard Publisher':'Publisher Dashboard','Buat AutoLink':'Create AutoLink',
+ 'Kumpulan BoxVidey':'BoxVidey Collection','Video Terbaru':'Latest Videos','Media Telegram Terpopuler':'Popular Telegram Media','Media BoxVidey Terpopuler':'Popular BoxVidey Media'
 });
 const get=()=>localStorage.getItem('boxcellink_lang')||'id';
 function apply(){const lang=get();document.documentElement.lang=lang;const map=dict[lang]||{};const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while((n=walker.nextNode())){const raw=n.nodeValue,trim=raw.trim();if(map[trim])n.nodeValue=raw.replace(trim,map[trim]);}document.querySelectorAll('[placeholder],[title],[aria-label]').forEach(el=>{['placeholder','title','aria-label'].forEach(attr=>{const value=el.getAttribute(attr);if(value&&map[value])el.setAttribute(attr,map[value]);});});document.querySelectorAll('[data-footer]').forEach(el=>{const labels={terms:'Syarat & ketentuan',privacy:'Kebijakan Dan Privasi',help:'Bantuan',cookies:'Kami menggunakan cookie untuk pengalaman yang lebih baik.',accept:'Setujui'};const k=el.dataset.footer;if(lang==='en'&&labels[k]&&map[labels[k]]&&el.textContent!==map[labels[k]])el.textContent=map[labels[k]]});document.querySelectorAll('[data-nav]').forEach(el=>{const key=el.dataset.nav;const labels={admin:'Panel Admin',box:'BoxVidey',telegram:'Media Telegram',dashboard:'Dashboard',account:'Akun Saya',vip:'VIP',groups:'Group VIP Telegram',discount:'Kode Diskon Saya',referral:'Referral & Hadiah',categories:'Kategori',payments:'Pembayaran',login:'Masuk',register:'Daftar',logout:'Keluar'};if(lang==='en'&&labels[key]&&map[labels[key]]&&el.textContent!==map[labels[key]])el.textContent=map[labels[key]]});const label=document.getElementById('translateLabel');if(label){const v=lang==='id'?'ID':'ENG';if(label.textContent!==v)label.textContent=v;}}
