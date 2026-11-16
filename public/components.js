@@ -87,10 +87,11 @@ function initMemberBottomNav(){
    const {data:profile,error:profileError}=await window.sb.from('profiles').select('username').eq('id',user.id).maybeSingle();
    if(profileError)throw profileError;
    if(!profile?.username)throw new Error('Atur username publik terlebih dahulu di halaman Akun Saya.');
-   const {data:post,error}=await window.sb.from('social_posts').insert({user_id:user.id,detail:detail||null,public_url:parsed.href}).select('id').single();
+   const shortCode=(()=>{const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';const bytes=new Uint8Array(5);crypto.getRandomValues(bytes);return Array.from(bytes,b=>chars[b%chars.length]).join('');})();
+   const {data:post,error}=await window.sb.from('social_posts').insert({user_id:user.id,detail:detail||null,public_url:parsed.href,short_code:shortCode}).select('id,short_code').single();
    if(error)throw error;
    if(linkInput)linkInput.value='';if(detailInput)detailInput.value='';closeComposer();
-   location.assign('/posts.html?new='+encodeURIComponent(post.id));
+   location.assign('/posts.html?new='+encodeURIComponent(post.id)+'&link='+encodeURIComponent(new URL('/z/'+post.short_code,location.origin).href));
   }catch(error){console.error('Publish social post failed:',error);showToast(error.message||'Postingan gagal dikirim. Coba lagi.');}
   finally{publishButton.disabled=false;publishButton.classList.remove('is-loading');publishButton.innerHTML=oldText;}
  });
