@@ -248,3 +248,44 @@
 .task1-page .task1-mid-article-ad{width:100%;max-width:760px;margin:14px auto 20px;padding:0 8px;box-sizing:border-box}
 .task1-page .task1-mid-article-ad .task1-ad-label{font-size:9px;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase}
 @media(max-width:520px){.task1-page .task1-mid-article-ad{margin:10px auto 16px;padding:0 4px}}
+
+
+/* Task 1 — floating direct access and Telegram invitation */
+.task1-direct-toast[hidden],.task1-telegram-dialog[hidden],.task1-telegram-float[hidden]{display:none!important}
+.task1-direct-toast{
+  position:fixed;z-index:120500;top:calc(env(safe-area-inset-top,0px) + 68px);right:18px;width:min(360px,calc(100vw - 28px));
+  box-sizing:border-box;padding:17px 16px 14px;border:1px solid rgba(148,163,184,.22);
+  border-radius:20px;background:linear-gradient(145deg,#fff 0%,#f7faff 100%);color:#172033;
+  box-shadow:0 22px 65px rgba(15,23,42,.22);opacity:0;transform:translate3d(0,-14px,0) scale(.98);
+  transition:opacity .24s ease,transform .24s ease;font-family:inherit;text-align:left
+}
+.task1-direct-toast.is-visible{opacity:1;transform:translate3d(0,0,0) scale(1)}
+.task1-toast-close{position:absolute;top:11px;right:11px;width:30px;height:30px;border:0;border-radius:10px;display:grid;place-items:center;background:#eef2f7;color:#64748b;cursor:pointer}
+.task1-toast-top{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.task1-toast-icon{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#2563eb,#0f766e);font-size:16px;box-shadow:0 8px 20px rgba(37,99,235,.2)}
+.task1-toast-tag{font-size:9px;letter-spacing:.13em;font-weight:900;color:#2563eb}
+.task1-direct-toast>strong{display:block;padding-right:22px;font-size:14px;line-height:1.35;font-weight:850;color:#172033}
+.task1-direct-toast>p{margin:6px 0 13px;color:#64748b;font-size:11px;line-height:1.55}
+.task1-toast-action{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;padding:12px 13px;border-radius:13px;background:linear-gradient(110deg,#1d4ed8,#0f766e);color:#fff!important;text-decoration:none;font-size:12px;font-weight:850;box-shadow:0 9px 22px rgba(29,78,216,.2)}
+.task1-toast-action span:last-child{white-space:nowrap;font-variant-numeric:tabular-nums}
+.task1-direct-toast>small{display:flex;align-items:center;gap:6px;margin-top:11px;color:#8290a3;font-size:9px}
+.task1-direct-toast>small i{color:#0f9888}
+.task1-telegram-dialog{position:fixed;z-index:120600;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 92px);width:min(360px,calc(100vw - 32px));box-sizing:border-box;padding:22px;border:1px solid rgba(255,255,255,.65);border-radius:24px;background:linear-gradient(145deg,#fff 0%,#f3f8ff 100%);color:#172033;box-shadow:0 24px 70px rgba(15,23,42,.24);opacity:0;transform:translateY(12px) scale(.98);transition:opacity .22s ease,transform .22s ease;font-family:inherit}
+.task1-telegram-dialog.is-visible{opacity:1;transform:translateY(0) scale(1)}
+.task1-telegram-close{position:absolute;right:12px;top:12px;width:30px;height:30px;border:0;border-radius:50%;background:#edf2f7;color:#334155;font-size:20px;cursor:pointer}
+.task1-telegram-mark{width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#e0f2fe;color:#168bd2;font-size:27px;margin-bottom:12px}
+.task1-telegram-eyebrow{font-size:10px;letter-spacing:.15em;font-weight:850;color:#168bd2}
+.task1-telegram-dialog h2{margin:6px 0 8px;font-size:20px;line-height:1.2}
+.task1-telegram-dialog p{margin:0;color:#64748b;font-size:13px;line-height:1.6}
+.task1-telegram-actions{display:flex;gap:9px;margin-top:18px}
+.task1-telegram-actions a,.task1-telegram-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 15px;border:0;border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;text-decoration:none;cursor:pointer}
+.task1-telegram-actions a{flex:1;background:#168bd2;color:#fff}
+.task1-telegram-actions button{background:#edf2f5;color:#334155}
+.task1-telegram-float{position:fixed;z-index:120600;left:16px;right:auto;top:50%;transform:translateY(-50%);width:54px;height:54px;border:0;border-radius:50%;background:#168bd2;color:#fff;font-size:29px;box-shadow:0 12px 30px rgba(22,139,210,.35);display:grid;place-items:center;animation:task1-telegram-bob 2.5s ease-in-out infinite;cursor:pointer}
+@keyframes task1-telegram-bob{0%,100%{transform:translateY(-50%)}50%{transform:translateY(calc(-50% - 5px))}}
+@media(max-width:600px){
+ .task1-direct-toast{top:calc(env(safe-area-inset-top,0px) + 68px);right:10px;width:min(350px,calc(100vw - 20px))}
+ .task1-telegram-dialog{right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 84px)}
+ .task1-telegram-float{left:12px;right:auto;width:50px;height:50px}
+}
+@media(prefers-reduced-motion:reduce){.task1-direct-toast,.task1-telegram-dialog{transition:none}.task1-telegram-float{animation:none}}
