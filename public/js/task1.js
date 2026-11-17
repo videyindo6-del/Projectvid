@@ -30,11 +30,10 @@ function mountAd(slot){
   slot.dataset.loaded='1';
   const frame=document.createElement('iframe');
   frame.title='Iklan sponsor';
-  frame.loading='lazy';
+  frame.loading='eager';
   frame.referrerPolicy='strict-origin-when-cross-origin';
   frame.width=String(width);frame.height=String(height);
-  frame.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox');
-  frame.style.cssText=`display:block;border:0;width:${width}px;height:${height}px;max-width:100%;margin:0 auto;`;
+  frame.style.cssText=`display:block;border:0;width:min(100%,${width}px);height:${height}px;max-width:100%;margin:0 auto;background:transparent;`;
   const scriptUrl=`https://www.highrevenueformat.com/${encodeURIComponent(key)}/invoke.js`;
   const doc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;overflow:hidden;">'
     +'<script>var atOptions={'+`'key':'${key}','format':'iframe','height':${height},'width':${width},'params':{}`+'};<\/script>'
@@ -162,32 +161,27 @@ if(task2Link){
   task2Link.addEventListener('click',event=>{if(busy)event.preventDefault();});
 }
 
-/* Load the native slide unit only after its panel is visible. It remains until the user closes it;
-   after closing, it is shown again 12 seconds later. */
+/* Slide banner: 468x60. It appears after 7 seconds and can only be dismissed by the visitor.
+   After dismissal it may reappear 7 seconds later. The banner itself is mounted once. */
 const slide=$('task1SlideAd');
-let slideDismissedAt=0,slideLoaded=false;
-function loadSlideUnit(){
-  if(slideLoaded)return;slideLoaded=true;
-  const container=$('container-d0c4535d3914ad4b2c4e09c4aa337646');
-  if(!container)return;
-  const script=document.createElement('script');
-  script.async=true;script.dataset.cfasync='false';
-  script.src='https://pl32231888.profitableratecpmnetwork.com/d0c4535d3914ad4b2c4e09c4aa337646/invoke.js';
-  container.before(script);
-}
+let slideDismissedAt=0;
 function showSlide(){
   if(!slide||!slide.hidden)return;
-  slide.hidden=false;slide.classList.add('is-visible');
-  loadSlideUnit();
+  slide.hidden=false;
+  slide.classList.add('is-visible');
+  const slot=slide.querySelector('.task1-ad-mount');
+  mountAd(slot);
 }
 $('task1SlideClose')?.addEventListener('click',()=>{
   if(!slide)return;
-  slide.classList.remove('is-visible');slide.hidden=true;slideDismissedAt=Date.now();
+  slide.classList.remove('is-visible');
+  slide.hidden=true;
+  slideDismissedAt=Date.now();
 });
 if(slide){
-  setTimeout(showSlide,12000);
-  setInterval(()=>{
-    if(slide.hidden&&slideDismissedAt&&Date.now()-slideDismissedAt>=12000)showSlide();
-  },1000);
+  window.setTimeout(showSlide,7000);
+  window.setInterval(()=>{
+    if(slide.hidden&&slideDismissedAt&&Date.now()-slideDismissedAt>=7000)showSlide();
+  },500);
 }
 })();
