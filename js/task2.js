@@ -3,142 +3,135 @@ const $=id=>document.getElementById(id);
 const code=new URLSearchParams(location.search).get('code')||'';
 let saved=null;try{saved=JSON.parse(sessionStorage.getItem('al_session')||'null')}catch{}
 if(!saved||saved.code!==code){location.replace('/x/'+encodeURIComponent(code));return;}
-const sponsorUrl='https://www.profitableratecpmnetwork.com/vw721j6q?key=e997cbbb9bbee0de7820bd0c98fc8351';
-let busy=false,index=Number(saved.progress_index??6),adGateTimer=null,slideClosedAt=0;
+let busy=true,index=Number(saved.progress_index??0),gateTimer=null,slideDismissedAt=0;
 const status=text=>{const el=$('task2PageStatus');if(el)el.textContent=text;};
+const setText=(id,text)=>{const el=$(id);if(el)el.textContent=text;};
 const reveal=id=>{const el=$(id);if(el)el.hidden=false;};
 const hide=id=>{const el=$(id);if(el)el.hidden=true;};
 const scrollTo=id=>$(id)?.scrollIntoView({behavior:'smooth',block:'center'});
+const persist=()=>{saved.progress_index=index;try{sessionStorage.setItem('al_session',JSON.stringify(saved));}catch{}};
 
+async function serverStatus(){
+  const response=await fetch('/api/autolink?action=status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({session_id:saved.id,token:saved.token})});
+  let data={};try{data=await response.json()}catch{}
+  if(!response.ok)throw new Error(data.error||'Tidak dapat membaca status sesi AutoLink.');
+  return Number(data.progress_index||0);
+}
 async function advance(next){
+  if(next!==index+1)throw new Error(`Urutan tahap tidak cocok. Tahap saat ini ${index}, tahap berikutnya ${index+1}.`);
   const response=await fetch('/api/autolink?action=advance',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({session_id:saved.id,token:saved.token,next_index:next})});
   let data={};try{data=await response.json()}catch{}
   if(!response.ok)throw new Error(data.error||'Tahap belum dapat diverifikasi. Silakan coba lagi.');
-  index=next;saved.progress_index=next;try{sessionStorage.setItem('al_session',JSON.stringify(saved));}catch{}
-  return data;
+  index=next;persist();return data;
 }
 
-function mountAd(slot,refresh=false){
-  if(!slot)return;
-  if(refresh){slot.dataset.loaded='';slot.replaceChildren();}
-  if(slot.dataset.loaded==='1')return;
+function mountAd(slot){
+  if(!slot||slot.dataset.loaded==='1')return;
   const key=slot.dataset.adKey,width=Number(slot.dataset.adWidth),height=Number(slot.dataset.adHeight);
   if(!key||!width||!height)return;
   slot.dataset.loaded='1';
-  const frame=document.createElement('iframe');frame.title='Iklan sponsor';frame.loading='eager';frame.width=String(width);frame.height=String(height);
+  const frame=document.createElement('iframe');frame.title='Iklan sponsor';frame.loading='lazy';frame.width=String(width);frame.height=String(height);
   frame.referrerPolicy='strict-origin-when-cross-origin';
   frame.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox');
   frame.style.cssText=`display:block;border:0;width:min(100%,${width}px);height:${height}px;max-width:100%;margin:0 auto;background:transparent`;
   const src=`https://www.highrevenueformat.com/${encodeURIComponent(key)}/invoke.js`;
-  frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;overflow:hidden"><script>var atOptions={'+`'key':'${key}','format':'iframe','height':${height},'width':${width},'params':{}`+' };</script><script src="'+src+'"></script></body></html>';
+  frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;overflow:hidden"><script>var atOptions={'+`'key':'${key}','format':'iframe','height':${height},'width':${width},'params':{}`+'};<\/script><script src="'+src+'"><\/script></body></html>';
   slot.replaceChildren(frame);
 }
+const adSlots=[...document.querySelectorAll('.task1-ad-mount')];
+if('IntersectionObserver' in window){
+  const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){mountAd(entry.target);observer.unobserve(entry.target);}}},{rootMargin:'320px 0px'});
+  adSlots.forEach(slot=>observer.observe(slot));
+}else adSlots.forEach(mountAd);
 
-// Slot iklan admin dipertahankan dan hanya dimuat jika aktif.
-document.querySelectorAll('[data-ads-slot]').forEach(async el=>{
-  try{if(typeof sb==='undefined')return;const {data}=await sb.from('go_ad_settings').select('ad_code,active').eq('slot',el.dataset.adsSlot).eq('active',true).maybeSingle();
-    if(data?.ad_code){const frame=document.createElement('iframe');frame.title='Iklan sponsor';frame.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox');frame.referrerPolicy='strict-origin-when-cross-origin';frame.style.cssText='width:100%;max-width:100%;min-height:90px;border:0';frame.srcdoc=data.ad_code;el.replaceChildren(frame);}
-  }catch(error){console.warn('Slot iklan Task 2 tidak tersedia',error);}
-});
-
-function countdown(seconds,{countId,statusText,barId}={}){
+function countdown(seconds,{countId,statusId,label}={}){
   return new Promise(resolve=>{
-    let left=seconds;const count=$(countId),bar=$(barId);
-    const paint=()=>{if(count)count.textContent=String(left);if(bar)bar.style.width=((seconds-left)/seconds*100)+'%';if(statusText)status(statusText(left));};
+    let left=seconds;const count=$(countId);
+    const paint=()=>{if(count)count.textContent=String(left);if(statusId)setText(statusId,`${label||'Memproses'} · ${left} detik`);};
     paint();const timer=setInterval(()=>{left=Math.max(0,left-1);paint();if(left===0){clearInterval(timer);resolve();}},1000);
   });
 }
-
-function showAdGate(){
+function showSponsorGate(){
   return new Promise(resolve=>{
-    const gate=$('task2AdGate'),skip=$('task2AdSkip'),label=$('task2AdCountdown');
+    const gate=$('task2AdGate'),skip=$('task2AdSkip'),timer=$('task2AdTimer');
     if(!gate||!skip){resolve();return;}
-    if(adGateTimer){clearInterval(adGateTimer);adGateTimer=null;}
-    gate.hidden=false;const slot=gate.querySelector('.task2-ad-mount');mountAd(slot,true);
-    let left=5;skip.disabled=true;skip.textContent=`Tunggu ${left} detik`;if(label)label.textContent=`Iklan · ${left} detik`;
-    let finished=false;
-    const finish=()=>{if(finished||skip.disabled)return;finished=true;if(adGateTimer)clearInterval(adGateTimer);adGateTimer=null;gate.hidden=true;skip.removeEventListener('click',finish);resolve();};
+    if(gateTimer){clearInterval(gateTimer);gateTimer=null;}
+    gate.hidden=false;mountAd(gate.querySelector('.task1-ad-mount'));
+    let left=5;skip.disabled=true;skip.textContent=`Tunggu ${left} detik`;if(timer)timer.textContent=`Lewati tersedia dalam ${left} detik`;
+    const finish=()=>{if(skip.disabled)return;if(gateTimer)clearInterval(gateTimer);gateTimer=null;gate.hidden=true;skip.removeEventListener('click',finish);resolve();};
     skip.addEventListener('click',finish);
-    adGateTimer=setInterval(()=>{left=Math.max(0,left-1);if(label)label.textContent=left?`Iklan · ${left} detik`:'Iklan selesai';if(left){skip.textContent=`Tunggu ${left} detik`;}else{clearInterval(adGateTimer);adGateTimer=null;skip.disabled=false;skip.textContent='Lewati iklan';}},1000);
+    gateTimer=setInterval(()=>{left=Math.max(0,left-1);if(timer)timer.textContent=left?`Lewati tersedia dalam ${left} detik`:'Iklan selesai';if(left){skip.textContent=`Tunggu ${left} detik`;}else{clearInterval(gateTimer);gateTimer=null;skip.disabled=false;skip.textContent='Lewati iklan';}},1000);
   });
 }
-
 async function runBusy(button,work){
   if(busy)return;busy=true;if(button)button.disabled=true;
   try{await work();}
   catch(error){status(error?.message||'Terjadi kendala. Silakan coba lagi.');if(button)button.disabled=false;}
   finally{busy=false;}
 }
+async function finishTask2Stages(){
+  // Stage 8 is the visible five-second verification; later Task 2 records are committed in order.
+  for(let next=index+1;next<=12;next++)await advance(next);
+  reveal('task2Task3Result');setText('task2FinalHint','Verifikasi berhasil. Tombol Download Now sudah tersedia untuk membuka Task 3.');
+  status('Task 2 selesai. Kamu dapat melanjutkan ke Task 3.');
+}
 
-// Tahap atas: 10 detik, jeda iklan 5 detik, lalu tampilkan Scroll Down.
 $('task2TopVerify')?.addEventListener('click',()=>runBusy($('task2TopVerify'),async()=>{
   hide('task2TopResult');reveal('task2TopLoader');
-  await countdown(10,{countId:'task2TopCount',statusText:left=>`Verifikasi tahap pertama · ${left} detik`});
-  await advance(7);
-  await showAdGate();
+  await countdown(10,{countId:'task2TopCount',statusId:'task2TopStatus',label:'Verifikasi tahap pertama'});
+  if(index<7)await advance(7);
+  await showSponsorGate();
   hide('task2TopLoader');reveal('task2TopResult');
-  status('Tahap pertama selesai. Tekan Scroll Down untuk menuju tombol bagian bawah.');
+  setText('task2TopHint','Selesai. Tekan Scroll Down untuk menuju bagian bawah artikel.');
+  status('Verifikasi tahap pertama selesai.');
 }));
-
 $('task2ScrollDown')?.addEventListener('click',()=>{
-  reveal('task2ActionArea');scrollTo('task2ActionArea');
-  status('Bagian bawah terbuka. Save menjalankan proses 10 detik; Download adalah tautan sponsor opsional.');
+  if(busy)return;reveal('task2ActionArea');scrollTo('task2ActionArea');
+  status('Bagian bawah terbuka. Tekan Up Down untuk menuju verifikasi tengah.');
 });
-
-// Tahap bawah: sama dengan Task 1, loading 10 detik dan jeda iklan 5 detik.
-$('task2Save')?.addEventListener('click',()=>runBusy($('task2Save'),async()=>{
-  hide('task2SaveResult');reveal('task2SaveLoader');
-  await countdown(10,{countId:'task2SaveCount',statusText:left=>{const el=$('task2SaveStatus');if(el)el.textContent=`Memproses Save · ${left} detik`;return 'Memproses penyimpanan';}});
-  await advance(8);
-  await showAdGate();
-  hide('task2SaveLoader');reveal('task2SaveResult');
-  status('Tahap bawah selesai. Tekan Next untuk menuju verifikasi tengah.');
-}));
-
-$('task2NextToMiddle')?.addEventListener('click',()=>{
-  reveal('task2MiddleStage');scrollTo('task2MiddleStage');
-  status('Verifikasi akhir siap. Tautan sponsor bersifat opsional dan tidak menjadi syarat verifikasi.');
+$('task2UpDown')?.addEventListener('click',()=>{
+  if(busy)return;reveal('task2MiddleStage');scrollTo('task2MiddleStage');
+  status('Bagian tengah terbuka. Verifikasi dapat dilakukan tanpa mengklik iklan.');
 });
-
-// Tahap tengah: verifikasi 5 detik, checkbox konfirmasi, validasi backend, lalu Next Task 3.
-// Klik sponsor tidak dijadikan syarat untuk menyelesaikan task atau memperoleh akses.
 $('task2FinalVerify')?.addEventListener('click',()=>runBusy($('task2FinalVerify'),async()=>{
-  hide('task2Task3Result');hide('task2FinalConfirm');reveal('task2FinalLoader');
-  await countdown(5,{countId:'task2FinalCount',statusText:left=>`Memproses verifikasi · ${left} detik`});
-  await advance(9);
-  hide('task2FinalLoader');reveal('task2FinalConfirm');
-  const check=$('task2FinalCheck');if(check)check.checked=false;
-  status('Proses awal selesai. Centang konfirmasi untuk menyelesaikan validasi.');
-  if(check)check.focus({preventScroll:true});
-}));
-
-$('task2FinalCheck')?.addEventListener('change',event=>runBusy(null,async()=>{
-  const check=event.currentTarget;
-  if(!check.checked)return;
-  check.disabled=true;
-  try{
-    await advance(10);
-    const label=$('task2FinalCheckStatus');
-    for(let left=5;left>0;left--){if(label)label.textContent=`Menyelesaikan validasi · ${left} detik`;await new Promise(resolve=>setTimeout(resolve,1000));}
-    await advance(11);
-    await advance(12);
-    reveal('task2Task3Result');
-    if(label)label.textContent='Verifikasi berhasil. Tombol Task 3 sudah tersedia.';
-    status('Verifikasi berhasil. Tekan Next untuk menuju Task 3.');
-  }catch(error){
-    check.disabled=false;check.checked=false;
-    throw error;
+  hide('task2Task3Result');reveal('task2FinalLoader');
+  if(index<8){
+    await countdown(5,{countId:'task2FinalCount',statusId:'task2FinalStatus',label:'Memverifikasi Task 2'});
+    await advance(8);
   }
+  await finishTask2Stages();hide('task2FinalLoader');
 }));
+$('task2GoTask3')?.addEventListener('click',()=>{if(busy||index!==12)return;location.assign('/task3.html?code='+encodeURIComponent(code));});
 
-$('task2GoTask3')?.addEventListener('click',()=>{if(busy)return;location.assign('/task3.html?code='+encodeURIComponent(code));});
-
-// Banner slide: tampil pertama kali setelah 7 detik. Setelah ditutup, tampil lagi 7 detik kemudian.
+// Slide banner: appears after 7 seconds and can be dismissed; it may return 7 seconds after dismissal.
 const slide=$('task2SlideAd');
-function showSlide(){if(!slide||!slide.hidden)return;slide.hidden=false;mountAd(slide.querySelector('.task2-ad-mount'));}
-$('task2SlideClose')?.addEventListener('click',()=>{if(!slide)return;slide.hidden=true;slideClosedAt=Date.now();});
-if(slide){setTimeout(showSlide,7000);setInterval(()=>{if(slide.hidden&&slideClosedAt&&Date.now()-slideClosedAt>=7000)showSlide();},500);}
+function showSlide(){if(!slide||!slide.hidden)return;slide.hidden=false;slide.classList.add('is-visible');mountAd(slide.querySelector('.task1-ad-mount'));}
+$('task2SlideClose')?.addEventListener('click',()=>{if(!slide)return;slide.classList.remove('is-visible');slide.hidden=true;slideDismissedAt=Date.now();});
+if(slide){setTimeout(showSlide,7000);setInterval(()=>{if(slide.hidden&&slideDismissedAt&&Date.now()-slideDismissedAt>=7000)showSlide();},500);}
 
-// Sponsor links are explicit external links; never auto-open or repeatedly trigger popunders.
-document.querySelectorAll('a[rel~="sponsored"]').forEach(link=>link.addEventListener('click',()=>status('Membuka halaman sponsor di tab baru.')));
+// Restore session and bridge older Task 1 sessions (three-stage versions) to Task 2's stage 7.
+(async()=>{
+  try{
+    index=await serverStatus();persist();
+    if(index>=3&&index<6){
+      status('Menyelaraskan sesi Task 1…');
+      if(index===3)await advance(4);
+      if(index===4){await new Promise(resolve=>setTimeout(resolve,5000));await advance(5);}
+      if(index===5)await advance(6);
+      status('Sesi Task 1 berhasil diselaraskan. Task 2 siap.');
+    }
+    if(index===6){$('task2TopVerify').disabled=false;}
+    else if(index===7){hide('task2TopLoader');reveal('task2TopResult');$('task2TopVerify').disabled=true;}
+    else if(index>=8&&index<12){
+      reveal('task2ActionArea');reveal('task2MiddleStage');reveal('task2FinalLoader');
+      await finishTask2Stages();hide('task2FinalLoader');$('task2FinalVerify').disabled=true;
+    }
+    else if(index===12){reveal('task2TopResult');reveal('task2ActionArea');reveal('task2MiddleStage');reveal('task2Task3Result');$('task2TopVerify').disabled=true;$('task2FinalVerify').disabled=true;}
+    else if(index>12){reveal('task2MiddleStage');reveal('task2Task3Result');status('Sesi sudah melewati Task 2. Lanjutkan ke Task 3.');}
+    else throw new Error('Selesaikan Task 1 terlebih dahulu sebelum membuka Task 2.');
+  }catch(error){
+    status(error?.message||'Sesi belum siap. Silakan mulai kembali dari halaman AutoLink.');
+    const button=$('task2TopVerify');if(button)button.disabled=true;
+  }finally{busy=false;}
+})();
 })();
