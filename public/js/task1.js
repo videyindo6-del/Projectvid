@@ -30,7 +30,7 @@ function mountAd(slot){
   slot.dataset.loaded='1';
   const frame=document.createElement('iframe');
   frame.title='Iklan sponsor';
-  frame.loading='eager';
+  frame.loading='lazy';
   frame.referrerPolicy='strict-origin-when-cross-origin';
   frame.width=String(width);frame.height=String(height);
   frame.style.cssText=`display:block;border:0;width:min(100%,${width}px);height:${height}px;max-width:100%;margin:0 auto;background:transparent;`;
@@ -161,27 +161,18 @@ if(task2Link){
   task2Link.addEventListener('click',event=>{if(busy)event.preventDefault();});
 }
 
-/* Slide banner: 468x60. It appears after 7 seconds and can only be dismissed by the visitor.
-   After dismissal it may reappear 7 seconds later. The banner itself is mounted once. */
+/* Floating sponsor banner appears once after 7 seconds and stays dismissed after close. */
 const slide=$('task1SlideAd');
-let slideDismissedAt=0;
 function showSlide(){
   if(!slide||!slide.hidden)return;
   slide.hidden=false;
   slide.classList.add('is-visible');
-  const slot=slide.querySelector('.task1-ad-mount');
-  mountAd(slot);
+  mountAd(slide.querySelector('.task1-ad-mount'));
 }
 $('task1SlideClose')?.addEventListener('click',()=>{
   if(!slide)return;
   slide.classList.remove('is-visible');
   slide.hidden=true;
-  slideDismissedAt=Date.now();
 });
-if(slide){
-  window.setTimeout(showSlide,7000);
-  window.setInterval(()=>{
-    if(slide.hidden&&slideDismissedAt&&Date.now()-slideDismissedAt>=7000)showSlide();
-  },500);
-}
+if(slide)window.setTimeout(showSlide,7000);
 })();
