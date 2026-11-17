@@ -90,7 +90,14 @@ if('IntersectionObserver' in window){
 function countdown(seconds,{countId,statusId,label}={}){
   return new Promise(resolve=>{
     let left=seconds;const count=$(countId);
-    const paint=()=>{if(count)count.textContent=String(left);if(statusId)setText(statusId,`${label||'Memproses'} · ${left} detik`);};
+    const phases=['Memproses...','Verifikasi...','Disiapkan...'];
+    const paint=()=>{
+      if(count)count.textContent=String(left);
+      if(statusId){
+        const phase=phases[(seconds-left)%phases.length];
+        setText(statusId,`${phase} ${left} detik`);
+      }
+    };
     paint();const timer=setInterval(()=>{left=Math.max(0,left-1);paint();if(left===0){clearInterval(timer);resolve();}},1000);
   });
 }
@@ -148,6 +155,14 @@ $('task2TopVerify')?.addEventListener('click',()=>runBusy($('task2TopVerify'),as
   setText('task2TopHint','Selesai. Tekan Scroll Down untuk menuju bagian bawah artikel.');
   status('Verifikasi tahap pertama selesai.');
 }));
+$('task2BottomVerify')?.addEventListener('click',()=>runBusy($('task2BottomVerify'),async()=>{
+  hide('task2BottomResult');reveal('task2BottomLoader');
+  await countdown(10,{countId:'task2BottomCount',statusId:'task2BottomStatus',label:'Verifikasi bagian bawah'});
+  if(index<8)await advance(8);
+  hide('task2BottomLoader');reveal('task2BottomResult');
+  setText('task2DownloadHint','Verifikasi bagian bawah selesai. Tekan Up Down untuk menuju tahap tengah.');
+  status('Verifikasi bagian bawah selesai.');
+}));
 $('task2ScrollDown')?.addEventListener('click',()=>{
   if(busy)return;reveal('task2ActionArea');scrollTo('task2ActionArea');
   status('Bagian bawah terbuka. Tekan Up Down untuk menuju verifikasi tengah.');
@@ -158,11 +173,8 @@ $('task2UpDown')?.addEventListener('click',()=>{
 });
 $('task2FinalVerify')?.addEventListener('click',()=>runBusy($('task2FinalVerify'),async()=>{
   hide('task2Task3Result');reveal('task2FinalLoader');
-  if(index<8){
-    await countdown(10,{countId:'task2FinalCount',statusId:'task2FinalStatus',label:'Memverifikasi Task 2'});
-    await showSponsorGate();
-    await advance(8);
-  }
+  await countdown(10,{countId:'task2FinalCount',statusId:'task2FinalStatus',label:'Verifikasi tahap tengah'});
+  if(index<9)await advance(9);
   await finishTask2Stages();hide('task2FinalLoader');
 }));
 $('task2GoTask3')?.addEventListener('click',()=>{if(busy||index!==12)return;location.assign('/task3.html?code='+encodeURIComponent(code));});
@@ -186,21 +198,21 @@ function hideSlide(){
 $('task2SlideClose')?.addEventListener('click',hideSlide);
 if(slide)setTimeout(showSlide,5000);
 
-// WhatsApp channel invitation appears once after 20 seconds; dismissing it leaves a floating shortcut.
+// WhatsApp channel invitation appears once after 10 seconds; dismissing it leaves a floating shortcut.
 const waDialog=$('task2WaDialog'),waFloat=$('task2WaFloat');
 function dismissWa(){
   if(waDialog){waDialog.classList.remove('is-visible');setTimeout(()=>{waDialog.hidden=true;},220);}
   if(waFloat)waFloat.hidden=false;
 }
 if(waDialog){
-  setTimeout(()=>{waDialog.hidden=false;requestAnimationFrame(()=>waDialog.classList.add('is-visible'));},20000);
+  setTimeout(()=>{waDialog.hidden=false;requestAnimationFrame(()=>waDialog.classList.add('is-visible'));},10000);
   $('task2WaOkay')?.addEventListener('click',dismissWa);
   $('task2WaClose')?.addEventListener('click',dismissWa);
   $('task2WaJoin')?.addEventListener('click',dismissWa);
 }
 waFloat?.addEventListener('click',()=>window.open('https://whatsapp.com/channel/0029Vb8bHHqGZNCnJhHlma1c','_blank','noopener,noreferrer'));
 
-// Restore session and bridge older Task 1 sessions (three-stage versions) to Task 2's stage 7.
+// Restore backend progress, but require a fresh visible verification action at each stage.
 (async()=>{
   try{
     index=await serverStatus();persist();
@@ -211,15 +223,15 @@ waFloat?.addEventListener('click',()=>window.open('https://whatsapp.com/channel/
       if(index===5)await advance(6);
       status('Sesi Task 1 berhasil diselaraskan. Task 2 siap.');
     }
-    if(index===6){$('task2TopVerify').disabled=false;}
-    else if(index===7){hide('task2TopLoader');reveal('task2TopResult');$('task2TopVerify').disabled=true;}
-    else if(index>=8&&index<12){
-      reveal('task2ActionArea');reveal('task2MiddleStage');reveal('task2FinalLoader');
-      await finishTask2Stages();hide('task2FinalLoader');$('task2FinalVerify').disabled=true;
-    }
-    else if(index===12){reveal('task2TopResult');reveal('task2ActionArea');reveal('task2MiddleStage');reveal('task2Task3Result');$('task2TopVerify').disabled=true;$('task2FinalVerify').disabled=true;}
-    else if(index>12){reveal('task2MiddleStage');reveal('task2Task3Result');status('Sesi sudah melewati Task 2. Lanjutkan ke Task 3.');}
-    else throw new Error('Selesaikan Task 1 terlebih dahulu sebelum membuka Task 2.');
+    if(index<6)throw new Error('Selesaikan Task 1 terlebih dahulu sebelum membuka Task 2.');
+    // Jangan tampilkan Scroll Down, Up Down, atau hasil akhir sebelum verifikasi di halaman ini diklik.
+    hide('task2TopLoader');hide('task2TopResult');
+    hide('task2ActionArea');hide('task2BottomLoader');hide('task2BottomResult');
+    hide('task2MiddleStage');hide('task2FinalLoader');hide('task2Task3Result');
+    $('task2TopVerify').disabled=false;
+    $('task2BottomVerify').disabled=false;
+    $('task2FinalVerify').disabled=false;
+    status('Task 2 siap. Tekan Verifikasi tahap pertama untuk memulai.');
   }catch(error){
     status(error?.message||'Sesi belum siap. Silakan mulai kembali dari halaman AutoLink.');
     const button=$('task2TopVerify');if(button)button.disabled=true;
