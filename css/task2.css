@@ -59,3 +59,77 @@
 
 /* Task 2 additional mid-article sponsor units. */
 .task2-page .task1-mid-article-ad{margin:12px auto 18px}
+
+
+/* Task 2 Native Ad placement: visibly labelled and separated from article controls. */
+.task2-page .task2-native-ad{box-sizing:border-box;width:min(100%,760px);margin:18px auto 24px;padding:12px;border:1px solid #dce5ef;border-radius:14px;background:#fff;text-align:center;overflow:hidden}
+.task2-page .task2-native-ad-label{display:block;margin:0 0 8px;color:#64748b;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.task2-page #container-d0c4535d3914ad4b2c4e09c4aa337646{display:block;width:100%;max-width:100%;min-height:80px;margin:0 auto;overflow:hidden}
+.task2-page .task2-extra-article-ad{margin:14px auto 20px}
+@media(max-width:680px){
+  .task2-page .task1-ad-frame.task1-ad-728x90,.task2-page .task1-ad-frame.task1-ad-468x60{width:min(320px,100%);min-height:50px}
+  .task2-page .task1-ad-frame.task1-ad-160x600,.task2-page .task1-ad-frame.task1-ad-160x300{width:min(300px,100%);min-height:250px}
+  .task2-page .task2-native-ad{margin:14px auto 18px;padding:9px}
+}
+
+
+/* Task 2 stronger ad layout: one clearly labeled banner in every article. */
+.task2-page .task2-added-article-ad{margin:14px auto 22px;padding:0 8px;box-sizing:border-box}
+.task2-page .task2-added-article-ad .task1-ad-label{display:block;margin:0 auto 6px;text-align:center;font-size:9px;letter-spacing:.08em;color:#94a3b8}
+.task2-page .task2-added-article-ad .task1-ad-frame{width:min(300px,100%);min-height:250px;margin:0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.task2-page .task2-added-article-ad .task1-ad-mount{width:100%;min-height:250px}
+.task2-page .task2-ad-gate{right:12px!important;left:auto!important;bottom:12px!important;width:min(350px,calc(100vw - 24px))!important}
+.task2-page .task2-slide-ad{right:10px;left:auto;bottom:10px;width:min(350px,calc(100vw - 20px));padding:10px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:rgba(15,23,42,.96);color:#e2e8f0;box-shadow:0 16px 45px rgba(2,8,23,.25)}
+.task2-page .task2-slide-ad[hidden]{display:none!important}
+.task2-page .task2-slide-ad .task1-overlay-ad-head{color:#e2e8f0}
+.task2-page .task2-slide-ad .task1-overlay-close{background:#334155;color:#fff;width:26px;height:26px;font-size:18px}
+.task2-page .task2-slide-ad-slot{width:100%;min-height:250px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.task2-page .task2-slide-ad-slot .task1-ad-mount{width:100%;min-height:250px}
+@media(max-width:680px){
+ .task2-page .task2-added-article-ad{margin:10px auto 18px;padding:0 4px}
+ .task2-page .task2-ad-gate{left:10px!important;right:10px!important;bottom:10px!important;width:auto!important}
+ .task2-page .task2-slide-ad{left:10px;right:10px;bottom:10px;width:auto}
+}
+
+
+/* Task 2 ads: clean transparent presentation without white panels or borders. */
+.task2-page .task1-inline-ad,
+.task2-page .task2-native-ad,
+.task2-page .task2-added-article-ad{
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding:0!important;
+}
+.task2-page .task1-ad-frame,
+.task2-page .task1-ad-mount,
+.task2-page #container-d0c4535d3914ad4b2c4e09c4aa337646{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.task2-page .task1-ad-label,
+.task2-page .task2-native-ad-label,
+.task2-page .task2-ad-gate-head span:first-child,
+.task2-page .task2-slide-ad .task1-overlay-ad-head span:first-child{
+  display:inline-flex!important;
+  margin:0 0 5px!important;
+  color:#94a3b8!important;
+  font-size:9px!important;
+  font-weight:700!important;
+  letter-spacing:.04em!important;
+  text-transform:uppercase!important;
+}
+.task2-page .task2-ad-gate{
+  background:rgba(15,23,42,.92)!important;
+  border:0!important;
+  border-radius:10px!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.18)!important;
+}
+.task2-page .task2-slide-ad{
+  background:rgba(15,23,42,.92)!important;
+  border:0!important;
+  border-radius:10px!important;
+  box-shadow:0 12px 34px rgba(0,0,0,.18)!important;
+}
