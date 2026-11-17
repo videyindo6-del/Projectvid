@@ -46,17 +46,23 @@ function mountAd(slot){
   if(!slot||slot.dataset.loaded==='1')return;
   let key=slot.dataset.adKey,width=Number(slot.dataset.adWidth),height=Number(slot.dataset.adHeight);
   if(!key||!width||!height)return;
-  // Use a mobile-native banner size instead of shrinking desktop creative dimensions.
   if(window.matchMedia('(max-width: 680px)').matches){
     if(width===728||width===468){key='e48004340d99ba399e04e57dd40239fa';width=320;height=50;}
   }
   slot.dataset.loaded='1';
-  const frame=document.createElement('iframe');frame.title='Advertisement';frame.loading='lazy';frame.width=String(width);frame.height=String(height);
+  const frame=document.createElement('iframe');
+  frame.title='Iklan sponsor';frame.loading='lazy';frame.width=String(width);frame.height=String(height);
   frame.referrerPolicy='strict-origin-when-cross-origin';
   frame.style.cssText=`display:block;border:0;width:min(100%,${width}px);height:${height}px;max-width:100%;margin:0 auto;background:transparent`;
   const src=`https://www.highrevenueformat.com/${encodeURIComponent(key)}/invoke.js`;
   frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;overflow:hidden"><script>var atOptions={'+`'key':'${key}','format':'iframe','height':${height},'width':${width},'params':{}`+'};<\/script><script src="'+src+'"><\/script></body></html>';
   slot.replaceChildren(frame);
+}
+function reloadAd(slot){
+  if(!slot)return;
+  slot.dataset.loaded='';
+  slot.replaceChildren();
+  mountAd(slot);
 }
 // Popunder: initialize the supplied provider scripts once per Task 2 page load.
 // The ad provider and browser decide when a valid popunder can be shown; repeatedly
@@ -161,26 +167,38 @@ $('task2FinalVerify')?.addEventListener('click',()=>runBusy($('task2FinalVerify'
 }));
 $('task2GoTask3')?.addEventListener('click',()=>{if(busy||index!==12)return;location.assign('/task3.html?code='+encodeURIComponent(code));});
 
-// Slide ad: first appears after 5 seconds, stays visible for 5 seconds,
-// then is eligible to reappear every 7 seconds. Close hides only the current display.
+// Slide ad: remains visible until the visitor presses X; it returns 7 seconds after closing.
 const slide=$('task2SlideAd');
-let slideHideTimer=null;
+let slideReturnTimer=null;
+function showSlide(){
+  if(!slide)return;
+  slide.hidden=false;
+  requestAnimationFrame(()=>slide.classList.add('is-visible'));
+  reloadAd(slide.querySelector('.task1-ad-mount'));
+}
 function hideSlide(){
   if(!slide||slide.hidden)return;
   slide.classList.remove('is-visible');
-  if(slideHideTimer)clearTimeout(slideHideTimer);
-  slideHideTimer=setTimeout(()=>{slide.hidden=true;},350);
-}
-function showSlide(){
-  if(!slide||!slide.hidden)return;
-  slide.hidden=false;
-  requestAnimationFrame(()=>slide.classList.add('is-visible'));
-  mountAd(slide.querySelector('.task1-ad-mount'));
-  if(slideHideTimer)clearTimeout(slideHideTimer);
-  slideHideTimer=setTimeout(hideSlide,5000);
+  setTimeout(()=>{slide.hidden=true;},260);
+  if(slideReturnTimer)clearTimeout(slideReturnTimer);
+  slideReturnTimer=setTimeout(showSlide,7000);
 }
 $('task2SlideClose')?.addEventListener('click',hideSlide);
-if(slide)setTimeout(()=>{showSlide();setInterval(showSlide,7000);},5000);
+if(slide)setTimeout(showSlide,5000);
+
+// WhatsApp channel invitation appears once after 20 seconds; dismissing it leaves a floating shortcut.
+const waDialog=$('task2WaDialog'),waFloat=$('task2WaFloat');
+function dismissWa(){
+  if(waDialog){waDialog.classList.remove('is-visible');setTimeout(()=>{waDialog.hidden=true;},220);}
+  if(waFloat)waFloat.hidden=false;
+}
+if(waDialog){
+  setTimeout(()=>{waDialog.hidden=false;requestAnimationFrame(()=>waDialog.classList.add('is-visible'));},20000);
+  $('task2WaOkay')?.addEventListener('click',dismissWa);
+  $('task2WaClose')?.addEventListener('click',dismissWa);
+  $('task2WaJoin')?.addEventListener('click',dismissWa);
+}
+waFloat?.addEventListener('click',()=>window.open('https://whatsapp.com/channel/0029Vb8bHHqGZNCnJhHlma1c','_blank','noopener,noreferrer'));
 
 // Restore session and bridge older Task 1 sessions (three-stage versions) to Task 2's stage 7.
 (async()=>{
