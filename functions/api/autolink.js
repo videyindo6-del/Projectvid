@@ -68,7 +68,7 @@ export async function onRequest({request,env}) {
    const rows=await db(env,`autolink_sessions?select=id,progress_index,stage_started_at,expires_at& id=eq.${sid}&token_hash=eq.${await hash(token)}&limit=1`.replace('& id=','&id='));
    const s=rows?.[0];if(!s||Date.parse(s.expires_at)<Date.now())return json({error:'Sesi tidak valid atau kedaluwarsa'},401);
    if(next!==Number(s.progress_index)+1)return json({error:'Urutan tahapan tidak valid'},409);
-   const min=[0,10,5,10,0,5,0,10,5,10,0,5,0,10,10,10,10][next]||0;
+   const min=[0,10,5,10,0,5,0,10,5,5,0,5,0,10,10,10,10][next]||0;
    const elapsed=(Date.now()-Date.parse(s.stage_started_at))/1000;
    if(elapsed<min)return json({error:`Tunggu ${Math.ceil(min-elapsed)} detik lagi`},429);
    await db(env,`autolink_sessions?id=eq.${sid}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({progress_index:next,stage_started_at:new Date().toISOString()})});
