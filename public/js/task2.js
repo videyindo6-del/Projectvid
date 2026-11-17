@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id);
 const code=new URLSearchParams(location.search).get('code')||'';
 let saved=null;try{saved=JSON.parse(sessionStorage.getItem('al_session')||'null')}catch{}
 if(!saved||saved.code!==code){location.replace('/x/'+encodeURIComponent(code));return;}
-let busy=true,index=Number(saved.progress_index??0),gateTimer=null;
+let busy=true,index=Number(saved.progress_index??0);
 const status=text=>{const el=$('task2PageStatus');if(el)el.textContent=text;};
 const setText=(id,text)=>{const el=$(id);if(el)el.textContent=text;};
 const reveal=id=>{const el=$(id);if(el)el.hidden=false;};
@@ -27,8 +27,13 @@ async function advance(next){
 
 function mountAd(slot){
   if(!slot||slot.dataset.loaded==='1')return;
-  const key=slot.dataset.adKey,width=Number(slot.dataset.adWidth),height=Number(slot.dataset.adHeight);
+  let key=slot.dataset.adKey,width=Number(slot.dataset.adWidth),height=Number(slot.dataset.adHeight);
   if(!key||!width||!height)return;
+  // Use a mobile-native banner size instead of shrinking desktop creative dimensions.
+  if(window.matchMedia('(max-width: 680px)').matches){
+    if(width===728||width===468){key='e48004340d99ba399e04e57dd40239fa';width=320;height=50;}
+    else if(width===160){key='896ad8ddb5ea1d057ac6d61226e3f54d';width=300;height=250;}
+  }
   slot.dataset.loaded='1';
   const frame=document.createElement('iframe');frame.title='Iklan sponsor';frame.loading='lazy';frame.width=String(width);frame.height=String(height);
   frame.referrerPolicy='strict-origin-when-cross-origin';
@@ -40,7 +45,7 @@ function mountAd(slot){
 }
 const adSlots=[...document.querySelectorAll('.task1-ad-mount')];
 if('IntersectionObserver' in window){
-  const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){mountAd(entry.target);observer.unobserve(entry.target);}}},{rootMargin:'320px 0px'});
+  const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){mountAd(entry.target);observer.unobserve(entry.target);}}},{rootMargin:'760px 0px'});
   adSlots.forEach(slot=>observer.observe(slot));
 }else adSlots.forEach(mountAd);
 
@@ -53,14 +58,20 @@ function countdown(seconds,{countId,statusId,label}={}){
 }
 function showSponsorGate(){
   return new Promise(resolve=>{
-    const gate=$('task2AdGate'),skip=$('task2AdSkip'),timer=$('task2AdTimer');
+    const gate=$('task2AdGate'),skip=$('task2AdSkip');
     if(!gate||!skip){resolve();return;}
-    if(gateTimer){clearInterval(gateTimer);gateTimer=null;}
-    gate.hidden=false;mountAd(gate.querySelector('.task1-ad-mount'));
-    let left=5;skip.disabled=true;skip.textContent=`Tunggu ${left} detik`;if(timer)timer.textContent=`Lewati tersedia dalam ${left} detik`;
-    const finish=()=>{if(skip.disabled)return;if(gateTimer)clearInterval(gateTimer);gateTimer=null;gate.hidden=true;skip.removeEventListener('click',finish);resolve();};
-    skip.addEventListener('click',finish);
-    gateTimer=setInterval(()=>{left=Math.max(0,left-1);if(timer)timer.textContent=left?`Lewati tersedia dalam ${left} detik`:'Iklan selesai';if(left){skip.textContent=`Tunggu ${left} detik`;}else{clearInterval(gateTimer);gateTimer=null;skip.disabled=false;skip.textContent='Lewati iklan';}},1000);
+    gate.hidden=false;
+    mountAd(gate.querySelector('.task1-ad-mount'));
+    // The 10-second verification loader has already finished. The user can
+    // continue only by pressing Skip; clicking the ad itself is never required.
+    skip.disabled=false;
+    skip.textContent='Lewati iklan';
+    const finish=()=>{
+      gate.hidden=true;
+      skip.removeEventListener('click',finish);
+      resolve();
+    };
+    skip.addEventListener('click',finish,{once:true});
   });
 }
 async function runBusy(button,work){
@@ -79,8 +90,8 @@ async function finishTask2Stages(){
 $('task2TopVerify')?.addEventListener('click',()=>runBusy($('task2TopVerify'),async()=>{
   hide('task2TopResult');reveal('task2TopLoader');
   await countdown(10,{countId:'task2TopCount',statusId:'task2TopStatus',label:'Verifikasi tahap pertama'});
-  if(index<7)await advance(7);
   await showSponsorGate();
+  if(index<7)await advance(7);
   hide('task2TopLoader');reveal('task2TopResult');
   setText('task2TopHint','Selesai. Tekan Scroll Down untuk menuju bagian bawah artikel.');
   status('Verifikasi tahap pertama selesai.');
@@ -96,18 +107,35 @@ $('task2UpDown')?.addEventListener('click',()=>{
 $('task2FinalVerify')?.addEventListener('click',()=>runBusy($('task2FinalVerify'),async()=>{
   hide('task2Task3Result');reveal('task2FinalLoader');
   if(index<8){
-    await countdown(5,{countId:'task2FinalCount',statusId:'task2FinalStatus',label:'Memverifikasi Task 2'});
+    await countdown(10,{countId:'task2FinalCount',statusId:'task2FinalStatus',label:'Memverifikasi Task 2'});
+    await showSponsorGate();
     await advance(8);
   }
   await finishTask2Stages();hide('task2FinalLoader');
 }));
 $('task2GoTask3')?.addEventListener('click',()=>{if(busy||index!==12)return;location.assign('/task3.html?code='+encodeURIComponent(code));});
 
-// Floating sponsor banner appears once after 7 seconds and stays dismissed after close.
+// Recurring in-page slide panel: appears every 7 seconds, stays visible briefly,
+// and reuses the already-mounted ad iframe (no repeated ad-script injection).
 const slide=$('task2SlideAd');
-function showSlide(){if(!slide||!slide.hidden)return;slide.hidden=false;slide.classList.add('is-visible');mountAd(slide.querySelector('.task1-ad-mount'));}
-$('task2SlideClose')?.addEventListener('click',()=>{if(!slide)return;slide.classList.remove('is-visible');slide.hidden=true;});
-if(slide)setTimeout(showSlide,7000);
+let slideHideTimer=null;
+function hideSlide(){
+  if(!slide||slide.hidden)return;
+  slide.classList.remove('is-visible');
+  if(slideHideTimer)clearTimeout(slideHideTimer);
+  slideHideTimer=setTimeout(()=>{slide.hidden=true;},350);
+}
+function showSlide(){
+  if(!slide||!slide.hidden)return;
+  slide.hidden=false;
+  requestAnimationFrame(()=>slide.classList.add('is-visible'));
+  // The iframe is mounted only once. Re-showing it does not create a new ad impression.
+  mountAd(slide.querySelector('.task1-ad-mount'));
+  if(slideHideTimer)clearTimeout(slideHideTimer);
+  slideHideTimer=setTimeout(hideSlide,5000);
+}
+$('task2SlideClose')?.addEventListener('click',hideSlide);
+if(slide)setTimeout(()=>{showSlide();setInterval(showSlide,7000);},7000);
 
 // Restore session and bridge older Task 1 sessions (three-stage versions) to Task 2's stage 7.
 (async()=>{
