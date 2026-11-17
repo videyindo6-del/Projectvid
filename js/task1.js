@@ -5,119 +5,184 @@ let saved=null;
 try{saved=JSON.parse(sessionStorage.getItem('al_session')||'null')}catch{}
 if(!saved||saved.code!==code){location.replace('/x/'+encodeURIComponent(code));return;}
 
-let index=0,busy=false;
-const advance=async()=>{
-  const next=index+1;
+let stageIndex=0,busy=false;
+const sponsorUrl='https://www.profitableratecpmnetwork.com/vw721j6q?key=e997cbbb9bbee0de7820bd0c98fc8351';
+const setStatus=(id,message)=>{const el=$(id);if(el)el.textContent=message;};
+const reveal=id=>{const el=$(id);if(el)el.hidden=false;};
+const scrollTo=id=>$(id)?.scrollIntoView({behavior:'smooth',block:'center'});
+
+async function advanceStage(){
+  const next=stageIndex+1;
   const response=await fetch('/api/autolink?action=advance',{
     method:'POST',headers:{'content-type':'application/json'},
     body:JSON.stringify({session_id:saved.id,token:saved.token,next_index:next})
   });
   let data={};try{data=await response.json()}catch{}
-  if(!response.ok)throw Error(data.error||'Tahap belum terverifikasi. Silakan coba lagi.');
-  index=next;return data;
-};
-const scrollTo=id=>$(id)?.scrollIntoView({behavior:'smooth',block:'center'});
-const status=(id,message)=>{const node=$(id);if(node)node.textContent=message;};
+  if(!response.ok)throw new Error(data.error||'Tahap belum dapat diverifikasi. Silakan coba lagi.');
+  stageIndex=next;return data;
+}
 
-// Sponsor interstitial: a visible 320x50 banner for five seconds after each completed stage.
-// It does not open tabs, simulate clicks, or claim that an ad click is required.
-let sponsorTimer=null;
-const showSponsorForFiveSeconds=()=>new Promise(resolve=>{
-  const gate=$('task1AdGate');
-  const timer=$('task1AdTimer');
-  if(!gate){resolve();return;}
-  gate.hidden=false;
-  let remaining=5;
-  if(timer)timer.textContent=`Sponsor · ${remaining} detik`;
-  sponsorTimer=setInterval(()=>{
-    remaining-=1;
-    if(timer)timer.textContent=remaining>0?`Sponsor · ${remaining} detik`:'Sponsor selesai';
-    if(remaining<=0){clearInterval(sponsorTimer);sponsorTimer=null;gate.hidden=true;resolve();}
-  },1000);
-});
+/* Each banner runs in its own iframe document so repeated atOptions keys cannot overwrite one another. */
+function mountAd(slot){
+  if(!slot||slot.dataset.loaded==='1')return;
+  const key=slot.dataset.adKey, width=Number(slot.dataset.adWidth), height=Number(slot.dataset.adHeight);
+  if(!key||!width||!height)return;
+  slot.dataset.loaded='1';
+  const frame=document.createElement('iframe');
+  frame.title='Iklan sponsor';
+  frame.loading='lazy';
+  frame.referrerPolicy='strict-origin-when-cross-origin';
+  frame.width=String(width);frame.height=String(height);
+  frame.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox');
+  frame.style.cssText=`display:block;border:0;width:${width}px;height:${height}px;max-width:100%;margin:0 auto;`;
+  const scriptUrl=`https://www.highrevenueformat.com/${encodeURIComponent(key)}/invoke.js`;
+  const doc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;overflow:hidden;">'
+    +'<script>var atOptions={'+`'key':'${key}','format':'iframe','height':${height},'width':${width},'params':{}`+'};<\/script>'
+    +'<script src="'+scriptUrl+'"><\/script></body></html>';
+  frame.srcdoc=doc;
+  slot.replaceChildren(frame);
+}
+const adSlots=[...document.querySelectorAll('.task1-ad-mount')];
+if('IntersectionObserver' in window){
+  const observer=new IntersectionObserver(entries=>{
+    for(const entry of entries)if(entry.isIntersecting){mountAd(entry.target);observer.unobserve(entry.target);}
+  },{rootMargin:'300px 0px'});
+  adSlots.forEach(slot=>observer.observe(slot));
+}else adSlots.forEach(mountAd);
 
-const runCountdown=async({seconds,startId,progressId,countId,barId,statusId,onDone})=>{
-  if(busy)return;
-  busy=true;
-  const start=$(startId),progress=$(progressId),count=$(countId),bar=$(barId);
-  if(start)start.disabled=true;
+/* The five-second sponsor interstitial appears after every completed 10-second stage.
+   The continue control becomes active after five seconds; an ad click is never required. */
+let gateTimer=null;
+function showSponsorGate(){
+  return new Promise(resolve=>{
+    const gate=$('task1AdGate'),timer=$('task1AdTimer'),skip=$('task1AdSkip');
+    if(!gate||!skip){resolve();return;}
+    if(gateTimer){clearInterval(gateTimer);gateTimer=null;}
+    gate.hidden=false;
+    const mount=gate.querySelector('.task1-ad-mount');mountAd(mount);
+    let remaining=5;
+    if(timer)timer.textContent=`Lewati tersedia dalam ${remaining} detik`;
+    skip.disabled=true;skip.textContent=`Tunggu ${remaining} detik`;
+    const finish=()=>{
+      if(gateTimer){clearInterval(gateTimer);gateTimer=null;}
+      gate.hidden=true;skip.removeEventListener('click',finish);resolve();
+    };
+    skip.addEventListener('click',finish,{once:true});
+    gateTimer=setInterval(()=>{
+      remaining=Math.max(0,remaining-1);
+      if(timer)timer.textContent=remaining?`Lewati tersedia dalam ${remaining} detik`:'Iklan selesai';
+      if(remaining){skip.textContent=`Tunggu ${remaining} detik`;}
+      else{clearInterval(gateTimer);gateTimer=null;skip.disabled=false;skip.textContent='Lewati iklan';}
+    },1000);
+  });
+}
+
+function runTimer({seconds,progressId,countId,barId,statusId,onTick}){
+  const progress=$(progressId),count=$(countId),bar=$(barId);
   if(progress)progress.hidden=false;
   let remaining=seconds;
   const paint=()=>{
+    const percent=((seconds-remaining)/seconds)*100;
     if(count)count.textContent=String(remaining);
-    if(bar)bar.style.width=((seconds-remaining)/seconds*100)+'%';
-    status(statusId,`Memproses… ${remaining} detik`);
+    if(bar)bar.style.width=percent+'%';
+    const ring=progress?.querySelector('.task1-spinner');
+    if(ring)ring.style.setProperty('--task-progress',percent+'%');
+    setStatus(statusId,`Memproses… ${remaining} detik`);
+    if(onTick)onTick(remaining,percent);
   };
   paint();
-  await new Promise(resolve=>{
+  return new Promise(resolve=>{
     const clock=setInterval(()=>{
       remaining=Math.max(0,remaining-1);paint();
-      if(remaining===0){clearInterval(clock);resolve();}
+      if(remaining===0){
+        clearInterval(clock);
+        if(progress)progress.hidden=true;
+        resolve();
+      }
     },1000);
   });
-  if(bar)bar.style.width='100%';
-  if(progress)progress.hidden=true;
+}
+
+async function runStage({startId,progressId,countId,barId,statusId,onDone}){
+  if(busy)return;
+  const start=$(startId);busy=true;if(start)start.disabled=true;
   try{
-    await advance();
-    await showSponsorForFiveSeconds();
+    await runTimer({seconds:10,progressId,countId,barId,statusId});
+    await advanceStage();
+    await showSponsorGate();
     await onDone();
     if(start)start.disabled=true;
   }catch(error){
     if(start)start.disabled=false;
-    status(statusId,error.message||'Terjadi kendala. Silakan coba lagi.');
+    setStatus(statusId,error?.message||'Terjadi kendala. Silakan coba lagi.');
   }finally{busy=false;}
-};
+}
 
-$('task1TopStart')?.addEventListener('click',()=>runCountdown({
-  seconds:10,startId:'task1TopStart',progressId:'task1TopProgress',
-  countId:'task1TopCountdown',barId:'task1TopBar',statusId:'task1TopStatus',
-  onDone:async()=>{
-    $('task1TopResult').hidden=false;
-    status('task1TopStatus','Tahap pertama selesai. Tekan Lanjutkan untuk membuka tahap berikutnya.');
-  }
+$('task1TopStart')?.addEventListener('click',()=>runStage({
+  startId:'task1TopStart',progressId:'task1TopProgress',countId:'task1TopCountdown',
+  barId:'task1TopBar',statusId:'task1TopStatus',
+  onDone:async()=>{reveal('task1TopResult');setStatus('task1TopStatus','Tahap pertama selesai. Tekan Lanjutkan untuk turun ke tahap berikutnya.');}
 }));
 $('task1TopNext')?.addEventListener('click',()=>{
-  const lower=$('task1LowerTask');
-  if(lower)lower.hidden=false;
-  scrollTo('task1LowerTask');
+  if(busy)return;reveal('task1LowerTask');scrollTo('task1LowerTask');
 });
-$('task1LowerStart')?.addEventListener('click',()=>runCountdown({
-  seconds:10,startId:'task1LowerStart',progressId:'task1LowerProgress',
-  countId:'task1LowerCountdown',barId:'task1LowerBar',statusId:'task1LowerStatus',
-  onDone:async()=>{
-    const middle=$('task1MiddleTask');
-    if(middle)middle.hidden=false;
-    status('task1LowerStatus','Selesai. Tahap verifikasi sudah terbuka di bawah.');
-    scrollTo('task1MiddleTask');
-  }
+$('task1LowerStart')?.addEventListener('click',()=>runStage({
+  startId:'task1LowerStart',progressId:'task1LowerProgress',countId:'task1LowerCountdown',
+  barId:'task1LowerBar',statusId:'task1LowerStatus',
+  onDone:async()=>{reveal('task1LowerResult');setStatus('task1LowerStatus','Tahap kedua selesai. Lanjutkan ke verifikasi di bagian tengah.');}
 }));
-$('task1MiddleStart')?.addEventListener('click',()=>runCountdown({
-  seconds:5,startId:'task1MiddleStart',progressId:'task1MiddleProgress',
-  countId:'task1MiddleCountdown',barId:'task1MiddleBar',statusId:'task1MiddleStatus',
-  onDone:async()=>{
-    $('task1Task2Wrap').hidden=false;
-    status('task1MiddleStatus','Verifikasi selesai. Tombol GO ke Task 2 sudah tersedia.');
-  }
+$('task1LowerNext')?.addEventListener('click',()=>{
+  if(busy)return;reveal('task1MiddleTask');scrollTo('task1MiddleTask');
+});
+$('task1MiddleStart')?.addEventListener('click',()=>runStage({
+  startId:'task1MiddleStart',progressId:'task1MiddleProgress',countId:'task1MiddleCountdown',
+  barId:'task1MiddleBar',statusId:'task1MiddleStatus',
+  onDone:async()=>{reveal('task1RobotWrap');setStatus('task1MiddleStatus','Waktu selesai. Centang verifikasi untuk melanjutkan.');}
 }));
+
+$('task1RobotCheck')?.addEventListener('change',async event=>{
+  const check=event.currentTarget;
+  if(!check.checked||busy)return;
+  busy=true;check.disabled=true;
+  try{
+    const progress=$('task1VerifyProgress');if(progress)progress.hidden=false;
+    await runTimer({seconds:5,progressId:'task1VerifyProgress',countId:'task1VerifyCountdown',
+      barId:'task1VerifyBar',statusId:'task1RobotStatus'});
+    reveal('task1Task2Wrap');
+    setStatus('task1RobotStatus','Verifikasi selesai. Tombol GO sudah tersedia.');
+  }catch(error){
+    check.checked=false;check.disabled=false;
+    setStatus('task1RobotStatus',error?.message||'Verifikasi gagal. Coba lagi.');
+  }finally{busy=false;}
+});
+
 const task2Link=$('task1Task2Link');
 if(task2Link){
   task2Link.href='/task2.html?code='+encodeURIComponent(code);
   task2Link.addEventListener('click',event=>{if(busy)event.preventDefault();});
 }
 
-// Slide/native Adsterra unit: stays visible until manually dismissed, then may return after 12s.
+/* Load the native slide unit only after its panel is visible. It remains until the user closes it;
+   after closing, it is shown again 12 seconds later. */
 const slide=$('task1SlideAd');
-let slideDismissedAt=0;
-const showSlide=()=>{
+let slideDismissedAt=0,slideLoaded=false;
+function loadSlideUnit(){
+  if(slideLoaded)return;slideLoaded=true;
+  const container=$('container-d0c4535d3914ad4b2c4e09c4aa337646');
+  if(!container)return;
+  const script=document.createElement('script');
+  script.async=true;script.dataset.cfasync='false';
+  script.src='https://pl32231888.profitableratecpmnetwork.com/d0c4535d3914ad4b2c4e09c4aa337646/invoke.js';
+  container.before(script);
+}
+function showSlide(){
   if(!slide||!slide.hidden)return;
-  slide.hidden=false;
-  slide.classList.add('is-visible');
-};
+  slide.hidden=false;slide.classList.add('is-visible');
+  loadSlideUnit();
+}
 $('task1SlideClose')?.addEventListener('click',()=>{
   if(!slide)return;
-  slide.classList.remove('is-visible');
-  slide.hidden=true;
-  slideDismissedAt=Date.now();
+  slide.classList.remove('is-visible');slide.hidden=true;slideDismissedAt=Date.now();
 });
 if(slide){
   setTimeout(showSlide,12000);
@@ -125,6 +190,4 @@ if(slide){
     if(slide.hidden&&slideDismissedAt&&Date.now()-slideDismissedAt>=12000)showSlide();
   },1000);
 }
-
-// No forced popunder windows. The sponsor prompt above is shown only after a user-started stage.
 })();
