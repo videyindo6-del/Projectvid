@@ -203,3 +203,46 @@
  .task2-direct-toast{top:auto;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));width:calc(100vw - 24px);padding:15px;border-radius:17px}
 }
 @media(prefers-reduced-motion:reduce){.task2-direct-toast{transition:none}}
+
+
+/* Task 2 repair: clean ad-only surfaces and keep the direct-access toast above mobile navigation. */
+.task2-page .task1-ad-label,
+.task2-page .task1-inline-ad > .task1-ad-label,
+.task2-page .task2-native-ad-label,
+.task2-page .task2-ad-gate-head > span:first-child,
+.task2-page .task2-slide-ad .task1-overlay-ad-head > span {
+  display:none!important;
+}
+.task2-page .task2-ad-gate-head {
+  justify-content:flex-end!important;
+  min-height:18px;
+}
+.task2-page .task2-slide-ad .task1-overlay-ad-head {
+  display:flex!important;
+  justify-content:flex-end!important;
+  min-height:28px;
+  margin:0!important;
+  padding:0!important;
+}
+.task2-page .task2-slide-ad {
+  padding:6px!important;
+}
+.task2-page .task2-slide-ad-slot {
+  margin:0!important;
+  padding:0!important;
+}
+.task2-page .task2-direct-toast {
+  z-index:99999!important;
+}
+@media(max-width:680px) {
+  .task2-page .task2-direct-toast {
+    top:auto!important;
+    right:12px!important;
+    bottom:calc(92px + env(safe-area-inset-bottom, 0px))!important;
+    left:12px!important;
+    width:auto!important;
+    max-width:480px;
+    margin-left:auto;
+    padding:14px!important;
+  }
+}
