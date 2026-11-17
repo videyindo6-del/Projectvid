@@ -62,13 +62,21 @@ export async function onRequest({request,env}) {
 
    return json({success:true,session_id:sessions[0].id,token,progress_index:startIndex,vip});
   }
+  if(action==='status'){
+   const sid=String(body.session_id||''),token=String(body.token||'');
+   if(!/^[0-9a-f-]{36}$/i.test(sid)||!token)return json({error:'Sesi tidak valid'},400);
+   const rows=await db(env,`autolink_sessions?select=id,progress_index,expires_at&id=eq.${encodeURIComponent(sid)}&token_hash=eq.${await hash(token)}&limit=1`);
+   const s=rows?.[0];
+   if(!s||Date.parse(s.expires_at)<Date.now())return json({error:'Sesi tidak valid atau kedaluwarsa'},401);
+   return json({success:true,progress_index:Number(s.progress_index||0),expires_at:s.expires_at});
+  }
   if(action==='advance'){
    const sid=String(body.session_id||''),token=String(body.token||''),next=Number(body.next_index);
    if(!sid||!token||!Number.isInteger(next)||next<1||next>16)return json({error:'Tahap tidak valid'},400);
    const rows=await db(env,`autolink_sessions?select=id,progress_index,stage_started_at,expires_at& id=eq.${sid}&token_hash=eq.${await hash(token)}&limit=1`.replace('& id=','&id='));
    const s=rows?.[0];if(!s||Date.parse(s.expires_at)<Date.now())return json({error:'Sesi tidak valid atau kedaluwarsa'},401);
    if(next!==Number(s.progress_index)+1)return json({error:'Urutan tahapan tidak valid'},409);
-   const min=[0,10,5,10,0,5,0,10,5,5,0,5,0,10,10,10,10][next]||0;
+   const min=[0,10,5,10,0,5,0,10,5,0,0,0,0,10,10,10,10][next]||0;
    const elapsed=(Date.now()-Date.parse(s.stage_started_at))/1000;
    if(elapsed<min)return json({error:`Tunggu ${Math.ceil(min-elapsed)} detik lagi`},429);
    await db(env,`autolink_sessions?id=eq.${sid}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({progress_index:next,stage_started_at:new Date().toISOString()})});
