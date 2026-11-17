@@ -280,3 +280,13 @@
 .task2-wa-float{position:fixed;z-index:100700;right:16px;top:50%;transform:translateY(-50%);width:54px;height:54px;border:0;border-radius:50%;background:#16a34a;color:#fff;font-size:29px;box-shadow:0 12px 30px rgba(22,163,74,.35);display:grid;place-items:center;animation:task2-wa-bob 2.5s ease-in-out infinite}
 @keyframes task2-wa-bob{0%,100%{transform:translateY(-50%)}50%{transform:translateY(calc(-50% - 5px))}}
 @media(max-width:600px){.task2-direct-toast{top:calc(env(safe-area-inset-top,0px) + 68px)!important;right:10px!important;width:min(350px,calc(100vw - 20px))!important}.task2-slide-ad{right:8px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 86px)!important}.task2-wa-dialog{right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 84px)}.task2-wa-float{right:12px;width:50px;height:50px}}
+
+/* Task 2 staged verification — consistent premium interaction states */
+.task2-action-area,.task2-middle-card{border:1px solid rgba(148,163,184,.22);border-radius:20px;background:linear-gradient(145deg,#fff 0%,#f7faff 100%);box-shadow:0 16px 40px rgba(24,54,88,.08);padding:clamp(18px,3vw,26px);margin:22px auto}
+.task2-loader{margin:18px auto 8px;padding:18px;border:1px solid rgba(59,130,246,.16);border-radius:16px;background:#f5f9ff;max-width:360px}
+.task2-loader p{font-size:13px;font-weight:700;color:#31577d;letter-spacing:.01em}
+.task2-task-actions,.task1-task-actions{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
+.task2-page .task1-mini-btn{transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
+.task2-page .task1-mini-btn:not(:disabled):active{transform:translateY(1px) scale(.98)}
+.task2-page .task1-mini-btn:disabled{opacity:.58;cursor:wait;filter:saturate(.7)}
+@media(max-width:680px){.task2-action-area,.task2-middle-card{margin:18px 4px;padding:17px 13px;border-radius:17px}.task2-page .task1-task-actions>*{flex:1 1 100%;justify-content:center}}
