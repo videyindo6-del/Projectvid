@@ -1,2 +1,93 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Task 3 — BoxCellink</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"><link rel="stylesheet" href="/css/task3.css">
-</head><body><div data-component="navbar"></div><main class="al-page"><div class="al-wrap" style="max-width:760px"><header class="al-head"><div><span class="al-kicker">AutoLink · Task 3</span><h1>Konfirmasi Tahap Akses</h1><p>Selesaikan tiga tahapan berikut. Jangan tutup halaman selama proses berlangsung.</p></div></header><div class="al-endorse" data-ads-slot="task3_video">Slot iklan video</div><div class="al-endorse" data-ads-slot="social_bar">Social bar</div><section class="al-card al-center"><div class="al-stat-icon" style="margin:0 auto 12px"><i class="fa-solid fa-circle-play"></i></div><h2 id="alTask3Title">Tahap 1 dari 3</h2><p id="alTask3Text" style="color:var(--al-muted)">Persiapkan halaman untuk tahap berikutnya.</p><div class="al-progress"><span id="alTask3Progress" style="width:0%"></span></div><button class="al-btn full" id="alTask3Button">Mulai Tahap 1</button><p id="alTask3Status" class="al-loading"></p></section></div></main><div data-component="footer"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/components.js"></script><script src="/js/task3.js"></script><script src="/js/page-i18n.js"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Task 3 AutoLink BoxCellink: verifikasi, reaction, dan penyelesaian akses.">
+<title>Task 3 — Verifikasi AutoLink | BoxCellink</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"><link rel="stylesheet" href="/css/task3.css">
+</head>
+<body>
+<div data-component="navbar"></div>
+<main class="al-page task3-page">
+ <div class="al-wrap task3-wrap">
+  <header class="al-head task3-head">
+   <div><span class="al-kicker">BOXCELLINK · AUTOLINK · TASK 3</span><h1>Selesaikan tahapan akses</h1><p>Ikuti tiga langkah berikut untuk menyelesaikan proses AutoLink.</p></div>
+   <div class="task3-secure"><i class="fa-solid fa-shield-halved"></i><span>Proses aman dan bertahap</span></div>
+  </header>
+
+  <section class="task3-stepper" aria-label="Tahapan Task 3">
+   <div class="task3-step is-active" id="stepper1"><span class="task3-step-number" id="stepIcon1">1</span><span><b>Verifikasi</b><small>Pemeriksaan awal</small></span></div>
+   <span class="task3-step-line" id="stepLine1"></span>
+   <div class="task3-step" id="stepper2"><span class="task3-step-number" id="stepIcon2">2</span><span><b>Reaction</b><small>Pemeriksaan lanjutan</small></span></div>
+   <span class="task3-step-line" id="stepLine2"></span>
+   <div class="task3-step" id="stepper3"><span class="task3-step-number" id="stepIcon3">3</span><span><b>Done</b><small>Selesaikan akses</small></span></div>
+  </section>
+
+  <section class="al-card task3-panel" id="task3Panel1">
+   <div class="task3-panel-icon blue"><i class="fa-solid fa-shield-halved"></i></div>
+   <div class="task3-panel-heading"><span class="task3-eyebrow">LANGKAH 1</span><h2>Verifikasi</h2><p>Jalankan pemeriksaan selama 10 detik. Tidak perlu mengklik iklan untuk menyelesaikan verifikasi.</p></div>
+   <a class="task3-sponsor-link" href="https://www.profitableratecpmnetwork.com/vw721j6q?key=e997cbbb9bbee0de7820bd0c98fc8351" target="_blank" rel="nofollow sponsored noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Kunjungi Sponsor <small>Opsional</small></a>
+   <button class="al-btn full task3-primary" id="task3VerifyStart" type="button"><i class="fa-solid fa-circle-check"></i> Mulai Verifikasi</button>
+   <div class="task3-loader" id="task3VerifyLoader" hidden><span class="task3-spinner"></span><div><strong id="task3VerifyCount">10</strong><small>detik</small></div><p id="task3VerifyText">Mengecek tahap...</p><div class="task3-track"><span id="task3VerifyBar"></span></div></div>
+   <div class="task3-success" id="task3VerifySuccess" hidden><i class="fa-solid fa-circle-check"></i><span>Verifikasi selesai</span></div>
+   <p class="task3-status" id="task3VerifyStatus" aria-live="polite">Siap memulai pemeriksaan.</p>
+  </section>
+
+  <section class="al-card task3-panel is-locked" id="task3Panel2">
+   <div class="task3-panel-icon violet"><i class="fa-solid fa-robot"></i></div>
+   <div class="task3-panel-heading"><span class="task3-eyebrow">LANGKAH 2</span><h2>Reaction</h2><p>Jalankan pemeriksaan singkat, lalu lewati tampilan sponsor setelah hitung mundur selesai.</p></div>
+   <button class="al-btn full task3-primary" id="task3RobotStart" type="button" disabled><i class="fa-solid fa-user-check"></i> Cek Saya Bukan Robot</button>
+   <div class="task3-loader" id="task3RobotLoader" hidden><span class="task3-spinner"></span><div><strong id="task3RobotCount">5</strong><small>detik</small></div><p id="task3RobotText">Memeriksa aktivitas...</p><div class="task3-track"><span id="task3RobotBar"></span></div></div>
+   <div class="task3-success" id="task3ReactionSuccess" hidden><i class="fa-solid fa-circle-check"></i><span>Reaction selesai</span></div>
+   <p class="task3-status" id="task3RobotStatus" aria-live="polite">Selesaikan Langkah 1 terlebih dahulu.</p>
+  </section>
+
+  <section class="al-card task3-panel is-locked" id="task3Panel3">
+   <div class="task3-panel-icon green"><i class="fa-solid fa-flag-checkered"></i></div>
+   <div class="task3-panel-heading"><span class="task3-eyebrow">LANGKAH 3</span><h2>Done</h2><p>Buka tautan komunitas di bawah. Tombol Done aktif setelah kedua tautan dibuka. Membuka tautan tidak membuktikan keanggotaan grup.</p></div>
+   <div class="task3-check-list">
+    <a class="task3-check-row" id="task3Telegram" href="https://t.me/+7I3Xnl1PLdZjMTY0" target="_blank" rel="noopener noreferrer"><span class="task3-check-brand telegram"><i class="fa-brands fa-telegram"></i></span><span><b>Telegram</b><small id="task3TelegramLabel">Buka grup Telegram</small></span><i class="fa-solid fa-arrow-up-right-from-square task3-check-action" id="task3TelegramMark"></i></a>
+    <a class="task3-check-row" id="task3Whatsapp" href="https://whatsapp.com/channel/0029Vb8bHHqGZNCnJhHlma1c" target="_blank" rel="noopener noreferrer"><span class="task3-check-brand whatsapp"><i class="fa-brands fa-whatsapp"></i></span><span><b>WhatsApp</b><small id="task3WhatsappLabel">Buka saluran WhatsApp</small></span><i class="fa-solid fa-arrow-up-right-from-square task3-check-action" id="task3WhatsappMark"></i></a>
+   </div>
+   <div class="task3-sponsor-optional"><span><i class="fa-solid fa-rectangle-ad"></i> Sponsor opsional</span><a href="https://www.profitableratecpmnetwork.com/vw721j6q?key=e997cbbb9bbee0de7820bd0c98fc8351" target="_blank" rel="nofollow sponsored noopener">Lihat sponsor <i class="fa-solid fa-arrow-up-right-from-square"></i></a></div>
+   <button class="al-btn full task3-done" id="task3Done" type="button" disabled><i class="fa-solid fa-check-double"></i> Done</button>
+   <div class="task3-loader" id="task3DoneLoader" hidden><span class="task3-spinner"></span><div><strong id="task3DoneCount">10</strong><small>detik</small></div><p id="task3DoneText">Memvalidasi tahap akhir...</p><div class="task3-track"><span id="task3DoneBar"></span></div></div>
+   <p class="task3-status" id="task3DoneStatus" aria-live="polite">Selesaikan Langkah 2 dan buka kedua tautan komunitas.</p>
+  </section>
+
+  <div class="task3-footer-note" id="task3PageStatus" role="status" aria-live="polite">Memeriksa sesi AutoLink...</div>
+ </div>
+</main>
+
+<aside class="task3-slide-ad" id="task3SlideAd" hidden aria-label="Iklan sponsor">
+ <button class="task3-ad-close" id="task3SlideClose" type="button" aria-label="Tutup iklan">×</button>
+ <div class="task3-ad-label">Iklan</div><div id="task3SlideMount" class="task3-ad-mount"></div>
+</aside>
+
+<aside class="task3-skip-overlay" id="task3SkipOverlay" hidden role="dialog" aria-modal="true" aria-label="Iklan sebelum melanjutkan">
+ <div class="task3-skip-card"><div class="task3-skip-head"><span><i class="fa-solid fa-rectangle-ad"></i> Iklan</span><span id="task3SkipCount">Lewati dalam 3 detik</span></div>
+ <div id="task3SkipMount" class="task3-skip-mount"></div>
+ <button class="al-btn full task3-primary" id="task3SkipButton" type="button" disabled>Lewati Iklan · 3</button>
+ </div>
+</aside>
+
+<aside class="task3-notice task3-telegram-notice" id="task3TelegramNotice" role="dialog" aria-labelledby="task3TelegramNoticeTitle" hidden>
+ <button class="task3-notice-close" id="task3TelegramNoticeClose" type="button" aria-label="Tutup">×</button>
+ <div class="task3-notice-icon telegram"><i class="fa-brands fa-telegram"></i></div><span class="task3-notice-kicker">UPDATE KOMUNITAS</span>
+ <h2 id="task3TelegramNoticeTitle">Gabung grup Telegram</h2><p>Dapatkan informasi dan update terbaru BoxCellink.</p>
+ <div class="task3-notice-actions"><a href="https://t.me/+7I3Xnl1PLdZjMTY0" target="_blank" rel="noopener noreferrer" id="task3TelegramNoticeJoin">Join</a><button id="task3TelegramNoticeDone" type="button">Done</button></div>
+</aside>
+<button class="task3-float-icon telegram" id="task3TelegramFloat" type="button" aria-label="Buka Telegram" hidden><i class="fa-brands fa-telegram"></i></button>
+
+<aside class="task3-notice task3-whatsapp-notice" id="task3WhatsappNotice" role="dialog" aria-labelledby="task3WhatsappNoticeTitle" hidden>
+ <button class="task3-notice-close" id="task3WhatsappNoticeClose" type="button" aria-label="Tutup">×</button>
+ <div class="task3-notice-icon whatsapp"><i class="fa-brands fa-whatsapp"></i></div><span class="task3-notice-kicker">UPDATE HARIAN</span>
+ <h2 id="task3WhatsappNoticeTitle">Gabung saluran WhatsApp</h2><p>Dapatkan update harian dan lebih banyak konten menarik.</p>
+ <div class="task3-notice-actions"><a href="https://whatsapp.com/channel/0029Vb8bHHqGZNCnJhHlma1c" target="_blank" rel="noopener noreferrer" id="task3WhatsappNoticeJoin">Join</a><button id="task3WhatsappNoticeDone" type="button">Done</button></div>
+</aside>
+<button class="task3-float-icon whatsapp" id="task3WhatsappFloat" type="button" aria-label="Buka WhatsApp" hidden><i class="fa-brands fa-whatsapp"></i></button>
+
+<div data-component="footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/components.js"></script><script src="/js/task3.js"></script><script src="/js/page-i18n.js"></script>
+</body></html>
