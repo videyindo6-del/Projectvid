@@ -45,7 +45,7 @@
         <button class="task2-btn task2-btn-quiet" id="task2AdSkip" type="button" disabled>Tunggu 5 detik</button>
       </div>
 
-      <section class="task2-content" id="task2LowerStage" hidden aria-labelledby="task2LowerTitle">
+      <section class="task2-content" id="task2LowerStage" aria-labelledby="task2LowerTitle">
         <div class="task2-stage-heading">
           <span class="task2-step">02</span>
           <div><h2 id="task2LowerTitle">Informasi Backlink & Website</h2><p>Baca ringkasan, lalu pilih tindakan yang ingin dilakukan.</p></div>
@@ -65,15 +65,15 @@
           <h3>Kesimpulan</h3>
           <p>Bangun backlink melalui publikasi berkualitas, hubungan profesional, dan konten yang layak direkomendasikan. Utamakan pengalaman pembaca serta patuhi ketentuan platform.</p>
         </article>
-        <div class="task2-action-area">
-          <div class="task2-action-copy"><strong>Simpan atau lanjutkan</strong><span>Download membuka halaman sponsor. Save menjalankan proses 20 detik.</span></div>
+        <div class="task2-action-area" id="task2ActionArea" hidden>
+          <div class="task2-action-copy"><strong>Simpan atau lanjutkan</strong><span>Download membuka halaman sponsor. Save menjalankan proses 10 detik.</span></div>
           <div class="task2-buttons">
             <button class="task2-btn task2-btn-red" id="task2Save" type="button"><i class="fa-solid fa-bookmark"></i> Save</button>
             <a class="task2-btn task2-btn-green" href="https://www.profitableratecpmnetwork.com/vw721j6q?key=e997cbbb9bbee0de7820bd0c98fc8351" target="_blank" rel="nofollow sponsored noopener"><i class="fa-solid fa-download"></i> Download</a>
           </div>
-          <div class="task2-linear-loader" id="task2SaveLoader" hidden>
-            <div class="task2-linear-track"><span id="task2SaveBar"></span></div>
-            <p id="task2SaveStatus">Menyiapkan penyimpanan… 20 detik</p>
+          <div class="task2-loader" id="task2SaveLoader" hidden>
+            <div class="task2-ring-wrap"><span class="task2-ring"></span><strong id="task2SaveCount">10</strong></div>
+            <p id="task2SaveStatus">Menyiapkan penyimpanan…</p>
           </div>
           <div class="task2-result" id="task2SaveResult" hidden>
             <button class="task2-btn task2-btn-green" id="task2NextToMiddle" type="button"><i class="fa-solid fa-arrow-up"></i> Next</button>
@@ -84,15 +84,22 @@
       <section class="task2-stage task2-middle" id="task2MiddleStage" hidden aria-labelledby="task2MiddleTitle">
         <div class="task2-stage-heading">
           <span class="task2-step">03</span>
-          <div><h2 id="task2MiddleTitle">Verifikasi akhir</h2><p>Verifikasi dilakukan satu kali. Tautan sponsor tersedia terpisah dan tidak wajib diklik.</p></div>
+          <div><h2 id="task2MiddleTitle">Verifikasi akhir</h2><p>Jalankan verifikasi untuk membuka akses ke Task 3. Tautan sponsor tersedia terpisah dan opsional.</p></div>
         </div>
         <div class="task2-buttons">
-          <a class="task2-btn task2-btn-sponsor" href="https://www.profitableratecpmnetwork.com/vw721j6q?key=e997cbbb9bbee0de7820bd0c98fc8351" target="_blank" rel="nofollow sponsored noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Kunjungi Sponsor</a>
+          <a class="task2-btn task2-btn-sponsor" href="https://www.profitableratecpmnetwork.com/vw721j6q?key=e997cbbb9bbee0de7820bd0c98fc8351" target="_blank" rel="nofollow sponsored noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Sponsor (opsional)</a>
           <button class="task2-btn task2-btn-red" id="task2FinalVerify" type="button"><i class="fa-solid fa-shield-halved"></i> Verifikasi</button>
         </div>
         <div class="task2-loader" id="task2FinalLoader" hidden aria-live="polite">
           <div class="task2-ring-wrap"><span class="task2-ring"></span><strong id="task2FinalCount">5</strong></div>
           <p id="task2FinalStatus">Memproses verifikasi…</p>
+        </div>
+        <div class="task2-result" id="task2FinalConfirm" hidden>
+          <label class="task2-confirm-label">
+            <input type="checkbox" id="task2FinalCheck">
+            <span>Saya mengonfirmasi proses verifikasi telah selesai.</span>
+          </label>
+          <p class="task2-confirm-hint" id="task2FinalCheckStatus">Centang untuk menyelesaikan validasi.</p>
         </div>
         <div class="task2-result" id="task2Task3Result" hidden>
           <button class="task2-btn task2-btn-green" id="task2GoTask3" type="button"><i class="fa-solid fa-arrow-right"></i> Next · Task 3</button>
