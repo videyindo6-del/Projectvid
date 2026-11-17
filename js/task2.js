@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id);
 const code=new URLSearchParams(location.search).get('code')||'';
 let saved=null;try{saved=JSON.parse(sessionStorage.getItem('al_session')||'null')}catch{}
 if(!saved||saved.code!==code){location.replace('/x/'+encodeURIComponent(code));return;}
-let busy=true,index=Number(saved.progress_index??0),gateTimer=null,slideDismissedAt=0;
+let busy=true,index=Number(saved.progress_index??0),gateTimer=null;
 const status=text=>{const el=$('task2PageStatus');if(el)el.textContent=text;};
 const setText=(id,text)=>{const el=$(id);if(el)el.textContent=text;};
 const reveal=id=>{const el=$(id);if(el)el.hidden=false;};
@@ -103,11 +103,11 @@ $('task2FinalVerify')?.addEventListener('click',()=>runBusy($('task2FinalVerify'
 }));
 $('task2GoTask3')?.addEventListener('click',()=>{if(busy||index!==12)return;location.assign('/task3.html?code='+encodeURIComponent(code));});
 
-// Slide banner: appears after 7 seconds and can be dismissed; it may return 7 seconds after dismissal.
+// Floating sponsor banner appears once after 7 seconds and stays dismissed after close.
 const slide=$('task2SlideAd');
 function showSlide(){if(!slide||!slide.hidden)return;slide.hidden=false;slide.classList.add('is-visible');mountAd(slide.querySelector('.task1-ad-mount'));}
-$('task2SlideClose')?.addEventListener('click',()=>{if(!slide)return;slide.classList.remove('is-visible');slide.hidden=true;slideDismissedAt=Date.now();});
-if(slide){setTimeout(showSlide,7000);setInterval(()=>{if(slide.hidden&&slideDismissedAt&&Date.now()-slideDismissedAt>=7000)showSlide();},500);}
+$('task2SlideClose')?.addEventListener('click',()=>{if(!slide)return;slide.classList.remove('is-visible');slide.hidden=true;});
+if(slide)setTimeout(showSlide,7000);
 
 // Restore session and bridge older Task 1 sessions (three-stage versions) to Task 2's stage 7.
 (async()=>{
