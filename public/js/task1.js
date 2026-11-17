@@ -175,4 +175,47 @@ $('task1SlideClose')?.addEventListener('click',()=>{
   slide.hidden=true;
 });
 if(slide)window.setTimeout(showSlide,7000);
+
+/* Floating AutoLink direct-access notice, matching the Task 2 presentation. */
+const directToast=$('task1DirectToast');
+if(directToast){
+  const directLink=$('task1DirectAccess');
+  if(directLink)directLink.href='/autolink-payment.html?code='+encodeURIComponent(code);
+  $('task1ToastClose')?.addEventListener('click',()=>{
+    directToast.dataset.dismissed='1';
+    directToast.classList.remove('is-visible');
+    window.setTimeout(()=>{directToast.hidden=true;},220);
+  });
+  window.setTimeout(()=>{
+    if(!directToast.dataset.dismissed){
+      directToast.hidden=false;
+      requestAnimationFrame(()=>directToast.classList.add('is-visible'));
+    }
+  },1400);
+}
+
+/* Telegram invitation: appears after 10 seconds, then becomes a floating shortcut when dismissed. */
+const telegramDialog=$('task1TelegramDialog');
+const telegramFloat=$('task1TelegramFloat');
+const telegramUrl='https://t.me/+7I3Xnl1PLdZjMTY0';
+function dismissTelegram(){
+  if(telegramDialog){
+    telegramDialog.classList.remove('is-visible');
+    window.setTimeout(()=>{telegramDialog.hidden=true;},220);
+  }
+  if(telegramFloat)telegramFloat.hidden=false;
+}
+if(telegramDialog){
+  window.setTimeout(()=>{
+    telegramDialog.hidden=false;
+    requestAnimationFrame(()=>telegramDialog.classList.add('is-visible'));
+  },10000);
+  $('task1TelegramOkay')?.addEventListener('click',dismissTelegram);
+  $('task1TelegramClose')?.addEventListener('click',dismissTelegram);
+  $('task1TelegramJoin')?.addEventListener('click',dismissTelegram);
+}
+telegramFloat?.addEventListener('click',()=>{
+  window.open(telegramUrl,'_blank','noopener,noreferrer');
+});
+
 })();
