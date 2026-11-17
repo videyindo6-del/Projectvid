@@ -130,3 +130,67 @@
 @media(prefers-reduced-motion:reduce){
   .task1-slide-ad,.task1-popunder-ad{transition:none}
 }
+
+/* Task 1 — compact, centered premium controls and seamless editorial layout */
+.task1-page .task1-opening-copy,
+.task1-page .task1-intro-card,
+.task1-page .task1-task-card,
+.task1-page .task1-long-article,
+.task1-page .task1-summary{
+  background:transparent!important;box-shadow:none!important;border:0!important;border-radius:0!important;
+}
+.task1-page .task1-opening-copy{max-width:900px;padding:14px 4px;margin:14px auto;color:var(--text,#334155)}
+.task1-page .task1-intro-card{padding:12px 0;margin:18px 0;border-top:1px solid rgba(148,163,184,.18);border-bottom:1px solid rgba(148,163,184,.18)}
+.task1-page .task1-long-article{padding:clamp(14px,2.2vw,22px) 4px;margin:0;border-bottom:1px solid rgba(148,163,184,.16);scroll-margin-top:90px}
+.task1-page .task1-article-heading h2{font-size:clamp(19px,2.7vw,25px)}
+.task1-page .task1-article-figure img{border-radius:12px}
+.task1-page .task1-article-points{background:rgba(16,185,129,.045);border-radius:10px}
+.task1-page .task1-task-card{max-width:760px;padding:15px 8px;margin:18px auto;text-align:center;border-top:1px solid rgba(148,163,184,.18)!important;border-bottom:1px solid rgba(148,163,184,.18)!important;scroll-margin-top:100px}
+.task1-page .task1-task-kicker{justify-content:center}
+.task1-page .task1-task-desc,.task1-page .task1-task-status{max-width:600px;margin:8px auto;text-align:center;font-size:12px}
+.task1-page .task1-task-actions,.task1-page .task1-reveal-actions{justify-content:center;align-items:center;margin:10px auto 4px}
+.task1-page .task1-mini-btn{min-height:32px;padding:7px 13px;border-radius:8px;font-size:12px;min-width:104px;flex:0 0 auto}
+.task1-page .task1-mini-blue{background:#2563eb;color:#fff!important}
+.task1-page .task1-mini-red{background:#e5484d;color:#fff!important}
+.task1-page .task1-mini-green{background:#059669;color:#fff!important}
+.task1-page .task1-task-progress{max-width:420px;margin:13px auto 7px;justify-content:center}
+.task1-page .task1-task-track{max-width:210px}
+.task1-page .task1-spinner{border-color:rgba(37,99,235,.2);border-top-color:#2563eb;border-right-color:#2563eb}
+.task1-page .task1-task-track span{background:linear-gradient(90deg,#2563eb,#60a5fa)}
+.task1-page [hidden]{display:none!important}
+
+/* Each article receives one of six rotating Adsterra banner formats; no white card wrapper. */
+.task1-banner-slot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:100%;max-width:100%;margin:8px auto 18px;padding:0;border:0;border-radius:0;background:transparent;overflow:visible}
+.task1-banner-slot .task1-ad-label{font-size:9px;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase}
+.task1-ad-frame{display:flex;align-items:center;justify-content:center;max-width:100%;overflow:hidden;margin:0 auto;min-height:0}
+.task1-ad-frame iframe{max-width:100%;border:0}
+.task1-ad-728x90{width:min(728px,100%);min-height:90px}
+.task1-ad-320x50{width:min(320px,100%);min-height:50px}
+.task1-ad-160x600{width:min(160px,100%);min-height:600px}
+.task1-ad-160x300{width:min(160px,100%);min-height:300px}
+.task1-ad-468x60{width:min(468px,100%);min-height:60px}
+.task1-ad-300x250{width:min(300px,100%);min-height:250px}
+
+/* Five-second sponsor interstitial is compact, transparent and not a white form. */
+.task1-ad-gate{position:fixed!important;inset:auto 12px 12px auto!important;z-index:10050!important;width:min(350px,calc(100vw - 24px))!important;margin:0!important;padding:12px!important;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,.94)!important;border:1px solid rgba(148,163,184,.28)!important;border-radius:12px!important;box-shadow:0 14px 42px rgba(0,0,0,.22)!important;backdrop-filter:blur(10px)}
+.task1-ad-gate[hidden]{display:none!important}
+.task1-ad-gate-card{width:100%;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;display:grid;justify-items:center;gap:8px}
+.task1-ad-gate-head{color:#e2e8f0}
+.task1-ad-gate-head span:first-child{color:#cbd5e1}
+.task1-ad-gate .task1-mini-btn{min-height:28px;padding:5px 10px}
+.task1-ad-320{width:320px;max-width:100%;min-height:50px;background:transparent}
+
+/* Native Adsterra slide panel: no timed auto-hide; only the close control dismisses it. */
+.task1-slide-ad{position:fixed;z-index:10020;right:10px;bottom:10px;width:min(350px,calc(100vw - 20px));padding:10px;border:1px solid rgba(148,163,184,.28);border-radius:12px;background:rgba(15,23,42,.96);color:#e2e8f0;box-shadow:0 16px 45px rgba(2,8,23,.25);transform:translate3d(0,120%,0);opacity:0;transition:transform .3s ease,opacity .3s ease}
+.task1-slide-ad[hidden]{display:none!important}
+.task1-slide-ad.is-visible{transform:translate3d(0,0,0);opacity:1}
+.task1-slide-ad .task1-overlay-ad-head{color:#e2e8f0}
+.task1-slide-ad .task1-overlay-close{background:#334155;color:#fff;width:26px;height:26px;font-size:18px}
+.task1-slide-native-slot{width:100%;min-height:60px;overflow:hidden;text-align:center}
+.task1-slide-native-slot #container-d0c4535d3914ad4b2c4e09c4aa337646{max-width:100%;overflow:hidden}
+@media(max-width:520px){
+ .task1-page .task1-task-actions{gap:8px}
+ .task1-page .task1-mini-btn{min-width:100px}
+ .task1-ad-gate{left:10px!important;right:10px!important;bottom:10px!important;width:auto!important}
+ .task1-slide-ad{left:10px;right:10px;bottom:10px;width:auto}
+}
