@@ -7,10 +7,18 @@ const directAccess=$('task2DirectAccess');if(directAccess)directAccess.href='/au
 const directToast=$('task2DirectToast');
 if(directToast){
   const toastClose=$('task2ToastClose');
-  toastClose?.addEventListener('click',()=>{directToast.classList.remove('is-visible');setTimeout(()=>{directToast.hidden=true;},220);});
+  toastClose?.addEventListener('click',()=>{
+    directToast.dataset.dismissed='1';
+    directToast.classList.remove('is-visible');
+    setTimeout(()=>{directToast.hidden=true;},220);
+  });
   // Show the optional direct-access notice shortly after entering Task 2.
-  setTimeout(()=>{if(!directToast.dataset.dismissed){directToast.hidden=false;requestAnimationFrame(()=>directToast.classList.add('is-visible'));}},1400);
-  toastClose?.addEventListener('click',()=>{directToast.dataset.dismissed='1';});
+  setTimeout(()=>{
+    if(!directToast.dataset.dismissed){
+      directToast.hidden=false;
+      requestAnimationFrame(()=>directToast.classList.add('is-visible'));
+    }
+  },1400);
 }
 let busy=true,index=Number(saved.progress_index??0);
 const status=text=>{const el=$('task2PageStatus');if(el)el.textContent=text;};
@@ -43,32 +51,29 @@ function mountAd(slot){
     if(width===728||width===468){key='e48004340d99ba399e04e57dd40239fa';width=320;height=50;}
   }
   slot.dataset.loaded='1';
-  const frame=document.createElement('iframe');frame.title='Iklan sponsor';frame.loading='lazy';frame.width=String(width);frame.height=String(height);
+  const frame=document.createElement('iframe');frame.title='Advertisement';frame.loading='lazy';frame.width=String(width);frame.height=String(height);
   frame.referrerPolicy='strict-origin-when-cross-origin';
-  frame.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox');
   frame.style.cssText=`display:block;border:0;width:min(100%,${width}px);height:${height}px;max-width:100%;margin:0 auto;background:transparent`;
   const src=`https://www.highrevenueformat.com/${encodeURIComponent(key)}/invoke.js`;
   frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;overflow:hidden"><script>var atOptions={'+`'key':'${key}','format':'iframe','height':${height},'width':${width},'params':{}`+'};<\/script><script src="'+src+'"><\/script></body></html>';
   slot.replaceChildren(frame);
 }
-// Popunder: trigger once on page entry, then retry every 10 seconds.
- // The provider/browser controls whether a popunder is actually displayed and how long it stays open.
- const task2PopunderScripts=[
-   'https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js',
-   'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js'
- ];
- function triggerTask2Popunder(){
-   task2PopunderScripts.forEach(src=>{
-     const script=document.createElement('script');
-     script.src=src;
-     script.async=true;
-     script.setAttribute('data-cfasync','false');
-     script.dataset.task2Popunder='1';
-     document.body.appendChild(script);
-   });
- }
- triggerTask2Popunder();
- const task2PopunderInterval=setInterval(triggerTask2Popunder,10000);
+// Popunder: initialize the supplied provider scripts once per Task 2 page load.
+// The ad provider and browser decide when a valid popunder can be shown; repeatedly
+// injecting the same scripts can cause duplicate requests and may be rejected.
+const task2PopunderScripts=[
+  'https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js',
+  'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js'
+];
+task2PopunderScripts.forEach((src,index)=>{
+  if(document.querySelector(`script[data-task2-popunder="${index}"]`))return;
+  const script=document.createElement('script');
+  script.src=src;
+  script.async=true;
+  script.setAttribute('data-cfasync','false');
+  script.dataset.task2Popunder=String(index);
+  document.body.appendChild(script);
+});
 
  const adSlots=[...document.querySelectorAll('.task1-ad-mount')];
 if('IntersectionObserver' in window){
