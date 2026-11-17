@@ -246,3 +246,37 @@
     padding:14px!important;
   }
 }
+
+
+/* Task 2: clean editorial image and ad interstitials */
+.task2-article-figure{margin:16px 0 20px;border-radius:16px;overflow:hidden;background:#eef2f7;aspect-ratio:16/7}
+.task2-article-figure img{display:block;width:100%;height:100%;object-fit:cover}
+.task2-between-ad{display:flex;flex-direction:column;align-items:center;gap:12px;margin:22px auto;padding:18px 14px;max-width:760px;border:1px solid #e5eaf1;border-radius:18px;background:linear-gradient(145deg,#fff,#f7f9fc);box-shadow:0 12px 32px rgba(15,23,42,.06)}
+.task2-between-ad-label{font-size:10px;letter-spacing:.16em;font-weight:800;color:#8491a5}
+.task2-between-ad-mount{display:flex;align-items:center;justify-content:center;width:100%;min-height:60px;overflow:hidden}
+.task2-sponsor-visit{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:#172b4d;color:#fff!important;text-decoration:none!important;font-size:13px;font-weight:750;box-shadow:0 5px 14px rgba(23,43,77,.16)}
+/* Slide stays until X is pressed. */
+.task2-slide-ad[hidden]{display:none!important}
+.task2-slide-ad{position:fixed!important;z-index:100500!important;right:14px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 92px)!important;top:auto!important;width:160px!important;min-height:300px!important;padding:0!important;border-radius:12px!important;overflow:visible!important;background:transparent!important;box-shadow:0 12px 38px rgba(15,23,42,.25)!important}
+.task2-slide-ad .task2-slide-ad-slot{width:160px;height:300px;background:#fff;border-radius:10px;overflow:hidden}
+.task2-slide-ad .task1-overlay-close{position:absolute;right:-10px;top:-12px;z-index:3;width:30px;height:30px;border:2px solid #fff;border-radius:50%;background:#172033;color:#fff;font-size:20px;line-height:1;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+/* Raise the priority access card well above fixed bottom navigation. */
+.task2-direct-toast{top:calc(env(safe-area-inset-top,0px) + 78px)!important;bottom:auto!important;z-index:100600!important}
+.task2-toast-action{animation:task2-cta-pulse 2.2s ease-in-out infinite;transform-origin:center}
+@keyframes task2-cta-pulse{0%,100%{transform:translateY(0)}8%{transform:translateY(-2px)}16%{transform:translateY(1px)}24%{transform:translateY(-1px)}32%{transform:translateY(0)} }
+/* WhatsApp invitation and floating shortcut */
+.task2-wa-dialog[hidden],.task2-wa-float[hidden]{display:none!important}
+.task2-wa-dialog{position:fixed;z-index:100700;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 92px);width:min(360px,calc(100vw - 32px));box-sizing:border-box;padding:22px;border:1px solid rgba(255,255,255,.65);border-radius:24px;background:linear-gradient(145deg,#fff 0%,#f3fbf6 100%);color:#172033;box-shadow:0 24px 70px rgba(15,23,42,.24);opacity:0;transform:translateY(12px) scale(.98);transition:opacity .22s ease,transform .22s ease;font-family:inherit}
+.task2-wa-dialog.is-visible{opacity:1;transform:translateY(0) scale(1)}
+.task2-wa-close{position:absolute;right:12px;top:12px;width:30px;height:30px;border:0;border-radius:50%;background:#edf2f5;color:#334155;font-size:20px}
+.task2-wa-mark{width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#dcfce7;color:#16a34a;font-size:27px;margin-bottom:12px}
+.task2-wa-eyebrow{font-size:10px;letter-spacing:.15em;font-weight:850;color:#16a34a}
+.task2-wa-dialog h2{margin:6px 0 8px;font-size:20px;line-height:1.2}
+.task2-wa-dialog p{margin:0;color:#64748b;font-size:13px;line-height:1.6}
+.task2-wa-actions{display:flex;gap:9px;margin-top:18px}
+.task2-wa-actions a,.task2-wa-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 15px;border:0;border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;text-decoration:none}
+.task2-wa-actions a{flex:1;background:#16a34a;color:#fff}
+.task2-wa-actions button{background:#edf2f5;color:#334155}
+.task2-wa-float{position:fixed;z-index:100700;right:16px;top:50%;transform:translateY(-50%);width:54px;height:54px;border:0;border-radius:50%;background:#16a34a;color:#fff;font-size:29px;box-shadow:0 12px 30px rgba(22,163,74,.35);display:grid;place-items:center;animation:task2-wa-bob 2.5s ease-in-out infinite}
+@keyframes task2-wa-bob{0%,100%{transform:translateY(-50%)}50%{transform:translateY(calc(-50% - 5px))}}
+@media(max-width:600px){.task2-direct-toast{top:calc(env(safe-area-inset-top,0px) + 68px)!important;right:10px!important;width:min(350px,calc(100vw - 20px))!important}.task2-slide-ad{right:8px!important;bottom:calc(env(safe-area-inset-bottom,0px) + 86px)!important}.task2-wa-dialog{right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 84px)}.task2-wa-float{right:12px;width:50px;height:50px}}
