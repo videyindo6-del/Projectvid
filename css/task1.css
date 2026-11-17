@@ -243,3 +243,8 @@
 .task1-page .task1-slide-ad{width:min(510px,calc(100vw - 28px))}
 .task1-page .task1-slide-ad .task1-overlay-ad-content{justify-content:center}
 .task1-page .task1-slide-ad .task1-slide-native-slot{width:468px;max-width:100%;min-height:60px;display:flex;align-items:center;justify-content:center}
+
+/* Additional in-article sponsor placements: clearly labeled and responsive. */
+.task1-page .task1-mid-article-ad{width:100%;max-width:760px;margin:14px auto 20px;padding:0 8px;box-sizing:border-box}
+.task1-page .task1-mid-article-ad .task1-ad-label{font-size:9px;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase}
+@media(max-width:520px){.task1-page .task1-mid-article-ad{margin:10px auto 16px;padding:0 4px}}

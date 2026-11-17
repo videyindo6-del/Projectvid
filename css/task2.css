@@ -56,3 +56,6 @@
 .task2-page .task1-mini-btn{min-width:148px;justify-content:center}
 .task2-page .task2-result{display:flex;justify-content:center}
 @media(max-width:480px){.task2-page .task1-task-actions{gap:8px}.task2-page .task1-mini-btn{min-width:132px;flex:1 1 132px}}
+
+/* Task 2 additional mid-article sponsor units. */
+.task2-page .task1-mid-article-ad{margin:12px auto 18px}
