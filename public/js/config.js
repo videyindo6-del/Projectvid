@@ -6,3 +6,32 @@ if(window.supabase && window.BOXCELLINK_SUPABASE_CONFIGURED) window.sb=window.su
 
 // Isi URL channel Telegram resmi untuk tombol Support -> Channel Telegram.
 window.BOXCELLINK_TELEGRAM_CHANNEL_URL = window.BOXCELLINK_TELEGRAM_CHANNEL_URL || '';
+// Presence heartbeat: mencatat member login dan pengunjung tamu untuk statistik admin.
+(function startBoxcellinkPresence(){
+  if (!window.sb || window.__boxcellinkPresenceStarted) return;
+  window.__boxcellinkPresenceStarted = true;
+  const storageKey = 'boxcellink_presence_visitor_v1';
+  let visitorKey = '';
+  try {
+    visitorKey = localStorage.getItem(storageKey) || '';
+    if (!/^[A-Za-z0-9_-]{16,80}$/.test(visitorKey)) {
+      visitorKey = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('bc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 18));
+      localStorage.setItem(storageKey, visitorKey);
+    }
+  } catch (_) {
+    visitorKey = 'bc_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 18);
+  }
+  let busy = false;
+  const heartbeat = async () => {
+    if (busy || !window.sb || document.visibilityState === 'prerender') return;
+    busy = true;
+    try {
+      await window.sb.rpc('heartbeat_site_presence', { p_visitor_key: visitorKey });
+    } catch (err) { console.warn('Presence heartbeat:', err?.message || err); }
+    finally { busy = false; }
+  };
+  heartbeat();
+  window.setInterval(() => { if (document.visibilityState === 'visible') heartbeat(); }, 45000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') heartbeat(); });
+  window.sb.auth.onAuthStateChange(() => { window.setTimeout(heartbeat, 250); });
+})();
