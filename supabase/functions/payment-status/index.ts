@@ -6,17 +6,32 @@ Deno.serve(async req => {
   if (req.method !== 'POST') return out({error:'Method tidak diizinkan'},405);
   try {
     const auth=req.headers.get('Authorization');
-    if(!auth) return out({error:'Login diperlukan'},401);
     const url=Deno.env.get('SUPABASE_URL')!, anon=Deno.env.get('SUPABASE_ANON_KEY')!, service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const userClient=createClient(url,anon,{global:{headers:{Authorization:auth}}});
-    const {data:{user},error:authError}=await userClient.auth.getUser();
-    if(authError||!user) return out({error:'Sesi tidak valid. Muat ulang halaman lalu coba lagi.'},401);
+    let user:any=null;
+    if(auth){
+      const userClient=createClient(url,anon,{global:{headers:{Authorization:auth}}});
+      const authResult=await userClient.auth.getUser();
+      user=authResult.data?.user||null;
+      if(!user) return out({error:'Sesi login tidak valid. Muat ulang halaman lalu coba lagi.'},401);
+    }
     const body=await req.json(); const order_id=String(body?.order_id||'').trim();
     if(!order_id) return out({error:'Order ID tidak dikirim'},400);
     const admin=createClient(url,service);
-    const {data:o,error:orderError}=await admin.from('cashi_orders').select('order_id,user_id,status,amount,coupon_code,gateway_payload').eq('order_id',order_id).eq('user_id',user.id).maybeSingle();
+    const {data:o,error:orderError}=await admin.from('cashi_orders').select('order_id,user_id,purpose,status,amount,coupon_code,gateway_payload').eq('order_id',order_id).maybeSingle();
     if(orderError) throw orderError;
-    if(!o) return out({error:'Order tidak ditemukan atau bukan milik akun ini'},404);
+    if(!o) return out({error:'Order tidak ditemukan'},404);
+    if(o.user_id){
+      if(!user||o.user_id!==user.id) return out({error:'Order bukan milik akun ini'},403);
+    }else{
+      if(o.purpose!=='autolink_direct_access') return out({error:'Order tamu tidak diizinkan untuk transaksi ini'},403);
+      const guestToken=String(body?.guest_token||'');
+      if(guestToken.length<32) return out({error:'Token pembayaran tamu tidak valid'},401);
+      const {data:payment,error:paymentError}=await admin.from('autolink_payments').select('guest_token_hash').eq('order_id',order_id).maybeSingle();
+      if(paymentError) throw paymentError;
+      const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(guestToken));
+      const hash=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
+      if(!payment?.guest_token_hash||payment.guest_token_hash!==hash) return out({error:'Token pembayaran tidak cocok'},403);
+    }
     if(o.status==='SETTLED') return out({success:true,status:'SETTLED'});
     if(['EXPIRED','FAILED'].includes(String(o.status).toUpperCase())) return out({success:true,status:o.status});
     const key=Deno.env.get('CASHI_API_KEY');
