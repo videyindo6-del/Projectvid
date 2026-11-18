@@ -1,14 +1,65 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pembayaran AutoLink — BoxCellink</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"><link rel="stylesheet" href="/css/autolink.css"></head><body><div data-component="navbar"></div><main class="al-page"><div class="al-wrap" style="max-width:650px"><section class="al-card"><span class="al-kicker">Direct Access</span><h1>Pembayaran Langsung Akses</h1><p style="color:var(--al-muted)">Harga tetap <b>Rp3.500</b>. Publisher menerima Rp2.000 dan platform Rp1.500 setelah pembayaran terverifikasi.</p><div id="alPaymentInfo" class="al-note">Menyiapkan pembayaran...</div>
-<div id="alMemberPayment" hidden class="al-note" style="margin-top:12px">
- <label for="alPaymentMethod"><b>Metode pembayaran member</b></label>
- <select id="alPaymentMethod" class="al-btn full" style="margin-top:8px">
-  <option value="qris">Cashi QRIS</option><option value="deposit">Saldo Deposit / Top Up</option><option value="affiliate">Saldo Afiliasi</option>
- </select>
- <label for="alCouponCode" style="display:block;margin-top:12px"><b>Kode diskon (opsional)</b></label>
- <input id="alCouponCode" type="text" maxlength="40" placeholder="Masukkan kode diskon" autocomplete="off" style="width:100%;margin-top:8px">
- <small id="alWalletInfo" style="display:block;margin-top:8px;color:var(--al-muted)"></small>
-</div>
-<div class="al-actions">
- <button class="al-btn full" id="alCreatePayment">Lanjutkan · Rp3.500</button>
- <button class="al-btn secondary full" id="alCheckPayment" hidden>Saya sudah membayar · Periksa status</button>
-</div><div id="alPaymentMessage"></div><a href="#" id="alPaymentCheckout" class="al-btn ghost full" target="_blank" rel="noopener" hidden>Buka halaman pembayaran Cashi</a></section></div></main><div data-component="footer"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/components.js"></script><script src="/js/autolink-payment.js"></script><script src="/js/page-i18n.js"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sistem Pembayaran Langsung Akses AutoLink — BoxCellink</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"><link rel="stylesheet" href="/css/autolink.css">
+</head>
+<body>
+<div data-component="navbar"></div>
+<main class="al-page al-payment-page">
+ <div class="al-wrap al-payment-wrap">
+  <section class="al-card al-payment-card">
+   <div class="al-payment-brand"><span class="al-payment-icon"><i class="fa-solid fa-bolt"></i></span><span><small>BOXCELLINK · SECURE CHECKOUT</small><b>AutoLink Direct Access</b></span></div>
+   <span class="al-kicker">DIRECT ACCESS PAYMENT</span>
+   <h1>Sistem Pembayaran Langsung Akses</h1>
+   <p class="al-payment-lead">Selesaikan pembayaran dengan QRIS Cashi untuk membuka akses AutoLink secara otomatis setelah pembayaran terverifikasi.</p>
+   <div id="alPaymentInfo" class="al-note" role="status">Menyiapkan informasi AutoLink...</div>
+
+   <div id="alMemberPayment" class="al-member-options" hidden>
+    <label for="alPaymentMethod">Metode pembayaran</label>
+    <select id="alPaymentMethod" class="al-btn full"><option value="qris">Cashi QRIS</option><option value="deposit">Saldo Deposit / Top Up</option><option value="affiliate">Saldo Afiliasi</option></select>
+    <label for="alCouponCode">Kode diskon (opsional)</label>
+    <input id="alCouponCode" type="text" maxlength="40" placeholder="Masukkan kode diskon" autocomplete="off">
+    <small id="alWalletInfo"></small>
+   </div>
+
+   <div id="alProcessing" class="al-payment-processing" hidden>
+    <span class="al-spinner"></span><strong>Menyiapkan QRIS Cashi...</strong><small>Mohon tunggu sekitar 3 detik. Jangan tutup halaman ini.</small>
+    <div class="al-processing-track"><span></span></div>
+   </div>
+
+   <section id="alQrPanel" class="al-qr-panel" hidden aria-live="polite">
+    <div class="al-qr-heading"><span><i class="fa-solid fa-qrcode"></i></span><div><b>Pembayaran Cashi QRIS</b><small>Pindai kode QR di bawah menggunakan aplikasi pembayaran Anda.</small></div></div>
+    <div class="al-qr-frame" id="alQrFrame"><div class="al-qr-placeholder"><i class="fa-solid fa-qrcode"></i><span>Menyiapkan kode QR...</span></div></div>
+    <div class="al-qr-amount"><small>Total pembayaran</small><strong id="alQrAmount">Rp3.500</strong></div>
+    <p class="al-qr-instruction">Setelah membayar, biarkan halaman ini terbuka. Sistem akan memeriksa pembayaran secara otomatis.</p>
+    <div id="alAutoStatus" class="al-payment-status" role="status">Menunggu pembayaran...</div>
+   </section>
+
+   <div class="al-actions al-payment-actions">
+    <button class="al-btn full" id="alCreatePayment" type="button"><i class="fa-solid fa-lock"></i> Bayar Akses AutoLink</button>
+    <button class="al-btn secondary full" id="alCheckPayment" type="button" hidden><i class="fa-solid fa-rotate"></i> Cek Pembayaran</button>
+   </div>
+   <div id="alPaymentMessage" aria-live="polite"></div>
+   <div class="al-payment-safe"><i class="fa-solid fa-shield-halved"></i> Pembayaran aman · Akses dibuka setelah verifikasi berhasil</div>
+  </section>
+
+  <section class="al-card al-join-card al-payment-join">
+   <div class="al-join-heading"><span class="al-join-icon"><i class="fa-solid fa-rocket"></i></span><div><span class="al-kicker">GROW WITH BOXCELLINK</span><h2>Bergabunglah dengan BoxCellink</h2></div></div>
+   <p class="al-join-lead">Buat AutoLink sendiri, bagikan pekerjaan Anda, dan dapatkan peluang saldo tambahan. Nikmati CPM kompetitif yang menyesuaikan pekerjaan valid, dengan sistem perhitungan dan peningkatan otomatis.</p>
+   <div class="al-join-benefits">
+    <div class="al-join-benefit"><span><i class="fa-solid fa-link"></i></span><div><strong>Buat AutoLink dengan mudah</strong><small>Kelola dan publikasikan link Anda dari satu dashboard.</small></div></div>
+    <div class="al-join-benefit"><span><i class="fa-solid fa-wallet"></i></span><div><strong>Dapatkan saldo tambahan</strong><small>Peluang penghasilan dari pekerjaan dan kunjungan yang valid.</small></div></div>
+    <div class="al-join-benefit"><span><i class="fa-solid fa-chart-line"></i></span><div><strong>CPM kompetitif</strong><small>Perhitungan mengikuti ketentuan dan kualitas pekerjaan.</small></div></div>
+    <div class="al-join-benefit"><span><i class="fa-solid fa-arrows-rotate"></i></span><div><strong>Sistem otomatis</strong><small>Pantau performa dan saldo melalui dashboard member.</small></div></div>
+   </div>
+   <div class="al-join-cta"><a class="al-btn al-register-shake" href="/register.html"><i class="fa-solid fa-user-plus"></i> Daftar Sekarang</a><a class="al-btn al-login-wobble" href="/login.html"><i class="fa-solid fa-right-to-bracket"></i> Login Member</a></div>
+   <p class="al-join-foot"><i class="fa-solid fa-circle-info"></i> CPM dan saldo mengikuti pekerjaan valid serta ketentuan platform.</p>
+  </section>
+ </div>
+</main>
+<div data-component="footer"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/components.js"></script><script src="/js/autolink-payment.js"></script><script src="/js/page-i18n.js"></script>
+</body></html>
