@@ -61,7 +61,7 @@ begin
   select count(distinct sp.user_id) into v_online_members
     from public.site_presence sp
     join public.profiles p on p.id=sp.user_id
-    where sp.user_id is not null and p.role='user' and sp.last_seen_at >= now()-interval '2 minutes';
+    where sp.user_id is not null and p.role='user' and coalesce(p.is_banned,false)=false and sp.last_seen_at >= now()-interval '2 minutes';
   select count(*) into v_guest_online
     from public.site_presence sp
     where sp.user_id is null and sp.last_seen_at >= now()-interval '2 minutes';

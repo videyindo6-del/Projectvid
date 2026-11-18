@@ -1,5 +1,5 @@
 -- PasteLink v1 for ProjectVID / BoxCellink.
--- Run once in Supabase SQL Editor. Pages Function uses service_role; no public table access.
+-- Run once after account_center_v1.sql, autolink_publisher_monetization_v1.sql and social_posts_v1.sql.\n-- Pages Function uses service_role; no public table access. PasteLink slugs are 8 chars (API), while the column allows 20 for compatibility.
 begin;
 create extension if not exists pgcrypto;
 alter table public.profiles add column if not exists game_id text;
@@ -72,7 +72,7 @@ returns trigger language plpgsql security definer set search_path=public as $$
 declare v_url text;
 begin
  if tg_op='DELETE' then delete from public.social_posts where paste_link_id=old.id; return old; end if;
- v_url:='https://boxcellink.pages.dev/pas/'||new.slug;
+ v_url:='https://boxcelink.pages.dev/pas/'||new.slug;
  if new.status='published' then
   insert into public.social_posts(user_id,detail,public_url,short_code,status,post_type,title,created_at,expires_at,paste_link_id)
   values(new.user_id,new.content,v_url,new.slug,'published','paste_link',new.title,new.created_at,new.expires_at,new.id)
