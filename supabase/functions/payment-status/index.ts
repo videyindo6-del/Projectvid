@@ -5,11 +5,14 @@ Deno.serve(async req => {
   if (req.method === 'OPTIONS') return new Response('ok', {headers:cors});
   if (req.method !== 'POST') return out({error:'Method tidak diizinkan'},405);
   try {
-    const auth=req.headers.get('Authorization');
+    const auth=req.headers.get('Authorization')||'';
+    const bearerToken=auth.match(/^Bearer\s+(.+)$/i)?.[1]?.trim()||'';
     const url=Deno.env.get('SUPABASE_URL')!, anon=Deno.env.get('SUPABASE_ANON_KEY')!, service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     let user:any=null;
-    if(auth){
-      const userClient=createClient(url,anon,{global:{headers:{Authorization:auth}}});
+    // Guest requests can carry the Supabase anon key in Authorization.
+    // Only validate a non-anon Bearer token as a signed-in member session.
+    if(bearerToken && bearerToken!==anon){
+      const userClient=createClient(url,anon,{global:{headers:{Authorization:`Bearer ${bearerToken}`}}});
       const authResult=await userClient.auth.getUser();
       user=authResult.data?.user||null;
       if(!user) return out({error:'Sesi login tidak valid. Muat ulang halaman lalu coba lagi.'},401);
