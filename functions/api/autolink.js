@@ -1,6 +1,7 @@
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','access-control-allow-origin':'*','access-control-allow-headers':'authorization,content-type','access-control-allow-methods':'GET,POST,OPTIONS'}});
 const b64url=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const hash=async s=>b64url(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)));
+const hashHex=async s=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))).map(x=>x.toString(16).padStart(2,'0')).join('');
 const SUPABASE_URL_FALLBACK='https://djxcdwnpheufoojfzorx.supabase.co';
 const SUPABASE_ANON_KEY_FALLBACK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqeGNkd25waGV1Zm9vamZ6b3J4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM3MDUxNTQsImV4cCI6MjEwOTI4MTE1NH0.FjWsw4XWoHvjUiFR7zmXMKNHBTZAxr8Sct8SKnrdFsQ';
 const supabaseUrl=env=>String(env.SUPABASE_URL||env.BOXCELLINK_SUPABASE_URL||SUPABASE_URL_FALLBACK).replace(/\/$/,'');
@@ -92,9 +93,16 @@ export async function onRequest({request,env}) {
    return json({success:true,destination:result.destination,publisher_amount:result.publisher_amount,total_wif:result.total_wif,cpm:result.cpm});
   }
   if(action==='paid-access'){
-   const user=await userFrom(request,env);if(!user?.id)return json({error:'Login diperlukan'},401);
-   const order=String(body.order_id||'');const rows=await db(env,`autolink_payments?select=order_id,buyer_id,autolink_id,status,target_url_snapshot,title_snapshot&order_id=eq.${encodeURIComponent(order)}&limit=1`);
-   const payment=rows?.[0];if(!payment||payment.buyer_id!==user.id||payment.status!=='settled')return json({error:'Pembayaran belum terverifikasi'},403);
+   const order=String(body.order_id||'');
+   const rows=await db(env,`autolink_payments?select=order_id,buyer_id,status,target_url_snapshot,title_snapshot,guest_token_hash&order_id=eq.${encodeURIComponent(order)}&limit=1`);
+   const payment=rows?.[0];if(!payment||payment.status!=='settled')return json({error:'Pembayaran belum terverifikasi'},403);
+   const user=await userFrom(request,env);
+   if(payment.buyer_id){
+    if(!user?.id||payment.buyer_id!==user.id)return json({error:'Order bukan milik akun ini'},403);
+   }else{
+    const guestToken=String(body.guest_token||'');
+    if(guestToken.length<32||!payment.guest_token_hash||await hashHex(guestToken)!==payment.guest_token_hash)return json({error:'Token pembayaran tamu tidak valid'},403);
+   }
    if(!payment.target_url_snapshot)return json({error:'Tujuan akses tidak tersedia'},404);
    return json({success:true,destination:payment.target_url_snapshot,title:payment.title_snapshot});
   }
