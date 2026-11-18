@@ -1,11 +1,15 @@
+
 [functions.create-payment]
-verify_jwt = true
+verify_jwt = false
+
 [functions.cashi-webhook]
 verify_jwt = false
+
 [functions.download-link]
 verify_jwt = true
+
 [functions.payment-status]
-verify_jwt = true
+verify_jwt = false
 
 [functions.admin-user]
 verify_jwt = true
