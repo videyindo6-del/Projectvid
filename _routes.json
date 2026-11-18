@@ -10,7 +10,8 @@
     "/withdraw",
     "/endorse",
     "/z/*",
-    "/pas/*"
+    "/pas/*",
+    "/api/pastelink"
   ],
   "exclude": []
 }

@@ -88,7 +88,7 @@ function initMemberBottomNav(){
    if(profileError)throw profileError;
    if(!profile?.username)throw new Error('Atur username publik terlebih dahulu di halaman Akun Saya.');
    const shortCode=(()=>{const chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';const bytes=new Uint8Array(5);crypto.getRandomValues(bytes);return Array.from(bytes,b=>chars[b%chars.length]).join('');})();
-   const {data:post,error}=await window.sb.from('social_posts').insert({user_id:user.id,detail:detail||null,public_url:parsed.href,short_code:shortCode}).select('id,short_code').single();
+   const {data:post,error}=await window.sb.from('social_posts').insert({user_id:user.id,detail:detail||null,public_url:parsed.href,short_code:shortCode,post_type:'paste_link'}).select('id,short_code').single();
    if(error)throw error;
    if(linkInput)linkInput.value='';if(detailInput)detailInput.value='';closeComposer();
    location.assign('/posts.html?new='+encodeURIComponent(post.id)+'&link='+encodeURIComponent(new URL('/z/'+post.short_code,location.origin).href));

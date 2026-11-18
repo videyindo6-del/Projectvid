@@ -65,6 +65,11 @@
         <small class="account-field-hint" data-account-i18n="username_hint">3–24 karakter. Gunakan huruf, angka, titik, atau garis bawah.</small>
         <button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="save_username">Simpan username</span></button>
       </form>
+      <form id="gameIdForm" class="account-form-grid" style="margin-top:18px;padding-top:18px;border-top:1px solid var(--border-color,#e2e8f0)">
+        <label for="memberGameId">Game ID</label><input id="memberGameId" type="text" maxlength="80" autocomplete="off" placeholder="Masukkan Game ID (opsional)">
+        <small class="account-field-hint">Game ID ini akan dicantumkan pada detail pengajuan withdraw untuk membantu admin memverifikasi akun.</small>
+        <button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Game ID</button>
+      </form>
     </article>
   </section>
 
