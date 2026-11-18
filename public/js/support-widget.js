@@ -21,23 +21,15 @@
   if (/\/(admin|admin-vip|review-admin|telegram-admin|users|payments|support-inbox)(\.html)?\/?$/.test(path)) return;
   if (!document.body || document.getElementById('bc-support-root')) return;
 
-  const groupUrl = 'https://t.me/+03WCfVAwaWUzZTkx';
-  const channelUrl = window.BOXCELLINK_TELEGRAM_CHANNEL_URL || '';
   const root = document.createElement('div');
   root.id = 'bc-support-root';
   root.innerHTML = `
     <div class="bc-support-menu" id="bcSupportMenu" aria-hidden="true" inert>
+      <a class="bc-support-choice bc-support-telegram" href="#" id="bcSupportTelegram" hidden target="_blank" rel="noopener noreferrer"><span class="bc-support-choice-icon"><i class="fa-brands fa-telegram"></i></span><span>Telegram</span></a>
+      <a class="bc-support-choice bc-support-whatsapp" href="#" id="bcSupportWhatsapp" hidden target="_blank" rel="noopener noreferrer"><span class="bc-support-choice-icon"><i class="fa-brands fa-whatsapp"></i></span><span>WhatsApp</span></a>
       <a class="bc-support-choice bc-support-admin" href="#" id="bcSupportChat">
         <span class="bc-support-choice-icon"><i class="fa-solid fa-headset" aria-hidden="true"></i></span>
         <span>Chat Support Admin</span>
-      </a>
-      <a class="bc-support-choice bc-support-channel" href="${channelUrl ? esc(channelUrl) : '#'}" ${channelUrl ? 'target="_blank" rel="noopener noreferrer"' : 'aria-disabled="true"'}>
-        <span class="bc-support-choice-icon"><i class="fa-brands fa-telegram" aria-hidden="true"></i></span>
-        <span>Channel Telegram</span>
-      </a>
-      <a class="bc-support-choice bc-support-group" href="${groupUrl}" target="_blank" rel="noopener noreferrer">
-        <span class="bc-support-choice-icon"><i class="fa-brands fa-telegram" aria-hidden="true"></i></span>
-        <span>Group Chat Telegram</span>
       </a>
     </div>
     <button type="button" class="bc-support-toggle" id="bcSupportToggle" aria-label="Buka menu support" aria-expanded="false" aria-controls="bcSupportMenu">
@@ -59,6 +51,19 @@
       <div class="bc-support-foot" id="bcSupportFoot"></div>
     </section>`;
   document.body.appendChild(root);
+  (async () => {
+    try {
+      if (!window.sb) return;
+      const { data } = await sb.from('site_link_settings').select('key,value').in('key',['main_whatsapp','main_telegram']);
+      for (const row of data || []) {
+        const isWa = row.key === 'main_whatsapp';
+        const link = root.querySelector(isWa ? '#bcSupportWhatsapp' : '#bcSupportTelegram');
+        const url = row.value?.url;
+        if (link && url && /^https?:\/\//i.test(url)) { link.href = url; link.hidden = false; }
+      }
+    } catch (error) { console.warn('Support links unavailable', error); }
+  })();
+
 
   const toggle = $('#bcSupportToggle', root);
   const menu = $('#bcSupportMenu', root);
