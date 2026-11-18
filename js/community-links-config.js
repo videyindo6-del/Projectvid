@@ -7,7 +7,7 @@
  */
 window.BOXCELLINK_COMMUNITY_LINKS = Object.freeze({
   telegram: {
-    url: "https://t.me/+03WCfVAwaWUzZTkx",
+    url: "https://t.me/+7I3Xnl1PLdZjMTY0",
     label: "Gabung Telegram"
   },
   whatsapp: {
@@ -15,7 +15,7 @@ window.BOXCELLINK_COMMUNITY_LINKS = Object.freeze({
     label: "Gabung WhatsApp"
   },
   youtube: {
-    url: "",
+    url: "https://youtube.com/@boxcellink?si=uXJk-geYPX5XdWMS",
     label: "Kunjungi YouTube"
   }
 });

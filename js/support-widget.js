@@ -21,19 +21,68 @@
   if (/\/(admin|admin-vip|review-admin|telegram-admin|users|payments|support-inbox)(\.html)?\/?$/.test(path)) return;
   if (!document.body || document.getElementById('bc-support-root')) return;
 
+  // Render the three community shortcuts independently of Supabase.
+  // Links are read from /js/community-links-config.js; icons remain visible
+  // even while that file is loading or a link has not been configured.
+  const mountCommunityDock = () => {
+    if (document.getElementById('bc-community-dock')) return;
+    const items = [
+      { key: 'telegram', icon: 'fa-brands fa-telegram', label: 'Telegram' },
+      { key: 'whatsapp', icon: 'fa-brands fa-whatsapp', label: 'WhatsApp' },
+      { key: 'youtube', icon: 'fa-brands fa-youtube', label: 'YouTube' }
+    ];
+    const dock = document.createElement('nav');
+    dock.id = 'bc-community-dock';
+    dock.setAttribute('aria-label', 'Link komunitas resmi');
+    dock.innerHTML = items.map(item =>
+      `<a class="bc-community-icon ${item.key} is-unconfigured" href="#" aria-label="${item.label}" title="${item.label}" aria-disabled="true"><i class="${item.icon}" aria-hidden="true"></i></a>`
+    ).join('');
+    document.body.appendChild(dock);
+
+    const applyLinks = () => {
+      const config = window.BOXCELLINK_COMMUNITY_LINKS || {};
+      items.forEach(item => {
+        const anchor = dock.querySelector(`.${item.key}`);
+        const raw = String(config[item.key]?.url || '').trim();
+        let href = '';
+        try {
+          const parsed = new URL(raw);
+          if (parsed.protocol === 'http:' || parsed.protocol === 'https:') href = parsed.href;
+        } catch (_) {}
+        if (href) {
+          anchor.href = href;
+          anchor.target = '_blank';
+          anchor.rel = 'noopener noreferrer';
+          anchor.classList.remove('is-unconfigured');
+          anchor.removeAttribute('aria-disabled');
+          anchor.title = config[item.key]?.label || `Buka ${item.label}`;
+          anchor.setAttribute('aria-label', anchor.title);
+        } else {
+          anchor.removeAttribute('target');
+          anchor.removeAttribute('rel');
+          anchor.href = '#';
+          anchor.classList.add('is-unconfigured');
+          anchor.setAttribute('aria-disabled', 'true');
+          anchor.addEventListener('click', event => event.preventDefault());
+        }
+      });
+    };
+
+    applyLinks();
+    if (!window.BOXCELLINK_COMMUNITY_LINKS) {
+      const script = document.createElement('script');
+      script.src = '/js/community-links-config.js?v=20261118-2';
+      script.onload = applyLinks;
+      script.onerror = () => console.warn('Community link config gagal dimuat:', script.src);
+      document.head.appendChild(script);
+    }
+  };
+
   const root = document.createElement('div');
   root.id = 'bc-support-root';
   root.innerHTML = `
-    <div class="bc-support-menu" id="bcSupportMenu" aria-hidden="true" inert>
-      <a class="bc-support-choice bc-support-telegram" href="#" id="bcSupportTelegram" hidden target="_blank" rel="noopener noreferrer"><span class="bc-support-choice-icon"><i class="fa-brands fa-telegram"></i></span><span>Telegram</span></a>
-      <a class="bc-support-choice bc-support-whatsapp" href="#" id="bcSupportWhatsapp" hidden target="_blank" rel="noopener noreferrer"><span class="bc-support-choice-icon"><i class="fa-brands fa-whatsapp"></i></span><span>WhatsApp</span></a>
-      <a class="bc-support-choice bc-support-admin" href="#" id="bcSupportChat">
-        <span class="bc-support-choice-icon"><i class="fa-solid fa-headset" aria-hidden="true"></i></span>
-        <span>Chat Support Admin</span>
-      </a>
-    </div>
-    <button type="button" class="bc-support-toggle" id="bcSupportToggle" aria-label="Buka menu support" aria-expanded="false" aria-controls="bcSupportMenu">
-      <i class="fa-solid fa-comments" aria-hidden="true"></i>
+    <button type="button" class="bc-support-toggle" id="bcSupportToggle" aria-label="Buka Chat Support" aria-expanded="false" aria-controls="bcSupportPanel">
+      <i class="fa-solid fa-headset" aria-hidden="true"></i>
     </button>
     <section class="bc-support-chat" id="bcSupportPanel" aria-label="Chat Support Admin" aria-hidden="true" hidden>
       <header>
@@ -50,22 +99,8 @@
       </form>
       <div class="bc-support-foot" id="bcSupportFoot"></div>
     </section>`;
+  mountCommunityDock();
   document.body.appendChild(root);
-  (async () => {
-    try {
-      if (!window.sb) return;
-      const { data } = await sb.from('site_link_settings').select('key,value').in('key',['main_whatsapp','main_telegram']);
-      for (const row of data || []) {
-        const isWa = row.key === 'main_whatsapp';
-        const link = root.querySelector(isWa ? '#bcSupportWhatsapp' : '#bcSupportTelegram');
-        const url = row.value?.url;
-        if (link && url && /^https?:\/\//i.test(url)) { link.href = url; link.hidden = false; }
-      }
-    } catch (error) { console.warn('Support links unavailable', error); }
-  })();
-
-
-
   // Community notifications for the support widget, configured in Admin > Link & Notifikasi.
   (async () => {
     try {
@@ -100,9 +135,7 @@
   })();
 
   const toggle = $('#bcSupportToggle', root);
-  const menu = $('#bcSupportMenu', root);
   const panel = $('#bcSupportPanel', root);
-  const chatLink = $('#bcSupportChat', root);
   const closeButton = $('#bcSupportClose', root);
   const form = $('#bcSupportForm', root);
   const input = $('#bcSupportInput', root);
@@ -144,26 +177,12 @@
     if(group)renderFaq(Number(group.dataset.faqGroup));
   });
 
-  const closeMenu = () => {
-    menu.classList.remove('is-open');
-    menu.setAttribute('aria-hidden', 'true');
-    menu.inert = true;
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.setAttribute('aria-label', 'Buka menu support');
-    toggle.innerHTML = '<i class="fa-solid fa-comments" aria-hidden="true"></i>';
-  };
-  const openMenu = () => {
-    menu.classList.add('is-open');
-    menu.setAttribute('aria-hidden', 'false');
-    menu.inert = false;
-    toggle.setAttribute('aria-expanded', 'true');
-    toggle.setAttribute('aria-label', 'Tutup menu support');
-    toggle.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
-  };
   const closeChat = () => {
     panel.hidden = true;
     panel.setAttribute('aria-hidden', 'true');
-    closeMenu();
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Buka Chat Support');
+    toggle.innerHTML = '<i class="fa-solid fa-headset" aria-hidden="true"></i>';
     toggle.focus({ preventScroll: true });
   };
 
@@ -173,36 +192,26 @@
   let refreshTimer = null;
   let loadingChat = false;
 
-  toggle.addEventListener('click', event => {
+  toggle.addEventListener('click', async event => {
     event.preventDefault();
     event.stopPropagation();
     if (!panel.hidden) {
       closeChat();
       return;
     }
-    if (menu.classList.contains('is-open')) closeMenu();
-    else openMenu();
-  });
-
-  chatLink.addEventListener('click', async event => {
-    event.preventDefault();
-    event.stopPropagation();
-    closeMenu();
     panel.hidden = false;
     panel.setAttribute('aria-hidden', 'false');
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Tutup Chat Support');
+    toggle.innerHTML = '<i class="fa-solid fa-xmark" aria-hidden="true"></i>';
     messagesEl.innerHTML = '<div class="bc-support-empty">Menghubungkan ke layanan bantuan...</div>';
     await loadChat();
   });
 
+
   closeButton.addEventListener('click', closeChat);
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      if (!panel.hidden) closeChat();
-      else closeMenu();
-    }
-  });
-  document.addEventListener('click', event => {
-    if (!root.contains(event.target) && menu.classList.contains('is-open')) closeMenu();
+    if (event.key === 'Escape' && !panel.hidden) closeChat();
   });
 
   function showLoginPrompt() {
