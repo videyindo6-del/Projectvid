@@ -9,7 +9,8 @@
     "/dashboard",
     "/withdraw",
     "/endorse",
-    "/z/*"
+    "/z/*",
+    "/pas/*"
   ],
   "exclude": []
 }

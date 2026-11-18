@@ -1,0 +1,17 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Link & Notifikasi — Admin</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/admin-global-nav.css"><style>*{box-sizing:border-box}.wrap{max-width:1050px;margin:30px auto;padding:0 16px 60px}.panel{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin:18px 0}.muted{color:#64748b;font-size:13px}label{display:grid;gap:6px;font-weight:700;font-size:13px;margin:12px 0}input,textarea,select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:9px;font:inherit}textarea{min-height:75px}button{border:0;background:#1768aa;color:white;padding:11px 17px;border-radius:9px;font-weight:700;cursor:pointer}.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.switch{display:flex;align-items:center;gap:10px}.switch input{width:auto}.status{font-size:13px;margin-left:10px}</style></head><body><nav class="admin-global-nav" aria-label="Navigasi Panel Admin">
+<a class="admin-brand" href="/admin.html"><i class="fa-solid fa-shield-halved"></i> ADMIN STUDIO</a>
+<a href="/admin.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+<a href="/users.html"><i class="fa-solid fa-users"></i> Member</a>
+<a href="/videos.html"><i class="fa-solid fa-film"></i> BoxVidey</a>
+<a href="/review-admin.html"><i class="fa-solid fa-star"></i> Review Media</a>
+<a href="/telegram.html"><i class="fa-brands fa-telegram"></i> Media Telegram</a>
+<a href="/admin-links.html"><i class="fa-solid fa-link"></i> Link & Notifikasi</a>
+<a href="/admin-autolink.html"><i class="fa-solid fa-bolt"></i> Admin AutoLink</a>
+<a href="/admin-publisher-withdraw.html"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw Publisher</a>
+<a href="/support-inbox.html"><i class="fa-solid fa-headset"></i> Support</a>
+<a href="/categories.html"><i class="fa-solid fa-layer-group"></i> Kategori</a>
+<a href="/admin-vip.html"><i class="fa-solid fa-crown"></i> VIP & Diskon</a>
+<a href="/affiliate-admin.html"><i class="fa-solid fa-handshake"></i> Affiliate</a>
+<a href="/payments.html"><i class="fa-solid fa-credit-card"></i> Transaksi</a>
+<a href="/servers.html"><i class="fa-solid fa-server"></i> Server</a>
+</nav><main class="wrap"><h1>Pengaturan Link & Notifikasi</h1><p class="muted">Atur link utama WhatsApp/Telegram dan notifikasi setiap halaman secara terpisah.</p><form id="settingsForm"><section class="panel"><h2>Link ikon menu Support</h2><div class="row"><label>Link WhatsApp utama<input id="main_whatsapp" type="url" placeholder="https://chat.whatsapp.com/..."></label><label>Link Telegram utama<input id="main_telegram" type="url" placeholder="https://t.me/..."></label></div><p class="muted">Link ini terpisah dari notifikasi per halaman.</p></section><div id="noticePanels"></div><button type="submit">Simpan semua pengaturan</button><span class="status" id="saveStatus" role="status"></span></form></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/js/admin-links.js"></script></body></html>
