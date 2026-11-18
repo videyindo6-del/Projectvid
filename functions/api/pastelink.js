@@ -23,6 +23,14 @@ export async function onRequest({request,env}) {
    return json({success:true,item:{slug:item.slug,title:item.title,content:item.content,created_at:item.created_at}});
   }
   const user=await getUser(request,env);if(!user?.id)return json({error:'Silakan login terlebih dahulu.'},401);
+  if(action==='list'){
+   const rows=await db(env,`paste_links?select=id,slug,title,status,expires_at,created_at,updated_at&user_id=eq.${user.id}&status=neq.deleted&order=created_at.desc&limit=500`);
+   const now=Date.now();
+   const items=Array.isArray(rows)?rows:[];
+   const active=items.filter(x=>x.status==='published'&&(!x.expires_at||Date.parse(x.expires_at)>now)).length;
+   const expired=items.filter(x=>x.expires_at&&Date.parse(x.expires_at)<=now).length;
+   return json({success:true,total:items.length,active,expired,items});
+  }
   if(action==='create'){
    const profile=await db(env,`profiles?select=username&id=eq.${user.id}&limit=1`);
    if(!profile?.[0]?.username||!String(profile[0].username).trim())return json({error:'Atur username publik terlebih dahulu di halaman Akun Saya sebelum membuat PasteLink.'},400);
@@ -57,6 +65,16 @@ export async function onRequest({request,env}) {
    if(body.expires_days!==undefined&&body.expires_days!==''){const days=body.expires_days==null||Number(body.expires_days)===0?null:Number(body.expires_days);if(days!==null&&![1,7,30,90].includes(days))return json({error:'Pilihan masa aktif tidak valid.'},400);patch.expires_at=days?new Date(Date.now()+days*86400000).toISOString():null;}
    const updated=await db(env,`paste_links?id=eq.${id}`,{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify(patch)});
    return json({success:true,item:updated?.[0]||{slug:item.slug}});
+  }
+  if(action==='delete'){
+   const id=cleanText(body.id||url.searchParams.get('id'),50);
+   if(!/^[0-9a-f-]{36}$/i.test(id))return json({error:'ID PasteLink tidak valid.'},400);
+   const rows=await db(env,`paste_links?select=id,user_id,slug,status&id=eq.${id}&limit=1`);
+   const item=rows?.[0];if(!item)return json({error:'PasteLink tidak ditemukan.'},404);
+   const profiles=await db(env,`profiles?select=role&id=eq.${user.id}&limit=1`);
+   if(item.user_id!==user.id&&profiles?.[0]?.role!=='admin')return json({error:'Tidak memiliki akses untuk menghapus PasteLink ini.'},403);
+   await db(env,`paste_links?id=eq.${id}`,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({status:'deleted',updated_at:new Date().toISOString()})});
+   return json({success:true,id,slug:item.slug});
   }
   return json({error:'Action tidak dikenal.'},404);
  }catch(error){return json({error:error?.message||'Internal server error.'},500);}
