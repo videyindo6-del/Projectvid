@@ -16,7 +16,12 @@ Deno.serve(async req=>{
    const userClient=createClient(url,anon,{global:{headers:{Authorization:`Bearer ${bearerToken}`}}});
    const authResult=await userClient.auth.getUser();
    user=authResult.data?.user||null;
-   if(!user) return reply({error:'Sesi login tidak valid. Silakan login kembali.'},401);
+   // AutoLink Direct Access has a guest QRIS path. If the browser retained an
+   // expired/stale session, allow guest checkout only when no member coupon is
+   // requested. All other payment purposes still require a valid member session.
+   if(!user && !(purpose==='autolink_direct_access' && !body.coupon_code)){
+    return reply({error:'Sesi login tidak valid. Silakan login kembali.'},401);
+   }
   }
   const apiKey=Deno.env.get('CASHI_API_KEY'); if(!apiKey) throw new Error('CASHI_API_KEY belum disetel');
 
