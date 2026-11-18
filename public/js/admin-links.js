@@ -18,8 +18,6 @@ async function init(){
  const {data,error}=await sb.from('site_link_settings').select('key,value');
  if(error){$('saveStatus').textContent='Gagal memuat: '+error.message+'. Jalankan SQL migrasi.';return}
  for(const r of data||[])settings[r.key]=r.value||{};
- $('main_whatsapp').value=settings.main_whatsapp?.url||'';
- $('main_telegram').value=settings.main_telegram?.url||'';
  $('noticePanels').innerHTML=pages.map(([k,t,type])=>{
   const n=settings['notice_'+k]||{};
   if(type==='dual') return `<section class="panel">
@@ -49,7 +47,7 @@ async function init(){
 }
 async function save(e){
  e.preventDefault();$('saveStatus').textContent='Menyimpan...';
- const rows=[['main_whatsapp',{url:$('main_whatsapp').value.trim()}],['main_telegram',{url:$('main_telegram').value.trim()}]];
+ const rows=[];
  for(const [k,,type] of pages){
   let value;
   if(type==='dual') value={
