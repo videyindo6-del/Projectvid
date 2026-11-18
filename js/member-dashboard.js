@@ -146,6 +146,55 @@
     return map;
   }
 
+  async function loadMemberPasteLinks(user) {
+    const statsHost=$('memberPasteStats'),listHost=$('memberPasteList');
+    if(!statsHost||!listHost)return;
+    const showError=message=>{listHost.innerHTML=`<div class="member-paste-state is-error"><i class="fa-solid fa-triangle-exclamation"></i><span>${esc(message)}</span></div>`;};
+    try {
+      const {data:{session}}=await sb.auth.getSession();
+      if(!session?.access_token)throw new Error('Sesi login tidak ditemukan. Silakan login kembali.');
+      const response=await fetch('/api/pastelink?action=list',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+session.access_token},body:JSON.stringify({})});
+      const payload=await response.json();
+      if(!response.ok||!payload.success)throw new Error(payload.error||'Gagal memuat daftar PasteLink.');
+      const rows=Array.isArray(payload.items)?payload.items:[];
+      const fmt=n=>Number(n||0).toLocaleString(lang()==='id'?'id-ID':'en-US');
+      statsHost.innerHTML=[
+        [payload.total,'Total PasteLink','fa-file-lines'],
+        [payload.active,'Link Aktif','fa-circle-check'],
+        [payload.expired,'Kedaluwarsa','fa-clock']
+      ].map(([value,label,icon])=>`<article class="member-paste-stat"><span><i class="fa-solid ${icon}"></i> ${label}</span><strong>${fmt(value)}</strong></article>`).join('');
+      if(!rows.length){listHost.innerHTML=`<div class="member-paste-state"><i class="fa-regular fa-folder-open"></i><b>Belum ada PasteLink</b><span>Buat PasteLink pertama kamu untuk mulai membagikan konten.</span><a href="/pastelink-create.html"><i class="fa-solid fa-plus"></i> Buat PasteLink</a></div>`;return;}
+      listHost.innerHTML=rows.map(item=>{
+        const url=new URL('/pas/'+encodeURIComponent(item.slug),location.origin).href;
+        const isExpired=!!item.expires_at&&Date.parse(item.expires_at)<=Date.now();
+        const isActive=item.status==='published'&&!isExpired;
+        const status=isExpired?'Kedaluwarsa':(item.status==='published'?'Aktif':'Disembunyikan');
+        const date=item.created_at?new Date(item.created_at).toLocaleDateString(lang()==='id'?'id-ID':'en-US',{day:'numeric',month:'short',year:'numeric'}):'—';
+        return `<article class="member-paste-item" data-paste-id="${esc(item.id)}">
+          <div class="member-paste-item-main"><div class="member-paste-item-icon"><i class="fa-solid fa-file-lines"></i></div><div class="member-paste-item-info"><div class="member-paste-item-top"><h3>${esc(item.title||'Tanpa judul')}</h3><span class="member-paste-status ${isActive?'is-active':(isExpired?'is-expired':'is-hidden')}">${status}</span></div><a class="member-paste-url" href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a><small><i class="fa-regular fa-calendar"></i> Dibuat ${esc(date)}</small></div></div>
+          <div class="member-paste-actions"><a href="${esc(url)}" target="_blank" rel="noopener" class="member-paste-action"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>Buka</span></a><button type="button" class="member-paste-action" data-paste-copy="${esc(url)}"><i class="fa-regular fa-copy"></i><span>Salin</span></button><a href="/pastelink-create.html?edit=${encodeURIComponent(item.id)}" class="member-paste-action"><i class="fa-solid fa-pen"></i><span>Edit</span></a><button type="button" class="member-paste-action is-delete" data-paste-delete="${esc(item.id)}"><i class="fa-regular fa-trash-can"></i><span>Hapus</span></button></div>
+        </article>`;
+      }).join('');
+      listHost.querySelectorAll('[data-paste-copy]').forEach(button=>button.addEventListener('click',async()=>{
+        const value=button.dataset.pasteCopy;
+        try{await navigator.clipboard.writeText(value);button.classList.add('is-copied');button.querySelector('span').textContent='Tersalin';setTimeout(()=>{button.classList.remove('is-copied');button.querySelector('span').textContent='Salin';},1800);}
+        catch{window.prompt('Salin link PasteLink:',value);}
+      }));
+      listHost.querySelectorAll('[data-paste-delete]').forEach(button=>button.addEventListener('click',async()=>{
+        const id=button.dataset.pasteDelete;
+        if(!window.confirm('Hapus PasteLink ini? Link yang dihapus tidak lagi dapat dibuka.'))return;
+        button.disabled=true;
+        try{
+          const {data:{session:current}}=await sb.auth.getSession();
+          const response=await fetch('/api/pastelink?action=delete',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+current.access_token},body:JSON.stringify({id})});
+          const result=await response.json();
+          if(!response.ok||!result.success)throw new Error(result.error||'Gagal menghapus PasteLink.');
+          await loadMemberPasteLinks(user);
+        }catch(error){window.alert(error.message||'Gagal menghapus PasteLink.');button.disabled=false;}
+      }));
+    } catch(error) {console.warn('Member PasteLink:',error);showError(error.message||'PasteLink belum dapat dimuat.');}
+  }
+
   async function init() {
     if (!window.sb) { $('latestVideos').innerHTML = empty(t('serviceError')); return; }
     const {data:{user}} = await sb.auth.getUser();
@@ -153,6 +202,7 @@
     const {data:profile} = await sb.from('profiles').select('full_name,role,is_banned').eq('id',user.id).maybeSingle();
     if (profile?.is_banned) { await sb.auth.signOut(); location.replace('/login.html'); return; }
     await sb.from('profiles').update({last_seen_at:new Date().toISOString()}).eq('id',user.id);
+    await loadMemberPasteLinks(user);
     // Publisher metrics: balances and WIF are server-settled, never based on page views.
     const autoStatsHost=$('memberAutoStats'),autoNote=$('memberAutoNote');
     if(autoStatsHost){
