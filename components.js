@@ -68,7 +68,7 @@ function initMemberBottomNav(){
  const closeChoice=()=>{if(addChoice)addChoice.hidden=true;};
  if(openButton&&!openButton.dataset.addChoiceBound){openButton.dataset.addChoiceBound='1';openButton.addEventListener('click',openChoice);}
  addChoice?.querySelectorAll('[data-close-add]').forEach(b=>b.addEventListener('click',closeChoice));
- document.getElementById('bcChoosePastelink')?.addEventListener('click',()=>{closeChoice();openComposer();});
+ document.getElementById('bcChoosePastelink')?.addEventListener('click',()=>{closeChoice();location.href='/pastelink-create.html';});
  composer?.querySelectorAll('[data-close-paste]').forEach(button=>button.addEventListener('click',closeComposer));
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&composer&&!composer.hidden)closeComposer();});
  publishButton?.addEventListener('click',async()=>{
