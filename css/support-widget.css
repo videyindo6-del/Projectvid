@@ -85,3 +85,19 @@
 .bc-support-choice[hidden]{display:none!important}
 .bc-support-whatsapp .bc-support-choice-icon{background:#25a65a}
 .bc-support-telegram .bc-support-choice-icon{background:#229ed9}
+
+
+/* Admin-configured community notices: Telegram on the left, WhatsApp on the right. */
+.bc-community-notice{position:fixed;z-index:1300;top:50%;transform:translateY(-50%);width:min(290px,calc(100vw - 28px));padding:18px 16px 15px;border:1px solid #dbe5ef;border-radius:17px;background:#fff;box-shadow:0 16px 44px rgba(15,35,58,.22);font-family:inherit;color:#18334f}
+.bc-community-notice.telegram{left:14px}.bc-community-notice.whatsapp{right:14px}
+.bc-community-notice[hidden],.bc-community-float[hidden]{display:none!important}
+.bc-community-notice .bc-community-close{position:absolute;right:9px;top:7px;border:0;background:transparent;color:#64748b;font-size:22px;cursor:pointer}
+.bc-community-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;margin-bottom:9px;color:#fff;background:#229ed9;font-size:22px}
+.bc-community-notice.whatsapp .bc-community-icon{background:#20a45a}
+.bc-community-notice b{display:block;font-size:15px;line-height:1.35}
+.bc-community-notice p{margin:6px 0 13px;color:#64748b;font-size:12px;line-height:1.55}
+.bc-community-notice>a{display:flex;justify-content:center;padding:10px 12px;border-radius:10px;background:#229ed9;color:#fff;text-decoration:none;font-size:12px;font-weight:800}
+.bc-community-notice.whatsapp>a{background:#20a45a}
+.bc-community-float{position:fixed;z-index:1290;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;text-decoration:none;font-size:23px;box-shadow:0 8px 24px rgba(13,35,58,.25)}
+.bc-community-float.telegram{left:12px;background:#229ed9}.bc-community-float.whatsapp{right:12px;background:#20a45a}
+@media(max-width:600px){.bc-community-notice.telegram{left:10px;right:auto}.bc-community-notice.whatsapp{right:10px;left:auto}.bc-community-float.telegram{left:10px}.bc-community-float.whatsapp{right:10px}}
