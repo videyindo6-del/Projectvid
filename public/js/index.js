@@ -19,8 +19,8 @@
       bottomCta.hidden = false;
       if (user) {
         if (ctaDescription) ctaDescription.textContent = en()
-          ? 'Continue exploring your Boxcelink member area.'
-          : 'Lanjutkan menjelajahi konten dan fitur member Boxcelink.';
+          ? 'Continue exploring your AL5Link member area.'
+          : 'Lanjutkan menjelajahi konten dan fitur member AL5Link.';
         if (ctaLink) {
           ctaLink.href = '/dashboard.html';
           ctaLink.innerHTML = `${en() ? 'Open Dashboard' : 'Buka Dashboard'} <i class="fa-solid fa-arrow-right"></i>`;
@@ -91,7 +91,7 @@
     if (clear) clear.hidden = !(search?.value || '').length;
     videoGrid.innerHTML = foundVideos.length ? foundVideos.slice(0, 8).map(v => {
       const image = thumb(v.thumbnail_url), previewInfo=!image?(window.ProjectVIDEmbed?.parse(v.thumbnail_url)||window.ProjectVIDEmbed?.parse(v.embed_url)):null, href = `/v/${encodeURIComponent(v.slug || v.id)}`;
-      return `<article class="home-content-card"><a class="home-card-thumb" href="${href}">${image ? `<img src="${esc(image)}" alt="${esc(v.title)}" loading="lazy" onerror="this.remove()">` : previewInfo?.type==='iframe'?`<iframe class="home-provider-poster" src="${esc(previewInfo.src)}" title="${esc(v.title)}" loading="lazy" tabindex="-1"></iframe>`:placeholder('fa-solid fa-play','BOX VIDEY')}<span class="thumb-play"><i class="fa-solid fa-play"></i></span><span class="thumb-tag">BOX VIDEY</span></a><div class="home-card-body"><h3><a href="${href}">${esc(v.title)}</a></h3><div class="home-card-meta"><span><i class="fa-solid fa-circle-play"></i> ${esc(v.provider || 'Video')}</span><span>${Number(v.view_count || 0).toLocaleString(en()?'en-US':'id-ID')} ${t('views','views')}</span></div><a class="home-card-link" href="${href}">${t('Tonton video','Watch video')} <i class="fa-solid fa-arrow-right"></i></a></div></article>`;
+      return `<article class="home-content-card"><a class="home-card-thumb" href="${href}">${image ? `<img src="${esc(image)}" alt="${esc(v.title)}" loading="lazy" onerror="this.remove()">` : previewInfo?.type==='iframe'?`<iframe class="home-provider-poster" src="${esc(previewInfo.src)}" title="${esc(v.title)}" loading="lazy" tabindex="-1"></iframe>`:placeholder('fa-solid fa-play','BOXVIDEO')}<span class="thumb-play"><i class="fa-solid fa-play"></i></span><span class="thumb-tag">BOXVIDEO</span></a><div class="home-card-body"><h3><a href="${href}">${esc(v.title)}</a></h3><div class="home-card-meta"><span><i class="fa-solid fa-circle-play"></i> ${esc(v.provider || 'Video')}</span><span>${Number(v.view_count || 0).toLocaleString(en()?'en-US':'id-ID')} ${t('views','views')}</span></div><a class="home-card-link" href="${href}">${t('Tonton video','Watch video')} <i class="fa-solid fa-arrow-right"></i></a></div></article>`;
     }).join('') : `<div class="home-empty">${t('Video tidak ditemukan.','No videos found.')}</div>`;
 
     telegramGrid.innerHTML = foundReviews.length ? foundReviews.slice(0, 8).map(r => {
