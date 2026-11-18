@@ -351,3 +351,23 @@ body.review-telegram-gate-open{overflow:hidden!important}
 .media-card{display:block;color:inherit;text-decoration:none}.review-thumb-shell.is-failed::after{content:"Book Video · Thumbnail belum tersedia · cek komentar";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;text-align:center;color:#eaf3ff;font-size:12px;font-weight:800;background:linear-gradient(135deg,#173653,#244e75)}.review-thumb-shell.is-failed .review-thumb-fallback{position:relative;z-index:1}.review-thumb-shell.is-failed .review-thumb-fallback{background:linear-gradient(135deg,#173653,#244e75)}
 
 .review-thumb-shell.is-failed.has-fallback::after{display:none}
+
+
+/* Admin-controlled Telegram/WhatsApp notices on Review Detail */
+.review-community-actions{display:flex;flex-wrap:wrap;gap:9px}
+.review-community-link{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 14px;border-radius:11px;color:#fff;text-decoration:none;font-weight:800;font-size:12px;background:#229ed9}
+.review-community-link.whatsapp{background:#20a45a}
+.review-community-link.telegram{background:#229ed9}
+.review-community-toast{position:fixed;z-index:1500;top:50%;transform:translateY(-50%);width:min(290px,calc(100vw - 28px));padding:18px 16px 15px;border:1px solid #dbe5ef;border-radius:17px;background:#fff;box-shadow:0 16px 44px rgba(15,35,58,.22);color:#18334f}
+.review-community-toast.telegram{left:14px}.review-community-toast.whatsapp{right:14px}
+.review-community-toast[hidden],.review-community-float[hidden]{display:none!important}
+.review-community-close{position:absolute;right:9px;top:7px;border:0;background:transparent;color:#64748b;font-size:22px;cursor:pointer}
+.review-community-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;margin-bottom:9px;color:#fff;background:#229ed9;font-size:22px}
+.review-community-toast.whatsapp .review-community-icon{background:#20a45a}
+.review-community-toast b{display:block;font-size:15px;line-height:1.35}
+.review-community-toast p{margin:6px 0 13px;color:#64748b;font-size:12px;line-height:1.55}
+.review-community-toast>a{display:flex;justify-content:center;padding:10px 12px;border-radius:10px;background:#229ed9;color:#fff;text-decoration:none;font-size:12px;font-weight:800}
+.review-community-toast.whatsapp>a{background:#20a45a}
+.review-community-float{position:fixed;z-index:1490;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:#fff;text-decoration:none;font-size:23px;box-shadow:0 8px 24px rgba(13,35,58,.25)}
+.review-community-float.telegram{left:12px;background:#229ed9}.review-community-float.whatsapp{right:12px;background:#20a45a}
+@media(max-width:600px){.review-community-toast.telegram{left:10px;right:auto}.review-community-toast.whatsapp{right:10px;left:auto}.review-community-float.telegram{left:10px}.review-community-float.whatsapp{right:10px}}
