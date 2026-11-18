@@ -15,7 +15,8 @@ Deno.serve(async req => {
       const userClient=createClient(url,anon,{global:{headers:{Authorization:`Bearer ${bearerToken}`}}});
       const authResult=await userClient.auth.getUser();
       user=authResult.data?.user||null;
-      if(!user) return out({error:'Sesi login tidak valid. Muat ulang halaman lalu coba lagi.'},401);
+      // Guest AutoLink orders are authorized below by their one-time guest token.
+      // Do not reject them just because the browser also sent a stale session.
     }
     const body=await req.json(); const order_id=String(body?.order_id||'').trim();
     if(!order_id) return out({error:'Order ID tidak dikirim'},400);
