@@ -28,7 +28,7 @@ export async function onRequest(context) {
         { headers },
       ),
       fetch(
-        `${base}/rest/v1/social_posts?select=public_url&short_code=eq.${encodeURIComponent(code)}&status=eq.published&limit=1`,
+        `${base}/rest/v1/social_posts?select=id,post_type&short_code=eq.${encodeURIComponent(code)}&status=eq.published&limit=1`,
         { headers },
       ),
     ]);
@@ -50,19 +50,15 @@ export async function onRequest(context) {
 
     if (pasteResponse.ok) {
       const rows = await pasteResponse.json();
-      const target = rows?.[0]?.public_url;
-      if (target) {
-        const destination = new URL(target);
-        if (["http:", "https:"].includes(destination.protocol)) {
-          return new Response(null, {
-            status: 302,
-            headers: {
-              Location: destination.href,
-              ...noStore,
-              "Referrer-Policy": "no-referrer",
-            },
-          });
-        }
+      if (rows?.[0]?.id && rows?.[0]?.post_type === "paste_link") {
+        return new Response(null, {
+          status: 302,
+          headers: {
+            Location: new URL(`/pas/${encodeURIComponent(code)}`, context.request.url).href,
+            ...noStore,
+            "Referrer-Policy": "no-referrer",
+          },
+        });
       }
     }
 
