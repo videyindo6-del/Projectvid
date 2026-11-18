@@ -65,6 +65,40 @@
   })();
 
 
+
+  // Community notifications for the support widget, configured in Admin > Link & Notifikasi.
+  (async () => {
+    try {
+      if (!window.sb) return;
+      const { data, error } = await sb.from('site_link_settings').select('value')
+        .eq('key', 'notice_widget').maybeSingle();
+      if (error) throw error;
+      const n = data?.value || {};
+      if (!n.enabled) return;
+      const valid = value => /^https?:\/\//i.test(String(value || '').trim());
+      const items = [
+        { key:'telegram', url:valid(n.telegram_url)?n.telegram_url.trim():'', label:n.telegram_button||'Gabung Telegram', icon:'fa-brands fa-telegram', delay:5000 },
+        { key:'whatsapp', url:valid(n.whatsapp_url)?n.whatsapp_url.trim():'', label:n.whatsapp_button||'Gabung WhatsApp', icon:'fa-brands fa-whatsapp', delay:10000 }
+      ].filter(item=>item.url);
+      items.forEach(item=>{
+        const notice=document.createElement('aside');
+        notice.className=`bc-community-notice ${item.key}`;
+        notice.innerHTML=`<button class="bc-community-close" type="button" aria-label="Tutup">×</button><span class="bc-community-icon"><i class="${item.icon}"></i></span><b>${esc(n.title||'Gabung komunitas resmi')}</b><p>${esc(n.description||'Dapatkan informasi dan update terbaru BoxCellink.')}</p><a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">${esc(item.label)}</a>`;
+        const floating=document.createElement('a');
+        floating.className=`bc-community-float ${item.key}`;
+        floating.href=item.url;floating.target='_blank';floating.rel='noopener noreferrer';
+        floating.setAttribute('aria-label',`Buka ${item.key}`);
+        floating.innerHTML=`<i class="${item.icon}"></i>`;
+        floating.hidden=true;notice.hidden=true;
+        document.body.append(notice,floating);
+        const dismiss=()=>{notice.hidden=true;floating.hidden=false;};
+        notice.querySelector('.bc-community-close').addEventListener('click',dismiss);
+        notice.querySelector('a').addEventListener('click',()=>{notice.dataset.dismissed='1';});
+        window.setTimeout(()=>{if(notice.dataset.dismissed!=='1')notice.hidden=false;},item.delay);
+      });
+    } catch(error) { console.warn('Widget community notice unavailable',error); }
+  })();
+
   const toggle = $('#bcSupportToggle', root);
   const menu = $('#bcSupportMenu', root);
   const panel = $('#bcSupportPanel', root);
