@@ -4,13 +4,16 @@ const reply=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status
 Deno.serve(async req=>{
  if(req.method==='OPTIONS') return new Response('ok',{headers:cors});
  try {
-  const auth=req.headers.get('Authorization');
+  const auth=req.headers.get('Authorization')||'';
+  const bearerToken=auth.match(/^Bearer\s+(.+)$/i)?.[1]?.trim()||'';
   const url=Deno.env.get('SUPABASE_URL')!, anon=Deno.env.get('SUPABASE_ANON_KEY')!, service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const admin=createClient(url,service);
   const body=await req.json(); const purpose=body.purpose;
   let user:any=null;
-  if(auth){
-   const userClient=createClient(url,anon,{global:{headers:{Authorization:auth}}});
+  // supabase.functions.invoke may send the anon key as Authorization for guests.
+  // Ignore that public key; validate only a real member access token.
+  if(bearerToken && bearerToken!==anon){
+   const userClient=createClient(url,anon,{global:{headers:{Authorization:`Bearer ${bearerToken}`}}});
    const authResult=await userClient.auth.getUser();
    user=authResult.data?.user||null;
    if(!user) return reply({error:'Sesi login tidak valid. Silakan login kembali.'},401);
