@@ -214,7 +214,7 @@ async function initAccount(){
  if(authError)throw authError;
  if(!user){location.replace('/login.html?next='+encodeURIComponent('/account.html'));return;}
  let p=null;
- let profileResult=await sb.from('profiles').select('full_name,username,vip_expires_at,premium_expires_at,role,membership_tier,affiliate_status,payout_method,payout_provider,payout_account_number,payout_account_holder').eq('id',user.id).maybeSingle();
+ let profileResult=await sb.from('profiles').select('full_name,username,game_id,vip_expires_at,premium_expires_at,role,membership_tier,affiliate_status,payout_method,payout_provider,payout_account_number,payout_account_holder').eq('id',user.id).maybeSingle();
  if(profileResult.error){
   console.warn('Account profile extended fields:',profileResult.error.message);
   profileResult=await sb.from('profiles').select('full_name,vip_expires_at,premium_expires_at,role,affiliate_status').eq('id',user.id).maybeSingle();
@@ -229,10 +229,12 @@ async function initAccount(){
  $('publicProfileName').textContent=fullName;
  $('publicProfileUsername').textContent=username?`@${username}`:'@—';
  $('publicUsername').value=username;
+ $('memberGameId') && ($('memberGameId').value=p?.game_id||'');
  $('profileAvatar').textContent=String(fullName).trim().charAt(0).toUpperCase()||'U';
  const now=new Date(),premium=p?.premium_expires_at&&new Date(p.premium_expires_at)>now,vip=p?.vip_expires_at&&new Date(p.vip_expires_at)>now;
  $('accountStatus').textContent=p?.role==='admin'?t('admin'):premium?`${t('premium_until')} ${dateA(p.premium_expires_at)}`:vip?`${t('vip_until')} ${dateA(p.vip_expires_at)}`:t('basic');
 
+ $('gameIdForm')?.addEventListener('submit',async e=>{e.preventDefault();const value=String($('memberGameId')?.value||'').trim();if(value.length>80){showNotice('Game ID maksimal 80 karakter.','error');return;}try{const {error}=await sb.from('profiles').update({game_id:value||null}).eq('id',user.id);if(error)throw error;showNotice('Game ID berhasil diperbarui.','success');}catch(err){showNotice('Gagal menyimpan Game ID: '+(err.message||''),'error');}});
  $('usernameForm').onsubmit=async e=>{
   e.preventDefault();const btn=e.currentTarget.querySelector('button');btn.disabled=true;
   const value=$('publicUsername').value.trim().replace(/^@/,'');

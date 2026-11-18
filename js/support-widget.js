@@ -37,6 +37,10 @@
     dock.innerHTML = items.map(item =>
       `<a class="bc-community-icon ${item.key} is-unconfigured" href="#" aria-label="${item.label}" title="${item.label}" aria-disabled="true"><i class="${item.icon}" aria-hidden="true"></i></a>`
     ).join('');
+    dock.addEventListener('click', event => {
+      const link = event.target.closest('a[aria-disabled="true"]');
+      if (link) event.preventDefault();
+    });
     document.body.appendChild(dock);
 
     const applyLinks = () => {
@@ -63,19 +67,25 @@
           anchor.href = '#';
           anchor.classList.add('is-unconfigured');
           anchor.setAttribute('aria-disabled', 'true');
-          anchor.addEventListener('click', event => event.preventDefault());
         }
       });
     };
 
     applyLinks();
-    if (!window.BOXCELLINK_COMMUNITY_LINKS) {
+    const ensureConfig = () => {
+      if (window.BOXCELLINK_COMMUNITY_LINKS) { applyLinks(); return; }
+      const existing = document.querySelector('script[data-bc-community-config]');
+      if (existing) { existing.addEventListener('load', applyLinks, { once: true }); return; }
       const script = document.createElement('script');
-      script.src = '/js/community-links-config.js?v=20261118-2';
+      script.src = '/js/community-links-config.js?v=20261118-3';
+      script.dataset.bcCommunityConfig = '1';
       script.onload = applyLinks;
       script.onerror = () => console.warn('Community link config gagal dimuat:', script.src);
       document.head.appendChild(script);
-    }
+    };
+    ensureConfig();
+    // Re-apply after all page scripts have initialized; this also repairs cached old widget instances.
+    window.addEventListener('load', ensureConfig, { once: true });
   };
 
   const root = document.createElement('div');

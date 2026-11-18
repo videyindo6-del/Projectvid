@@ -153,6 +153,16 @@
     const {data:profile} = await sb.from('profiles').select('full_name,role,is_banned').eq('id',user.id).maybeSingle();
     if (profile?.is_banned) { await sb.auth.signOut(); location.replace('/login.html'); return; }
     await sb.from('profiles').update({last_seen_at:new Date().toISOString()}).eq('id',user.id);
+    // Publisher metrics: balances and WIF are server-settled, never based on page views.
+    const autoStatsHost=$('memberAutoStats'),autoNote=$('memberAutoNote');
+    if(autoStatsHost){
+      try{const [links,balance]=await Promise.all([sb.from('autolink_public').select('id',{count:'exact',head:true}).eq('publisher_id',user.id).neq('status','deleted'),sb.from('publisher_balances').select('valid_wif,available_balance,cpm').eq('publisher_id',user.id).maybeSingle()]);
+        if(links.error)throw links.error;if(balance.error)throw balance.error;const b=balance.data||{};const fmtMoney=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
+        autoStatsHost.innerHTML=[[links.count||0,'Total AutoLink'],[Number(b.valid_wif||0),'WIF valid'],[fmtMoney(b.available_balance),'Saldo tersedia'],[Number(b.cpm||50).toFixed(2)+'%','CPM saat ini']].map(([v,l])=>`<div class="member-auto-stat"><small>${l}</small><strong>${v}</strong></div>`).join('');
+        if(autoNote)autoNote.textContent='Penghasilan bertambah hanya setelah Redirect valid ditekan di halaman Final. Statistik kunjungan Go dan Task tidak menambah saldo.';
+      }catch(err){console.warn('Member AutoLink stats:',err.message);if(autoNote)autoNote.textContent='Statistik publisher belum tersedia. Pastikan migrasi AutoLink Publisher dan perbaikan dashboard sudah dijalankan.';}
+    }
+
 
     const {data:ann} = await sb.from('announcements').select('title,body').eq('active',true).order('created_at',{ascending:false}).limit(1);
     if (ann?.[0]) {
@@ -187,6 +197,20 @@
       renderPager('reviewPager',page,count||0,loadReviews);
     }
     await Promise.all([loadVideos(1),loadReviews(1)]);
+    // Extra continuously swipeable lanes: latest and oldest Telegram media and BoxVideo.
+    const [latestT,oldestT,latestB,oldestB]=await Promise.all([
+      sb.from('review_items').select('id,slug,title,thumbnail_url,gallery_urls,view_count,price,access').eq('status','published').order('created_at',{ascending:false}).limit(1000),
+      sb.from('review_items').select('id,slug,title,thumbnail_url,gallery_urls,view_count,price,access').eq('status','published').order('created_at',{ascending:true}).limit(1000),
+      sb.from('videos').select('id,slug,title,thumbnail_url,embed_url,view_count,access').eq('status','published').order('created_at',{ascending:false}).limit(1000),
+      sb.from('videos').select('id,slug,title,thumbnail_url,embed_url,view_count,access').eq('status','published').order('created_at',{ascending:true}).limit(1000)
+    ]);
+    const renderReviewLane=(rows)=> (rows||[]).map(r=>`<a class="mini-card" href="${safeReviewUrl(r)}">${thumb(r.thumbnail_url||(Array.isArray(r.gallery_urls)?r.gallery_urls[0]:''),r.title,'fa-telegram')}<b>${esc(r.title||t('noTitle'))}</b><span><i class="fa-brands fa-telegram"></i> ${num(r.view_count)} ${t('views').toLowerCase()}</span></a>`).join('')||empty(t('noReviews'));
+    const renderVideoLane=(rows)=> (rows||[]).map(v=>`<a class="mini-card" href="${safeVideoUrl(v)}">${thumb(v.thumbnail_url||v.embed_url,v.title,'fa-play')}<b>${esc(v.title||t('noTitle'))}</b><span><i class="fa-solid fa-eye"></i> ${num(v.view_count)} ${t('views').toLowerCase()}</span></a>`).join('')||empty(t('noVideos'));
+    if($('latestTelegramAll'))$('latestTelegramAll').innerHTML=renderReviewLane(latestT.data);
+    if($('oldestTelegramAll'))$('oldestTelegramAll').innerHTML=renderReviewLane(oldestT.data);
+    if($('latestBoxAll'))$('latestBoxAll').innerHTML=renderVideoLane(latestB.data);
+    if($('oldestBoxAll'))$('oldestBoxAll').innerHTML=renderVideoLane(oldestB.data);
+
 
     // VIP strip only contains published VIP videos.
     const {data:vipVideos,error:vipError}=await sb.from('videos').select('id,slug,title,thumbnail_url,embed_url,view_count,access').eq('status','published').eq('access','vip').order('created_at',{ascending:false}).limit(8);
@@ -202,7 +226,7 @@
     if(topReviewError) console.warn('Top Telegram:',topReviewError.message);
     const topVideoStats=await fetchVideoStats((topVideos||[]).map(v=>v.id));
     const reviewStats=await fetchReviewStats();
-    const rankedReviews=[...(topReviews||[])].sort((a,b)=>Number(reviewStats.get(b.id)?.total_sold||0)-Number(reviewStats.get(a.id)?.total_sold||0)).slice(0,10);
+    const rankedReviews=[...(topReviews||[])].sort((a,b)=>Number(reviewStats.get(b.id)?.total_links||0)-Number(reviewStats.get(a.id)?.total_links||0)).slice(0,10);
     $('topTelegram').innerHTML=rankedReviews.map((r,i)=>rankCard(r,i,'telegram',reviewStats.get(r.id)||{})).join('') || empty(t('noReviews'));
     $('topBox').innerHTML=(topVideos||[]).map((v,i)=>rankCard(v,i,'video',topVideoStats.get(v.id)||{})).join('') || empty(t('noVideos'));
   }
