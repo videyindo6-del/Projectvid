@@ -8,6 +8,21 @@ let currentUser=null,profile=null;
 const message=(s,e=false)=>{$('alPaymentMessage').innerHTML=`<div class="al-alert ${e?'error':''}">${s}</div>`;};
 const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
 const authHeaders=async()=>{const {data:{session}}=await sb.auth.getSession();return session?.access_token?{authorization:'Bearer '+session.access_token}:{};};
+async function invokeFunction(name,options){
+ const {data,error}=await sb.functions.invoke(name,options);
+ if(error){
+  let detail='';
+  try{
+   const response=error.context;
+   if(response&&typeof response.clone==='function'){
+    const payload=await response.clone().json();
+    detail=payload?.error||payload?.message||'';
+   }
+  }catch(_){}
+  throw new Error(detail||error.message||'Permintaan pembayaran gagal.');
+ }
+ return data;
+}
 async function init(){
  $('alPaymentInfo').textContent='AutoLink: '+code+' · Harga dasar Rp3.500.';
  const {data:{session}}=await sb.auth.getSession();
@@ -50,7 +65,7 @@ $('alCreatePayment').onclick=async()=>{
    setTimeout(()=>location.replace(d.destination),900);
    return;
   }
-  const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'autolink_direct_access',short_code:code,coupon_code:coupon||undefined}});
+  const data=await invokeFunction('create-payment',{body:{purpose:'autolink_direct_access',short_code:code,coupon_code:coupon||undefined}});
   if(error)throw error;
   if(!data?.success)throw Error(data?.error||'Gagal membuat pembayaran.');
   order=data.order_id;guestToken=data.guest_token||null;
@@ -67,8 +82,7 @@ $('alCheckPayment').onclick=async()=>{
  if(!order)return;
  try{
   const body={order_id:order,...(guestToken?{guest_token:guestToken}:{})};
-  const {data,error}=await sb.functions.invoke('payment-status',{body});
-  if(error)throw error;
+  const data=await invokeFunction('payment-status',{body});
   if(data?.status!=='SETTLED'){message('Pembayaran belum terverifikasi. Silakan periksa kembali setelah membayar.');return;}
   const headers=await authHeaders();
   const r=await fetch('/api/autolink?action=paid-access',{method:'POST',headers:{'content-type':'application/json',...headers},body:JSON.stringify(body)});
