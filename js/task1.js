@@ -197,10 +197,8 @@ if(directToast){
 /* Telegram invitation: appears after 10 seconds, then becomes a floating shortcut when dismissed. */
 const telegramDialog=$('task1TelegramDialog');
 const telegramFloat=$('task1TelegramFloat');
-const communityLinks=window.BOXCELLINK_COMMUNITY_LINKS||{};
-const telegramUrl=communityLinks.telegram?.url||'';
-const telegramJoin=$('task1TelegramJoin');
-if(telegramJoin&&telegramUrl)telegramJoin.href=telegramUrl;
+const telegramUrl=window.BOXCELLINK_COMMUNITY_LINKS?.telegram?.url||'';
+if($('task1TelegramJoin')&&telegramUrl)$('task1TelegramJoin').href=telegramUrl;
 function dismissTelegram(){
   if(telegramDialog){
     telegramDialog.classList.remove('is-visible');

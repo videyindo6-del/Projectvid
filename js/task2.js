@@ -200,10 +200,8 @@ if(slide)setTimeout(showSlide,5000);
 
 // WhatsApp channel invitation appears once after 10 seconds; dismissing it leaves a floating shortcut.
 const waDialog=$('task2WaDialog'),waFloat=$('task2WaFloat');
-const communityLinks=window.BOXCELLINK_COMMUNITY_LINKS||{};
-const whatsappUrl=communityLinks.whatsapp?.url||'';
-const waJoin=$('task2WaJoin');
-if(waJoin&&whatsappUrl)waJoin.href=whatsappUrl;
+const whatsappUrl=window.BOXCELLINK_COMMUNITY_LINKS?.whatsapp?.url||'';
+if($('task2WaJoin')&&whatsappUrl)$('task2WaJoin').href=whatsappUrl;
 function dismissWa(){
   if(waDialog){waDialog.classList.remove('is-visible');setTimeout(()=>{waDialog.hidden=true;},220);}
   if(waFloat)waFloat.hidden=false;

@@ -4,10 +4,14 @@ const code=new URLSearchParams(location.search).get('code')||'';
 let saved=null;try{saved=JSON.parse(sessionStorage.getItem('al_session')||'null')}catch{}
 if(!saved||saved.code!==code){location.replace('/x/'+encodeURIComponent(code));return;}
 const API='/api/autolink?action=';
-const communityLinks=window.BOXCELLINK_COMMUNITY_LINKS||{};
-const TELE=communityLinks.telegram?.url||'';
-const WA=communityLinks.whatsapp?.url||'';
-[['task3Telegram',TELE],['task3TelegramNoticeJoin',TELE],['task3Whatsapp',WA],['task3WhatsappNoticeJoin',WA]].forEach(([id,url])=>{const link=document.getElementById(id);if(link&&url)link.href=url;});
+const COMMUNITY=window.BOXCELLINK_COMMUNITY_LINKS||{};
+const TELE=COMMUNITY.telegram?.url||'';
+const WA=COMMUNITY.whatsapp?.url||'';
+const setCommunityHref=(id,url)=>{const el=$(id);if(el&&url)el.href=url;};
+setCommunityHref('task3Telegram',TELE);
+setCommunityHref('task3Whatsapp',WA);
+setCommunityHref('task3TelegramNoticeJoin',TELE);
+setCommunityHref('task3WhatsappNoticeJoin',WA);
 const SPONSOR='https://www.profitableratecpmnetwork.com/vw721j6q?key=e997cbbb9bbee0de7820bd0c98fc8351';
 let progressIndex=12,busy=false,telegramOpened=false,whatsappOpened=false;
 const post=async(action,payload={})=>{const r=await fetch(API+action,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({session_id:saved.id,token:saved.token,...payload})});let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.error||'Permintaan belum berhasil');return d;};
