@@ -2,8 +2,17 @@
 -- Run this migration once in Supabase SQL Editor after the existing VIP Group migrations.
 begin;
 
+-- Keep the order snapshot columns available for checkout and settlement recovery.
+alter table public.cashi_orders
+  add column if not exists vip_group_id uuid references public.vip_groups(id) on delete set null,
+  add column if not exists vip_group_invite_url text;
+
 alter table public.vip_group_entitlements
   add column if not exists invite_expires_at timestamptz;
+
+create index if not exists cashi_orders_vip_group_user_history_idx
+  on public.cashi_orders(user_id, settled_at desc)
+  where purpose='vip_group' and status='SETTLED';
 
 create table if not exists public.vip_group_secrets(
   group_id uuid primary key references public.vip_groups(id) on delete cascade,
