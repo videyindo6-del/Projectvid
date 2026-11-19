@@ -316,6 +316,11 @@ async function initAccount(){
  await loadPurchasedMedia(user);
  await loadVipPurchaseHistory(user);
 
+ // Repair paid Group VIP orders before reading the member's access list.
+ // This is idempotent and only processes SETTLED orders owned by this account.
+ const {data:syncResult,error:syncError}=await sb.rpc('sync_my_vip_group_entitlements');
+ if(syncError)console.warn('VIP Group history sync:',syncError.message);
+ else if(syncResult?.ok===false)console.warn('VIP Group history sync:',syncResult.reason);
  const {data:groups,error:gerror}=await sb.rpc('get_my_vip_group_entitlements');
  const groupRows=groups||[];
  $('groupLinks').innerHTML=gerror?emptyState('fa-triangle-exclamation',langA()==='en'?'Group history unavailable':'Riwayat group belum dapat dimuat',gerror.message):groupRows.map(x=>{
