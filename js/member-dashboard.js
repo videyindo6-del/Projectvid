@@ -103,7 +103,7 @@
     const title = item.title || t('noTitle');
     const gallery = Array.isArray(item.gallery_urls) ? item.gallery_urls : [];
     const cover = isTelegram ? (item.thumbnail_url || gallery.map(x => typeof x === 'string' ? x : (x?.url || x?.src || x?.thumbnail_url || x?.embed_url || '')).find(Boolean)) : (item.thumbnail_url || item.embed_url);
-    const metric = isTelegram ? `${num(stats.total_sold)} ${t('sold').toLowerCase()}` : `${num(item.view_count)} ${t('views').toLowerCase()}`;
+    const metric = `${num(item.view_count)} ${t('views').toLowerCase()}`;
     const medal = index === 0 ? 'fa-trophy' : index === 1 ? 'fa-medal' : index === 2 ? 'fa-award' : 'fa-hashtag';
     return `<a class="mini-card rank-card rank-${index+1}" href="${href}">
       <span class="rank-badge"><i class="fa-solid ${medal}"></i><b>#${index+1}</b></span>
@@ -160,7 +160,8 @@
       const fmt=n=>Number(n||0).toLocaleString(lang()==='id'?'id-ID':'en-US');
       statsHost.innerHTML=[
         [payload.total,'Total PasteLink','fa-file-lines'],
-        [payload.active,'Link Aktif','fa-circle-check'],
+        [payload.total_views,'Total View','fa-eye'],
+        [payload.published,'Sudah Dipublikasikan','fa-circle-check'],
         [payload.expired,'Kedaluwarsa','fa-clock']
       ].map(([value,label,icon])=>`<article class="member-paste-stat"><span><i class="fa-solid ${icon}"></i> ${label}</span><strong>${fmt(value)}</strong></article>`).join('');
       if(!rows.length){listHost.innerHTML=`<div class="member-paste-state"><i class="fa-regular fa-folder-open"></i><b>Belum ada PasteLink</b><span>Buat PasteLink pertama kamu untuk mulai membagikan konten.</span><a href="/pastelink-create.html"><i class="fa-solid fa-plus"></i> Buat PasteLink</a></div>`;return;}
@@ -270,13 +271,13 @@
     // Ranking uses only published rows; top ten is calculated independently from the paginated lists.
     const [{data:topVideos,error:topVideoError},{data:topReviews,error:topReviewError}] = await Promise.all([
       sb.from('videos').select('id,slug,title,thumbnail_url,embed_url,view_count,access').eq('status','published').order('view_count',{ascending:false}).limit(10),
-      sb.from('review_items').select('id,slug,title,thumbnail_url,gallery_urls,view_count,price,access').eq('status','published').order('created_at',{ascending:false}).limit(1000)
+      sb.from('review_items').select('id,slug,title,thumbnail_url,gallery_urls,view_count,price,access').eq('status','published').order('view_count',{ascending:false}).limit(10)
     ]);
     if(topVideoError) console.warn('Top BoxVidey:',topVideoError.message);
     if(topReviewError) console.warn('Top Telegram:',topReviewError.message);
     const topVideoStats=await fetchVideoStats((topVideos||[]).map(v=>v.id));
     const reviewStats=await fetchReviewStats();
-    const rankedReviews=[...(topReviews||[])].sort((a,b)=>Number(reviewStats.get(b.id)?.total_links||0)-Number(reviewStats.get(a.id)?.total_links||0)).slice(0,10);
+    const rankedReviews=topReviews||[];
     $('topTelegram').innerHTML=rankedReviews.map((r,i)=>rankCard(r,i,'telegram',reviewStats.get(r.id)||{})).join('') || empty(t('noReviews'));
     $('topBox').innerHTML=(topVideos||[]).map((v,i)=>rankCard(v,i,'video',topVideoStats.get(v.id)||{})).join('') || empty(t('noVideos'));
   }
