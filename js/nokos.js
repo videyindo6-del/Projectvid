@@ -4,7 +4,7 @@
  const input=document.getElementById('nokosChatInput'),send=form?.querySelector('button');
  if(!feed||!form||!input||!send)return;
  const HUB='https://chat.whatsapp.com/LCBrSdRWPWp2yk3pTeuMdM?s=cl&p=a&iam=2';
- let busy=false,stage='start',lastService='';
+ let busy=false,stage='start',selectedApp='',selectedType='';
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const scroll=()=>{feed.scrollTop=feed.scrollHeight;};
  function message(text,who='bot',actions=[]){
@@ -14,28 +14,52 @@
    feed.appendChild(wrap);scroll();
  }
  function typing(){const el=document.createElement('div');el.className='nokos-msg is-bot nokos-typing';el.innerHTML='<div class="nokos-bubble"><i></i><i></i><i></i></div>';feed.appendChild(el);scroll();return el;}
- function reply(text,actions=[],delay=850){if(busy)return;busy=true;input.disabled=true;send.disabled=true;const wait=typing();setTimeout(()=>{wait.remove();message(text,'bot',actions);busy=false;input.disabled=false;send.disabled=false;input.focus();},delay);}
- function hub(){reply('Oke Ready, Silahkan Langsung Masuk Kesini dan mengikuti Aturan Dan Privasi.\nJangan Percayakan Yang Mengatasnamakan Kita.',[{label:'Hub Admin / Gabung Grup',run:()=>window.open(HUB,'_blank','noopener,noreferrer')}],700);}
- function showStart(){reply('🌐 Layanan Tersedia\n\n➡️ Telegram\nPembelian nomor Telegram yang siap pakai\n\n➡️ Layanan Lain\nPembelian OTP berbagai aplikasi seperti WhatsApp, Google, dan Facebook',[
-  {label:'Telegram',run:telegram},{label:'Layanan Lain',run:other}
-],900);}
- function telegram(){stage='telegram-country';reply('Syarat & Ketentuan:\n——————————————\n• Nomor yang dibeli tidak dapat dikembalikan\n• Kami tidak bertanggung jawab atas penyalahgunaan nomor\n• Dilarang menghapus akun secara permanen\n• Perangkat/server tidak dikeluarkan\n• Akun dapat terkena pembatasan jika melanggar aturan aplikasi\n\nKalian wajib membaca informasi tersebut untuk menghindari masalah di kemudian hari.',[],900);setTimeout(()=>{if(stage==='telegram-country')reply('Silahkan Beritahu saya negara mana atau nomor mana yang anda mau.',[],3000);},950);}
- function other(){stage='other-app';reply('Silahkan Kirim atau beritahu saya Aplikasi Yang Anda Mau.',[],800);}
+ function reply(text,actions=[],delay=450){
+   if(busy)return;busy=true;input.disabled=true;send.disabled=true;const wait=typing();
+   setTimeout(()=>{wait.remove();message(text,'bot',actions);busy=false;input.disabled=false;send.disabled=false;input.focus();},delay);
+ }
+ const apps=['Telegram','WhatsApp','Facebook','Gmail / Google','Instagram','TikTok','Discord','Aplikasi lainnya'];
+ function appButtons(){return apps.map(app=>({label:app,run:()=>chooseApp(app)}));}
+ function showStart(){stage='app';reply('Halo! Saya asisten layanan Ready Nokos. Pilih aplikasi yang kamu butuhkan. Kami akan bantu teruskan permintaan ke admin untuk pengecekan ketersediaan nomor dan OTP.',appButtons(),500);}
+ function chooseApp(app){selectedApp=app;stage='type';message(app,'user');reply('Untuk '+app+', kamu membutuhkan layanan yang mana?',[
+   {label:'Nomor siap pakai',run:()=>chooseType('Nomor siap pakai')},
+   {label:'Kode OTP / Verifikasi',run:()=>chooseType('Kode OTP / Verifikasi')}
+ ]);}
+ function chooseType(type){selectedType=type;stage='country';message(type,'user');reply('Baik. Untuk '+selectedApp+' — '+selectedType+'. Sebutkan negara atau kode negara yang kamu inginkan. Jika belum tahu, ketik “bebas”.');}
+ function sendToAdmin(){
+   stage='done';
+   reply('Permintaan kamu sudah dirangkum:\n• Aplikasi: '+selectedApp+'\n• Layanan: '+selectedType+'\n\nSilakan gabung ke grup WhatsApp resmi dan ikuti arahan admin. Admin akan memeriksa ketersediaan, harga, serta proses pesanan. Jangan kirim kata sandi atau OTP akun pribadi ke siapa pun.',[
+    {label:'GABUNG GRUP WHATSAPP & HUBUNGI ADMIN',run:()=>window.open(HUB,'_blank','noopener,noreferrer')},
+    {label:'Pilih layanan lain',run:()=>{selectedApp='';selectedType='';showStart();}}
+   ],550);
+ }
  function handle(raw){
-   const v=raw.trim();if(!v||busy)return;message(v,'user');
-   const q=v.toLowerCase();
-   if(/^(telegram|tele|tg)$/.test(q)){telegram();return;}
-   if(/^(layanan lain|lainnya|other)$/.test(q)){other();return;}
-   if(stage==='start'){if(/whatsapp|google|facebook|instagram|tiktok|discord|aplikasi|otp/.test(q)){stage='other-app';reply('Silahkan Kirim atau beritahu saya Aplikasi Yang Anda Mau.');}else{showStart();}return;}
-   if(stage==='other-app'){
-     if(/^(hai|halo|hello|p|test|tes)$/.test(q)){reply('Halo! Saya bantu arahkan. Aplikasi apa yang kamu cari?');return;}
-     lastService=v;stage='other-country';reply('Untuk '+v+', silahkan kirim negara mana yang anda mau karena setiap negara memiliki harga dan ketersediaan yang berbeda.');return;
+   const v=raw.trim();if(!v||busy)return;message(v,'user');const q=v.toLowerCase();
+   if(/^(mulai|menu|start|ulang|kembali)$/.test(q)){showStart();return;}
+   if(stage==='app'){
+     const found=apps.find(a=>a.toLowerCase()===q)||apps.find(a=>q.includes(a.toLowerCase()));
+     if(found){chooseApp(found);return;}
+     if(/otp|nomor|nokos|telegram|whatsapp|facebook|gmail|google|instagram|tiktok|discord/.test(q)){
+       const app=apps.find(a=>q.includes(a.toLowerCase()))||(q.includes('google')?'Gmail / Google':q.includes('otp')?'Aplikasi lainnya':'');
+       if(app){chooseApp(app);return;}
+     }
+     reply('Silakan pilih salah satu aplikasi berikut agar permintaanmu tercatat dengan benar.',appButtons());return;
    }
-   if(stage==='telegram-country'||stage==='other-country'){stage='hub';hub();return;}
-   if(/nomor|no.?kos|otp|kode|negara|country|telegram|whatsapp|google|facebook|harga|beli|pesan|aplikasi|ready/.test(q)){stage='hub';hub();return;}
-   if(/anjing|babi|kontol|memek|ngentot|fuck|bitch|porno|jorok/.test(q)){reply('Mari gunakan bahasa yang sopan agar kami bisa membantu dengan baik. Jika ingin konsultasi nomor atau OTP, silakan hubungi admin melalui grup resmi.',[{label:'Hub Admin / Gabung Grup',run:()=>window.open(HUB,'_blank','noopener,noreferrer')}]);return;}
-   reply('Saya siap membantu pertanyaan seputar layanan nomor dan OTP. Silahkan pilih layanan yang ingin ditanyakan.',[{label:'Telegram',run:telegram},{label:'Layanan Lain',run:other},{label:'Hub Admin',run:()=>window.open(HUB,'_blank','noopener,noreferrer')}]);
+   if(stage==='type'){
+     if(/otp|kode|verifikasi/.test(q)){chooseType('Kode OTP / Verifikasi');return;}
+     if(/nomor|ready|siap pakai/.test(q)){chooseType('Nomor siap pakai');return;}
+     reply('Pilih jenis layanan terlebih dahulu.',[
+       {label:'Nomor siap pakai',run:()=>chooseType('Nomor siap pakai')},
+       {label:'Kode OTP / Verifikasi',run:()=>chooseType('Kode OTP / Verifikasi')}
+     ]);return;
+   }
+   if(stage==='country'){message('Negara/kode negara: '+v,'user');sendToAdmin();return;}
+   if(stage==='done'){reply('Jika ingin membuat permintaan baru, tekan tombol “Pilih layanan lain”. Untuk melanjutkan pesanan, gabung grup WhatsApp resmi.',[
+     {label:'GABUNG GRUP WHATSAPP',run:()=>window.open(HUB,'_blank','noopener,noreferrer')},
+     {label:'Pilih layanan lain',run:showStart}
+   ]);return;}
+   showStart();
  }
  form.addEventListener('submit',e=>{e.preventDefault();const v=input.value;input.value='';handle(v);});
- setTimeout(()=>{feed.innerHTML='';message('Halo! Selamat datang di layanan Ready Nokos. Saya akan membantu menanyakan kebutuhan kamu.');showStart();},1100);
+ setTimeout(()=>{feed.innerHTML='';message('Selamat datang di layanan Ready Nokos.');showStart();},500);
 })();

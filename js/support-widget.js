@@ -159,6 +159,15 @@
       ['Bagaimana cara saya login?','Pilih Masuk, masukkan email dan kata sandi akun BoxCellink. Jika lupa kata sandi, gunakan tautan Lupa Kata Sandi.'],
       ['Bagaimana cara melihat Box Video?','Buka menu BoxVidey atau Box Video. Pilih kategori atau gunakan pencarian, lalu buka video yang ingin ditonton. Video publik dapat ditonton tanpa login; konten login/VIP mengikuti aturan aksesnya.'],
       ['Bagaimana cara mengakses Media Telegram?','Buka menu Media Telegram, cari judul atau kategori, lalu pilih Lihat Review. Ikuti informasi akses pada halaman review; tautan Telegram akan dibuka melalui alur yang tersedia.']
+      ,['Saya sudah membayar Media Telegram, tetapi akses belum terbuka. Apa yang harus dilakukan?','Setelah pembayaran berhasil, tunggu beberapa menit agar sistem menyelesaikan verifikasi dan memperbarui akses. Muat ulang halaman review atau periksa status pembayaran. Jika akses tetap belum terbuka, pilih Chat Admin dan kirim kode pesanan/bukti transaksi tanpa membagikan PIN, kata sandi, atau OTP pribadi.']
+      ,['Bagaimana jika Media Telegram yang saya cari tidak tersedia?','Kamu dapat mengajukan request kepada admin. Sebutkan judul atau jenis media yang dicari, lalu admin akan memeriksa apakah permintaan tersebut bisa dipenuhi.']
+      ,['Bagaimana cara membeli Media Telegram?','Buka Media Telegram, pilih review yang diinginkan, baca detail dan harga akses, lalu tekan tombol pembelian. Selesaikan pembayaran dan tunggu beberapa menit sampai status akses diperbarui. Jika ada kendala, hubungi admin melalui Chat Admin.']
+    ]},
+    {title:'Media Telegram & pembelian',items:[
+      ['Panduan membeli Media Telegram','Buka menu Media Telegram, pilih kategori atau cari judul, buka review, periksa deskripsi dan harga, lalu lanjutkan pembelian. Setelah pembayaran berhasil, tunggu beberapa menit untuk verifikasi dan pembukaan akses.'],
+      ['Pembayaran berhasil tetapi akses belum masuk','Tunggu beberapa menit, muat ulang halaman review, lalu periksa status pembayaran. Jika masih terkunci, hubungi admin dan sertakan kode pesanan agar transaksi dapat diperiksa.'],
+      ['Media tidak tersedia atau ingin request','Kirim judul media atau kebutuhan yang kamu cari melalui Chat Admin. Admin akan memeriksa ketersediaan dan memberi informasi lanjutan.'],
+      ['Saya punya pertanyaan lain','Gunakan Chat Admin untuk menyampaikan pertanyaan, kendala pembelian, atau permintaan khusus.']
     ]},
     {title:'Penghasilan, referral & withdraw',items:[
       ['Bagaimana cara menghasilkan uang di BoxCellink?','Gunakan fitur Referral & Hadiah atau program afiliasi jika tersedia pada akun. Bagikan link referral secara wajar dan ikuti ketentuan program untuk memperoleh saldo/komisi.'],
@@ -183,8 +192,22 @@
   faqChoices?.addEventListener('click',event=>{
     const group=event.target.closest('[data-faq-group]'),question=event.target.closest('[data-faq-question]'),back=event.target.closest('[data-faq-back]');
     if(back){renderFaq();return;}
-    if(question){const item=faqGroups[Number(question.dataset.faqGroup)]?.items[Number(question.dataset.faqQuestion)];if(item)faqAnswer.innerHTML=`<b>${esc(item[0])}</b><p>${esc(item[1])}</p><button type="button" data-faq-back="1">Pilih pertanyaan lain</button>`;return;}
+    if(question){const item=faqGroups[Number(question.dataset.faqGroup)]?.items[Number(question.dataset.faqQuestion)];if(item)faqAnswer.innerHTML=`<b>${esc(item[0])}</b><p>${esc(item[1])}</p><button type="button" class="bc-support-contact-admin" data-contact-admin="${esc(item[0])}">Chat Admin / Ajukan Request</button><button type="button" data-faq-back="1">Pilih pertanyaan lain</button>`;return;}
     if(group)renderFaq(Number(group.dataset.faqGroup));
+  });
+
+  faqAnswer?.addEventListener('click',event=>{
+    const contact=event.target.closest('[data-contact-admin]');
+    if(!contact)return;
+    if(!currentUser){
+      messagesEl.innerHTML='<div class="bc-support-empty"><strong>Masuk untuk menghubungi admin</strong><br>Login terlebih dahulu agar permintaan tersimpan dan dapat dibalas admin.</div>';
+      foot.innerHTML='<a href="/login.html?next='+encodeURIComponent(location.pathname+location.search)+'">Masuk ke akun</a>';
+      return;
+    }
+    form.hidden=false;
+    input.value='[Permintaan: '+contact.dataset.contactAdmin+'] ';
+    input.focus();
+    input.scrollIntoView({behavior:'smooth',block:'nearest'});
   });
 
   const closeChat = () => {
