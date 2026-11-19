@@ -43,8 +43,9 @@ async function pay(){
   if(ownedError)throw ownedError;if(owned)throw new Error(tr('owned'));
   const coupon=document.getElementById('groupCoupon')?.value||'';
   const {data,error}=await sb.functions.invoke('create-payment',{body:{purpose:'vip_group',group_id:selected.id,coupon_code:coupon||undefined,affiliate_code:localStorage.getItem('boxcellink_affiliate_code')||null}});
-  if(error)throw error;if(!data?.checkout_url)throw new Error(data?.error||tr('failed'));
-  sessionStorage.setItem('boxcellink_pending_group_order',data.order_id||'');location.href=data.checkout_url;
+  if(error)throw error;if(!data?.checkout_url||!data?.order_id)throw new Error(data?.error||tr('failed'));
+  localStorage.setItem('boxcellink_pending_group_'+data.order_id,JSON.stringify({order_id:data.order_id,user_id:user.id,group_id:selected.id,group_name:selected.name,amount:data.amount,qr_url:data.qrUrl||null,checkout_url:data.checkout_url,expires_at:data.expires_at||null,created_at:new Date().toISOString()}));
+  location.href='/vip-group-checkout.html?order_id='+encodeURIComponent(data.order_id);
  }catch(e){alert(e.message||tr('failed'))}
  finally{busy=false;btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-lock"></i> '+tr('payment')}
 }
