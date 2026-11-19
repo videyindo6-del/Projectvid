@@ -7,7 +7,7 @@
  */
 window.BOXCELLINK_COMMUNITY_LINKS = Object.freeze({
   telegram: {
-    url: "https://t.me/+7I3Xnl1PLdZjMTY0",
+    url: "https://t.me/+-0qZ2iBc2KkyMGNl",
     label: "Gabung Telegram"
   },
   whatsapp: {
