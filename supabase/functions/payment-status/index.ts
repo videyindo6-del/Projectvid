@@ -36,7 +36,16 @@ Deno.serve(async req => {
       const hash=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
       if(!payment?.guest_token_hash||payment.guest_token_hash!==hash) return out({error:'Token pembayaran tidak cocok'},403);
     }
-    if(o.status==='SETTLED') return out({success:true,status:'SETTLED'});
+    if(o.status==='SETTLED'){
+      if(o.purpose==='vip_group'){
+        const {data:grantData,error:grantError}=await admin.rpc('ensure_vip_group_entitlement_for_order',{p_order_id:order_id});
+        if(grantError||!grantData?.ok){
+          console.error('VIP Group entitlement recovery failed for settled order',grantError||grantData);
+          return out({error:'Pembayaran sudah tercatat berhasil, tetapi link Group VIP belum dapat diterbitkan. Hubungi admin dengan Order ID.',detail:grantData||grantError?.message,order_id},500);
+        }
+      }
+      return out({success:true,status:'SETTLED',order_id});
+    }
     if(['EXPIRED','FAILED'].includes(String(o.status).toUpperCase())) return out({success:true,status:o.status});
     const key=Deno.env.get('CASHI_API_KEY');
     if(!key) return out({error:'CASHI_API_KEY belum disetel pada Supabase Edge Functions'},500);
@@ -99,6 +108,15 @@ Deno.serve(async req => {
       }
       const {data,error}=await admin.rpc('settle_cashi_order',{p_order_id:order_id,p_amount:expected,p_payload:d});
       if(error||!data?.ok){console.error('Cashi settlement rejected',error||data);return out({error:'Pembayaran terdeteksi SETTLED tetapi aktivasi akses gagal. Hubungi admin dengan Order ID.',detail:data||error?.message},500);}
+      // Idempotent recovery: settlement may have succeeded earlier while the
+      // VIP Group entitlement insert failed or the invite URL was not configured.
+      if(o.purpose==='vip_group'){
+        const {data:grantData,error:grantError}=await admin.rpc('ensure_vip_group_entitlement_for_order',{p_order_id:order_id});
+        if(grantError||!grantData?.ok){
+          console.error('VIP Group entitlement recovery failed',grantError||grantData);
+          return out({error:'Pembayaran berhasil, tetapi link Group VIP belum dapat diterbitkan. Hubungi admin dengan Order ID.',detail:grantData||grantError?.message,order_id},500);
+        }
+      }
     }
     if(['EXPIRED','FAILED','CANCELLED','CANCELED'].includes(state)) {
       if(o.coupon_code) await admin.rpc('release_referral_coupon',{p_order_id:order_id});
