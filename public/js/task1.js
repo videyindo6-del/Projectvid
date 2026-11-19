@@ -197,7 +197,8 @@ if(directToast){
 /* Telegram invitation: appears after 10 seconds, then becomes a floating shortcut when dismissed. */
 const telegramDialog=$('task1TelegramDialog');
 const telegramFloat=$('task1TelegramFloat');
-const telegramUrl='https://t.me/+7I3Xnl1PLdZjMTY0';
+const telegramUrl=window.BOXCELLINK_COMMUNITY_LINKS?.telegram?.url||'';
+if($('task1TelegramJoin')&&telegramUrl)$('task1TelegramJoin').href=telegramUrl;
 function dismissTelegram(){
   if(telegramDialog){
     telegramDialog.classList.remove('is-visible');
@@ -215,7 +216,7 @@ if(telegramDialog){
   $('task1TelegramJoin')?.addEventListener('click',dismissTelegram);
 }
 telegramFloat?.addEventListener('click',()=>{
-  window.open(telegramUrl,'_blank','noopener,noreferrer');
+  if(telegramUrl)window.open(telegramUrl,'_blank','noopener,noreferrer');
 });
 
 })();

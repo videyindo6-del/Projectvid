@@ -200,6 +200,8 @@ if(slide)setTimeout(showSlide,5000);
 
 // WhatsApp channel invitation appears once after 10 seconds; dismissing it leaves a floating shortcut.
 const waDialog=$('task2WaDialog'),waFloat=$('task2WaFloat');
+const whatsappUrl=window.BOXCELLINK_COMMUNITY_LINKS?.whatsapp?.url||'';
+if($('task2WaJoin')&&whatsappUrl)$('task2WaJoin').href=whatsappUrl;
 function dismissWa(){
   if(waDialog){waDialog.classList.remove('is-visible');setTimeout(()=>{waDialog.hidden=true;},220);}
   if(waFloat)waFloat.hidden=false;
@@ -210,7 +212,7 @@ if(waDialog){
   $('task2WaClose')?.addEventListener('click',dismissWa);
   $('task2WaJoin')?.addEventListener('click',dismissWa);
 }
-waFloat?.addEventListener('click',()=>window.open('https://whatsapp.com/channel/0029Vb8bHHqGZNCnJhHlma1c','_blank','noopener,noreferrer'));
+waFloat?.addEventListener('click',()=>{if(whatsappUrl)window.open(whatsappUrl,'_blank','noopener,noreferrer');});
 
 // Restore backend progress, but require a fresh visible verification action at each stage.
 (async()=>{

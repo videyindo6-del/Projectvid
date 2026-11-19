@@ -1,9 +1,9 @@
 /*
  * BOXCELLINK COMMUNITY LINKS — EDIT LINK DI FILE INI SAJA.
- * Berlaku untuk ikon komunitas pada halaman Watch, Review, dan Detail Review.
+ * Berlaku untuk Task 1, Task 2, Task 3, Watch, Review, dan Detail Review.
  *
  * Ganti URL di bawah dengan link resmi milik Anda.
- * Jika URL YouTube belum tersedia, ikon tetap tampil tetapi belum bisa diklik.
+ * Untuk mengganti grup/komunitas, cukup ubah URL telegram atau whatsapp di bawah ini.
  */
 window.BOXCELLINK_COMMUNITY_LINKS = Object.freeze({
   telegram: {
