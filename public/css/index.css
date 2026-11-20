@@ -457,3 +457,90 @@ body:has(.home-shell){background:#f4f7fb;color:#15263b;font-family:Inter,"Plus J
   .al5-service-card{animation:none!important;filter:none!important}
   .al5-service-card,.al5-service-card:before,.al5-service-card .al5-service-icon,.al5-service-link{transition:none!important}
 }
+
+
+/* AL5Link FULL MOTION LAYER — premium, smooth, mobile-friendly */
+:root { --al5-motion-ease: cubic-bezier(.2,.75,.22,1); }
+.home-hero { animation: al5HeroArrive .9s var(--al5-motion-ease) both, al5HeroGlow 9s ease-in-out 1s infinite alternate !important; }
+.hero-glow-one { animation: al5GlowDrift 11s ease-in-out infinite alternate !important; }
+.hero-glow-two { animation: al5GlowDrift 13s ease-in-out -3s infinite alternate-reverse !important; }
+.hero-kicker { animation: al5KickerFloat 4.5s ease-in-out infinite !important; }
+.hero-kicker .live-dot { animation: liveDotBeat 1.7s ease-in-out infinite !important; }
+.hero-art { animation: al5ArtFloat 6s ease-in-out infinite !important; transform-origin:center; }
+.art-main-card { animation: al5CardHover 5.5s ease-in-out infinite !important; }
+.art-float-top { animation: al5FloatChip 4.2s ease-in-out infinite !important; }
+.art-float-bottom { animation: al5FloatChip 4.8s ease-in-out -1.4s infinite !important; }
+.art-orbit { animation: al5OrbitSpin 22s linear infinite !important; }
+.home-marquee-track { animation: marqueeMove 30s linear infinite !important; will-change:transform; }
+.intro-mark { animation: al5MarkFloat 4.8s ease-in-out infinite !important; }
+.intro-mark > i { animation: al5IconPulse 2.8s ease-in-out infinite !important; }
+.al5-service-card { transition: transform .38s var(--al5-motion-ease), box-shadow .38s ease, border-color .3s ease !important; }
+.al5-service-card:nth-child(odd) { animation: al5CardBreath 7s ease-in-out infinite !important; }
+.al5-service-card:nth-child(even) { animation: al5CardBreath 7s ease-in-out -3.5s infinite !important; }
+.al5-service-icon { animation: serviceIconFloat 4.2s ease-in-out infinite !important; }
+.al5-service-card:nth-child(2) .al5-service-icon { animation-delay:.45s !important; }
+.al5-service-card:nth-child(3) .al5-service-icon { animation-delay:.9s !important; }
+.al5-service-card:nth-child(4) .al5-service-icon { animation-delay:1.35s !important; }
+.al5-service-card:nth-child(5) .al5-service-icon { animation: serviceIconPulse 2.7s ease-in-out infinite !important; }
+.al5-service-card:hover { transform:translate3d(0,-8px,0) scale(1.012) !important; }
+.al5-service-card:hover .al5-service-icon { transform:translateY(-5px) rotate(-7deg) scale(1.1) !important; }
+.al5-guide-band, .al5-referral-detail, .al5-withdraw-detail, .al5-chatbot-section, .home-referral-cta, .home-bottom-cta { position:relative; overflow:hidden; }
+.al5-guide-band:before, .al5-referral-detail:before, .al5-withdraw-detail:before, .al5-chatbot-section:before, .home-referral-cta:before, .home-bottom-cta:before { content:""; position:absolute; pointer-events:none; inset:-120% auto -120% -35%; width:24%; transform:rotate(20deg); background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); animation:al5SectionShine 8s ease-in-out infinite; }
+.al5-guide-points > div { transition:transform .3s ease, box-shadow .3s ease !important; }
+.al5-guide-points > div:hover { transform:translateY(-5px) !important; box-shadow:0 12px 25px rgba(24,64,105,.10); }
+.al5-guide-points > div > i { animation:al5IconWiggle 4s ease-in-out infinite !important; }
+.al5-referral-stats > div, .al5-referral-stats strong { transition:transform .3s ease; }
+.al5-referral-stats > div:hover { transform:translateY(-5px); }
+.al5-referral-stats strong { display:inline-block; animation:al5NumberGlow 3.5s ease-in-out infinite; }
+.al5-withdraw-icon { animation:al5IconPulse 3s ease-in-out infinite !important; }
+.al5-chatbot-section .al5-phone-wrap { animation:al5PhoneFloat 5.5s ease-in-out infinite !important; }
+.al5-bot-avatar { animation:al5BotBob 3.2s ease-in-out infinite !important; }
+.al5-online-dot { animation:liveDotBeat 1.7s ease-in-out infinite !important; }
+.al5-chat-welcome button, .al5-chat-input button { transition:transform .22s ease, box-shadow .22s ease !important; }
+.al5-chat-welcome button:hover, .al5-chat-input button:hover { transform:translateY(-2px) scale(1.04) !important; }
+.home-search { transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease !important; }
+.home-search:focus-within { transform:translateY(-3px) !important; box-shadow:0 16px 34px rgba(31,94,157,.14) !important; border-color:#78aee3 !important; }
+.home-search input { transition:letter-spacing .25s ease !important; }
+.home-search:focus-within input { letter-spacing:.1px; }
+.home-search > i { animation:al5SearchPulse 3s ease-in-out infinite !important; }
+.home-btn, .text-link, .al5-service-link { transition:transform .25s ease, gap .25s ease, box-shadow .25s ease, color .25s ease !important; }
+.home-btn { position:relative; overflow:hidden; }
+.home-btn:after { content:""; position:absolute; inset:-30% auto -30% -55%; width:35%; transform:skewX(-20deg); background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent); transition:left .65s ease; pointer-events:none; }
+.home-btn:hover:after { left:125%; }
+.home-btn:hover { transform:translateY(-3px) !important; box-shadow:0 13px 26px rgba(29,91,151,.17) !important; }
+.home-horizontal-rail > .home-content-card { transition:transform .35s ease, box-shadow .35s ease !important; }
+.home-horizontal-rail > .home-content-card:hover { transform:translateY(-7px) scale(1.012) !important; box-shadow:0 18px 35px rgba(20,53,88,.15) !important; }
+.home-card-thumb img { transition:transform .65s cubic-bezier(.2,.75,.22,1), filter .5s ease !important; }
+.home-content-card:hover .home-card-thumb img { transform:scale(1.055) !important; filter:saturate(1.08); }
+.section-kicker i, .hero-trust i, .home-marquee i, .search-hint i { display:inline-block; animation:al5IconWiggle 3.5s ease-in-out infinite !important; }
+.hero-trust span { transition:transform .25s ease, background .25s ease !important; }
+.hero-trust span:hover { transform:translateY(-3px); background:rgba(255,255,255,.13); }
+.hero-typed-wrap { min-width:18ch; }
+#homeTypedText { display:inline-block; min-width:1ch; opacity:1 !important; visibility:visible !important; color:#a9d7ff !important; -webkit-text-fill-color:#a9d7ff !important; text-shadow:0 0 24px rgba(117,185,255,.35); }
+.hero-caret { animation:homeCaret .78s steps(1,end) infinite !important; }
+.al5-motion-enabled .al5-motion-item { opacity:0; transform:translate3d(0,24px,0) scale(.99); transition:opacity .72s var(--al5-motion-ease), transform .72s var(--al5-motion-ease); transition-delay:var(--al5-motion-delay,0ms); }
+.al5-motion-enabled .al5-motion-item.al5-motion-visible { opacity:1; transform:translate3d(0,0,0) scale(1); }
+@keyframes al5HeroArrive { from{opacity:0;transform:translateY(20px) scale(.985);filter:blur(4px)} to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)} }
+@keyframes al5HeroGlow { from{box-shadow:0 25px 65px rgba(15,45,78,.15)} to{box-shadow:0 30px 78px rgba(27,100,170,.23)} }
+@keyframes al5GlowDrift { from{transform:translate3d(-8px,0,0) scale(.94)} to{transform:translate3d(16px,18px,0) scale(1.12)} }
+@keyframes al5KickerFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+@keyframes al5ArtFloat { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-10px) rotate(.7deg)} }
+@keyframes al5CardHover { 0%,100%{transform:rotate(0) translateY(0)} 50%{transform:rotate(-1deg) translateY(-5px)} }
+@keyframes al5FloatChip { 0%,100%{translate:0 0} 50%{translate:0 -8px} }
+@keyframes al5OrbitSpin { to{transform:rotate(360deg)} }
+@keyframes al5MarkFloat { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-7px) rotate(1deg)} }
+@keyframes al5IconPulse { 0%,100%{transform:scale(1);filter:drop-shadow(0 0 0 rgba(64,143,213,0))} 50%{transform:scale(1.09);filter:drop-shadow(0 5px 9px rgba(64,143,213,.28))} }
+@keyframes al5IconWiggle { 0%,88%,100%{transform:translateY(0) rotate(0)} 92%{transform:translateY(-3px) rotate(-8deg)} 96%{transform:translateY(0) rotate(7deg)} }
+@keyframes al5CardBreath { 0%,100%{box-shadow:0 8px 24px rgba(20,53,88,.045)} 50%{box-shadow:0 13px 30px rgba(35,100,160,.085)} }
+@keyframes al5SectionShine { 0%,65%,100%{left:-40%;opacity:0} 72%{opacity:.65} 88%{left:130%;opacity:0} }
+@keyframes al5NumberGlow { 0%,100%{text-shadow:0 0 0 rgba(48,126,196,0)} 50%{text-shadow:0 0 16px rgba(48,126,196,.22)} }
+@keyframes al5PhoneFloat { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-8px) rotate(.6deg)} }
+@keyframes al5BotBob { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-4px) rotate(5deg)} }
+@keyframes al5SearchPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+@media(max-width:700px){
+ .home-hero{animation-duration:.75s,11s !important}
+ .hero-art{animation-duration:7s !important}
+ .al5-service-card:nth-child(odd),.al5-service-card:nth-child(even){animation-duration:9s !important}
+ .al5-motion-enabled .al5-motion-item{transform:translate3d(0,16px,0) scale(.995)}
+ .home-btn:hover{transform:translateY(-1px) !important}
+}
