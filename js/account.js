@@ -180,7 +180,7 @@ const durationA=value=>{
 };
 async function loadVipPurchaseHistory(user){
  const host=$('vipPurchaseHistory');if(!host)return;
- const {data:orders,error}=await sb.from('cashi_orders').select('order_id,vip_group_id,amount,settled_at,created_at').eq('user_id',user.id).eq('purpose','vip_group').eq('status','SETTLED').order('settled_at',{ascending:false}).limit(100);
+ const {data:orders,error}=await sb.from('cashi_orders').select('order_id,vip_group_id,amount,settled_at,created_at').eq('user_id',user.id).eq('purpose','vip_group').eq('status','SETTLED').order('settled_at',{ascending:false,nullsFirst:false}).order('created_at',{ascending:false}).limit(100);
  if(error){host.innerHTML=emptyState('fa-triangle-exclamation',t('load_failed'),error.message);return;}
  const rows=orders||[];
  if(!rows.length){host.innerHTML=emptyState('fa-crown',t('no_vip_history'));return;}
