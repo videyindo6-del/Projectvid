@@ -6,63 +6,6 @@
   const count = document.getElementById('catalogCount');
   if (!videoGrid || !telegramGrid) return;
 
-  // Rotating, typewriter-style service shortcut. Every phrase remains a real link.
-  const typedLink = document.getElementById('homeTypedService');
-  const typedText = document.getElementById('homeTypedText');
-  if (typedLink && typedText) {
-    const services = [
-      { label: 'Grup Telegram', href: '/vip-groups.html' },
-      { label: 'Telegram Media', href: '/telegram.html' },
-      { label: 'Video BoxVideo', href: '/book-video.html' },
-      { label: 'PasteLink', href: '/pastelink-create.html' },
-      { label: 'AutoLink', href: '/autolink.html' },
-      { label: 'Ready No Cost', href: '/nokos.html' },
-      { label: 'Kode OTP', href: '/nokos.html' }
-    ];
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    let serviceIndex = 0, charIndex = services[0].label.length, deleting = true, timer = null;
-    const showService = () => {
-      const item = services[serviceIndex];
-      typedText.textContent = item.label.slice(0, charIndex);
-      typedLink.href = item.href;
-      typedLink.setAttribute('aria-label', `Buka ${item.label}`);
-    };
-    if (reduceMotion) {
-      showService();
-    } else {
-      const tick = () => {
-        const current = services[serviceIndex].label;
-        if (deleting) {
-          charIndex = Math.max(0, charIndex - 1);
-          showService();
-          if (charIndex === 0) {
-            deleting = false;
-            serviceIndex = (serviceIndex + 1) % services.length;
-            timer = window.setTimeout(tick, 280);
-            return;
-          }
-          timer = window.setTimeout(tick, 48);
-        } else {
-          const next = services[serviceIndex].label;
-          charIndex = Math.min(next.length, charIndex + 1);
-          showService();
-          if (charIndex === next.length) {
-            deleting = true;
-            timer = window.setTimeout(tick, 1750);
-            return;
-          }
-          timer = window.setTimeout(tick, 82);
-        }
-      };
-      showService();
-      timer = window.setTimeout(tick, 1750);
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden && timer) window.clearTimeout(timer);
-        else if (!document.hidden) timer = window.setTimeout(tick, 300);
-      });
-    }
-  }
-
   // Homepage CTA mengikuti sesi Supabase: tombol Login/Register hanya untuk guest.
   const guestActions = document.getElementById('homeGuestActions');
   const bottomCta = document.getElementById('homeBottomCta');
@@ -139,6 +82,37 @@
   };
 
   const placeholder = (icon, label) => `<div class="home-thumb-placeholder"><i class="${icon}"></i><span>${label}</span></div>`;
+
+  // Rotating typewriter headline: static fallback remains visible without JS.
+  const typedNode = document.getElementById('homeTypedText');
+  if (typedNode && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const phrases = ['Telegram Media', 'Grup VIP', 'PasteLink', 'AutoLink', 'Ready No Cost', 'Kode OTP'];
+    let phraseIndex = 0, charIndex = phrases[0].length, deleting = false;
+    const typeNext = () => {
+      const phrase = phrases[phraseIndex];
+      charIndex += deleting ? -1 : 1;
+      typedNode.textContent = phrase.slice(0, Math.max(0, charIndex));
+      let delay = deleting ? 42 : 78;
+      if (!deleting && charIndex >= phrase.length) { deleting = true; delay = 1350; }
+      else if (deleting && charIndex <= 0) { deleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; delay = 300; }
+      window.setTimeout(typeNext, delay);
+    };
+    window.setTimeout(typeNext, 1500);
+  }
+
+  // Reveal sections/cards as they enter the viewport; gracefully falls back without IO.
+  const revealItems = document.querySelectorAll('.al5-service-card,.al5-guide-band,.al5-referral-detail,.al5-withdraw-detail,.al5-chatbot-section,.catalog-section,.home-referral-cta,.home-bottom-cta');
+  if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    revealItems.forEach(item => item.classList.add('home-reveal-pending'));
+    const revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('home-revealed');
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -35px 0px' });
+    revealItems.forEach(item => revealObserver.observe(item));
+  }
 
   function render() {
     const q = (search?.value || '').trim().toLocaleLowerCase(en() ? 'en' : 'id');
