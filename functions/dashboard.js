@@ -1,2 +1,6 @@
 import { serveStaticPage } from "./_utils/serve-static-page.js";
-export async function onRequest(context) { return serveStaticPage(context, "/publisher-dashboard.html"); }
+
+// /dashboard harus menampilkan dashboard member, bukan publisher-dashboard.
+export async function onRequest(context) {
+  return serveStaticPage(context, "/dashboard.html");
+}
