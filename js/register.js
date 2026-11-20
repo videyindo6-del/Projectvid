@@ -12,6 +12,7 @@
   const consent = document.getElementById('registerConsent');
   const submit = document.getElementById('registerSubmit');
   const savedKey = 'boxcellink_saved_accounts';
+  const makeRecoveryCode = () => { const bytes = new Uint8Array(10); crypto.getRandomValues(bytes); return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('').toUpperCase().match(/.{1,4}/g).join('-'); };
   let hasSession = false;
   const notify = (message, type = 'success') => {
     if (!toast) return;
@@ -98,6 +99,11 @@
       });
       if (error) throw error;
       hasSession = !!data?.session;
+      const recoveryCode = makeRecoveryCode();
+      if (!hasSession) throw new Error('Supabase belum membuat sesi otomatis. Pastikan Confirm Email dinonaktifkan sebelum pendaftaran.');
+      const { error: recoveryError } = await window.sb.rpc('set_my_recovery_code', { p_recovery_code: recoveryCode });
+      if (recoveryError) throw new Error('Akun dibuat, tetapi kode pemulihan gagal disimpan. Hubungi admin sebelum keluar: ' + recoveryError.message);
+      document.getElementById('recoveryCodeDisplay').textContent = recoveryCode;
       try {
         const accounts = JSON.parse(localStorage.getItem(savedKey) || '[]');
         const clean = (Array.isArray(accounts) ? accounts : []).filter(account => account && account.email?.toLowerCase() !== email);
