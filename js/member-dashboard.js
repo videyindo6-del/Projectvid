@@ -68,6 +68,41 @@
   const stat = (icon, value, label, color='') => `<span class="stat-item ${color}"><i class="fa-solid ${icon}"></i><b>${num(value)}</b><small>${esc(label)}</small></span>`;
   const safeVideoUrl = v => v.slug ? `/v/${encodeURIComponent(v.slug)}` : `/watch.html?id=${encodeURIComponent(v.id)}`;
   const safeReviewUrl = r => `/r/${encodeURIComponent(r.slug || '')}`;
+  const safeHttp = value => { try { const u=new URL(value,location.origin); return ['http:','https:'].includes(u.protocol)?u.href:null; } catch { return null; } };
+  const linkify = value => esc(value).replace(/(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi, raw => { const href=safeHttp(raw.startsWith('www.')?'https://'+raw:raw); return href?`<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${raw}</a>`:raw; });
+  const rupiahText = n => 'Rp '+Number(n||0).toLocaleString('id-ID');
+  let dashboardMetrics=null;
+  function drawTrend(kind,metric='views'){
+    const data=dashboardMetrics?.[kind+'_trend']||[];const chart=$(kind==='auto'?'autoTrendChart':'pasteTrendChart');const labels=$(kind==='auto'?'autoTrendLabels':'pasteTrendLabels');const title=$(kind==='auto'?'autoTrendTitle':'pasteTrendTitle');const change=$(kind==='auto'?'autoTrendChange':'pasteTrendChange');if(!chart)return;
+    const series=data.map(x=>Number(metric==='income'?x.earned:metric==='cpm'?x.cpm:x.views||0));const max=Math.max(1,...series);const min=Math.min(0,...series);const h=112,w=620;const pts=series.map((v,i)=>`${series.length<2?0:i*(w/(series.length-1))},${h-10-((v-min)/(max-min||1))*(h-24)}`).join(' ');
+    const last=series.at(-1)||0,prev=series.at(-2)||0,diff=last-prev,pct=prev?diff/prev*100:(last?100:0);change.textContent=(diff>=0?'▲ ':'▼ ')+Math.abs(pct).toFixed(1)+'%';change.className='dash-trend-change '+(diff>=0?'up':'down');
+    title.textContent=metric==='income'?'Pendapatan AutoLink':metric==='cpm'?'CPM AutoLink':metric==='pasteviews'?'View PasteLink':'View AutoLink';
+    chart.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Grafik statistik 14 hari"><defs><linearGradient id="${kind}Area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${kind==='auto'?'#23845b':'#397bc0'}" stop-opacity=".25"/><stop offset="1" stop-color="${kind==='auto'?'#23845b':'#397bc0'}" stop-opacity="0"/></linearGradient></defs><polyline points="${pts}" fill="none" stroke="${kind==='auto'?'#23845b':'#397bc0'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="${series.length<2?0:(series.length-1)*(w/(series.length-1))}" cy="${h-10-((last-min)/(max-min||1))*(h-24)}" r="5" fill="${kind==='auto'?'#23845b':'#397bc0'}"/></svg>`;
+    labels.innerHTML=data.map(x=>`<span>${new Date(x.date+'T12:00:00').toLocaleDateString(lang()==='id'?'id-ID':'en-US',{day:'numeric',month:'short'})}</span>`).join('');
+  }
+  async function loadDashboardMetrics(user){
+    const {data,error}=await sb.rpc('get_member_dashboard_metrics');if(error){console.warn('Dashboard metrics RPC:',error.message);return;}
+    dashboardMetrics=data||{};
+    const fmt= n=>Number(n||0).toLocaleString(lang()==='id'?'id-ID':'en-US');
+    const auto=$('memberAutoStats');if(auto){const metrics=[['links',fmt(data.total_autolinks),'Total AutoLink'],['views',fmt(data.auto_today_views),'View hari ini'],['income',rupiahText(data.auto_today_earned),'Pendapatan hari ini'],['cpm',Number(data.cpm||50).toFixed(2)+'%','CPM hari ini']];auto.innerHTML=metrics.map(([key,val,label])=>`<button type="button" class="member-auto-stat dash-metric-button" data-auto-metric="${key}"><small>${label}</small><strong>${val}</strong><span>Lihat statistik <i class="fa-solid fa-arrow-right"></i></span></button>`).join('');auto.querySelectorAll('[data-auto-metric]').forEach(b=>b.addEventListener('click',()=>drawTrend('auto',b.dataset.autoMetric==='income'?'income':b.dataset.autoMetric==='cpm'?'cpm':'views')));}
+    const ps=$('memberPasteStats');if(ps){ps.innerHTML=`<button type="button" class="member-paste-stat dash-paste-metric" data-paste-metric="total"><span><i class="fa-solid fa-file-lines"></i> Total PasteLink</span><strong>${fmt(data.total_pastelinks)}</strong><small>Lihat daftar link</small></button><button type="button" class="member-paste-stat dash-paste-metric" data-paste-metric="views"><span><i class="fa-solid fa-eye"></i> View hari ini</span><strong>${fmt(data.paste_today_views)}</strong><small>Lihat statistik 14 hari</small></button>`;ps.querySelectorAll('[data-paste-metric]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.pasteMetric==='views')drawTrend('paste','pasteviews');else $('memberPasteList')?.scrollIntoView({behavior:'smooth',block:'start'});}));}
+    drawTrend('auto','views');drawTrend('paste','pasteviews');
+  }
+  async function loadAnnouncementCenter(){
+    const {data,error}=await sb.from('announcements').select('id,title,body,created_at').eq('active',true).order('created_at',{ascending:false}).limit(100);
+    if(error){console.warn('Announcements:',error.message);return;}const rows=data||[];const first=rows[0];if(first){$('announcement').querySelector('h2').textContent=first.title;$('announcement').querySelector('p').innerHTML=linkify(first.body);}
+    const list=$('announcementList');if(list)list.innerHTML=rows.map(a=>`<article class="dash-ann-item"><small><i class="fa-regular fa-calendar"></i> ${new Date(a.created_at).toLocaleString(lang()==='id'?'id-ID':'en-US')}</small><h3>${esc(a.title)}</h3><p>${linkify(a.body)}</p></article>`).join('')||'<div class="dash-ann-empty">Belum ada pengumuman admin.</div>';
+    const modal=$('announcementModal');const open=()=>{modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('dash-modal-open');};const close=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.classList.remove('dash-modal-open');};$('showAllAnnouncements')?.addEventListener('click',open);document.querySelectorAll('[data-close-announcements]').forEach(x=>x.addEventListener('click',close));$('announcementRead')?.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+  }
+  async function loadMemberAutoLinks(user){
+    const host=$('memberAutoList');if(!host)return;try{const {data:rows,error}=await sb.from('autolink_public').select('id,short_code,title,description,status,total_visits,total_wif,created_at').eq('publisher_id',user.id).neq('status','deleted').order('created_at',{ascending:false}).limit(200);if(error)throw error;
+      if(!rows?.length){host.innerHTML='<div class="member-paste-state"><i class="fa-solid fa-link"></i><b>Belum ada AutoLink</b><span>Buat AutoLink pertama untuk mulai mendapatkan pendapatan.</span><a href="/autolink-create.html"><i class="fa-solid fa-plus"></i> Buat AutoLink</a></div>';return;}
+      host.innerHTML=rows.map(a=>`<article class="member-paste-item dash-autolink-item"><div class="member-paste-item-main"><div class="member-paste-item-icon auto-icon"><i class="fa-solid fa-bolt"></i></div><div class="member-paste-item-info"><div class="member-paste-item-top"><h3>${esc(a.title||'Tanpa judul')}</h3><span class="member-paste-status ${a.status==='published'?'is-active':'is-hidden'}">${esc(a.status)}</span></div><a class="member-paste-url" target="_blank" rel="noopener" href="/z/${encodeURIComponent(a.short_code)}">${esc(location.origin+'/z/'+a.short_code)}</a><small>${fmtDate(a.created_at)} · ${num(a.total_visits)} view · ${num(a.total_wif)} WIF</small></div></div><div class="member-paste-actions"><a class="member-paste-action" href="/z/${encodeURIComponent(a.short_code)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>Buka</span></a><button class="member-paste-action" type="button" data-auto-edit="${esc(a.id)}"><i class="fa-solid fa-pen"></i><span>Edit</span></button><button class="member-paste-action is-delete" type="button" data-auto-delete="${esc(a.id)}"><i class="fa-regular fa-trash-can"></i><span>Hapus</span></button></div></article>`).join('');
+      host.querySelectorAll('[data-auto-edit]').forEach(btn=>btn.addEventListener('click',async()=>{btn.disabled=true;try{const {data:{session}}=await sb.auth.getSession();const auth={authorization:'Bearer '+session.access_token};const d=await fetch('/api/autolink?action=edit-details&id='+encodeURIComponent(btn.dataset.autoEdit),{headers:auth}).then(r=>r.json());if(!d.success)throw new Error(d.error||'Gagal mengambil data AutoLink');const title=prompt('Judul AutoLink',d.autolink.title);if(title===null)return;const description=prompt('Deskripsi',d.autolink.description||'');if(description===null)return;const target_url=prompt('Link tujuan',d.autolink.target_url);if(target_url===null)return;const r=await fetch('/api/autolink?action=update',{method:'POST',headers:{'content-type':'application/json',...auth},body:JSON.stringify({id:btn.dataset.autoEdit,title,description,target_url})});const out=await r.json();if(!r.ok||!out.success)throw new Error(out.error||'Gagal memperbarui AutoLink');await loadMemberAutoLinks(user);}catch(e){alert(e.message);}finally{btn.disabled=false;}}));
+      host.querySelectorAll('[data-auto-delete]').forEach(btn=>btn.addEventListener('click',async()=>{if(!confirm('Hapus AutoLink ini? Link tidak akan dapat digunakan lagi.'))return;btn.disabled=true;try{const {data:{session}}=await sb.auth.getSession();const r=await fetch('/api/autolink?action=delete',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+session.access_token},body:JSON.stringify({id:btn.dataset.autoDelete})});const d=await r.json();if(!r.ok||!d.success)throw new Error(d.error||'Gagal menghapus AutoLink');await loadMemberAutoLinks(user);await loadDashboardMetrics(user);}catch(e){alert(e.message);btn.disabled=false;}}));
+    }catch(e){console.warn('AutoLink list:',e);host.innerHTML=`<div class="member-paste-state is-error">${esc(e.message||'Gagal memuat AutoLink')}</div>`;}
+  }
+  const fmtDate=value=>value?new Date(value).toLocaleString(lang()==='id'?'id-ID':'en-US',{dateStyle:'medium'}):'—';
 
   function videoCard(v, stats={}) {
     const href = safeVideoUrl(v);
@@ -158,12 +193,7 @@
       if(!response.ok||!payload.success)throw new Error(payload.error||'Gagal memuat daftar PasteLink.');
       const rows=Array.isArray(payload.items)?payload.items:[];
       const fmt=n=>Number(n||0).toLocaleString(lang()==='id'?'id-ID':'en-US');
-      statsHost.innerHTML=[
-        [payload.total,'Total PasteLink','fa-file-lines'],
-        [payload.total_views,'Total View','fa-eye'],
-        [payload.published,'Sudah Dipublikasikan','fa-circle-check'],
-        [payload.expired,'Kedaluwarsa','fa-clock']
-      ].map(([value,label,icon])=>`<article class="member-paste-stat"><span><i class="fa-solid ${icon}"></i> ${label}</span><strong>${fmt(value)}</strong></article>`).join('');
+      if(!dashboardMetrics) statsHost.innerHTML=`<article class="member-paste-stat"><span><i class="fa-solid fa-file-lines"></i> Total PasteLink</span><strong>${fmt(payload.total)}</strong></article><article class="member-paste-stat"><span><i class="fa-solid fa-eye"></i> View hari ini</span><strong>—</strong></article>`;
       if(!rows.length){listHost.innerHTML=`<div class="member-paste-state"><i class="fa-regular fa-folder-open"></i><b>Belum ada PasteLink</b><span>Buat PasteLink pertama kamu untuk mulai membagikan konten.</span><a href="/pastelink-create.html"><i class="fa-solid fa-plus"></i> Buat PasteLink</a></div>`;return;}
       listHost.innerHTML=rows.map(item=>{
         const url=new URL('/pas/'+encodeURIComponent(item.slug),location.origin).href;
@@ -204,24 +234,8 @@
     if (profile?.is_banned) { await sb.auth.signOut(); location.replace('/login.html'); return; }
     await sb.from('profiles').update({last_seen_at:new Date().toISOString()}).eq('id',user.id);
     await loadMemberPasteLinks(user);
-    // Publisher metrics: balances and WIF are server-settled, never based on page views.
-    const autoStatsHost=$('memberAutoStats'),autoNote=$('memberAutoNote');
-    if(autoStatsHost){
-      try{const [links,balance]=await Promise.all([sb.from('autolink_public').select('id',{count:'exact',head:true}).eq('publisher_id',user.id).neq('status','deleted'),sb.from('publisher_balances').select('valid_wif,available_balance,cpm').eq('publisher_id',user.id).maybeSingle()]);
-        if(links.error)throw links.error;if(balance.error)throw balance.error;const b=balance.data||{};const fmtMoney=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
-        autoStatsHost.innerHTML=[[links.count||0,'Total AutoLink'],[Number(b.valid_wif||0),'WIF valid'],[fmtMoney(b.available_balance),'Saldo tersedia'],[Number(b.cpm||50).toFixed(2)+'%','CPM saat ini']].map(([v,l])=>`<div class="member-auto-stat"><small>${l}</small><strong>${v}</strong></div>`).join('');
-        if(autoNote)autoNote.textContent='Penghasilan bertambah hanya setelah Redirect valid ditekan di halaman Final. Statistik kunjungan Go dan Task tidak menambah saldo.';
-      }catch(err){console.warn('Member AutoLink stats:',err.message);if(autoNote)autoNote.textContent='Statistik publisher belum tersedia. Pastikan migrasi AutoLink Publisher dan perbaikan dashboard sudah dijalankan.';}
-    }
-
-
-    const {data:ann} = await sb.from('announcements').select('title,body').eq('active',true).order('created_at',{ascending:false}).limit(1);
-    if (ann?.[0]) {
-      $('announcement').querySelector('h2').textContent=ann[0].title;
-      $('announcement').querySelector('p').textContent=ann[0].body;
-      const ticker=$('memberAnnouncementTicker');
-      if(ticker){const span=ticker.querySelector('span');if(span)span.textContent=`${ann[0].title} — ${ann[0].body}`;}
-    }
+    await Promise.all([loadDashboardMetrics(user),loadMemberAutoLinks(user),loadAnnouncementCenter()]);
+    const autoNote=$('memberAutoNote');if(autoNote)autoNote.textContent='Penghasilan dihitung dari Redirect valid dan akses langsung yang berhasil diselesaikan. View biasa tidak otomatis menjadi pendapatan.';
 
     const {data:cats,error:catError} = await sb.from('categories').select('id,name').eq('status','published').order('name');
     if (catError) console.warn('Dashboard categories:',catError.message);
@@ -247,7 +261,6 @@
       $('reviews').innerHTML=(reviews||[]).map(r=>reviewCard(r,stats.get(r.id)||{})).join('') || empty(t('noReviews'));
       renderPager('reviewPager',page,count||0,loadReviews);
     }
-    await Promise.all([loadVideos(1),loadReviews(1)]);
     // Extra continuously swipeable lanes: latest and oldest Telegram media and BoxVideo.
     const [latestT,oldestT,latestB,oldestB]=await Promise.all([
       sb.from('review_items').select('id,slug,title,thumbnail_url,gallery_urls,view_count,price,access').eq('status','published').order('created_at',{ascending:false}).limit(1000),
