@@ -366,3 +366,40 @@ body:has(.home-shell){background:#f4f7fb;color:#15263b;font-family:Inter,"Plus J
 @media(prefers-reduced-motion:reduce){.home-hero,.hero-art,.home-shell .home-hero,.home-shell>.home-marquee,.home-shell>.intro-band,.hero-caret{animation:none!important}.al5-service-card,.home-horizontal-rail>.home-content-card,.home-btn,.al5-guide-points>div{transition:none!important}}
 
 .home-reveal-pending{opacity:0;transform:translateY(18px);transition:opacity .65s ease,transform .65s cubic-bezier(.2,.75,.25,1)}.home-reveal-pending.home-revealed{opacity:1;transform:translateY(0)}@media(prefers-reduced-motion:reduce){.home-reveal-pending{opacity:1;transform:none;transition:none}}
+
+/* Premium motion layer: restrained floating, icon pulse and soft card shimmer. */
+.al5-service-card{isolation:isolate;overflow:hidden;will-change:transform}
+.al5-service-card:after{content:"";position:absolute;z-index:-1;top:-65%;left:-55%;width:42%;height:230%;transform:rotate(24deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.68),transparent);opacity:0;transition:left .7s ease,opacity .25s ease;pointer-events:none}
+.al5-service-card:hover:after{left:125%;opacity:1}
+.al5-service-icon{position:relative;animation:serviceIconFloat 4.2s ease-in-out infinite;transform-origin:50% 55%}
+.al5-service-card:nth-child(2) .al5-service-icon{animation-delay:.45s}
+.al5-service-card:nth-child(3) .al5-service-icon{animation-delay:.9s}
+.al5-service-card:nth-child(4) .al5-service-icon{animation-delay:1.35s}
+.al5-service-card:nth-child(5) .al5-service-icon{animation:serviceIconPulse 2.7s ease-in-out infinite}
+@keyframes serviceIconFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-5px) rotate(-3deg)}}
+@keyframes serviceIconPulse{0%,100%{transform:scale(1);box-shadow:0 7px 16px rgba(35,91,151,.08),0 0 0 0 rgba(36,145,102,0)}50%{transform:scale(1.075);box-shadow:0 9px 22px rgba(35,145,102,.16),0 0 0 8px rgba(36,145,102,.07)}}
+.al5-service-nokos{border-color:#d7eee4;background:radial-gradient(circle at 100% 0,rgba(54,180,126,.13),transparent 42%),linear-gradient(150deg,#fff 0%,#f5fcf8 100%)}
+.al5-service-nokos:hover{border-color:#83c9a8;box-shadow:0 22px 48px rgba(26,132,87,.16)}
+.al5-service-nokos .al5-service-link{color:#168354}
+.nokos-card-pulse{position:absolute;right:18px;top:18px;width:8px;height:8px;border-radius:50%;background:#24a36b;box-shadow:0 0 0 0 rgba(36,163,107,.38);animation:nokosDotPulse 1.9s ease-out infinite}
+@keyframes nokosDotPulse{0%{box-shadow:0 0 0 0 rgba(36,163,107,.38)}75%,100%{box-shadow:0 0 0 11px rgba(36,163,107,0)}}
+.hero-kicker .live-dot{animation:liveDotBeat 1.7s ease-in-out infinite}
+@keyframes liveDotBeat{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(105,221,170,.3)}50%{opacity:.7;box-shadow:0 0 0 7px rgba(105,221,170,0)}}
+.intro-mark>i,.al5-withdraw-icon>i,.cta-icon>i{animation:gentleIconBob 3.5s ease-in-out infinite}
+@keyframes gentleIconBob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(4deg)}}
+.al5-guide-points>div>i,.al5-chatbot-section .al5-bot-avatar,.al5-referral-stats strong{transition:transform .25s ease}
+.al5-guide-points>div:hover>i{transform:translateY(-3px) rotate(-7deg)}
+.home-btn-primary{position:relative;overflow:hidden}
+.home-btn-primary:after{content:"";position:absolute;inset:-40% auto -40% -55%;width:35%;transform:skewX(-22deg);background:rgba(255,255,255,.2);transition:left .65s ease}
+.home-btn-primary:hover:after{left:125%}
+.hero-typed{display:inline-block;min-width:1ch;text-shadow:0 0 24px rgba(117,185,255,.22)}
+@media(prefers-reduced-motion:reduce){
+ .al5-service-icon,.al5-service-card:after,.nokos-card-pulse,.hero-kicker .live-dot,.intro-mark>i,.al5-withdraw-icon>i,.cta-icon>i,.home-btn-primary:after{animation:none!important;transition:none!important}
+}
+/* Small icon details throughout the homepage, not only the service tiles. */
+.home-shell .section-kicker i,.home-shell .hero-trust i,.home-shell .home-marquee i,.home-shell .al5-chatbot-note i,.home-shell .search-hint i{display:inline-block;animation:microIconMotion 3.6s ease-in-out infinite}
+.home-shell .hero-trust span:nth-child(2) i{animation-delay:.35s}
+.home-shell .hero-trust span:nth-child(3) i{animation-delay:.7s}
+.home-shell .home-marquee i{animation-duration:4.8s}
+@keyframes microIconMotion{0%,100%{transform:translateY(0) scale(1);opacity:1}50%{transform:translateY(-2px) scale(1.08);opacity:.78}}
+@media(prefers-reduced-motion:reduce){.home-shell .section-kicker i,.home-shell .hero-trust i,.home-shell .home-marquee i,.home-shell .al5-chatbot-note i,.home-shell .search-hint i{animation:none!important}}
