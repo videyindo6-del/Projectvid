@@ -4,43 +4,39 @@
   const search = document.getElementById('homeSearch');
   const clear = document.getElementById('homeSearchClear');
   const count = document.getElementById('catalogCount');
-  // Reliable homepage typewriter: always starts with a complete phrase, then types/deletes in a loop.
+  // Homepage typewriter: type, pause, erase, then rotate through every service.
   const typedNode = document.getElementById('homeTypedText');
   if (typedNode) {
     const phrases = ['Media Telegram', 'Grup VIP Telegram', 'Video Videy', 'PasteLink', 'AutoLink', 'Ready Nokos', 'Kode OTP'];
     let phraseIndex = 0;
-    let charIndex = phrases[0].length;
-    let deleting = true;
-    let timer = null;
-    const typeNext = () => {
+    let charIndex = 0;
+    let deleting = false;
+    let timerId;
+    const tick = () => {
       if (!typedNode.isConnected) return;
       const phrase = phrases[phraseIndex];
-      if (deleting) {
-        charIndex = Math.max(0, charIndex - 1);
-        typedNode.textContent = phrase.slice(0, charIndex);
-        if (charIndex === 0) {
-          deleting = false;
-          phraseIndex = (phraseIndex + 1) % phrases.length;
-          timer = window.setTimeout(typeNext, 320);
-          return;
-        }
-        timer = window.setTimeout(typeNext, 38);
-        return;
-      }
-      charIndex = Math.min(phrases[phraseIndex].length, charIndex + 1);
-      typedNode.textContent = phrases[phraseIndex].slice(0, charIndex);
-      if (charIndex >= phrases[phraseIndex].length) {
+      typedNode.textContent = phrase.slice(0, charIndex);
+      if (!deleting && charIndex < phrase.length) {
+        charIndex += 1;
+        timerId = window.setTimeout(tick, 85);
+      } else if (!deleting) {
         deleting = true;
-        timer = window.setTimeout(typeNext, 1550);
+        timerId = window.setTimeout(tick, 1500);
+      } else if (charIndex > 0) {
+        charIndex -= 1;
+        timerId = window.setTimeout(tick, 42);
       } else {
-        timer = window.setTimeout(typeNext, 76);
+        deleting = false;
+        phraseIndex = (phraseIndex + 1) % phrases.length;
+        timerId = window.setTimeout(tick, 350);
       }
     };
-    typedNode.textContent = phrases[0];
-    timer = window.setTimeout(typeNext, 1300);
+    // Start blank so the first phrase visibly types character by character.
+    typedNode.textContent = '';
+    timerId = window.setTimeout(tick, 500);
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden && timer) window.clearTimeout(timer);
-      else if (!document.hidden) timer = window.setTimeout(typeNext, 250);
+      if (document.hidden) window.clearTimeout(timerId);
+      else timerId = window.setTimeout(tick, 250);
     });
   }
 
