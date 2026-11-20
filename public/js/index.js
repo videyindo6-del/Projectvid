@@ -1,44 +1,73 @@
 (() => {
+  // AL5Link full-motion homepage layer: typewriter runs independently of catalog/auth requests.
+  function initHomeTypewriter() {
+    const node = document.getElementById('homeTypedText');
+    if (!node || node.dataset.al5Typewriter === '1') return;
+    node.dataset.al5Typewriter = '1';
+    const phrases = ['Media Telegram', 'Grup VIP Telegram', 'Video Videy', 'PasteLink', 'AutoLink', 'Ready Nokos', 'Kode OTP'];
+    let phraseIndex = 0, position = 0, deleting = false, timer = 0;
+    node.textContent = '';
+    const tick = () => {
+      if (!node.isConnected) return;
+      if (document.hidden) return;
+      const phrase = phrases[phraseIndex];
+      if (!deleting) {
+        position = Math.min(position + 1, phrase.length);
+        node.textContent = phrase.slice(0, position);
+        if (position >= phrase.length) { deleting = true; timer = window.setTimeout(tick, 1550); }
+        else timer = window.setTimeout(tick, 88);
+      } else {
+        position = Math.max(0, position - 1);
+        node.textContent = phrase.slice(0, position);
+        if (!position) { deleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; timer = window.setTimeout(tick, 300); }
+        else timer = window.setTimeout(tick, 42);
+      }
+    };
+    timer = window.setTimeout(tick, 450);
+    document.addEventListener('visibilitychange', () => {
+      window.clearTimeout(timer);
+      if (!document.hidden) timer = window.setTimeout(tick, 180);
+    });
+  }
+
+  function initHomeMotion() {
+    const selectors = [
+      '.home-marquee', '.intro-band', '.al5-services', '.al5-service-card',
+      '.al5-guide-band', '.al5-guide-points > div', '.al5-referral-detail',
+      '.al5-withdraw-detail', '.al5-chatbot-section', '.catalog-section',
+      '.home-referral-cta', '.home-bottom-cta', '.home-search',
+      '.home-horizontal-rail > .home-content-card'
+    ];
+    const nodes = document.querySelectorAll(selectors.join(','));
+    document.documentElement.classList.add('al5-motion-enabled');
+    if (!('IntersectionObserver' in window)) {
+      nodes.forEach(el => el.classList.add('al5-motion-visible'));
+      return;
+    }
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('al5-motion-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.10, rootMargin: '0px 0px -35px 0px' });
+    nodes.forEach((el, index) => {
+      el.classList.add('al5-motion-item');
+      el.style.setProperty('--al5-motion-delay', `${Math.min(index % 6, 5) * 65}ms`);
+      observer.observe(el);
+    });
+  }
+
+  initHomeTypewriter();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initHomeMotion, { once: true });
+  else initHomeMotion();
+
   const videoGrid = document.getElementById('homeVideoGrid');
   const telegramGrid = document.getElementById('homeTelegramGrid');
   const search = document.getElementById('homeSearch');
   const clear = document.getElementById('homeSearchClear');
   const count = document.getElementById('catalogCount');
-  // Homepage typewriter: type, pause, erase, then rotate through every service.
-  const typedNode = document.getElementById('homeTypedText');
-  if (typedNode) {
-    const phrases = ['Media Telegram', 'Grup VIP Telegram', 'Video Videy', 'PasteLink', 'AutoLink', 'Ready Nokos', 'Kode OTP'];
-    let phraseIndex = 0;
-    let charIndex = 0;
-    let deleting = false;
-    let timerId;
-    const tick = () => {
-      if (!typedNode.isConnected) return;
-      const phrase = phrases[phraseIndex];
-      typedNode.textContent = phrase.slice(0, charIndex);
-      if (!deleting && charIndex < phrase.length) {
-        charIndex += 1;
-        timerId = window.setTimeout(tick, 85);
-      } else if (!deleting) {
-        deleting = true;
-        timerId = window.setTimeout(tick, 1500);
-      } else if (charIndex > 0) {
-        charIndex -= 1;
-        timerId = window.setTimeout(tick, 42);
-      } else {
-        deleting = false;
-        phraseIndex = (phraseIndex + 1) % phrases.length;
-        timerId = window.setTimeout(tick, 350);
-      }
-    };
-    // Start blank so the first phrase visibly types character by character.
-    typedNode.textContent = '';
-    timerId = window.setTimeout(tick, 500);
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) window.clearTimeout(timerId);
-      else timerId = window.setTimeout(tick, 250);
-    });
-  }
 
   if (!videoGrid || !telegramGrid) return;
 
