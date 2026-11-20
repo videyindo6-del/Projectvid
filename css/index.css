@@ -403,3 +403,57 @@ body:has(.home-shell){background:#f4f7fb;color:#15263b;font-family:Inter,"Plus J
 .home-shell .home-marquee i{animation-duration:4.8s}
 @keyframes microIconMotion{0%,100%{transform:translateY(0) scale(1);opacity:1}50%{transform:translateY(-2px) scale(1.08);opacity:.78}}
 @media(prefers-reduced-motion:reduce){.home-shell .section-kicker i,.home-shell .hero-trust i,.home-shell .home-marquee i,.home-shell .al5-chatbot-note i,.home-shell .search-hint i{animation:none!important}}
+
+
+/* AL5Link Stage 1 — refined service cards and premium motion */
+.al5-service-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  transform:translateZ(0);
+  animation:al5ServiceEnter .72s cubic-bezier(.2,.75,.25,1) both;
+  transition:transform .32s cubic-bezier(.2,.8,.2,1),box-shadow .32s ease,border-color .32s ease,background .32s ease;
+}
+.al5-service-card:nth-child(1){animation-delay:.04s}
+.al5-service-card:nth-child(2){animation-delay:.10s}
+.al5-service-card:nth-child(3){animation-delay:.16s}
+.al5-service-card:nth-child(4){animation-delay:.22s}
+.al5-service-card:nth-child(5){animation-delay:.28s}
+.al5-service-card:nth-child(6){animation-delay:.34s}
+@keyframes al5ServiceEnter{
+  from{opacity:0;transform:translate3d(0,22px,0) scale(.985);filter:blur(3px)}
+  to{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}
+}
+.al5-service-card:before{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at 90% 5%,rgba(91,164,235,.16),transparent 42%);
+  transition:opacity .35s ease;
+}
+.al5-service-card:hover{
+  transform:translate3d(0,-9px,0) scale(1.012);
+  border-color:#a9c9ec;
+  box-shadow:0 24px 48px rgba(20,65,112,.14),0 5px 14px rgba(20,65,112,.06);
+}
+.al5-service-card:hover:before{opacity:1}
+.al5-service-card .al5-service-icon{
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s ease;
+}
+.al5-service-card:hover .al5-service-icon{
+  transform:translateY(-4px) rotate(-5deg) scale(1.09);
+  box-shadow:0 12px 24px rgba(30,86,145,.15);
+}
+.al5-service-icon.vip{background:#e9f1ff;color:#2867bb}
+.al5-service-card:hover .al5-service-link{gap:12px}
+.al5-service-link{transition:gap .25s ease,color .25s ease}
+.al5-service-card:nth-child(2):hover{border-color:#9bb9eb}
+@media(max-width:700px){
+  .al5-service-card{min-height:248px}
+  .al5-service-card:hover{transform:translateY(-4px)}
+}
+@media(max-width:390px){
+  .al5-service-card{min-height:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .al5-service-card{animation:none!important;filter:none!important}
+  .al5-service-card,.al5-service-card:before,.al5-service-card .al5-service-icon,.al5-service-link{transition:none!important}
+}
