@@ -123,4 +123,67 @@
   clear?.addEventListener('click', () => { search.value = ''; search.focus(); render(); });
   window.addEventListener('storage', e => { if (e.key === 'boxcellink_lang') render(); });
   load();
+
+  // Hero typing effect: progressive text, with a static fallback for reduced motion.
+  const typedTarget = document.getElementById('homeTypedText');
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (typedTarget && !reduceMotion) {
+    const phrases = ['AL5Link.', 'konten favoritmu.', 'layanan digitalmu.'];
+    let phraseIndex = 0;
+    let charIndex = phrases[0].length;
+    let deleting = false;
+    let timer;
+    const tick = () => {
+      const phrase = phrases[phraseIndex];
+      charIndex += deleting ? -1 : 1;
+      typedTarget.textContent = phrase.slice(0, Math.max(0, charIndex));
+      if (!deleting && charIndex >= phrase.length) {
+        deleting = true;
+        timer = window.setTimeout(tick, 1650);
+        return;
+      }
+      if (deleting && charIndex <= 0) {
+        deleting = false;
+        phraseIndex = (phraseIndex + 1) % phrases.length;
+        timer = window.setTimeout(tick, 280);
+        return;
+      }
+      timer = window.setTimeout(tick, deleting ? 42 : 78);
+    };
+    timer = window.setTimeout(tick, 1500);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) window.clearTimeout(timer);
+      else if (typedTarget.isConnected) timer = window.setTimeout(tick, 450);
+    });
+  }
+
+  // Reveal sections/cards as they enter the viewport; keep content visible without JS.
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    const revealItems = document.querySelectorAll('.al5-service-card, .al5-guide-band, .al5-referral-detail, .al5-withdraw-detail, .al5-chatbot-section, .home-content-card, .home-bottom-cta');
+    revealItems.forEach((item, index) => {
+      item.classList.add('home-reveal-pending');
+      item.style.setProperty('--home-reveal-delay', `${Math.min(index % 5, 4) * 65}ms`);
+    });
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('home-revealed');
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+    revealItems.forEach(item => revealObserver.observe(item));
+    // Content cards are inserted after the Supabase query completes.
+    const cardObserver = new MutationObserver(records => {
+      records.forEach(record => record.addedNodes.forEach(node => {
+        if (!(node instanceof Element)) return;
+        const cards = node.matches('.home-content-card') ? [node] : [...node.querySelectorAll('.home-content-card')];
+        cards.forEach((card, index) => {
+          card.classList.add('home-reveal-pending');
+          card.style.setProperty('--home-reveal-delay', `${(index % 4) * 55}ms`);
+          revealObserver.observe(card);
+        });
+      }));
+    });
+    [videoGrid, telegramGrid].forEach(grid => cardObserver.observe(grid, { childList: true }));
+  }
 })();
