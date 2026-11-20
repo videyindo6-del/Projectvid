@@ -1,1 +1,50 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Buat AutoLink — BoxCellink</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"><link rel="stylesheet" href="/css/autolink.css"></head><body><div data-component="navbar"></div><main class="al-page"><div class="al-wrap"><header class="al-head"><div><span class="al-kicker">Publisher Studio</span><h1>Buat AutoLink</h1><p>Publikasikan tautan dan bagikan ke komunitas untuk memperoleh WIF valid.</p></div><a class="al-btn ghost" href="/posts.html"><i class="fa-solid fa-arrow-left"></i> Kembali ke Postingan</a></header><section class="al-card"><form id="alCreateForm"><div class="al-field"><label for="alTarget">Link asli</label><input id="alTarget" type="url" placeholder="https://website.com/halaman" required maxlength="2048"></div><div class="al-field"><label for="alTitle">Judul AutoLink</label><input id="alTitle" required maxlength="140" placeholder="Masukkan judul yang menarik"></div><div class="al-field"><label for="alDescription">Deskripsi</label><textarea id="alDescription" maxlength="1200" placeholder="Jelaskan isi tautan ini..."></textarea></div><div id="alCreateMessage" aria-live="polite"></div><button class="al-btn full" id="alPublish"><i class="fa-solid fa-paper-plane"></i> Publish AutoLink</button></form><div id="alPublished" hidden></div></section></div></main><div data-component="footer"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/components.js"></script><script src="/js/autolink-create.js"></script><script src="/js/page-i18n.js"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f8fc">
+  <title>AutoLink Studio — BoxCellink</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/autolink-studio.css?v=20261120-1">
+</head>
+<body>
+  <div data-component="navbar"></div>
+  <main class="als-page"><div class="als-wrap">
+    <header class="als-hero">
+      <div class="als-hero-copy"><span class="als-eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> BOXCELLINK PUBLISHER STUDIO</span><h1>Buat dan kelola <span>AutoLink</span></h1><p>Ubah link panjang menjadi link pendek yang siap dibagikan. Kelola semua AutoLink kamu dari satu tempat.</p>
+        <div class="als-hero-points"><span><i class="fa-solid fa-shield-halved"></i> Link terkelola</span><span><i class="fa-solid fa-chart-line"></i> Statistik terpantau</span><span><i class="fa-solid fa-share-nodes"></i> Mudah dibagikan</span></div>
+      </div>
+      <a class="als-back" href="/posts.html"><i class="fa-solid fa-arrow-left"></i><span>Kembali ke Postingan</span></a>
+      <div class="als-hero-art" aria-hidden="true"><div class="als-art-orbit"></div><div class="als-art-card"><span><i class="fa-solid fa-link"></i></span><b>AutoLink</b><small>Short link studio</small><div class="als-art-line"></div><div class="als-art-line short"></div><div class="als-art-check"><i class="fa-solid fa-check"></i></div></div></div>
+    </header>
+
+    <section class="als-create-grid">
+      <div class="als-panel als-form-panel">
+        <div class="als-panel-heading"><div class="als-heading-icon"><i class="fa-solid fa-link"></i></div><div><span class="als-overline">MULAI SEKARANG</span><h2>Buat AutoLink baru</h2><p>Isi link tujuan dan judul yang mudah dikenali.</p></div></div>
+        <form id="alCreateForm" novalidate>
+          <div class="als-field"><label for="alTarget">Link tujuan <em>*</em></label><div class="als-input-wrap"><i class="fa-solid fa-globe"></i><input id="alTarget" type="url" inputmode="url" placeholder="https://website.com/halaman" required maxlength="2048"></div><small>Masukkan alamat website lengkap yang diawali https:// atau http://</small></div>
+          <div class="als-field"><label for="alTitle">Judul AutoLink <em>*</em></label><div class="als-input-wrap"><i class="fa-solid fa-heading"></i><input id="alTitle" required maxlength="140" minlength="3" placeholder="Contoh: Kunjungi halaman produk saya"></div><div class="als-field-meta"><small>Judul untuk membantu kamu mengenali link.</small><small id="alTitleCount">0/140</small></div></div>
+          <div class="als-field"><label for="alDescription">Deskripsi <span>Opsional</span></label><textarea id="alDescription" maxlength="1200" rows="3" placeholder="Tambahkan catatan singkat tentang link ini..."></textarea><div class="als-field-meta"><small>Deskripsi hanya untuk pengelolaan AutoLink.</small><small id="alDescCount">0/1200</small></div></div>
+          <div id="alCreateMessage" aria-live="polite"></div>
+          <button class="als-primary" id="alPublish" type="submit"><i class="fa-solid fa-bolt"></i><span>Publikasikan AutoLink</span><i class="fa-solid fa-arrow-right"></i></button>
+          <div class="als-form-foot"><i class="fa-solid fa-lock"></i> Link kamu tersimpan di akun BoxCellink.</div>
+        </form>
+      </div>
+      <aside class="als-side-stack"><div class="als-tip-card"><div class="als-tip-icon"><i class="fa-solid fa-lightbulb"></i></div><div><b>Tips AutoLink</b><p>Gunakan judul singkat dan jelas agar link mudah ditemukan saat kamu membagikannya.</p></div></div><div class="als-side-card"><span class="als-side-label">ALUR SINGKAT</span><div class="als-step"><b>01</b><span><strong>Masukkan link</strong><small>Tempel alamat website tujuan.</small></span></div><div class="als-step"><b>02</b><span><strong>Publikasikan</strong><small>Link pendek dibuat otomatis.</small></span></div><div class="als-step"><b>03</b><span><strong>Bagikan</strong><small>Kirim ke media sosial pilihanmu.</small></span></div></div></aside>
+    </section>
+
+    <section class="als-result" id="alPublished" hidden aria-live="polite"></section>
+
+    <section class="als-list-section" id="alMyLinksSection">
+      <div class="als-list-heading"><div><span class="als-overline">LINK LIBRARY</span><h2>Semua AutoLink</h2><p>Kelola judul, link tujuan, dan hapus AutoLink yang tidak digunakan.</p></div><div class="als-list-tools"><label class="als-search"><i class="fa-solid fa-magnifying-glass"></i><input id="alSearch" type="search" placeholder="Cari judul atau link..."></label><button class="als-refresh" id="alRefresh" type="button" aria-label="Muat ulang daftar"><i class="fa-solid fa-rotate"></i></button></div></div>
+      <div id="alMyLinks" class="als-link-list"><div class="als-loading"><span class="als-spinner"></span> Memuat AutoLink kamu...</div></div>
+      <div class="als-list-foot" id="alListFoot"></div>
+    </section>
+  </div></main>
+
+  <div class="als-modal" id="alEditModal" aria-hidden="true"><div class="als-modal-backdrop" data-close-edit></div><section class="als-modal-card" role="dialog" aria-modal="true" aria-labelledby="alEditTitle"><button class="als-modal-close" type="button" data-close-edit aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button><span class="als-overline">KELOLA LINK</span><h2 id="alEditTitle">Edit AutoLink</h2><p>Perubahan akan diterapkan pada link pendek yang sama.</p><form id="alEditForm"><input type="hidden" id="alEditId"><div class="als-field"><label for="alEditName">Judul AutoLink</label><input id="alEditName" required minlength="3" maxlength="140"></div><div class="als-field"><label for="alEditTarget">Link tujuan</label><input id="alEditTarget" type="url" required maxlength="2048"></div><div class="als-field"><label for="alEditDescription">Deskripsi</label><textarea id="alEditDescription" rows="3" maxlength="1200"></textarea></div><div id="alEditMessage" aria-live="polite"></div><div class="als-modal-actions"><button class="als-secondary" type="button" data-close-edit>Batal</button><button class="als-primary" id="alSaveEdit" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan</button></div></form></section></div>
+
+  <div data-component="footer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/components.js"></script><script src="/js/autolink-create.js?v=20261120-1"></script><script src="/js/page-i18n.js"></script>
+</body></html>
