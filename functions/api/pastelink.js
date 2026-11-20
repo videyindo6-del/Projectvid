@@ -20,7 +20,15 @@ export async function onRequest({request,env}) {
    const rows=await db(env,`paste_links?select=id,slug,title,content,password_salt,password_hash,status,expires_at,created_at,user_id&slug=eq.${encodeURIComponent(slug)}&status=eq.published&limit=1`);
    const item=rows?.[0];if(!item||(item.expires_at&&Date.parse(item.expires_at)<=Date.now()))return json({error:'PasteLink tidak ditemukan atau sudah kedaluwarsa.'},404);
    if(item.password_hash){const password=String(body.password||'');if(!password)return json({error:'Konten ini dilindungi password.',password_required:true,title:item.title},403);const hash=await passwordHash(password,item.password_salt);if(hash!==item.password_hash)return json({error:'Password salah.',password_required:true,title:item.title},403);}
-   return json({success:true,item:{slug:item.slug,title:item.title,content:item.content,created_at:item.created_at}});
+   // Count a view only after the published link is successfully resolved (and password accepted).
+   // The counter RPC is atomic; a stats failure must not prevent the content from opening.
+   let viewCount=Number(item.view_count||0);
+   try {
+    await db(env,'rpc/increment_pastelink_view',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({p_paste_link_id:item.id})});
+    const stats=await db(env,`paste_links?select=view_count&id=eq.${item.id}&limit=1`);
+    if(stats?.[0]?.view_count!=null)viewCount=Number(stats[0].view_count);
+   } catch(statsError) { /* Keep content available if the optional counter migration is not installed. */ }
+   return json({success:true,item:{slug:item.slug,title:item.title,content:item.content,created_at:item.created_at,view_count:viewCount}});
   }
   const user=await getUser(request,env);if(!user?.id)return json({error:'Silakan login terlebih dahulu.'},401);
   if(action==='list'){
