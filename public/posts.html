@@ -1,8 +1,35 @@
 <!doctype html>
-<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f4f7fb"><title>Postingan — BoxCellink</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css?v=20261115-5"><link rel="stylesheet" href="/css/footer.css"><link rel="stylesheet" href="/css/social-posts.css?v=20261116-1"><link rel="stylesheet" href="/css/autolink.css"></head>
-<body><div data-component="navbar"></div><main class="bc-social-main"><header class="bc-social-page-head"><div><h1>Postingan komunitas</h1><p>Temukan dan bagikan tautan publik bersama komunitas.</p></div><div class="bc-social-create-actions">
-<button type="button" class="bc-social-create" id="bcPageCreate"><i class="fa-solid fa-link"></i> Buat PasteLink</button>
-<a class="bc-social-create" href="/autolink.html"><i class="fa-solid fa-bolt"></i> Buat AutoLink</a>
-</div></header><section class="bc-post-feed" id="bcPostFeed" aria-live="polite"><div class="bc-post-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat postingan...</div></section><div class="bc-post-more" id="bcPostMore"></div></main><div data-component="footer"></div>
-<script src="/components.js?v=20261115-4"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/js/social-posts.js?v=20261115-2"></script><script src="/js/page-i18n.js"></script></body></html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f4f7fb"><title>Posts Komunitas — BoxCellink</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css?v=20261115-5">
+<link rel="stylesheet" href="/css/footer.css"><link rel="stylesheet" href="/css/social-posts.css?v=20261120-posts-premium-v2">
+<link rel="stylesheet" href="/css/autolink.css">
+</head>
+<body>
+<div data-component="navbar"></div>
+<main class="bc-social-main">
+  <section class="bc-social-composer" aria-label="Buat publikasi">
+    <div class="bc-composer-top">
+      <div class="bc-composer-avatar"><i class="fa-solid fa-users"></i></div>
+      <div class="bc-composer-copy"><span class="bc-social-eyebrow">BOXCELLINK COMMUNITY</span><h1>Apa yang ingin kamu bagikan hari ini?</h1><p>Bagikan AutoLink atau PasteLink dan temukan publikasi terbaru dari member lainnya.</p></div>
+    </div>
+    <div class="bc-social-create-actions">
+      <a class="bc-social-create bc-create-auto" href="/autolink.html"><i class="fa-solid fa-bolt"></i><span>Buat AutoLink</span><i class="fa-solid fa-arrow-up-right-from-square bc-create-arrow"></i></a>
+      <button type="button" class="bc-social-create bc-create-paste" id="bcPageCreate"><i class="fa-solid fa-link"></i><span>Buat PasteLink</span><i class="fa-solid fa-arrow-up-right-from-square bc-create-arrow"></i></button>
+    </div>
+  </section>
+  <div class="bc-feed-heading"><div><span class="bc-social-eyebrow">COMMUNITY FEED</span><h2>Publikasi Member</h2><p>AutoLink dan PasteLink terbaru dalam satu tempat.</p></div><span class="bc-feed-live"><i class="fa-solid fa-circle"></i> Live Feed</span></div>
+  <div class="bc-new-posts" id="bcNewPosts" hidden><button type="button" id="bcShowNewPosts"><i class="fa-solid fa-arrow-up"></i><span>1 publikasi terbaru · Tampilkan</span></button></div>
+  <section class="bc-post-feed" id="bcPostFeed" aria-live="polite"><div class="bc-post-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat postingan...</div></section>
+  <div class="bc-post-more" id="bcPostMore"></div>
+</main>
+<div data-component="footer"></div>
+<script src="/components.js?v=20261115-4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/social-posts.js?v=20261120-posts-premium-v2"></script>
+<script src="/js/page-i18n.js"></script>
+</body></html>
