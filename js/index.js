@@ -4,22 +4,44 @@
   const search = document.getElementById('homeSearch');
   const clear = document.getElementById('homeSearchClear');
   const count = document.getElementById('catalogCount');
-  // Rotating typewriter headline runs independently from catalog loading.
+  // Reliable homepage typewriter: always starts with a complete phrase, then types/deletes in a loop.
   const typedNode = document.getElementById('homeTypedText');
-  if (typedNode && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const phrases = ['Media Telegram', 'Group VIP Telegram', 'Video Videy', 'AutoLink', 'PasteLink', 'Ready Nokos', 'Kode OTP'];
-    let phraseIndex = 0, charIndex = phrases[0].length, deleting = false;
+  if (typedNode) {
+    const phrases = ['Media Telegram', 'Grup VIP Telegram', 'Video Videy', 'PasteLink', 'AutoLink', 'Ready Nokos', 'Kode OTP'];
+    let phraseIndex = 0;
+    let charIndex = phrases[0].length;
+    let deleting = true;
+    let timer = null;
     const typeNext = () => {
       if (!typedNode.isConnected) return;
       const phrase = phrases[phraseIndex];
-      charIndex += deleting ? -1 : 1;
-      typedNode.textContent = phrase.slice(0, Math.max(0, charIndex));
-      let delay = deleting ? 42 : 78;
-      if (!deleting && charIndex >= phrase.length) { deleting = true; delay = 1450; }
-      else if (deleting && charIndex <= 0) { deleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; delay = 300; }
-      window.setTimeout(typeNext, delay);
+      if (deleting) {
+        charIndex = Math.max(0, charIndex - 1);
+        typedNode.textContent = phrase.slice(0, charIndex);
+        if (charIndex === 0) {
+          deleting = false;
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+          timer = window.setTimeout(typeNext, 320);
+          return;
+        }
+        timer = window.setTimeout(typeNext, 38);
+        return;
+      }
+      charIndex = Math.min(phrases[phraseIndex].length, charIndex + 1);
+      typedNode.textContent = phrases[phraseIndex].slice(0, charIndex);
+      if (charIndex >= phrases[phraseIndex].length) {
+        deleting = true;
+        timer = window.setTimeout(typeNext, 1550);
+      } else {
+        timer = window.setTimeout(typeNext, 76);
+      }
     };
-    window.setTimeout(typeNext, 900);
+    typedNode.textContent = phrases[0];
+    timer = window.setTimeout(typeNext, 1300);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && timer) window.clearTimeout(timer);
+      else if (!document.hidden) timer = window.setTimeout(typeNext, 250);
+    });
   }
 
   if (!videoGrid || !telegramGrid) return;
