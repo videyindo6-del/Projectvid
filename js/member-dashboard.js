@@ -73,19 +73,52 @@
   const rupiahText = n => 'Rp '+Number(n||0).toLocaleString('id-ID');
   let dashboardMetrics=null;
   function drawTrend(kind,metric='views'){
-    const data=dashboardMetrics?.[kind+'_trend']||[];const chart=$(kind==='auto'?'autoTrendChart':'pasteTrendChart');const labels=$(kind==='auto'?'autoTrendLabels':'pasteTrendLabels');const title=$(kind==='auto'?'autoTrendTitle':'pasteTrendTitle');const change=$(kind==='auto'?'autoTrendChange':'pasteTrendChange');if(!chart)return;
-    const series=data.map(x=>Number(metric==='income'?x.earned:metric==='cpm'?x.cpm:x.views||0));const max=Math.max(1,...series);const min=Math.min(0,...series);const h=112,w=620;const pts=series.map((v,i)=>`${series.length<2?0:i*(w/(series.length-1))},${h-10-((v-min)/(max-min||1))*(h-24)}`).join(' ');
-    const last=series.at(-1)||0,prev=series.at(-2)||0,diff=last-prev,pct=prev?diff/prev*100:(last?100:0);change.textContent=(diff>=0?'▲ ':'▼ ')+Math.abs(pct).toFixed(1)+'%';change.className='dash-trend-change '+(diff>=0?'up':'down');
-    title.textContent=metric==='income'?'Pendapatan AutoLink':metric==='cpm'?'CPM AutoLink':metric==='pasteviews'?'View PasteLink':'View AutoLink';
-    chart.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Grafik statistik 14 hari"><defs><linearGradient id="${kind}Area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${kind==='auto'?'#23845b':'#397bc0'}" stop-opacity=".25"/><stop offset="1" stop-color="${kind==='auto'?'#23845b':'#397bc0'}" stop-opacity="0"/></linearGradient></defs><polyline points="${pts}" fill="none" stroke="${kind==='auto'?'#23845b':'#397bc0'}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="${series.length<2?0:(series.length-1)*(w/(series.length-1))}" cy="${h-10-((last-min)/(max-min||1))*(h-24)}" r="5" fill="${kind==='auto'?'#23845b':'#397bc0'}"/></svg>`;
-    labels.innerHTML=data.map(x=>`<span>${new Date(x.date+'T12:00:00').toLocaleDateString(lang()==='id'?'id-ID':'en-US',{day:'numeric',month:'short'})}</span>`).join('');
+    const data=dashboardMetrics?.[kind+'_trend']||[];
+    const chart=$(kind==='auto'?'autoTrendChart':'pasteTrendChart');
+    const labels=$(kind==='auto'?'autoTrendLabels':'pasteTrendLabels');
+    const title=$(kind==='auto'?'autoTrendTitle':'pasteTrendTitle');
+    const change=$(kind==='auto'?'autoTrendChange':'pasteTrendChange');
+    const summary=$(kind==='auto'?'autoTrendSummary':'pasteTrendSummary');
+    if(!chart)return;
+    const series=data.map(x=>Number(metric==='income'?x.earned:metric==='cpm'?x.cpm:x.views||0));
+    const max=Math.max(1,...series), min=Math.min(0,...series), w=700, h=190, padX=16, top=16, bottom=24;
+    const xAt=i=>series.length<2?w/2:padX+i*((w-padX*2)/(series.length-1));
+    const yAt=v=>top+(h-top-bottom)*(1-(v-min)/(max-min||1));
+    const points=series.map((v,i)=>[xAt(i),yAt(v)]);
+    const poly=points.map(p=>p.join(',')).join(' ');
+    const area=`${padX},${h-bottom} ${poly} ${w-padX},${h-bottom}`;
+    const last=series.at(-1)||0, prev=series.at(-2)||0, diff=last-prev;
+    const pct=prev?diff/prev*100:(last?100:0);
+    change.textContent=(diff>0?'▲ ':diff<0?'▼ ':'• ')+Math.abs(pct).toFixed(1)+'%';
+    change.className='dash-trend-change '+(diff>0?'up':diff<0?'down':'flat');
+    const metricName=metric==='income'?'Pendapatan AutoLink':metric==='cpm'?'CPM AutoLink':metric==='pasteviews'?'View PasteLink':'View AutoLink';
+    title.textContent=metricName;
+    const color=kind==='auto'?'#159768':'#4387d7';
+    const grid=[0,1,2,3].map(i=>{const y=top+i*(h-top-bottom)/3;return `<line x1="${padX}" y1="${y}" x2="${w-padX}" y2="${y}" stroke="#eaf0f5" stroke-width="1" stroke-dasharray="4 6"/>`;}).join('');
+    const circles=points.map((p,i)=>`<circle class="dash-chart-point" data-point-index="${i}" tabindex="0" role="button" aria-label="${esc(data[i]?.date||'')} ${esc(num(series[i]))}" cx="${p[0]}" cy="${p[1]}" r="${i===series.length-1?6:4}" fill="#fff" stroke="${color}" stroke-width="2.5"><title>${esc(data[i]?.date||'')} · ${esc(num(series[i]))}</title></circle>`).join('');
+    chart.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="group" aria-label="Grafik ${esc(metricName)} 14 hari terakhir"><defs><linearGradient id="${kind}TrendFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity=".20"/><stop offset="100%" stop-color="${color}" stop-opacity=".015"/></linearGradient></defs>${grid}<polygon points="${area}" fill="url(#${kind}TrendFill)"/><polyline points="${poly}" fill="none" stroke="${color}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>${circles}</svg>`;
+    const labelIndexes=[0,Math.round((data.length-1)*.25),Math.round((data.length-1)*.5),Math.round((data.length-1)*.75),Math.max(0,data.length-1)].filter((v,i,a)=>a.indexOf(v)===i);
+    labels.innerHTML=labelIndexes.map(i=>`<span>${data[i]?.date?new Date(data[i].date+'T12:00:00').toLocaleDateString(lang()==='id'?'id-ID':'en-US',{day:'numeric',month:'short'}):''}</span>`).join('');
+    const showPoint=i=>{
+      const item=data[i];if(!item||!summary)return;
+      const date=item.date?new Date(item.date+'T12:00:00').toLocaleDateString(lang()==='id'?'id-ID':'en-US',{weekday:'short',day:'numeric',month:'short',year:'numeric'}):'';
+      const value=metric==='income'?rupiahText(series[i]):metric==='cpm'?`${series[i].toFixed(2)}%`:num(series[i]);
+      summary.innerHTML=`<span><i class="fa-solid fa-calendar-day"></i> ${esc(date)}</span><strong>${esc(value)}</strong>`;
+      chart.querySelectorAll('.dash-chart-point').forEach((node,j)=>node.classList.toggle('selected',j===i));
+    };
+    chart.querySelectorAll('[data-point-index]').forEach(node=>{
+      const activate=()=>showPoint(Number(node.dataset.pointIndex));
+      node.addEventListener('click',activate);
+      node.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();activate();}});
+    });
+    if(series.length)showPoint(series.length-1);
   }
   async function loadDashboardMetrics(user){
     const {data,error}=await sb.rpc('get_member_dashboard_metrics');if(error){console.warn('Dashboard metrics RPC:',error.message);return;}
     dashboardMetrics=data||{};
     const fmt= n=>Number(n||0).toLocaleString(lang()==='id'?'id-ID':'en-US');
-    const auto=$('memberAutoStats');if(auto){const metrics=[['links',fmt(data.total_autolinks),'Total AutoLink'],['views',fmt(data.auto_today_views),'View hari ini'],['income',rupiahText(data.auto_today_earned),'Pendapatan hari ini'],['cpm',Number(data.cpm||50).toFixed(2)+'%','CPM hari ini']];auto.innerHTML=metrics.map(([key,val,label])=>`<button type="button" class="member-auto-stat dash-metric-button" data-auto-metric="${key}"><small>${label}</small><strong>${val}</strong><span>Lihat statistik <i class="fa-solid fa-arrow-right"></i></span></button>`).join('');auto.querySelectorAll('[data-auto-metric]').forEach(b=>b.addEventListener('click',()=>drawTrend('auto',b.dataset.autoMetric==='income'?'income':b.dataset.autoMetric==='cpm'?'cpm':'views')));}
-    const ps=$('memberPasteStats');if(ps){ps.innerHTML=`<button type="button" class="member-paste-stat dash-paste-metric" data-paste-metric="total"><span><i class="fa-solid fa-file-lines"></i> Total PasteLink</span><strong>${fmt(data.total_pastelinks)}</strong><small>Lihat daftar link</small></button><button type="button" class="member-paste-stat dash-paste-metric" data-paste-metric="views"><span><i class="fa-solid fa-eye"></i> View hari ini</span><strong>${fmt(data.paste_today_views)}</strong><small>Lihat statistik 14 hari</small></button>`;ps.querySelectorAll('[data-paste-metric]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.pasteMetric==='views')drawTrend('paste','pasteviews');else $('memberPasteList')?.scrollIntoView({behavior:'smooth',block:'start'});}));}
+    const auto=$('memberAutoStats');if(auto){const metrics=[['links',fmt(data.total_autolinks),'Total AutoLink'],['views',fmt(data.auto_today_views),'View hari ini'],['income',rupiahText(data.auto_today_earned),'Pendapatan hari ini'],['cpm',Number(data.cpm||50).toFixed(2)+'%','CPM hari ini']];auto.innerHTML=metrics.map(([key,val,label])=>`<button type="button" class="member-auto-stat dash-metric-button" data-auto-metric="${key}"><small>${label}</small><strong>${val}</strong><span>Lihat statistik <i class="fa-solid fa-arrow-right"></i></span></button>`).join('');auto.querySelectorAll('[data-auto-metric]').forEach(b=>b.addEventListener('click',()=>{drawTrend('auto',b.dataset.autoMetric==='income'?'income':b.dataset.autoMetric==='cpm'?'cpm':'views');auto.querySelectorAll('[data-auto-metric]').forEach(x=>x.classList.toggle('active',x===b));}));}
+    const ps=$('memberPasteStats');if(ps){ps.innerHTML=`<button type="button" class="member-paste-stat dash-paste-metric" data-paste-metric="total"><span><i class="fa-solid fa-file-lines"></i> Total PasteLink</span><strong>${fmt(data.total_pastelinks)}</strong><small>Lihat daftar link</small></button><button type="button" class="member-paste-stat dash-paste-metric" data-paste-metric="views"><span><i class="fa-solid fa-eye"></i> View hari ini</span><strong>${fmt(data.paste_today_views)}</strong><small>Lihat statistik 14 hari</small></button>`;ps.querySelectorAll('[data-paste-metric]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.pasteMetric==='views'){drawTrend('paste','pasteviews');ps.querySelectorAll('[data-paste-metric]').forEach(x=>x.classList.toggle('active',x===b));}else $('memberPasteList')?.scrollIntoView({behavior:'smooth',block:'start'});}));}
     drawTrend('auto','views');drawTrend('paste','pasteviews');
   }
   async function loadAnnouncementCenter(){
