@@ -1,1 +1,44 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Masuk — BoxCellink</title><link rel="stylesheet" href="css/login.css"><link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"></head><body><div data-component="navbar"></div><div id="toast" class="toast" role="status" aria-live="polite"></div><main class="auth-page"><section class="auth-visual"><div class="brand"><b>B</b> BoxCellink</div><div><h1 data-i18n="visualTitle">Konten rapi. Akses jelas.</h1><p data-i18n="visualDesc">Masuk untuk melanjutkan ke konten member atau dashboard admin.</p></div><small>BoxCellink · Supabase</small></section><section class="auth-panel"><div class="auth-card"><div class="auth-tools"><a class="btn back" href="index.html">← <span data-i18n="back">Kembali</span></a></div><div class="brand"><b>B</b> BoxCellink</div><h1 data-i18n="title">Selamat datang 👋</h1><p class="muted" data-i18n="subtitle">Masuk untuk melanjutkan.</p><div id="savedAccounts" class="saved-accounts" hidden></div><form id="loginForm"><div class="field"><label data-i18n="emailOrName">Email / Nama</label><input id="email" name="email" type="text" autocomplete="username" required></div><div class="field"><label data-i18n="password">Kata sandi</label><div class="password-wrap"><input id="password" name="password" type="password" autocomplete="current-password" required><button class="password-toggle" type="button" data-target="password" aria-label="Tampilkan kata sandi"><i class="fa-solid fa-eye"></i></button></div></div><div class="forgot"><a href="forgot-password.html" data-i18n="forgot">Lupa kata sandi?</a></div><button class="btn primary full" type="submit"><span data-i18n="login">Masuk</span></button></form><p class="muted bottom-link"><span data-i18n="noAccount">Belum punya akun?</span> <a href="register.html"><span data-i18n="register">Daftar</span></a></p></div></section></main><div data-component="footer"></div><script src="components.js?v=20261116-addmenu-fix"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script><script src="js/login.js?v=20261115-account-v2"></script><script src="js/page-i18n.js"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101b34">
+  <title>Masuk — BoxCellink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"><link rel="stylesheet" href="css/login.css?v=20261120-auth-premium-v2">
+</head>
+<body>
+  <div data-component="navbar"></div><div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <main class="auth-page auth-login">
+    <aside class="auth-visual">
+      <a class="auth-brand" href="index.html"><span class="brand-mark">B</span><span>BoxCellink</span></a>
+      <div class="visual-content">
+        <span class="visual-eyebrow"><i class="fa-solid fa-shield-halved"></i> YOUR DIGITAL SPACE</span>
+        <h1>Semua akses,<br><span>dalam satu akun.</span></h1>
+        <p>Masuk dengan aman dan lanjutkan aktivitasmu. Konten, komunitas, dan layanan favoritmu menunggu di satu tempat.</p>
+        <div class="visual-points"><div><i class="fa-solid fa-circle-check"></i><span>Akses akun lebih praktis</span></div><div><i class="fa-solid fa-lock"></i><span>Autentikasi aman</span></div><div><i class="fa-solid fa-bolt"></i><span>Pengalaman cepat dan nyaman</span></div></div>
+      </div>
+      <div class="visual-foot"><span>BOXCELLINK</span><span>SECURE MEMBER ACCESS</span></div>
+      <div class="visual-orb orb-one"></div><div class="visual-orb orb-two"></div>
+    </aside>
+    <section class="auth-panel"><div class="auth-card">
+      <div class="auth-mobile-brand"><span class="brand-mark">B</span><span>BoxCellink</span></div>
+      <div class="auth-topline"><a class="back-link" href="index.html"><i class="fa-solid fa-arrow-left"></i> Beranda</a><span class="secure-label"><i class="fa-solid fa-lock"></i> Login aman</span></div>
+      <div class="auth-heading"><span class="section-kicker">SELAMAT DATANG KEMBALI</span><h2>Masuk ke akunmu</h2><p>Gunakan username atau Gmail yang sudah terdaftar.</p></div>
+      <div id="savedAccounts" class="saved-accounts" hidden></div>
+      <form id="loginForm" novalidate>
+        <div class="field"><label for="email">Username atau Gmail</label><div class="input-shell"><i class="fa-regular fa-user input-icon"></i><input id="email" name="username" type="text" placeholder="contoh: username atau nama@gmail.com" autocomplete="username" autocapitalize="none" spellcheck="false" required><span class="input-check"><i class="fa-solid fa-check"></i></span></div><small class="field-hint">Pilih akun yang pernah digunakan jika Chrome menampilkan saran akun.</small></div>
+        <div class="field"><div class="label-row"><label for="password">Kata sandi</label><a href="forgot-password.html">Lupa kata sandi?</a></div><div class="input-shell password-wrap"><i class="fa-solid fa-key input-icon"></i><input id="password" name="password" type="password" placeholder="Masukkan kata sandi" autocomplete="current-password" required><button class="password-toggle" type="button" data-target="password" aria-label="Tampilkan kata sandi"><i class="fa-regular fa-eye"></i></button></div></div>
+        <label class="consent-row"><input type="checkbox" id="loginConsent"><span class="custom-check"><i class="fa-solid fa-check"></i></span><span>Saya telah membaca dan menyetujui <a href="terms.html" target="_blank" rel="noopener">Syarat &amp; Ketentuan</a> serta <a href="privacy.html" target="_blank" rel="noopener">Kebijakan Privasi</a>.</span></label>
+        <button class="btn primary full auth-submit" id="loginSubmit" type="submit" disabled><span>Masuk ke akun</span><i class="fa-solid fa-arrow-right"></i></button>
+      </form>
+      <div class="auth-divider"><span>Belum bergabung?</span></div>
+      <a class="secondary-action" href="register.html">Buat akun baru <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      <p class="auth-assurance"><i class="fa-solid fa-shield-halved"></i> Informasi akunmu dilindungi. Jangan bagikan kata sandi kepada siapa pun.</p>
+    </div></section>
+  </main>
+  <div data-component="footer"></div>
+  <script src="components.js?v=20261116-addmenu-fix"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script><script src="js/i18n-auth.js"></script><script src="js/login.js?v=20261120-auth-premium-v2"></script><script src="js/page-i18n.js"></script>
+</body></html>
