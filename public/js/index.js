@@ -4,6 +4,24 @@
   const search = document.getElementById('homeSearch');
   const clear = document.getElementById('homeSearchClear');
   const count = document.getElementById('catalogCount');
+  // Rotating typewriter headline runs independently from catalog loading.
+  const typedNode = document.getElementById('homeTypedText');
+  if (typedNode && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const phrases = ['Telegram Media', 'Grup VIP', 'PasteLink', 'AutoLink', 'Ready Nokos', 'Kode OTP'];
+    let phraseIndex = 0, charIndex = phrases[0].length, deleting = false;
+    const typeNext = () => {
+      if (!typedNode.isConnected) return;
+      const phrase = phrases[phraseIndex];
+      charIndex += deleting ? -1 : 1;
+      typedNode.textContent = phrase.slice(0, Math.max(0, charIndex));
+      let delay = deleting ? 42 : 78;
+      if (!deleting && charIndex >= phrase.length) { deleting = true; delay = 1450; }
+      else if (deleting && charIndex <= 0) { deleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; delay = 300; }
+      window.setTimeout(typeNext, delay);
+    };
+    window.setTimeout(typeNext, 900);
+  }
+
   if (!videoGrid || !telegramGrid) return;
 
   // Homepage CTA mengikuti sesi Supabase: tombol Login/Register hanya untuk guest.
@@ -82,23 +100,6 @@
   };
 
   const placeholder = (icon, label) => `<div class="home-thumb-placeholder"><i class="${icon}"></i><span>${label}</span></div>`;
-
-  // Rotating typewriter headline: static fallback remains visible without JS.
-  const typedNode = document.getElementById('homeTypedText');
-  if (typedNode && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const phrases = ['Telegram Media', 'Grup VIP', 'PasteLink', 'AutoLink', 'Ready No Cost', 'Kode OTP'];
-    let phraseIndex = 0, charIndex = phrases[0].length, deleting = false;
-    const typeNext = () => {
-      const phrase = phrases[phraseIndex];
-      charIndex += deleting ? -1 : 1;
-      typedNode.textContent = phrase.slice(0, Math.max(0, charIndex));
-      let delay = deleting ? 42 : 78;
-      if (!deleting && charIndex >= phrase.length) { deleting = true; delay = 1350; }
-      else if (deleting && charIndex <= 0) { deleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; delay = 300; }
-      window.setTimeout(typeNext, delay);
-    };
-    window.setTimeout(typeNext, 1500);
-  }
 
   // Reveal sections/cards as they enter the viewport; gracefully falls back without IO.
   const revealItems = document.querySelectorAll('.al5-service-card,.al5-guide-band,.al5-referral-detail,.al5-withdraw-detail,.al5-chatbot-section,.catalog-section,.home-referral-cta,.home-bottom-cta');

@@ -20,7 +20,7 @@
  }
  const apps=['Telegram','WhatsApp','Facebook','Gmail / Google','Instagram','TikTok','Discord','Aplikasi lainnya'];
  function appButtons(){return apps.map(app=>({label:app,run:()=>chooseApp(app)}));}
- function showStart(){stage='app';reply('Halo! Saya asisten layanan Ready Nokos. Pilih aplikasi yang kamu butuhkan. Kami akan bantu teruskan permintaan ke admin untuk pengecekan ketersediaan nomor dan OTP.',appButtons(),500);}
+ function showStart(){stage='app';reply('Halo! Saya asisten layanan Ready Nokos. Pilih aplikasi yang kamu butuhkan. Kami akan bantu teruskan permintaan ke admin untuk pengecekan ketersediaan nomor dan OTP.',appButtons(),350);}
  function chooseApp(app){selectedApp=app;stage='type';message(app,'user');reply('Untuk '+app+', kamu membutuhkan layanan yang mana?',[
    {label:'Nomor siap pakai',run:()=>chooseType('Nomor siap pakai')},
    {label:'Kode OTP / Verifikasi',run:()=>chooseType('Kode OTP / Verifikasi')}
@@ -61,5 +61,7 @@
    showStart();
  }
  form.addEventListener('submit',e=>{e.preventDefault();const v=input.value;input.value='';handle(v);});
- setTimeout(()=>{feed.innerHTML='';message('Selamat datang di layanan Ready Nokos.');showStart();},500);
+ // Input tetap bisa dipakai sejak awal; pesan pembuka tidak mengunci form.
+ input.disabled=false;send.disabled=false;
+ setTimeout(()=>{feed.innerHTML='';message('Selamat datang di layanan Ready Nokos.');showStart();},250);
 })();
