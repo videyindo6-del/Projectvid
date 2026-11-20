@@ -36,7 +36,8 @@ Deno.serve(async req => {
       const hash=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
       if(!payment?.guest_token_hash||payment.guest_token_hash!==hash) return out({error:'Token pembayaran tidak cocok'},403);
     }
-    if(o.status==='SETTLED'){
+    const storedStatus=String(o.status||'').toUpperCase();
+    if(storedStatus==='SETTLED'){
       if(o.purpose==='vip_group'){
         const {data:grantData,error:grantError}=await admin.rpc('ensure_vip_group_entitlement_for_order',{p_order_id:order_id});
         if(grantError||!grantData?.ok){
@@ -46,7 +47,7 @@ Deno.serve(async req => {
       }
       return out({success:true,status:'SETTLED',order_id});
     }
-    if(['EXPIRED','FAILED'].includes(String(o.status).toUpperCase())) return out({success:true,status:o.status});
+    if(['EXPIRED','FAILED','CANCELLED','CANCELED'].includes(storedStatus)) return out({success:true,status:storedStatus==='CANCELLED'||storedStatus==='CANCELED'?'FAILED':storedStatus});
     const key=Deno.env.get('CASHI_API_KEY');
     if(!key) return out({error:'CASHI_API_KEY belum disetel pada Supabase Edge Functions'},500);
     // Cashi create-order mengembalikan orderId (camelCase); ID ini dipakai pada endpoint check-status.
