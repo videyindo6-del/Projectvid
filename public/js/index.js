@@ -7,7 +7,7 @@
   // Rotating typewriter headline runs independently from catalog loading.
   const typedNode = document.getElementById('homeTypedText');
   if (typedNode && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const phrases = ['Telegram Media', 'Grup VIP', 'PasteLink', 'AutoLink', 'Ready Nokos', 'Kode OTP'];
+    const phrases = ['Media Telegram', 'Group VIP Telegram', 'Video Videy', 'AutoLink', 'PasteLink', 'Ready Nokos', 'Kode OTP'];
     let phraseIndex = 0, charIndex = phrases[0].length, deleting = false;
     const typeNext = () => {
       if (!typedNode.isConnected) return;
