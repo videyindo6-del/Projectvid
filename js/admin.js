@@ -9,16 +9,19 @@ const safeText=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','
 async function loadAdminActivity(){
  if(!activityBox)return;
  activityBox.innerHTML='<article class="hub-card"><span class="hub-card-copy"><b>Memuat...</b><span>Memeriksa aktivitas member.</span></span></article>';
- const [withdrawals,support]=await Promise.all([
+ const [withdrawals,publisherWithdrawals,support]=await Promise.all([
   sb.from('affiliate_withdrawals').select('id,user_id,amount,status,payout_provider,payout_method,created_at').order('created_at',{ascending:false}).limit(8),
+  sb.from('publisher_withdrawals').select('id,publisher_id,amount,status,created_at').order('created_at',{ascending:false}).limit(8),
   sb.from('support_conversations').select('id,user_id,subject,status,updated_at').order('updated_at',{ascending:false}).limit(8)
  ]);
  const items=[];
  if(!withdrawals.error)(withdrawals.data||[]).forEach(w=>items.push({time:w.created_at,html:`<a class="hub-card" href="affiliate-admin.html"><span class="hub-card-icon"><i class="fa-solid fa-wallet"></i></span><span class="hub-card-copy"><b>Pengajuan withdraw · Rp ${Number(w.amount||0).toLocaleString('id-ID')}</b><span>Status: ${safeText(w.status)} · ${safeText(w.payout_provider||w.payout_method||'Metode payout')}<br>${new Date(w.created_at).toLocaleString('id-ID')}</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>`}));
+ if(!publisherWithdrawals.error)(publisherWithdrawals.data||[]).forEach(w=>items.push({time:w.created_at,html:`<a class="hub-card" href="admin-publisher-withdraw.html"><span class="hub-card-icon"><i class="fa-solid fa-money-bill-transfer"></i></span><span class="hub-card-copy"><b>Withdraw Publisher · Rp ${Number(w.amount||0).toLocaleString('id-ID')}</b><span>Status: ${safeText(w.status)} · ${new Date(w.created_at).toLocaleString('id-ID')}</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>`}));
  if(!support.error)(support.data||[]).forEach(c=>items.push({time:c.updated_at,html:`<a class="hub-card" href="support-inbox.html"><span class="hub-card-icon"><i class="fa-solid fa-headset"></i></span><span class="hub-card-copy"><b>Support member · ${safeText(c.subject||'Chat Support')}</b><span>Status: ${safeText(c.status)} · ${new Date(c.updated_at).toLocaleString('id-ID')}</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>`}));
  items.sort((a,b)=>new Date(b.time)-new Date(a.time));
  activityBox.innerHTML=items.slice(0,10).map(x=>x.html).join('')||'<article class="hub-card"><span class="hub-card-copy"><b>Belum ada aktivitas baru</b><span>Pengajuan withdraw dan percakapan support akan muncul di sini.</span></span></article>';
  if(withdrawals.error)console.warn('Withdraw feed:',withdrawals.error.message);
+ if(publisherWithdrawals.error)console.warn('Publisher withdraw feed:',publisherWithdrawals.error.message);
  if(support.error)console.warn('Support feed:',support.error.message);
 }
 async function loadAdminAnnouncements(){
