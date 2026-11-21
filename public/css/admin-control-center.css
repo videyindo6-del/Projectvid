@@ -1,0 +1,10 @@
+/* BoxCellink Admin Control Center metrics */
+.admin-live-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px}
+.admin-live-card{min-width:0;border:1px solid #e1e9f2;border-radius:16px;padding:16px;background:#fff;box-shadow:0 6px 18px #102b4908;display:grid;gap:8px}
+.admin-live-card span{font-size:12px;font-weight:800;color:#64748b;display:flex;gap:8px;align-items:center}
+.admin-live-card span i{color:#2874b8}
+.admin-live-card strong{font-size:clamp(25px,3vw,34px);line-height:1.1;color:#102b49;font-variant-numeric:tabular-nums}
+.admin-live-card small{font-size:12px;color:#718096;line-height:1.5}
+.admin-live-note{margin:10px 0 0;font-size:12px;color:#718096}
+.admin-embed-help{grid-column:1/-1;margin:-2px 0 10px;color:#64748b;font-size:12px;line-height:1.6;background:#f4f8fc;border:1px solid #e1eaf3;padding:10px 12px;border-radius:10px}
+@media(max-width:520px){.admin-live-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-live-card{padding:13px}.admin-live-card strong{font-size:25px}}
