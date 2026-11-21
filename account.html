@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/member-pages.css">
 <link rel="stylesheet" href="css/upgrade-pages.css">
-<link rel="stylesheet" href="css/account-premium.css?v=20261115-social-v1">
+<link rel="stylesheet" href="css/account-premium.css?v=20261121-profile-audit-v2">
 <link rel="stylesheet" href="/css/navbar.css">
 <link rel="stylesheet" href="/css/footer.css"></head>
 <body>
@@ -49,6 +49,11 @@
     </article>
   </section>
 
+  <nav class="account-history-shortcuts" aria-label="Purchase history shortcuts">
+    <a href="#mediaPurchaseSection" data-account-i18n="jump_media"><i class="fa-brands fa-telegram"></i> Histori Media Telegram</a>
+    <a href="#vipGroupPurchaseSection" data-account-i18n="jump_groups"><i class="fa-solid fa-users"></i> Histori Group VIP</a>
+    <a href="#vipPurchaseSection" data-account-i18n="jump_vip"><i class="fa-solid fa-crown"></i> Histori VIP</a>
+  </nav>
   <section class="account-section account-profile-section">
     <div class="section-heading">
       <div><span class="section-eyebrow">PUBLIC PROFILE</span><h2 data-account-i18n="profile_title">Profil Publik</h2><p data-account-i18n="profile_desc">Atur username yang akan dikenali pengguna lain di BoxCellink.</p></div>
@@ -65,11 +70,7 @@
         <small class="account-field-hint" data-account-i18n="username_hint">3–24 karakter. Gunakan huruf, angka, titik, atau garis bawah.</small>
         <button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="save_username">Simpan username</span></button>
       </form>
-      <form id="gameIdForm" class="account-form-grid" style="margin-top:18px;padding-top:18px;border-top:1px solid var(--border-color,#e2e8f0)">
-        <label for="memberGameId">Game ID</label><input id="memberGameId" type="text" maxlength="80" autocomplete="off" placeholder="Masukkan Game ID (opsional)">
-        <small class="account-field-hint">Game ID ini akan dicantumkan pada detail pengajuan withdraw untuk membantu admin memverifikasi akun.</small>
-        <button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Game ID</button>
-      </form>
+
     </article>
   </section>
 
@@ -145,6 +146,8 @@
       <article class="account-panel">
         <div class="panel-heading"><span class="panel-icon password-icon"><i class="fa-solid fa-key"></i></span><div><h3 data-account-i18n="change_password">Ganti Kata Sandi</h3><p data-account-i18n="password_desc">Buat kata sandi baru untuk login berikutnya.</p></div></div>
         <form id="passwordForm">
+          <label class="password-reset-mode"><input id="forgotPasswordMode" type="checkbox"><span data-account-i18n="forgot_password_mode">Saya lupa kata sandi lama</span></label>
+          <small id="passwordModeHint" class="account-field-hint" data-account-i18n="password_mode_hint">Kamu tidak perlu memasukkan kata sandi lama saat sudah login. Isi kata sandi baru dan konfirmasikan.</small>
           <label for="newPassword" data-account-i18n="new_password">Kata sandi baru</label>
           <input id="newPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Minimal 8 karakter">
           <label for="confirmPassword" data-account-i18n="confirm_password">Konfirmasi kata sandi baru</label>
@@ -155,11 +158,12 @@
       </article>
     </div>
   </section>
-  <section class="account-section media-section">
+  <section class="account-section media-section" id="mediaPurchaseSection">
     <div class="section-heading">
       <div><span class="section-eyebrow" data-account-i18n="your_library">YOUR LIBRARY</span><h2><i class="fa-brands fa-telegram telegram-heading-icon"></i> <span data-account-i18n="telegram_media">Media Telegram Saya</span></h2><p data-account-i18n="library_desc">Semua review yang sudah berhasil kamu beli akan otomatis tersimpan di sini.</p></div>
       <span class="library-count" id="purchaseCount">0 <span data-account-i18n="items">MEDIA</span></span>
     </div>
+    <div class="account-reset-warning" data-account-i18n="media_reset_notice"><i class="fa-solid fa-clock"></i> Target masa simpan Review Media: 3 hari setelah pembayaran diproses. Penghapusan otomatis database belum diaktifkan.</div>
     <div class="library-toolbar">
       <span><i class="fa-solid fa-circle-check"></i> <span data-account-i18n="verified_purchases">Pembelian terverifikasi</span></span>
       <span><i class="fa-solid fa-cloud-arrow-down"></i> <span data-account-i18n="access_anytime">Akses dari halaman akun</span></span>
@@ -181,17 +185,19 @@
     </div>
   </section>
 
-  <section class="account-section">
+  <section class="account-section" id="vipPurchaseSection">
     <div class="section-heading">
       <div><span class="section-eyebrow" data-account-i18n="vip_history_eyebrow">PURCHASE HISTORY</span><h2><i class="fa-solid fa-crown"></i> <span data-account-i18n="vip_history_title">Histori Pembelian VIP</span></h2><p data-account-i18n="vip_history_desc">Riwayat transaksi VIP tetap tersimpan meskipun link undangan sudah kedaluwarsa.</p></div>
+    <div class="account-reset-warning" data-account-i18n="vip_expiry_notice"><i class="fa-solid fa-clock"></i> Status VIP otomatis berakhir saat masa aktif habis. Histori transaksi tetap tersimpan.</div>
     </div>
     <div id="vipPurchaseHistory" class="purchase-list"><div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_vip_history">Memuat histori pembelian VIP...</span></div></div>
   </section>
 
-  <section class="account-section">
+  <section class="account-section" id="vipGroupPurchaseSection">
     <div class="section-heading">
       <div><span class="section-eyebrow" data-account-i18n="exclusive_access">EXCLUSIVE ACCESS</span><h2><i class="fa-brands fa-telegram telegram-heading-icon"></i> <span data-account-i18n="vip_groups">Group VIP Telegram</span></h2><p data-account-i18n="groups_desc">Kelola undangan group VIP yang sudah kamu beli.</p></div>
     </div>
+    <div class="account-reset-warning" data-account-i18n="group_reset_notice"><i class="fa-solid fa-clock"></i> Link undangan Group VIP berlaku 24 jam. Histori transaksi tidak otomatis dihapus oleh UI ini.</div>
     <div id="groupLinks" class="purchase-list"><div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_groups">Memuat akses group...</span></div></div>
   </section>
   <section class="account-section account-security-section">
@@ -213,7 +219,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="components.js?v=20261115-4"></script>
-<script src="js/account.js?v=20261119-vipgroup-history"></script>
+<script src="js/account.js?v=20261121-profile-audit-v2"></script>
 <script src="js/page-i18n.js"></script>
 </body>
 </html>
