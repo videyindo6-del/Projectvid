@@ -17,11 +17,11 @@ const copyA = {
   no_history:'Belum ada riwayat tontonan.',no_groups:'Belum ada Group VIP yang dibeli.',group_success:'Pembayaran Group VIP berhasil!',group_active:'Akses group aktif.',invite_until:'Link undangan aktif sampai',invite_expired:'Link undangan tidak tersedia. Hubungi admin untuk pembaruan.',join_group:'Masuk Group',expired:'Link tidak tersedia',check_link:'Cek link terbaru',copy_link:'Salin link',link_updated:'Link undangan mengikuti pengaturan terbaru admin.',group_notice:'Pembayaran berhasil! Akses Group VIP kamu sudah aktif.',
   email_sent:'Tautan konfirmasi dikirim ke email baru.',password_updated:'Kata sandi berhasil diperbarui.',email_failed:'Gagal memperbarui email.',password_failed:'Gagal memperbarui kata sandi.',
   load_failed:'Riwayat media tidak dapat dimuat.',order_fallback:'Menampilkan pembelian yang telah terverifikasi.',retry:'Coba muat ulang',previous:'Sebelumnya',next:'Berikutnya',email_request_ok:'Gmail berhasil diganti.',email_confirm_pending:'Alamat Gmail akun telah diperbarui.',sign_in:'Silakan login untuk melihat akun.',
-  profile_title:'Profil Publik',profile_desc:'Atur username yang akan dikenali pengguna lain di BoxCellink.',public_identity:'Identitas publik',username_label:'Username publik',username_hint:'3–24 karakter. Gunakan huruf, angka, titik, atau garis bawah.',save_username:'Simpan username',username_saved:'Username berhasil diperbarui.',username_failed:'Gagal memperbarui username.',
+  profile_title:'Profil Publik',profile_desc:'Atur username yang akan dikenali pengguna lain di BoxCellink.',social_eyebrow:'PROFIL SOSIAL',social_title:'Bio & tautan sosial',social_desc:'Informasi ini akan terlihat pada halaman profil publikmu.',bio_label:'Bio',bio_placeholder:'Ceritakan sedikit tentang dirimu...',bio_hint:'Maksimal 500 karakter.',social_links_title:'Tautan sosial',social_links_hint:'Opsional. Gunakan tautan lengkap yang diawali https://',social_instagram:'Instagram',social_facebook:'Facebook',social_youtube:'YouTube',social_telegram:'Telegram',social_whatsapp:'WhatsApp',social_x:'X',social_other:'Link lainnya',social_save:'Simpan bio & tautan sosial',social_saved:'Bio dan tautan sosial berhasil disimpan.',social_save_failed:'Gagal menyimpan profil sosial.',social_url_error:'Gunakan tautan http:// atau https:// yang valid untuk',public_identity:'Identitas publik',username_label:'Username publik',username_hint:'3–24 karakter. Gunakan huruf, angka, titik, atau garis bawah.',save_username:'Simpan username',username_saved:'Username berhasil diperbarui.',username_failed:'Gagal memperbarui username.',
   payout_eyebrow:'WITHDRAWAL SETTINGS',payout_title:'Rekening Saya',payout_desc:'Simpan rekening bank atau e-wallet untuk pencairan saldo.',payout_secure:'Informasi rekening hanya digunakan untuk proses pencairan saldo.',payout_holder:'Nama pemilik rekening',payout_method:'Jenis rekening',payout_provider:'Pilih bank / e-wallet',payout_other:'Nama lainnya',payout_number:'Nomor rekening / e-wallet',payout_save:'Simpan rekening',payout_saved:'Rekening pencairan berhasil disimpan.',payout_failed:'Gagal menyimpan rekening.',payout_unavailable:'Rekening pencairan tersedia setelah status Affiliate disetujui.',payout_bank:'Pilih bank',payout_wallet:'Pilih e-wallet',payout_empty:'Rekening belum disimpan.',edit_payout:'Ubah rekening',saved_payout:'Rekening tersimpan',
   current_email:'Email saat ini',email_desc:'Masukkan alamat email baru untuk akunmu.',email_hint:'Email akun akan diperbarui setelah berhasil diproses.',new_email:'Email baru',change_email_button:'Simpan email baru',
   confirm_password:'Konfirmasi kata sandi baru',password_desc:'Buat kata sandi baru untuk login berikutnya.',password_hint:'Minimal 8 karakter dan pastikan kedua kolom sama.',
-  vip_history_eyebrow:'PURCHASE HISTORY',vip_history_title:'Histori Pembelian VIP',vip_history_desc:'Riwayat transaksi VIP tetap tersimpan meskipun link undangan sudah kedaluwarsa.',loading_vip_history:'Memuat histori pembelian VIP...',no_vip_history:'Belum ada pembelian VIP.',vip_order:'Pembelian VIP',invite_until:'Link undangan aktif sampai',invite_expired:'Link undangan sudah kedaluwarsa. Beli kembali untuk mendapatkan link baru.',buy_again:'Beli lagi',watch_duration:'Durasi ditonton',sort_history:'Urutkan',sort_recent:'Terbaru ditonton',sort_oldest:'Terlama ditonton',sort_duration:'Durasi terpanjang',
+  vip_history_eyebrow:'PURCHASE HISTORY',vip_history_title:'Histori Pembelian VIP',vip_history_desc:'Riwayat transaksi VIP tetap tersimpan meskipun link undangan sudah kedaluwarsa.',loading_vip_history:'Memuat histori pembelian VIP...',no_vip_history:'Belum ada pembelian VIP.',vip_order:'Paket VIP',days:'hari',invite_until:'Link undangan aktif sampai',invite_expired:'Link undangan sudah kedaluwarsa. Beli kembali untuk mendapatkan link baru.',buy_again:'Beli lagi',watch_duration:'Durasi ditonton',sort_history:'Urutkan',sort_recent:'Terbaru ditonton',sort_oldest:'Terlama ditonton',sort_duration:'Durasi terpanjang',
   security_eyebrow:'ACCOUNT SECURITY',login_devices:'Perangkat Login',login_devices_desc:'Periksa browser dan perangkat yang pernah digunakan untuk masuk ke akun ini.',loading_devices:'Memuat perangkat...',current_device:'Perangkat ini',other_device:'Perangkat lain',last_login:'Login terakhir',signout_others:'Keluar dari perangkat lain',signout_current:'Keluar dari akun ini',security_note:'Jika ada perangkat yang tidak kamu kenali, keluarkan semua sesi lain lalu segera ganti kata sandi.',devices_unavailable:'Riwayat perangkat belum tersedia. Jalankan migration Account Center.',devices_signed_out:'Semua sesi perangkat lain telah dikeluarkan. Segera ganti kata sandi jika login tersebut bukan milikmu.',no_other_devices:'Tidak ada perangkat lain yang tercatat.',unknown_device:'Perangkat tidak dikenal',jump_media:'Histori Media Telegram',jump_groups:'Histori Group VIP',jump_vip:'Histori VIP',media_reset_notice:'Target masa simpan Review Media: 3 hari setelah pembayaran diproses. Penghapusan otomatis database belum diaktifkan.',group_reset_notice:'Link undangan Group VIP berlaku 24 jam. Histori transaksi tidak otomatis dihapus oleh UI ini.',vip_expiry_notice:'Status VIP otomatis berakhir saat masa aktif habis. Histori transaksi tetap tersimpan.',forgot_password_mode:'Saya lupa kata sandi lama',password_mode_hint:'Kamu tidak perlu memasukkan kata sandi lama saat sudah login. Isi kata sandi baru dan konfirmasikan.',bank:'Bank',ewallet:'E-Wallet'
  },
  en:{
@@ -37,11 +37,11 @@ const copyA = {
   no_history:'No watch history yet.',no_groups:'No VIP Telegram groups purchased yet.',group_success:'VIP Group payment successful!',group_active:'Group access is active.',invite_until:'Invitation link active until',invite_expired:'Invitation link has expired',join_group:'Join group',expired:'Link expired',
   email_sent:'A confirmation link has been sent to your new email.',password_updated:'Your password has been updated.',email_failed:'Unable to update email.',password_failed:'Unable to update password.',
   load_failed:'Unable to load purchased media.',order_fallback:'Showing verified purchases.',retry:'Reload',previous:'Previous',next:'Next',email_request_ok:'Gmail changed successfully.',email_confirm_pending:'Your account Gmail address has been updated.',sign_in:'Please sign in to view your account.',
-  profile_title:'Public profile',profile_desc:'Set the username other BoxCellink users can recognize.',public_identity:'Public identity',username_label:'Public username',username_hint:'3–24 characters. Use letters, numbers, dots, or underscores.',save_username:'Save username',username_saved:'Username updated successfully.',username_failed:'Unable to update username.',
+  profile_title:'Public profile',profile_desc:'Set the username other BoxCellink users can recognize.',social_eyebrow:'SOCIAL PROFILE',social_title:'Bio & social links',social_desc:'This information will appear on your public profile page.',bio_label:'Bio',bio_placeholder:'Tell people a little about yourself...',bio_hint:'Up to 500 characters.',social_links_title:'Social links',social_links_hint:'Optional. Use full links starting with https://',social_instagram:'Instagram',social_facebook:'Facebook',social_youtube:'YouTube',social_telegram:'Telegram',social_whatsapp:'WhatsApp',social_x:'X',social_other:'Other link',social_save:'Save bio & social links',social_saved:'Bio and social links saved successfully.',social_save_failed:'Unable to save your public profile.',social_url_error:'Enter a valid http:// or https:// link for',public_identity:'Public identity',username_label:'Public username',username_hint:'3–24 characters. Use letters, numbers, dots, or underscores.',save_username:'Save username',username_saved:'Username updated successfully.',username_failed:'Unable to update username.',
   payout_eyebrow:'WITHDRAWAL SETTINGS',payout_title:'My payout account',payout_desc:'Save a bank or e-wallet account for withdrawals.',payout_secure:'Payout details are only used to process withdrawals.',payout_holder:'Account holder name',payout_method:'Account type',payout_provider:'Choose bank / e-wallet',payout_other:'Other provider',payout_number:'Account / e-wallet number',payout_save:'Save payout account',payout_saved:'Payout account saved successfully.',payout_failed:'Unable to save payout account.',payout_unavailable:'Payout settings become available after Affiliate approval.',payout_bank:'Choose a bank',payout_wallet:'Choose an e-wallet',payout_empty:'No payout account saved.',edit_payout:'Edit account',saved_payout:'Saved payout account',
   current_email:'Current email',email_desc:'Enter the new email address for your account.',email_hint:'Your account email will be updated after processing.',new_email:'New email',change_email_button:'Save new email',
   confirm_password:'Confirm new password',password_desc:'Create a new password for your next sign-in.',password_hint:'At least 8 characters; both fields must match.',
-  vip_history_eyebrow:'PURCHASE HISTORY',vip_history_title:'VIP purchase history',vip_history_desc:'VIP transactions remain in your history even after invitation links expire.',loading_vip_history:'Loading VIP purchase history...',no_vip_history:'No VIP purchases yet.',vip_order:'VIP purchase',invite_until:'Invitation link active until',invite_expired:'The invitation link has expired. Purchase again to get a new link.',buy_again:'Buy again',watch_duration:'Time watched',sort_history:'Sort by',sort_recent:'Recently watched',sort_oldest:'Oldest watched',sort_duration:'Longest watch time',
+  vip_history_eyebrow:'PURCHASE HISTORY',vip_history_title:'VIP purchase history',vip_history_desc:'VIP transactions remain in your history even after invitation links expire.',loading_vip_history:'Loading VIP purchase history...',no_vip_history:'No VIP purchases yet.',vip_order:'VIP plan',days:'days',invite_until:'Invitation link active until',invite_expired:'The invitation link has expired. Purchase again to get a new link.',buy_again:'Buy again',watch_duration:'Time watched',sort_history:'Sort by',sort_recent:'Recently watched',sort_oldest:'Oldest watched',sort_duration:'Longest watch time',
   security_eyebrow:'ACCOUNT SECURITY',login_devices:'Login devices',login_devices_desc:'Review browsers and devices that have been used to access this account.',loading_devices:'Loading devices...',current_device:'This device',other_device:'Other device',last_login:'Last login',signout_others:'Sign out other devices',signout_current:'Sign out',security_note:'If you see a device you do not recognize, sign out other sessions and change your password immediately.',devices_unavailable:'Device history is unavailable. Run the Account Center migration.',devices_signed_out:'All other device sessions have been signed out. Change your password if that login was not yours.',no_other_devices:'No other devices recorded.',unknown_device:'Unknown device',jump_media:'Telegram Media Purchases',jump_groups:'VIP Group History',jump_vip:'VIP History',media_reset_notice:'Target retention for Telegram Review purchases: 3 days after payment. Automatic database cleanup is not enabled yet.',group_reset_notice:'VIP Group invite links expire after 24 hours. Purchase history is not automatically deleted by this UI.',vip_expiry_notice:'VIP access automatically ends when the membership expires. Transaction history is retained.',forgot_password_mode:'I forgot my old password',password_mode_hint:'You do not need to enter your old password while signed in. Enter a new password and confirm it.',bank:'Bank',ewallet:'E-Wallet'
  }
 };
@@ -155,6 +155,7 @@ function applyAccountLanguage(){
  if(fresh)fresh.placeholder=langA()==='en'?'new-email@gmail.com':'email-baru@gmail.com';
  if(pass)pass.placeholder=langA()==='en'?'At least 8 characters':'Minimal 8 karakter';
  if(confirm)confirm.placeholder=langA()==='en'?'Repeat new password':'Ulangi kata sandi baru';
+ const bio=$('profileBio');if(bio)bio.placeholder=t('bio_placeholder');
  const sort=$('watchHistorySort');
  if(sort){const values=[['recent','sort_recent'],['oldest','sort_oldest'],['duration','sort_duration']];sort.innerHTML=values.map(([v,k])=>`<option value="${v}">${escA(t(k))}</option>`).join('');}
  const title=document.querySelector('title');if(title)title.textContent=langA()==='en'?'My Account — BoxCellink':'Akun Saya — BoxCellink';
@@ -180,14 +181,27 @@ const durationA=value=>{
 };
 async function loadVipPurchaseHistory(user){
  const host=$('vipPurchaseHistory');if(!host)return;
- const {data:orders,error}=await sb.from('cashi_orders').select('order_id,vip_group_id,amount,settled_at,created_at').eq('user_id',user.id).eq('purpose','vip_group').eq('status','SETTLED').order('settled_at',{ascending:false,nullsFirst:false}).order('created_at',{ascending:false}).limit(100);
+ // Website VIP membership orders use purpose='vip' and reference vip_plans.
+ // Group purchases are rendered separately in the VIP Telegram Groups section.
+ const {data:orders,error}=await sb.from('cashi_orders')
+  .select('order_id,plan_id,amount,settled_at,created_at')
+  .eq('user_id',user.id).eq('purpose','vip').eq('status','SETTLED')
+  .order('settled_at',{ascending:false,nullsFirst:false})
+  .order('created_at',{ascending:false}).limit(100);
  if(error){host.innerHTML=emptyState('fa-triangle-exclamation',t('load_failed'),error.message);return;}
  const rows=orders||[];
  if(!rows.length){host.innerHTML=emptyState('fa-crown',t('no_vip_history'));return;}
- const ids=[...new Set(rows.map(x=>x.vip_group_id).filter(Boolean))];
- const {data:groups}=ids.length?await sb.from('vip_groups').select('id,name').in('id',ids):{data:[]};
- const names=new Map((groups||[]).map(x=>[x.id,x.name]));
- host.innerHTML=rows.map(x=>`<article class="purchase-row account-simple-row vip-history-row"><span class="simple-row-icon"><i class="fa-solid fa-crown"></i></span><div><b>${escA(names.get(x.vip_group_id)||t('vip_order'))}</b><small>${escA(t('purchased'))} ${escA(dateA(x.settled_at||x.created_at))} · ID ${escA(x.order_id)}</small></div><strong class="vip-history-price">${escA(moneyA(x.amount))}</strong></article>`).join('');
+ const ids=[...new Set(rows.map(x=>x.plan_id).filter(Boolean))];
+ const {data:plans,error:planError}=ids.length
+  ?await sb.from('vip_plans').select('id,name,duration_days').in('id',ids)
+  :{data:[],error:null};
+ if(planError)console.warn('VIP plan labels unavailable:',planError.message);
+ const planMap=new Map((plans||[]).map(x=>[x.id,x]));
+ host.innerHTML=rows.map(x=>{
+  const plan=planMap.get(x.plan_id);
+  const details=[t('purchased')+' '+dateA(x.settled_at||x.created_at),x.order_id?'ID '+x.order_id:''].filter(Boolean).join(' · ');
+  return `<article class="purchase-row account-simple-row vip-history-row"><span class="simple-row-icon"><i class="fa-solid fa-crown"></i></span><div><b>${escA(plan?.name||t('vip_order'))}</b><small>${escA(details)}</small>${plan?.duration_days?`<small>${escA(String(plan.duration_days))} ${escA(t('days'))}</small>`:''}</div><strong class="vip-history-price">${escA(moneyA(x.amount))}</strong></article>`;
+ }).join('');
 }
 async function loadLoginDevices(user){
  const host=$('loginDevices');if(!host)return;
@@ -214,13 +228,19 @@ async function initAccount(){
  if(authError)throw authError;
  if(!user){location.replace('/login.html?next='+encodeURIComponent('/account.html'));return;}
  let p=null;
+ // Keep the profile query narrow, but retain a core fallback so one missing
+ // optional migration does not blank the entire account page.
  let profileResult=await sb.from('profiles').select('full_name,username,vip_expires_at,premium_expires_at,role,membership_tier,affiliate_status,payout_method,payout_provider,payout_account_number,payout_account_holder').eq('id',user.id).maybeSingle();
  if(profileResult.error){
-  console.warn('Account profile extended fields:',profileResult.error.message);
-  profileResult=await sb.from('profiles').select('full_name,vip_expires_at,premium_expires_at,role,affiliate_status').eq('id',user.id).maybeSingle();
+  console.warn('Extended account profile fields unavailable:',profileResult.error.message);
+  profileResult=await sb.from('profiles').select('full_name,username,vip_expires_at,role').eq('id',user.id).maybeSingle();
+ }
+ if(profileResult.error){
+  console.warn('Basic account profile fields unavailable:',profileResult.error.message);
+  profileResult=await sb.from('profiles').select('full_name,role').eq('id',user.id).maybeSingle();
  }
  p=profileResult.data||null;
- if(profileResult.error)console.warn('Account profile:',profileResult.error.message);
+ if(profileResult.error)throw profileResult.error;
  const fullName=p?.full_name||user.user_metadata?.full_name||user.email?.split('@')[0]||'—';
  const username=p?.username||'';
  $('accountName').textContent=fullName;
@@ -229,8 +249,6 @@ async function initAccount(){
  $('publicProfileName').textContent=fullName;
  $('publicProfileUsername').textContent=username?`@${username}`:'@—';
  $('publicUsername').value=username;
- const forgotMode=$('forgotPasswordMode'),passwordModeHint=$('passwordModeHint');
- if(forgotMode&&passwordModeHint){forgotMode.addEventListener('change',()=>{passwordModeHint.textContent=forgotMode.checked?(langA()==='en'?'Old password is not required for this signed-in session. Set and confirm your new password.':'Password lama tidak diperlukan pada sesi login ini. Masukkan dan konfirmasi kata sandi baru.'):(t('password_mode_hint'));});}
  document.querySelectorAll('.account-history-shortcuts a').forEach(link=>link.addEventListener('click',event=>{const target=document.querySelector(link.getAttribute('href'));if(target){event.preventDefault();target.scrollIntoView({behavior:'smooth',block:'start'});target.classList.add('account-section-highlight');window.setTimeout(()=>target.classList.remove('account-section-highlight'),1200);}}));
  $('profileAvatar').textContent=String(fullName).trim().charAt(0).toUpperCase()||'U';
  const now=new Date(),premium=p?.premium_expires_at&&new Date(p.premium_expires_at)>now,vip=p?.vip_expires_at&&new Date(p.vip_expires_at)>now;
@@ -244,12 +262,12 @@ async function initAccount(){
    if(!/^[A-Za-z0-9_.]{3,24}$/.test(value))throw new Error(langA()==='en'?'Use 3–24 letters, numbers, dots, or underscores.':'Gunakan 3–24 karakter berupa huruf, angka, titik, atau garis bawah.');
    const {data,error}=await sb.rpc('update_my_username',{p_username:value});if(error)throw error;
    if(data?.ok===false)throw new Error(data.reason||t('username_failed'));
-   $('publicProfileUsername').textContent='@'+value;showNotice(t('username_saved'),'success');
+   const savedUsername=data?.username||value.toLowerCase();$('publicUsername').value=savedUsername;$('publicProfileUsername').textContent='@'+savedUsername;showNotice(t('username_saved'),'success');
   }catch(err){showNotice(`${t('username_failed')} ${err.message||''}`,'error');}
   finally{btn.disabled=false;}
  };
 
- const payoutEligible=p?.affiliate_status==='approved'||p?.membership_tier==='affiliate';
+ const payoutEligible=p?.affiliate_status==='approved';
  const payoutSection=$('payoutAccountSection');
  if(payoutEligible){
   payoutSection.hidden=false;
@@ -268,7 +286,7 @@ async function initAccount(){
   const showSaved=()=>{
    if(!hasPayout){saved.hidden=true;form.hidden=false;return;}
    saved.hidden=false;form.hidden=true;
-   saved.innerHTML=`<div class="payout-saved-card"><span class="payout-saved-icon"><i class="fa-solid ${p.payout_method==='ewallet'?'fa-wallet':'fa-building-columns'}"></i></span><div><small>${escA(t('saved_payout'))}</small><b>${escA(p.payout_provider)}</b><span>${escA(p.payout_account_holder)} · ${escA(p.payout_account_number)}</span></div><button type="button" class="library-detail-link" id="editPayoutButton"><i class="fa-solid fa-pen"></i> ${escA(t('edit_payout'))}</button></div>`;
+   saved.innerHTML=`<div class="payout-saved-card"><span class="payout-saved-icon"><i class="fa-solid ${p.payout_method==='ewallet'?'fa-wallet':'fa-building-columns'}"></i></span><div><small>${escA(t('saved_payout'))}</small><b>${escA(p.payout_provider)}</b><span>${escA(p.payout_account_holder)} · ${escA(String(p.payout_account_number).replace(/.(?=.{4})/g,'•'))}</span></div><button type="button" class="library-detail-link" id="editPayoutButton"><i class="fa-solid fa-pen"></i> ${escA(t('edit_payout'))}</button></div>`;
    $('editPayoutButton').onclick=()=>{saved.hidden=true;form.hidden=false;};
   };
   showSaved();
@@ -381,11 +399,11 @@ async function initAccount(){
  $('socialProfileForm')?.addEventListener('submit',async event=>{
   event.preventDefault();const form=event.currentTarget,button=form.querySelector('button[type="submit"]');button.disabled=true;
   try{
-   const links={};for(const [key,id] of Object.entries(socialFields)){const value=String($(id)?.value||'').trim();if(!value)continue;const url=new URL(value);if(!['http:','https:'].includes(url.protocol))throw new Error('Gunakan tautan https:// atau http:// untuk '+key+'.');links[key]=url.href;}
+   const links={};for(const [key,id] of Object.entries(socialFields)){const value=String($(id)?.value||'').trim();if(!value)continue;let url;try{url=new URL(value);}catch{throw new Error(`${t('social_url_error')} ${key}.`);}if(!['http:','https:'].includes(url.protocol))throw new Error(`${t('social_url_error')} ${key}.`);links[key]=url.href;}
    const bio=String($('profileBio').value||'').trim();if(bio.length>500)throw new Error('Bio maksimal 500 karakter.');
    const {error}=await sb.from('profiles').update({bio,social_links:links}).eq('id',user.id);if(error)throw error;
-   showNotice('Bio dan tautan sosial berhasil disimpan.','success');
-  }catch(err){showNotice('Gagal menyimpan profil: '+(err.message||'Periksa kembali tautan.'),'error');}
+   showNotice(t('social_saved'),'success');
+  }catch(err){showNotice(`${t('social_save_failed')} ${err.message||''}`,'error');}
   finally{button.disabled=false;}
  });
 }
