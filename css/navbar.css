@@ -140,3 +140,23 @@
 .bc-bottom-nav-add{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;font-size:10px!important;font-weight:750!important}.bc-bottom-nav-add i{font-size:18px!important}.bc-add-choice{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;padding:18px}.bc-add-choice[hidden]{display:none!important}.bc-add-choice-backdrop{position:absolute;inset:0;border:0;background:rgba(8,22,39,.62);backdrop-filter:blur(6px)}.bc-add-choice-sheet{position:relative;width:min(430px,100%);background:#fff;border:1px solid #e2eaf3;border-radius:23px;padding:25px;box-shadow:0 25px 80px rgba(0,0,0,.2)}.bc-add-choice-close{position:absolute;right:15px;top:15px;border:0;background:#f1f5f9;border-radius:10px;width:34px;height:34px}.bc-add-choice-kicker{font-size:10px;letter-spacing:.16em;font-weight:850;color:#2867a6}.bc-add-choice-sheet h2{font-size:23px;margin:8px 0}.bc-add-choice-sheet>p{font-size:13px;color:#718096;margin:0 0 17px}.bc-add-choice-option{width:100%;display:flex;align-items:center;gap:13px;padding:15px;border:1px solid #e3eaf2;border-radius:15px;background:#fff;color:#18324f;text-align:left;text-decoration:none;margin-top:10px}.bc-add-choice-option>i:first-child{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:#edf4fb;color:#2867a6}.bc-add-choice-option span{flex:1;display:grid;gap:3px}.bc-add-choice-option small{font-size:11px;color:#718096}.bc-add-choice-option>i:last-child{color:#8a9caf}
 
 .bc-bottom-nav-add{width:56px!important;height:52px!important;min-height:52px!important;border-radius:14px!important;line-height:1!important;box-shadow:0 6px 16px rgba(36,99,165,.22)!important}.bc-bottom-nav-add span{font-size:9px!important;font-weight:800!important;letter-spacing:0!important}
+
+
+/* Boxcellink Stage 1 — shared navigation polish */
+.bc-navbar{background:rgba(255,255,255,.96);border-bottom:1px solid #e7edf4;box-shadow:0 5px 22px rgba(20,43,73,.055)}
+.bc-nav-inner{min-height:68px;gap:14px}
+.bc-brand{letter-spacing:.015em;font-size:15px}
+.bc-nav-btn,.bc-profile-btn,.bc-icon-btn{min-height:42px;border-radius:12px;font-weight:800}
+#translateBtn{width:auto!important;min-width:62px!important;padding:0 11px!important;gap:7px!important}
+#translateBtn #translateLabel{display:inline!important;font-size:11px;font-weight:900;letter-spacing:.04em}
+.bc-nav-actions{gap:8px}
+.bc-drawer{border-right:1px solid #e8eef5;padding:20px 16px;overscroll-behavior:contain}
+.bc-drawer-head{padding-bottom:16px}
+.bc-menu{gap:4px}
+.bc-menu a,.bc-menu button{min-height:45px;border-radius:11px;font-size:13px}
+.bc-menu a:focus-visible,.bc-menu button:focus-visible,.bc-nav-btn:focus-visible,.bc-profile-btn:focus-visible,.bc-icon-btn:focus-visible{outline:3px solid rgba(48,119,190,.28);outline-offset:2px}
+.bc-nav-shade{background:rgba(10,25,42,.46);backdrop-filter:blur(2px)}
+.bc-custom-nav-item{min-height:44px;border:1px solid rgba(220,230,241,.72)}
+.bc-member-bottom-nav{border-top:1px solid #e7edf4!important;box-shadow:0 -6px 24px rgba(20,43,73,.07)!important}
+@media(max-width:620px){.bc-nav-inner{min-height:62px!important;padding-inline:12px!important}.bc-brand{font-size:13px}.bc-nav-actions{gap:6px}.bc-nav-btn{height:38px;min-height:38px}.bc-menu-btn{height:38px;min-height:38px}}
+@media(prefers-reduced-motion:reduce){.bc-navbar,.bc-nav-btn,.bc-drawer,.bc-nav-shade,.bc-menu a,.bc-menu button{transition:none!important;scroll-behavior:auto!important}}
