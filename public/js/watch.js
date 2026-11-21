@@ -228,6 +228,9 @@ function setupGuestAds(){
   mountAdUnit(el,unit);
  });
  document.querySelectorAll('.ad-inline-300,.ad-inline-native').forEach(mountInlineAd);
+ // VIP: retain ordinary banner placements and the popunder, but suppress Social Bar,
+ // video-playback ads, floating/repeating banners, and timed interstitial overlays.
+ if(isVip){setupPopunder();return;}
  setupSocialBars();setupPopunder();setupVideoAdPlayback();mountFloatingBanner();setupInterstitial();
 }
 async function showGuestWatchPreparation(){
