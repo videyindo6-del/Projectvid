@@ -33,20 +33,12 @@ create table if not exists public.withdrawal_requests(
 );
 create index if not exists withdrawal_requests_user_created_idx on public.withdrawal_requests(user_id,created_at desc);
 create index if not exists withdrawal_requests_status_created_idx on public.withdrawal_requests(status,created_at desc);
-create table if not exists public.withdrawal_telegram_events(
- id uuid not null references public.withdrawal_requests(id) on delete cascade,
- event text not null check(event in ('requested','processing','rejected','success')),
- sent_at timestamptz not null default now(),
- primary key(id,event)
-);
-revoke all on public.withdrawal_telegram_events from public,anon,authenticated;
 alter table public.withdrawal_requests enable row level security;
 drop policy if exists "Users read own withdrawal requests" on public.withdrawal_requests;
 create policy "Users read own withdrawal requests" on public.withdrawal_requests for select to authenticated using(user_id=auth.uid() or public.is_admin());
 grant select on public.withdrawal_requests to authenticated;
 revoke insert,update,delete on public.withdrawal_requests from anon,authenticated;
 grant select on public.indonesia_public_holidays to anon,authenticated;
-grant all on public.withdrawal_telegram_events to service_role;
 
 drop function if exists public.get_withdrawable_balances();
 create function public.get_withdrawable_balances() returns jsonb
