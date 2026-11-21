@@ -267,7 +267,7 @@ async function initAccount(){
   finally{btn.disabled=false;}
  };
 
- const payoutEligible=p?.affiliate_status==='approved';
+ const payoutEligible=true;
  const payoutSection=$('payoutAccountSection');
  if(payoutEligible){
   payoutSection.hidden=false;
