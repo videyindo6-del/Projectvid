@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="css/shared.css">
 <link rel="stylesheet" href="css/member-pages.css">
 <link rel="stylesheet" href="css/upgrade-pages.css">
-<link rel="stylesheet" href="css/account-premium.css?v=20261121-profile-audit-v2">
+<link rel="stylesheet" href="css/account-premium.css?v=20261121-account-premium-v3">
 <link rel="stylesheet" href="/css/navbar.css">
 <link rel="stylesheet" href="/css/footer.css"></head>
 <body>
@@ -75,21 +75,33 @@
   </section>
 
   <section class="account-section" id="socialProfileSection">
-    <div class="section-heading"><div><span class="section-eyebrow">SOCIAL PROFILE</span><h2>Bio & tautan sosial</h2><p>Informasi ini akan terlihat pada halaman profil publikmu.</p></div><span class="section-heading-icon"><i class="fa-solid fa-share-nodes"></i></span></div>
-    <article class="account-panel"><form id="socialProfileForm" class="account-form-grid">
-      <label for="profileBio">Bio</label><textarea id="profileBio" maxlength="500" rows="4" placeholder="Ceritakan sedikit tentang dirimu..."></textarea>
-      <small class="account-field-hint">Maksimal 500 karakter.</small>
-      <div class="bc-social-links-editor">
-        <label for="socialInstagram">Instagram</label><input id="socialInstagram" type="url" placeholder="https://instagram.com/username">
-        <label for="socialFacebook">Facebook</label><input id="socialFacebook" type="url" placeholder="https://facebook.com/username">
-        <label for="socialYoutube">YouTube</label><input id="socialYoutube" type="url" placeholder="https://youtube.com/@channel">
-        <label for="socialTelegram">Telegram</label><input id="socialTelegram" type="url" placeholder="https://t.me/username">
-        <label for="socialWhatsapp">WhatsApp</label><input id="socialWhatsapp" type="url" placeholder="https://wa.me/628123456789">
-        <label for="socialX">X</label><input id="socialX" type="url" placeholder="https://x.com/username">
-        <label for="socialOther">Link lainnya</label><input id="socialOther" type="url" placeholder="https://website.com">
-      </div>
-      <button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan bio & tautan sosial</button>
-    </form></article>
+    <div class="section-heading">
+      <div><span class="section-eyebrow" data-account-i18n="social_eyebrow">SOCIAL PROFILE</span><h2 data-account-i18n="social_title">Bio & tautan sosial</h2><p data-account-i18n="social_desc">Informasi ini akan terlihat pada halaman profil publikmu.</p></div>
+      <span class="section-heading-icon"><i class="fa-solid fa-share-nodes"></i></span>
+    </div>
+    <article class="account-panel social-profile-panel">
+      <form id="socialProfileForm" class="account-form-grid">
+        <div class="account-field">
+          <label for="profileBio" data-account-i18n="bio_label">Bio</label>
+          <textarea id="profileBio" maxlength="500" rows="4" data-account-placeholder="bio_placeholder" placeholder="Ceritakan sedikit tentang dirimu..."></textarea>
+          <small class="account-field-hint" data-account-i18n="bio_hint">Maksimal 500 karakter.</small>
+        </div>
+        <div class="social-fields-heading">
+          <span data-account-i18n="social_links_title">Tautan sosial</span>
+          <small data-account-i18n="social_links_hint">Opsional. Gunakan tautan lengkap yang diawali https://</small>
+        </div>
+        <div class="bc-social-links-editor">
+          <div class="account-field"><label for="socialInstagram" data-account-i18n="social_instagram">Instagram</label><input id="socialInstagram" type="url" inputmode="url" autocomplete="url" placeholder="https://instagram.com/username"></div>
+          <div class="account-field"><label for="socialFacebook" data-account-i18n="social_facebook">Facebook</label><input id="socialFacebook" type="url" inputmode="url" placeholder="https://facebook.com/username"></div>
+          <div class="account-field"><label for="socialYoutube" data-account-i18n="social_youtube">YouTube</label><input id="socialYoutube" type="url" inputmode="url" placeholder="https://youtube.com/@channel"></div>
+          <div class="account-field"><label for="socialTelegram" data-account-i18n="social_telegram">Telegram</label><input id="socialTelegram" type="url" inputmode="url" placeholder="https://t.me/username"></div>
+          <div class="account-field"><label for="socialWhatsapp" data-account-i18n="social_whatsapp">WhatsApp</label><input id="socialWhatsapp" type="url" inputmode="url" placeholder="https://wa.me/628123456789"></div>
+          <div class="account-field"><label for="socialX" data-account-i18n="social_x">X</label><input id="socialX" type="url" inputmode="url" placeholder="https://x.com/username"></div>
+          <div class="account-field"><label for="socialOther" data-account-i18n="social_other">Link lainnya</label><input id="socialOther" type="url" inputmode="url" placeholder="https://website.com"></div>
+        </div>
+        <button class="account-action social-save-button" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="social_save">Simpan bio & tautan sosial</span></button>
+      </form>
+    </article>
   </section>
 
   <section class="account-upgrade">
@@ -146,8 +158,7 @@
       <article class="account-panel">
         <div class="panel-heading"><span class="panel-icon password-icon"><i class="fa-solid fa-key"></i></span><div><h3 data-account-i18n="change_password">Ganti Kata Sandi</h3><p data-account-i18n="password_desc">Buat kata sandi baru untuk login berikutnya.</p></div></div>
         <form id="passwordForm">
-          <label class="password-reset-mode"><input id="forgotPasswordMode" type="checkbox"><span data-account-i18n="forgot_password_mode">Saya lupa kata sandi lama</span></label>
-          <small id="passwordModeHint" class="account-field-hint" data-account-i18n="password_mode_hint">Kamu tidak perlu memasukkan kata sandi lama saat sudah login. Isi kata sandi baru dan konfirmasikan.</small>
+          <small id="passwordModeHint" class="account-field-hint" data-account-i18n="password_mode_hint">Kamu dapat memperbarui kata sandi tanpa memasukkan kata sandi lama selama masih login.</small>
           <label for="newPassword" data-account-i18n="new_password">Kata sandi baru</label>
           <input id="newPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Minimal 8 karakter">
           <label for="confirmPassword" data-account-i18n="confirm_password">Konfirmasi kata sandi baru</label>
@@ -219,7 +230,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="components.js?v=20261115-4"></script>
-<script src="js/account.js?v=20261121-profile-audit-v2"></script>
+<script src="js/account.js?v=20261121-account-premium-v3"></script>
 <script src="js/page-i18n.js"></script>
 </body>
 </html>
