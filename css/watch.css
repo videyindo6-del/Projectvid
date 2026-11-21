@@ -658,3 +658,8 @@ body{background:#f7f5ef;color:#233b57}
 .adsterra-banner-clean .ad-caption{background:transparent!important}
 #watchBannerBottom{margin-top:14px!important}
 @media(max-width:480px){#guestAdTop .adsterra-social-slot:nth-child(2){right:8px!important}#guestAdTop .adsterra-social-slot:nth-child(3){left:8px!important}.watch-feature-ad,.watch-player-ad{margin:10px auto!important}}
+
+/* Direct MP4 source fallback: only visible when native video reports an error. */
+.direct-video-player .direct-video-error{display:none;padding:14px;text-align:center;color:#fff;background:rgba(20,24,32,.92)}
+.direct-video-player.video-source-error .direct-video-error{display:block}
+.direct-video-player .direct-video-error a{color:#9cc7ff;text-decoration:underline}
