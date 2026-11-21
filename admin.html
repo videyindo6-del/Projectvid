@@ -15,7 +15,7 @@
 <a href="/users.html"><i class="fa-solid fa-users"></i> Member</a>
 <a href="/videos.html"><i class="fa-solid fa-film"></i> BoxVidey</a>
 <a href="/review-admin.html"><i class="fa-solid fa-star"></i> Review Media</a>
-<a href="/telegram.html"><i class="fa-brands fa-telegram"></i> Media Telegram</a>
+<a href="/review-admin.html"><i class="fa-brands fa-telegram"></i> Media Telegram</a>
 <a href="/admin-links.html"><i class="fa-solid fa-link"></i> Link & Notifikasi</a>
 <a href="/admin-autolink.html"><i class="fa-solid fa-bolt"></i> Admin AutoLink</a>
 <a href="/admin-publisher-withdraw.html"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw Publisher</a>
@@ -30,11 +30,23 @@
 <main class="admin-hub">
   <div class="hub-top"><div><small>ADMIN CONTROL CENTER</small><h1>Semua Akses Admin</h1><p>Satu halaman untuk membuka dan mengelola seluruh fitur BoxCellink.</p></div><span class="hub-email" id="adminEmail">Memeriksa akun...</span></div>
   <section class="hub-hero"><div><h2>Selamat datang di Panel Admin</h2><p>Pilih menu di bawah untuk mengelola konten, member, transaksi, VIP, diskon, dan komunitas Telegram. Semua akses admin dikumpulkan di sini agar lebih mudah ditemukan.</p></div><div class="hub-hero-icon"><i class="fa-solid fa-shield-halved"></i></div></section>
+  <section class="hub-section admin-live-control" id="adminLiveControl">
+    <div class="hub-section-head"><div><h2>Ringkasan Kontrol Live</h2><p>Ringkasan member, konten, aktivitas chat, dan permintaan penarikan. Data dapat diperbarui kapan saja.</p></div><button class="hub-refresh" id="adminLiveRefresh" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+    <div class="admin-live-grid" id="adminLiveMetrics" aria-live="polite">
+      <article class="admin-live-card"><span><i class="fa-solid fa-users"></i> Member</span><strong>—</strong><small>Total akun member</small></article>
+      <article class="admin-live-card"><span><i class="fa-solid fa-user-check"></i> Member online</span><strong>—</strong><small>2 menit terakhir</small></article>
+      <article class="admin-live-card"><span><i class="fa-solid fa-user-clock"></i> Pengunjung</span><strong>—</strong><small>Tamu online</small></article>
+      <article class="admin-live-card"><span><i class="fa-solid fa-film"></i> Video</span><strong>—</strong><small>Konten video tersimpan</small></article>
+      <article class="admin-live-card"><span><i class="fa-solid fa-star"></i> Review</span><strong>—</strong><small>Review tersimpan</small></article>
+      <article class="admin-live-card"><span><i class="fa-solid fa-headset"></i> Support</span><strong>—</strong><small>Percakapan member</small></article>
+      <article class="admin-live-card"><span><i class="fa-solid fa-wallet"></i> Withdraw pending</span><strong>—</strong><small>Affiliate + Publisher</small></article>
+    </div><p class="admin-live-note" id="adminLiveNote">Menghubungkan data...</p>
+  </section>
   <section class="hub-section"><div class="hub-section-head"><div><h2>Manajemen Utama</h2><p>Pengelolaan konten dan aktivitas member.</p></div></div>
     <div class="hub-grid"><a class="hub-card featured" href="admin-links.html"><span class="hub-card-icon"><i class="fa-solid fa-link"></i></span><span class="hub-card-copy"><b>Link & Notifikasi</b><span>Atur link WhatsApp/Telegram dan notifikasi khusus Watch, Review Media, dan Telegram.</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a><a class="hub-card featured" href="support-inbox.html"><span class="hub-card-icon"><i class="fa-solid fa-headset"></i></span><span class="hub-card-copy"><b>Support Chat Member</b><span>Terima dan balas chat dari seluruh member, edit atau hapus pesan.</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>
       <a class="hub-card" href="users.html"><span class="hub-card-icon"><i class="fa-solid fa-users"></i></span><span class="hub-card-copy"><b>Member & Online</b><span>Lihat member, status akun, blokir, dan pengelolaan pengguna.</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>
       <a class="hub-card" href="videos.html"><span class="hub-card-icon"><i class="fa-solid fa-film"></i></span><span class="hub-card-copy"><b>BoxVidey</b><span>Tambah, edit, hapus video, atur kategori dan publikasi.</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>
-      <a class="hub-card" href="telegram-admin.html"><span class="hub-card-icon"><i class="fa-brands fa-telegram"></i></span><span class="hub-card-copy"><b>Media Telegram</b><span>Kelola informasi dan konten Telegram.</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>
+      <a class="hub-card" href="review-admin.html"><span class="hub-card-icon"><i class="fa-brands fa-telegram"></i></span><span class="hub-card-copy"><b>Media Telegram</b><span>Kelola informasi dan konten Telegram.</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>
       <a class="hub-card" href="review-admin.html"><span class="hub-card-icon"><i class="fa-solid fa-star"></i></span><span class="hub-card-copy"><b>Review & PasteLink</b><span>Kelola konten review, link, harga, dan akses.</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>
       <a class="hub-card" href="categories.html"><span class="hub-card-icon"><i class="fa-solid fa-layer-group"></i></span><span class="hub-card-copy"><b>Kategori</b><span>Buat dan atur kategori konten website.</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>
     </div>
