@@ -24,7 +24,7 @@ async function load(){
    else if(source==='affiliate'){rpc='admin_process_affiliate_withdrawal_v2';args={p_withdrawal_id:id,p_status:status,p_note:note};}
    else{rpc='admin_update_publisher_withdrawal';args={p_id:id,p_status:status,p_note:note};}
    const {data,error}=await sb.rpc(rpc,args);if(error)throw error;if(data?.ok===false)throw Error(data.reason||'Gagal memperbarui status.');
-   if(source==='combined'){try{await sb.functions.invoke('withdrawal-telegram',{body:{event:status,withdrawal_id:id,note}});}catch(e){console.warn('Telegram notification error',e);}}
+   // Pengumuman dan bukti pembayaran dibagikan manual oleh admin ke grup Telegram setelah pembayaran benar-benar selesai.
    alert('Status withdrawal diperbarui.');await load();
   }catch(e){alert(e.message||'Gagal menyimpan.');b.disabled=false;}
  });
