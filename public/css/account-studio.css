@@ -1,0 +1,36 @@
+/* BoxCellink Account Studio — visual system aligned with AutoLink / PasteLink Studio */
+.account-page{max-width:1120px;padding:28px 20px 76px;color:#29445f;font-family:'DM Sans',Inter,system-ui,-apple-system,sans-serif}
+.account-page .account-hero{min-height:220px;padding:clamp(24px,4vw,38px);border:1px solid #dce7f0;border-radius:21px;background:radial-gradient(circle at 88% 12%,rgba(66,139,198,.14),transparent 31%),linear-gradient(125deg,#fff 0%,#f3f8fc 100%);box-shadow:0 9px 28px rgba(24,52,82,.045)}
+.account-kicker,.section-eyebrow,.upgrade-kicker{color:#3980b9;letter-spacing:.14em;font-size:9px}
+.account-hero h1{color:#1d3854;font-size:clamp(30px,4.5vw,43px);letter-spacing:-.045em}
+.account-hero p{color:#8292a4;font-size:12px;line-height:1.75}
+.account-hero-meta{color:#6f8295;font-size:10px}.account-hero-meta i{color:#3982bd}
+.hero-glass{background:linear-gradient(145deg,#69a8d8,#28699f);border-color:#c8dfef;box-shadow:0 12px 32px rgba(39,108,171,.2)}
+.hero-orbit{border-color:#c6dceb}.hero-float{border-color:#dce8f1;color:#3982bd;box-shadow:0 6px 18px rgba(24,52,82,.08)}
+.account-notice{border-color:#dce7f0;border-radius:12px;box-shadow:0 5px 18px rgba(24,52,82,.035)}
+.account-overview{gap:13px;margin:17px 0}.account-overview .overview-card{border-color:#e2eaf1;border-radius:16px;background:#fff;box-shadow:0 7px 20px rgba(24,52,82,.035)}
+.overview-icon{border-color:#dceaf4;background:#edf5fb;color:#347bb8}.membership-icon{background:#eef5fc;color:#347bb8}.secure-icon{background:#edf8f2;border-color:#d7eddf;color:#39845a}
+.overview-card b{color:#29445f}.overview-card small,.overview-muted{color:#8797a8}
+.account-history-shortcuts a{border-color:#dce7f0;border-radius:10px;background:#fff;color:#347bb2;font-size:10px;box-shadow:0 3px 12px rgba(24,52,82,.025)}
+.account-history-shortcuts a:hover{border-color:#b9d4e7;background:#f5faff}
+.account-section{margin:27px 0}.account-section .section-heading{margin-bottom:14px}
+.section-heading h2{color:#1d3854;font-size:clamp(19px,2.5vw,22px);letter-spacing:-.035em}
+.section-heading p{color:#8292a4;font-size:11px}.section-heading-icon{border-color:#dce8f1;border-radius:12px;background:#edf5fb;color:#3982bd}
+.account-page .account-panel,.account-page .media-section,.account-page .account-section>.purchase-list,.account-empty,.account-simple-row,.library-item,.purchase-row{border-color:#e2eaf1;border-radius:17px;background:#fff;box-shadow:0 8px 24px rgba(24,52,82,.04)}
+.account-page .account-panel{padding:clamp(16px,2.5vw,23px)}
+.profile-avatar{background:linear-gradient(145deg,#28699f,#5b9acb);box-shadow:0 8px 20px rgba(49,105,150,.18)}
+.account-form-grid input,.account-form-grid select,.account-form-grid textarea,.account-panel form input:not([type=checkbox]),.account-panel form select,.account-panel form textarea,.username-input-wrap{border-color:#dce5ee;border-radius:11px;background:#fbfdff;color:#29445f}
+.account-form-grid input:focus,.account-form-grid select:focus,.account-form-grid textarea:focus,.account-panel form input:focus,.account-panel form select:focus,.account-panel form textarea:focus{border-color:#7eadd5;box-shadow:0 0 0 3px rgba(50,119,190,.09)}
+.account-action{border-color:#286da8;border-radius:11px;background:linear-gradient(110deg,#2365a5,#3986c8);box-shadow:0 9px 19px rgba(39,108,171,.17);font-size:10px}
+.account-action:hover{box-shadow:0 12px 23px rgba(39,108,171,.22)}
+.account-upgrade{border-color:#d7e7f3;border-radius:19px;background:radial-gradient(circle at 90% 5%,#e1f0fb 0,transparent 34%),linear-gradient(120deg,#fff,#f2f8fc);box-shadow:0 9px 26px rgba(24,52,82,.04)}
+.upgrade-emblem{background:linear-gradient(145deg,#397fb5,#235d91);box-shadow:0 10px 25px rgba(35,93,145,.2)}
+.account-reset-warning{border-color:#f0e3c9;border-radius:11px;background:#fffaf1;color:#927344}
+.library-toolbar{border-color:#e5edf3;background:#f8fbfd;color:#71879a}
+.account-library-grid .library-item,.history-card{border-color:#e2eaf1;border-radius:14px;background:#fff;box-shadow:0 7px 20px rgba(24,52,82,.04)}
+.library-detail-link,.account-pagination button{color:#347bb8}.account-pagination button{border-color:#dce5ee;border-radius:9px}
+.payout-eligibility-note{background:#f2f8fc;color:#55718d}.payout-saved-card{border-color:#dce7f0;background:linear-gradient(135deg,#fff,#f4f8fc)}
+.simple-row-icon,.panel-icon{background:#edf5fb;color:#3982bd}
+.account-section-highlight{animation:accountSectionPulseStudio 1.2s ease-out}
+@keyframes accountSectionPulseStudio{0%{outline:3px solid rgba(57,130,189,.25);outline-offset:3px}100%{outline-color:transparent;outline-offset:8px}}
+@media(max-width:640px){.account-page{padding:20px 13px 62px}.account-page .account-hero{padding:22px 18px}.account-page .account-panel{padding:16px}.account-section{margin:23px 0}}
