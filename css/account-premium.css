@@ -242,3 +242,17 @@ body:has(.account-page){background:#f7f8fc!important;color:#243047!important}
 #socialProfileForm textarea,#socialProfileForm input{width:100%;min-height:42px;padding:11px 12px;border:1px solid #dce5ef;border-radius:11px;background:#fff;color:#263d54;font:inherit;font-size:13px;outline:none}#socialProfileForm textarea{min-height:100px;resize:vertical}#socialProfileForm textarea:focus,#socialProfileForm input:focus{border-color:#8bb5df;box-shadow:0 0 0 3px #eaf3fc}.bc-social-links-editor{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px}.bc-social-links-editor label{align-self:end;color:#536a80;font-size:12px;font-weight:800}@media(max-width:620px){.bc-social-links-editor{grid-template-columns:1fr}}
 
 #gameIdForm{display:grid;gap:10px}#gameIdForm input{width:100%;min-height:43px;padding:10px 12px;border:1px solid var(--border-color,#dce5ef);border-radius:10px;background:var(--card-bg,#fff);color:inherit;font:inherit}
+/* Account Center refinements: compact premium shortcuts, reset notices and password mode */
+.account-history-shortcuts{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 6px}
+.account-history-shortcuts a{display:inline-flex;align-items:center;gap:9px;padding:11px 15px;border:1px solid #dce5f2;border-radius:13px;background:linear-gradient(180deg,#fff,#f7faff);color:#244b83;text-decoration:none;font-size:.9rem;font-weight:750;box-shadow:0 4px 14px rgba(28,65,116,.04);transition:transform .18s,border-color .18s,box-shadow .18s}
+.account-history-shortcuts a:hover{transform:translateY(-2px);border-color:#9dbce7;box-shadow:0 8px 22px rgba(28,65,116,.09)}
+.account-history-shortcuts a i{color:#3d78c4}
+.account-reset-warning{display:flex;align-items:flex-start;gap:9px;margin:0 0 14px;padding:10px 12px;border:1px solid #f2b8b8;border-radius:11px;background:#fff5f5;color:#9d3030;font-size:.82rem;line-height:1.5;font-weight:650}
+.account-reset-warning i{margin-top:2px;flex:none}
+.password-reset-mode{display:flex!important;align-items:center;gap:9px;margin:4px 0 8px;font-size:.88rem;font-weight:700;color:#3d526c}
+.password-reset-mode input{width:17px;height:17px;accent-color:#3578d4}
+.account-page #passwordModeHint{display:block;margin:0 0 12px}
+@media(max-width:600px){.account-history-shortcuts{display:grid;grid-template-columns:1fr;gap:8px}.account-history-shortcuts a{width:100%;justify-content:flex-start}.account-reset-warning{font-size:.78rem}}
+.account-page .account-section[id]{scroll-margin-top:100px}
+.account-page .account-section-highlight{animation:accountSectionPulse 1.2s ease-out}
+@keyframes accountSectionPulse{0%{outline:3px solid rgba(65,126,205,.3);outline-offset:3px}100%{outline-color:transparent;outline-offset:8px}}
