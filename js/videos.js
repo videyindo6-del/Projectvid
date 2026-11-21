@@ -21,7 +21,7 @@ function renderEmbedPreview(){
   providerInput.value=info.provider||'External';
   if(hint)hint.textContent=info.type==='link'?`${info.provider}: link berbagi terdeteksi. Untuk pemutaran langsung, tempel URL embed resmi atau kode iframe.`:`Provider terdeteksi: ${info.provider} · Tipe: ${info.type}`;
   if(info.type==='iframe')preview.innerHTML=`<div class="admin-note"><b>Preview ${esc(info.provider)}</b><iframe src="${esc(info.src)}" title="Preview embed" loading="lazy" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen style="width:100%;height:320px;border:0;border-radius:12px"></iframe></div>`;
-  else if(info.type==='video')preview.innerHTML=`<div class="admin-note"><b>Preview ${esc(info.provider)}</b><video src="${esc(info.src)}" controls playsinline preload="metadata" style="width:100%;max-height:360px"></video></div>`;
+  else if(info.type==='video')preview.innerHTML=`<div class="admin-note"><b>Preview ${esc(info.provider)}</b><video class="admin-direct-video-preview" src="${esc(info.src)}" controls playsinline preload="metadata" style="width:100%;max-height:360px"></video><small class="admin-video-preview-status">Video langsung · Klik Play untuk menguji sumber.</small><a href="${esc(info.src)}" target="_blank" rel="noopener noreferrer">Buka file sumber ↗</a></div>`;
   else if(info.type==='audio')preview.innerHTML=`<div class="admin-note"><b>Preview ${esc(info.provider)}</b><audio src="${esc(info.src)}" controls></audio></div>`;
   else if(info.type==='image')preview.innerHTML=`<div class="admin-note"><b>Preview ${esc(info.provider)}</b><img src="${esc(info.src)}" alt="Preview" style="max-width:100%;max-height:280px;object-fit:contain"></div>`;
   else preview.innerHTML=`<div class="admin-note"><b>${esc(info.provider)}</b><p>Link ini belum berupa player embed. Gunakan tombol Embed/Bagikan dari provider lalu tempel kode iframe-nya.</p><a href="${esc(info.src)}" target="_blank" rel="noopener noreferrer">Buka sumber asli ↗</a></div>`;
@@ -51,6 +51,8 @@ document.getElementById('addVideo')?.addEventListener('click',async()=>{
 });
 document.getElementById('cancelVideo')?.addEventListener('click',()=>{form.style.display='none';form.reset();renderEmbedPreview();});
 embedInput?.addEventListener('input',renderEmbedPreview);
+preview?.addEventListener('loadedmetadata',e=>{if(e.target?.matches?.('video.admin-direct-video-preview')){const status=e.target.parentElement.querySelector('.admin-video-preview-status');if(status)status.textContent=`Video berhasil dimuat · ${Math.round(e.target.duration||0)} detik`;}} ,true);
+preview?.addEventListener('error',e=>{if(e.target?.matches?.('video.admin-direct-video-preview')){const status=e.target.parentElement.querySelector('.admin-video-preview-status');if(status)status.textContent='Gagal memuat video. Sumber mungkin membatasi akses, format, atau tidak mengirim file MP4 yang valid.';}},true);
 form?.addEventListener('submit',async e=>{
   e.preventDefault();if(saving)return;
   const f=new FormData(form),v=Object.fromEntries(f.entries());
