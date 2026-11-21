@@ -6,6 +6,10 @@
  * Untuk mengganti grup/komunitas, cukup ubah URL telegram atau whatsapp di bawah ini.
  */
 window.BOXCELLINK_COMMUNITY_LINKS = Object.freeze({
+  withdrawalNotifications: {
+    url: "https://t.me/+-0qZ2iBc2KkyMGNl",
+    label: "Grup Notifikasi Withdrawal"
+  },
   telegram: {
     url: "https://t.me/+-0qZ2iBc2KkyMGNl",
     label: "Gabung Telegram"
