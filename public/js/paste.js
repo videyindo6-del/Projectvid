@@ -12,6 +12,8 @@ function getRouteCode(prefix) {
 }
 
 const slug = getRouteCode('paste');
+const pasteLang=()=>localStorage.getItem('boxcellink_lang')||'id';
+const pasteText=(id,en)=>pasteLang()==='en'?en:id;
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 }[char]));
@@ -73,34 +75,34 @@ async function run() {
 
     const destinationHost = downloadUrl.hostname.toLowerCase();
     const isTelegramDestination = destinationHost === 't.me' || destinationHost.endsWith('.t.me') || destinationHost === 'telegram.me' || destinationHost.endsWith('.telegram.me');
-    const destinationTitle = isTelegramDestination ? 'LINK MEDIA ASLI TELEGRAM' : 'LINK AKSES / DOWNLOAD DARI PANEL ADMIN';
-    const destinationButton = isTelegramDestination ? 'Buka Media di Telegram' : 'Buka Link Sekarang';
+    const destinationTitle = isTelegramDestination ? pasteText('LINK MEDIA ASLI TELEGRAM','ORIGINAL TELEGRAM MEDIA LINK') : pasteText('LINK AKSES / DOWNLOAD DARI PANEL ADMIN','ACCESS / DOWNLOAD LINK FROM ADMIN');
+    const destinationButton = isTelegramDestination ? pasteText('Buka Media di Telegram','Open Media in Telegram') : pasteText('Buka Link Sekarang','Open Link Now');
     const accessLabel = data.is_admin
-      ? 'AKSES ADMIN TERVERIFIKASI'
-      : (String(item.access || '').trim().toLowerCase() === 'free' ? 'FREE ACCESS' : 'AKSES PEMBELIAN TERVERIFIKASI');
+      ? pasteText('AKSES ADMIN TERVERIFIKASI','VERIFIED ADMIN ACCESS')
+      : (String(item.access || '').trim().toLowerCase() === 'free' ? 'FREE ACCESS' : pasteText('AKSES PEMBELIAN TERVERIFIKASI','VERIFIED PURCHASE ACCESS'));
     const accessMessage = data.is_admin
-      ? 'Akses admin berhasil diverifikasi. Link download yang diterapkan admin tersedia di bawah ini.'
+      ? pasteText('Akses admin berhasil diverifikasi. Link download yang diterapkan admin tersedia di bawah ini.','Admin access has been verified. The configured download link is available below.')
       : (String(item.access || '').trim().toLowerCase() === 'free'
-          ? 'Konten ini gratis. Link download yang diterapkan admin tersedia di bawah ini.'
-          : 'Pembelian berhasil diverifikasi. Link download yang diterapkan admin tersedia di bawah ini.');
+          ? pasteText('Konten ini gratis. Link download yang diterapkan admin tersedia di bawah ini.','This content is free. The configured download link is available below.')
+          : pasteText('Pembelian berhasil diverifikasi. Link download yang diterapkan admin tersedia di bawah ini.','Purchase verified. The configured download link is available below.'));
 
     root.innerHTML = `
-      <span class="eyebrow">${accessLabel}</span>
-      <h1>${esc(data.title || item.title)}</h1>
-      <p>${accessMessage}</p>
-      ${data.content_after_payment ? `<div class="watch-card"><p>${esc(data.content_after_payment)}</p></div>` : ''}
-      <div class="paste-download-link" style="margin:18px 0;padding:16px;border:1px solid var(--border-color,#dbe2ea);border-radius:14px;background:var(--card-bg,#fff)">
-        <div style="font-size:12px;font-weight:700;letter-spacing:.06em;opacity:.7;margin-bottom:8px">${destinationTitle}</div>
-        <a id="pasteDownloadUrl" href="${esc(downloadUrl.href)}" target="_blank" rel="noopener noreferrer" style="display:block;overflow-wrap:anywhere;word-break:break-word;margin-bottom:12px">${esc(downloadUrl.href)}</a>
-        <button class="btn" type="button" id="copyPasteDownloadUrl">Salin Link</button>
+      <div class="paste-access-head"><span class="eyebrow">${accessLabel}</span><span class="paste-access-verified"><i class="fa-solid fa-shield-check"></i> ${pasteText('Akses terverifikasi','Verified access')}</span></div>
+      <h1 class="paste-premium-title">${esc(data.title || item.title)}</h1>
+      <p class="paste-premium-lead">${accessMessage}</p>
+      ${data.content_after_payment ? `<div class="paste-extra-content"><p>${esc(data.content_after_payment)}</p></div>` : ''}
+      <div class="paste-download-link">
+        <div class="paste-link-label">${destinationTitle}</div>
+        <a id="pasteDownloadUrl" class="paste-download-url" href="${esc(downloadUrl.href)}" target="_blank" rel="noopener noreferrer">${esc(downloadUrl.href)}</a>
+        <button class="paste-copy-button" type="button" id="copyPasteDownloadUrl">${pasteText('Salin Link','Copy Link')}</button>
       </div>
-      <a class="btn primary" href="${esc(downloadUrl.href)}" target="_blank" rel="noopener noreferrer">${destinationButton}</a>`;
+      <a class="paste-open-button" href="${esc(downloadUrl.href)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> ${destinationButton}</a>`;
 
     document.getElementById('copyPasteDownloadUrl')?.addEventListener('click', async () => {
       const button = document.getElementById('copyPasteDownloadUrl');
       try {
         await navigator.clipboard.writeText(downloadUrl.href);
-        button.textContent = 'Link berhasil disalin ✓';
+        button.textContent = pasteText('Link berhasil disalin ✓','Link copied ✓');
       } catch (_) {
         const field = document.createElement('textarea');
         field.value = downloadUrl.href;
@@ -111,7 +113,7 @@ async function run() {
         field.select();
         const copied = document.execCommand('copy');
         field.remove();
-        button.textContent = copied ? 'Link berhasil disalin ✓' : 'Salin manual dari link di atas';
+        button.textContent = copied ? pasteText('Link berhasil disalin ✓','Link copied ✓') : pasteText('Salin manual dari link di atas','Copy the link manually above');
       }
     });
   } catch (error) {
@@ -119,10 +121,10 @@ async function run() {
     const returnTo = location.pathname + location.search;
     const needsLogin = /sesi login tidak valid|login ulang|login diperlukan|konten ini berbayar/i.test(message);
     root.innerHTML = `
-      <h1>Akses belum tersedia</h1>
-      <p>${esc(message)}</p>
-      <a class="btn primary" href="/d/${encodeURIComponent(slug)}">Periksa status / lanjutkan pembayaran</a>
-      ${needsLogin ? `<p><a href="/login.html?next=${encodeURIComponent(returnTo)}">Login dengan akun pembelian</a></p>` : ''}`;
+      <div class="paste-error-icon"><i class="fa-solid fa-lock"></i></div><h1 class="paste-premium-title">${pasteText('Akses belum tersedia','Access unavailable')}</h1>
+      <p class="paste-premium-lead">${esc(message)}</p>
+      <a class="paste-open-button" href="/d/${encodeURIComponent(slug)}">${pasteText('Periksa status / lanjutkan pembayaran','Check status / continue payment')}</a>
+      ${needsLogin ? `<p><a class="paste-secondary-link" href="/login.html?next=${encodeURIComponent(returnTo)}">${pasteText('Login dengan akun pembelian','Sign in with purchase account')}</a></p>` : ''}`;
   }
 }
 
