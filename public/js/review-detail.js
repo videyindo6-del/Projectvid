@@ -181,6 +181,15 @@ async function incrementReviewView(id) {
   }
 }
 
+async function recordReviewWatch(id) {
+  try {
+    const user = await getCurrentReviewUser();
+    if (!user || !id || !sb?.rpc) return;
+    const { error } = await sb.rpc('record_review_watch', { p_review_id: id });
+    if (error) console.warn('Review watch history unavailable:', error.message);
+  } catch (error) { console.warn('Record review watch failed:', error); }
+}
+
 // =====================================================
 // LOAD EXTRA DATA
 // =====================================================
@@ -601,6 +610,7 @@ async function load() {
     const totalLikes = Number(stats?.total_likes ?? 0);
     const totalComments = Number(stats?.total_comments ?? 0);
     incrementReviewView(v.id);
+    recordReviewWatch(v.id);
     const galleryHTML = renderGallery(galleryImages, v.title);
     const reviewSlug = v.slug || v.id;
     const downloadLabel = v.access === 'paid'
