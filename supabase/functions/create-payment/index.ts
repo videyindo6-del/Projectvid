@@ -117,8 +117,8 @@ Deno.serve(async req=>{
    const {data,error}=await admin.from('review_items').select('id,price,access,status').eq('id',body.review_id).single();
    if(error||!data||data.status!=='published') return reply({error:'Konten review tidak ditemukan'},404);
    if(data.access==='free') return reply({error:'Konten ini gratis, tidak perlu checkout'},400);
-   const {data:owned}=await admin.from('review_entitlements').select('id').eq('user_id',user.id).eq('review_id',data.id).maybeSingle();
-   if(owned) return reply({error:'Konten sudah dibeli'},409);
+   const {data:owned}=await admin.from('review_entitlements').select('id,expires_at').eq('user_id',user.id).eq('review_id',data.id).maybeSingle();
+   if(owned?.expires_at && new Date(owned.expires_at)>new Date()) return reply({error:'Akses pembelian masih aktif sampai '+new Date(owned.expires_at).toISOString(),code:'ACCESS_ACTIVE',expires_at:owned.expires_at},409);
    baseAmount=Number(data.price); review_id=data.id;
    const {data:profile}=await admin.from('profiles').select('vip_expires_at').eq('id',user.id).maybeSingle();
    if(profile?.vip_expires_at && new Date(profile.vip_expires_at)>new Date()) discountPercent=20;
