@@ -108,3 +108,26 @@ body:has(.checkout-shell) main.container{width:min(1120px,94%);max-width:1120px;
 .payment-state.is-error .state-pulse{background:#dc2626;box-shadow:0 0 0 4px rgba(220,38,38,.13)}
 .payment-state.is-error b{color:#b4232c}
 @keyframes paymentLivePulse{0%{box-shadow:0 0 0 0 rgba(239,48,56,.55)}70%{box-shadow:0 0 0 9px rgba(239,48,56,0)}100%{box-shadow:0 0 0 0 rgba(239,48,56,0)}}
+/* Checkout and QR payment page — match BoxCellink Posts cards */
+.checkout-header{border-bottom-color:#e2e9f1}
+.checkout-secure-mark{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #d7e7f4;border-radius:999px;background:#f5f9fd;color:#3974a8;font-size:10px;font-weight:850;white-space:nowrap}
+.checkout-access-note,.checkout-expired-note{display:flex;align-items:flex-start;gap:9px;margin:12px 0;padding:12px 14px;border:1px solid #dce8f5;border-radius:12px;background:#f6f9fd;color:#52718f;font-size:11px;line-height:1.65}
+.checkout-access-note i{color:#3974b4;margin-top:2px;flex:none}.checkout-expired-note{border-color:#f2d6b6;background:#fff8ef;color:#9a652b}.checkout-expired-note i{margin-top:2px;flex:none}
+.wallet-purchase-button{background:linear-gradient(135deg,#16714f,#25966b)!important;border-color:#16714f!important;box-shadow:0 8px 18px rgba(22,113,79,.13)!important}
+.wallet-discount-note{display:block;margin:6px 0 12px;color:#7d8da0;font-size:10px;line-height:1.55}
+.payment-method-marquees{display:grid;gap:8px;margin:12px 0 18px;padding:12px 0;border:1px solid #e3eaf2;border-radius:15px;background:#fff;overflow:hidden}
+.payment-method-lane{display:flex;align-items:center;gap:10px;min-width:0;overflow:hidden;padding:0 10px}
+.payment-lane-label{width:80px;flex:none;text-align:center;padding:6px 8px;border:1px solid #e3eaf2;border-radius:999px;background:#f5f8fc;color:#637b95;font-size:9px;font-weight:900;letter-spacing:.07em}
+.payment-marquee-track{display:flex;flex:1;min-width:0;overflow:hidden;gap:12px;mask-image:linear-gradient(90deg,transparent,black 5%,black 95%,transparent)}
+.payment-marquee-items{display:flex;align-items:center;flex:none;gap:9px;width:max-content;animation:paymentBankTicker 24s linear infinite;}
+.payment-marquee-track.reverse .payment-marquee-items{animation-name:paymentWalletTicker;animation-duration:21s;}
+.payment-method-chip{display:inline-flex;align-items:center;justify-content:center;min-width:64px;height:31px;padding:0 12px;border:1px solid #e4eaf2;border-radius:9px;background:#f8fafc;color:#304b66;font-size:10px;font-weight:900;letter-spacing:.02em;white-space:nowrap}
+.bank-lane .payment-method-chip{border-color:#d8e6f4;background:#f4f8fd;color:#285d92}.wallet-lane .payment-method-chip{border-color:#dcebe3;background:#f4faf6;color:#24734f}
+.payment-method-disclaimer{display:block;padding:2px 12px 0;color:#8292a3;font-size:9px;line-height:1.5;text-align:center}
+@keyframes paymentBankTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes paymentWalletTicker{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+.payment-method-marquees:hover .payment-marquee-items{animation-play-state:paused}
+@media(max-width:540px){.payment-method-marquees{padding:10px 0;margin:10px 0 14px}.payment-method-lane{gap:7px;padding:0 8px}.payment-lane-label{width:66px;font-size:8px;padding:6px 4px}.payment-method-chip{height:29px;min-width:56px;padding:0 9px;font-size:9px}.payment-method-disclaimer{font-size:8px;padding:0 8px}}
+@media(prefers-reduced-motion:reduce){.payment-marquee-items{animation:none!important}.checkout-dialog,.checkout-modal{animation:none!important}}
+.dialog-access-terms{display:flex;align-items:flex-start;gap:8px;margin:13px 0;padding:11px 12px;border:1px solid #dce8f5;border-radius:11px;background:#f5f9fd;color:#617b95;font-size:10px;line-height:1.65}.dialog-access-terms i{flex:none;margin-top:2px;color:#3974b4}
+@media(prefers-color-scheme:dark){.dialog-access-terms{background:#14263a;border-color:#2b425b;color:#b4c4d5}}

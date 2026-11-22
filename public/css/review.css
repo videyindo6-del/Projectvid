@@ -439,3 +439,25 @@ body.review-telegram-gate-open{overflow:hidden!important}
 @media(max-width:950px){.review-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:13px!important}}
 @media(max-width:620px){.review-catalog-page{padding-inline:12px}.review-catalog-hero{padding:20px 16px;border-radius:19px;margin-bottom:19px}.review-catalog-search{min-height:48px}.review-catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.review-catalog-card{border-radius:15px!important}.review-catalog-card-body{padding:11px!important;gap:7px}.review-catalog-card h3{font-size:12px!important}.review-catalog-card p{font-size:10px!important;line-height:1.55!important;min-height:3.1em}.review-catalog-access{font-size:8px;padding:4px 6px}.review-catalog-price{font-size:10px}.review-catalog-card-cta{font-size:10px}.review-catalog-section-head h2{font-size:16px}.review-catalog-section-icon{width:36px;height:36px;border-radius:11px}}
 @media(prefers-color-scheme:dark){.review-catalog-hero{border-color:#263b52;background:radial-gradient(circle at 92% 8%,rgba(77,145,215,.16),transparent 34%),linear-gradient(135deg,#14253a,#101d2e)}.review-catalog-hero h1,.review-catalog-section-head h2{color:#e6f0fa}.review-catalog-hero>p,.review-catalog-section-head p{color:#a7b9cc}.review-catalog-search{border-color:#2a425b;background:#0f1e30;color:#90abc5}.review-catalog-search input{color:#e3eef9}.review-catalog-search button{background:#1b3048;color:#a9c7e4}.review-catalog-section-icon{border-color:#2a425b;background:#162a41;color:#7fb4df}.review-catalog-card{background:#111f30!important;border-color:#273d54!important}.review-catalog-card h3{color:#e2edf8!important}.review-catalog-card p{color:#a3b6ca!important}.review-catalog-price{color:#a9cbe8}.review-catalog-thumb,.review-catalog-thumb-fallback{background:linear-gradient(135deg,#1a2c42,#142338);color:#7696b7}.review-catalog-state{border-color:#2b425b;background:#13243a;color:#afc2d5}.review-page-arrow,.review-page-number{border-color:#2a425b;background:#14263c;color:#aec5dd}.review-page-number.is-active{background:#377eb7;color:white;border-color:#377eb7}}
+/* Review detail alignment with the BoxCellink Posts visual system */
+.review-shell{border:1px solid #e2e9f1;border-radius:18px;background:#fff;box-shadow:0 8px 26px rgba(23,52,82,.045);overflow:hidden;gap:0;}
+.review-topline{padding:16px 20px;background:linear-gradient(135deg,#fff 0%,#f5f9fd 100%);border-bottom:1px solid #e8eef5;}
+.review-heading{padding:20px 22px 17px;align-items:flex-start;}
+.review-heading h1{color:#183a5b;letter-spacing:-.04em;font-size:clamp(23px,3.2vw,34px);}
+.review-lead{font-size:13px;line-height:1.7;color:#718196;}
+.gallery-panel,.product-info-panel,.social-panel{margin:0 16px 14px;padding:17px;border-radius:16px;border:1px solid #e2e9f1;box-shadow:0 6px 22px rgba(23,52,82,.035);}
+.gallery-head,.social-title,.comment-heading{gap:10px;align-items:flex-start;}
+.product-description h2,.social-title h2,.comment-heading h3,.related-heading h2{color:#183a5b;letter-spacing:-.03em;}
+.product-info-panel{display:grid;gap:16px;}
+.purchase-strip{border:1px solid #dce8f5;border-radius:14px;background:linear-gradient(135deg,#f5f9fe,#fff);padding:16px;gap:12px;}
+.purchase-strip>div{min-width:0;display:grid;gap:5px;}
+.purchase-strip>div strong{font-size:clamp(20px,4vw,28px);color:#245f99;}
+.purchase-note{font-size:11px;line-height:1.6;color:#718196;}
+.purchase-btn{min-height:44px;border-radius:11px;white-space:normal;text-align:center;}
+.social-panel{padding-top:20px;}
+.social-actions{display:flex;flex-wrap:wrap;gap:7px;}
+.social-action{border-radius:10px;min-height:39px;}
+.review-comments{display:grid;gap:10px;}
+.review-comment{border-radius:12px;background:#f7f9fc;}
+@media(max-width:700px){.review-shell{border-radius:15px}.review-topline{padding:12px 14px}.review-heading{padding:16px 14px 13px}.gallery-panel,.product-info-panel,.social-panel{margin:0 9px 11px;padding:13px;border-radius:13px}.purchase-strip{padding:13px;display:grid;grid-template-columns:1fr}.purchase-btn{width:100%}}
+@media(prefers-color-scheme:dark){.review-shell{background:#101d2d;border-color:#263b52}.review-topline{background:#13243a;border-color:#263b52}.review-heading h1,.product-description h2{color:#e6eff8}.review-lead{color:#a6b8cb}.gallery-panel,.product-info-panel,.social-panel{background:#111f30;border-color:#263b52}.purchase-strip{background:linear-gradient(135deg,#142b43,#17283e);border-color:#2a4059}.purchase-note{color:#b0c0d0}.review-comment{background:#14263a}}
