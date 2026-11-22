@@ -81,6 +81,18 @@ const reviewTranslations = {
  'Terjual':'Sold','Total komentar':'Total comments','Total like':'Total likes','Published':'Published','Free content':'Free content','Premium content':'Premium content',
  'Buka sumber asli':'Open original source','Media belum tersedia':'Media is not available','Konten media akan ditampilkan di sini setelah diunggah oleh penjual.':'Media will appear here once uploaded by the seller.'
 };
+
+Object.assign(reviewTranslations, {
+ 'Menyiapkan detail produk':'Preparing product details','Memuat media dan informasi produk...':'Loading media and product information...','DETAIL PRODUK':'PRODUCT DETAILS','Cek review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.':'Review the details first. If interested, select Download / Buy below to continue.',
+ 'Preview media produk':'Product media preview','TENTANG PRODUK':'ABOUT THIS PRODUCT','Informasi produk belum ditambahkan oleh penjual.':'The seller has not added product information yet.',
+ 'Terjual':'Sold','Views':'Views','Total like':'Total likes','Total komentar':'Total comments','Published':'Published','HARGA AKSES':'ACCESS PRICE','AKSES KONTEN':'CONTENT ACCESS','Gratis':'Free','Download / Beli':'Download / Buy','Link postingan asli Telegram dibuka setelah akses gratis atau pembayaran terverifikasi.':'The original Telegram post link is revealed after free access or verified payment.',
+ 'Baca review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.':'Review the details first. If interested, select Download / Buy below to continue.',
+ 'Bagikan pengalamanmu':'Share your experience','Bantu pengguna lain menemukan konten menarik.':'Help others discover interesting content.',
+ 'Username / Nama':'Username / Name','Masukkan nama yang ingin ditampilkan':'Enter a display name','Tulis komentar yang sopan dan relevan...':'Write a polite, relevant comment...','Kirim komentar':'Post comment','Komentar':'Comments','Belum ada komentar. Jadilah yang pertama berkomentar.':'No comments yet. Be the first to comment.',
+ 'Review lainnya':'More reviews','Temukan koleksi dan konten pilihan lainnya.':'Discover more collections and featured content.',
+ 'Buka sumber asli':'Open original source','Media belum tersedia':'Media is not available','Konten media akan ditampilkan di sini setelah diunggah oleh penjual.':'Media will appear here once uploaded by the seller.'
+});
+
 function applyReviewTranslations(root = document) {
  if (!reviewEN()) return;
  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let node;
@@ -665,7 +677,7 @@ async function load() {
             <div><i class="fa-regular fa-comments"></i><span><b>${totalComments.toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</b><small>Total komentar</small></span></div>
             <div><i class="fa-regular fa-calendar"></i><span><b>${v.created_at ? new Date(v.created_at).toLocaleDateString(reviewEN() ? 'en-US' : 'id-ID') : '-'}</b><small>Published</small></span></div>
           </div>
-          <div class="purchase-strip"><div><small>${v.access === 'paid' ? 'HARGA AKSES' : 'AKSES KONTEN'}</small><strong>${v.access === 'paid' ? rp(v.price) : 'Gratis'}</strong><span class="purchase-note">${reviewText('Link postingan asli Telegram dibuka setelah akses gratis atau pembayaran terverifikasi.','The original Telegram post link is revealed after free access or verified payment.')}</span></div><a class="btn primary purchase-btn" href="/d/${encodeURIComponent(reviewSlug)}"><i class="fa-solid fa-download"></i> ${esc(downloadLabel)}</a></div>
+          <div class="purchase-strip"><div><small>${v.access === 'paid' ? 'HARGA AKSES' : 'AKSES KONTEN'}</small><strong>${v.access === 'paid' ? rp(v.price) : 'Gratis'}</strong><span class="purchase-note">${reviewText('Link postingan asli Telegram dibuka setelah akses gratis atau pembayaran terverifikasi. Untuk media berbayar, akses berlaku 72 jam sejak pembayaran berhasil.','The original Telegram post link is revealed after free access or verified payment. Paid access lasts 72 hours from successful payment.')}</span></div><a class="btn primary purchase-btn" href="/d/${encodeURIComponent(reviewSlug)}"><i class="fa-solid fa-download"></i> ${esc(downloadLabel)}</a></div>
         </section>
         <section class="social-panel" id="reviewSocial"><div class="social-title"><div><span class="review-kicker">COMMUNITY</span><h2>Bagikan pengalamanmu</h2></div><span class="social-subtitle">Bantu pengguna lain menemukan konten menarik.</span></div>
           <div class="social-actions"><button type="button" id="reviewLike" class="social-action"><i class="fa-regular fa-heart"></i><span>Suka</span><b id="reviewLikeCount">${totalLikes}</b></button><button type="button" id="reviewCommentJump" class="social-action"><i class="fa-regular fa-comment"></i><span>Komentar</span></button><button type="button" id="reviewShare" class="social-action"><i class="fa-solid fa-share-nodes"></i><span>Bagikan</span></button></div>
@@ -680,22 +692,7 @@ async function load() {
     applyReviewTranslations(box);
     try {
       const {data:{user}} = await sb.auth.getUser();
-      if(user && v.access === 'paid'){
-        const {data:publisherWallet}=await sb.from('publisher_balances').select('available_balance').eq('publisher_id',user.id).maybeSingle();
-        if(Number(publisherWallet?.available_balance||0)>=Number(v.price||0)){
-          const purchaseStrip=box.querySelector('.purchase-strip');
-          if(purchaseStrip){
-            const publisherBuy=document.createElement('button');publisherBuy.type='button';publisherBuy.className='btn';publisherBuy.textContent=reviewText('Beli dengan saldo publisher','Buy with publisher balance');
-            publisherBuy.style.cssText='margin-top:10px;width:100%;border:1px solid #c9d9e9;border-radius:12px;padding:12px;background:#edf4fb;color:#245f96;font-weight:800;cursor:pointer';
-            publisherBuy.addEventListener('click',async()=>{
-              publisherBuy.disabled=true;
-              try{const {data,error}=await sb.rpc('buy_review_with_publisher_balance',{p_review_id:v.id});if(error)throw error;if(!data?.ok)throw new Error(data?.reason||'Pembelian gagal');reviewToast(reviewText('Pembelian berhasil menggunakan saldo publisher.','Purchase completed using publisher balance.'),'success');location.href='/d/'+encodeURIComponent(reviewSlug);}
-              catch(err){reviewToast(err.message||reviewText('Pembelian gagal.','Purchase failed.'),'error');publisherBuy.disabled=false;}
-            });
-            purchaseStrip.appendChild(publisherBuy);
-          }
-        }
-      }
+      // All paid purchases now use the shared /d checkout, which applies VIP pricing, wallet balance, and 72-hour access consistently.
       if(user){
         const {data:affiliate} = await sb.from('profiles').select('affiliate_status,referral_code').eq('id',user.id).maybeSingle();
         if(affiliate?.affiliate_status==='approved' && affiliate.referral_code){
