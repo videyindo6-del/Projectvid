@@ -93,6 +93,16 @@ Object.assign(reviewTranslations, {
  'Buka sumber asli':'Open original source','Media belum tersedia':'Media is not available','Konten media akan ditampilkan di sini setelah diunggah oleh penjual.':'Media will appear here once uploaded by the seller.'
 });
 
+
+Object.assign(reviewTranslations, {
+ 'Gabung Group Resmi Telegram':'Join Official Telegram Group',
+ 'Gabung group resmi BoxCellink untuk informasi, bantuan, dan update.':'Join the official BoxCellink group for updates, information, and help.',
+ 'DETAIL PRODUK':'PRODUCT DETAILS',
+ 'Cek review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.':'Review the details first. If interested, use Download / Buy below to continue.',
+ 'Link postingan asli Telegram dibuka setelah akses gratis atau pembayaran terverifikasi. Untuk media berbayar, akses berlaku 72 jam sejak pembayaran berhasil.':'The original Telegram post opens after free access or verified payment. Paid access lasts 72 hours after payment.',
+ 'Transaksi aman dan terpercaya':'Secure and trusted transaction'
+});
+
 function applyReviewTranslations(root = document) {
  if (!reviewEN()) return;
  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let node;
@@ -665,11 +675,11 @@ async function load() {
     box.innerHTML = `
       <div class="review-shell">
         <div class="review-topline"><span class="eyebrow"><i class="fa-solid fa-shield-halved"></i> BOXCELLINK MARKETPLACE</span><span class="review-live"><i class="fa-solid fa-circle"></i> ${v.access === 'paid' ? 'Premium content' : 'Free content'}</span></div>
-        <header class="review-heading"><div><p class="review-kicker">DETAIL PRODUK</p><h1>${esc(v.title)}</h1><p class="review-lead">Cek review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.</p></div></header>
+        <header class="review-heading review-detail-notice-card"><div><p class="review-kicker">DETAIL PRODUK</p><h1>${esc(v.title)}</h1><p class="review-lead">Cek review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.</p></div></header>
         <section class="gallery-panel"><div class="gallery-head"><div><b><i class="fa-regular fa-images"></i> Preview media produk</b><small>${reviewText('Seluruh media ditampilkan di halaman ini agar bisa diperiksa sebelum membeli.','All media is displayed here so you can review it before purchasing.')}</small></div><span class="gallery-count"><i class="fa-regular fa-images"></i> ${galleryImages.length} ${reviewText('media','items')}</span></div><div id="reviewGalleryAccess" hidden><div class="review-gallery">${galleryHTML}</div><div class="gallery-controls" aria-label="Kontrol galeri"><button type="button" id="galleryPrev" aria-label="Media sebelumnya"><i class="fa-solid fa-chevron-left"></i></button><span id="galleryCounter">1 / ${galleryImages.length}</span><button type="button" id="galleryNext" aria-label="Media berikutnya"><i class="fa-solid fa-chevron-right"></i></button><small>${reviewText("Geser ke samping untuk melihat semua media","Swipe sideways to view all media")}</small></div></div></section>
         <div class="review-telegram-gate" id="reviewTelegramGate" role="dialog" aria-modal="true" aria-labelledby="reviewTelegramGateTitle"><div class="review-telegram-gate-card"><span class="review-telegram-gate-icon"><i class="fa-brands fa-telegram"></i></span><span class="review-telegram-gate-kicker">BOXCELLINK MEDIA ACCESS</span><h2 id="reviewTelegramGateTitle">${reviewText('Media khusus pengguna Telegram','Media for Telegram users')}</h2><p>${reviewText('Semua media di halaman ini ditujukan khusus untuk pengguna Telegram. Apakah kamu sudah memiliki Telegram?','All media on this page is intended for Telegram users. Do you have Telegram?')}</p><div class="review-telegram-gate-actions"><div class="review-community-actions" id="reviewCommunityActions"></div><button class="review-telegram-confirm" type="button" id="reviewTelegramConfirm">${reviewText('Ya, Punya Telegram','Yes, I Have Telegram')} <i class="fa-solid fa-arrow-right"></i></button><button class="review-telegram-no-account" type="button" id="reviewTelegramNoAccount">${reviewText('Tidak, Saya Tidak Punya Telegram','No, I Don’t Have Telegram')} <i class="fa-solid fa-arrow-right"></i></button></div><small class="review-telegram-gate-foot"><i class="fa-solid fa-shield-halved"></i> ${reviewText('Akses media tetap mengikuti ketentuan dan izin pembelian.','Media access remains subject to access and purchase permissions.')}</small></div></div>
         <div class="review-viewer" id="reviewViewer" hidden><button type="button" class="viewer-close" aria-label="Tutup">×</button><img alt="Pratinjau gambar"></div>
-        <section class="product-info-panel"><div class="product-description"><span class="review-kicker">TENTANG PRODUK</span><h2>${esc(v.title)}</h2><p>${esc(v.description || 'Informasi produk belum ditambahkan oleh penjual.')}</p></div>
+        <section class="product-info-panel review-about-premium"><div class="product-description"><span class="review-kicker">TENTANG PRODUK</span><h2>${esc(v.title)}</h2><p>${esc(v.description || 'Informasi produk belum ditambahkan oleh penjual.')}</p></div>
           <div class="product-stats product-stats-grid">
             <div><i class="fa-solid fa-bag-shopping"></i><span><b>${totalSold.toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</b><small>Terjual</small></span></div>
             <div><i class="fa-regular fa-eye"></i><span><b>${totalViews.toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</b><small>Views</small></span></div>
@@ -677,7 +687,7 @@ async function load() {
             <div><i class="fa-regular fa-comments"></i><span><b>${totalComments.toLocaleString(reviewEN() ? 'en-US' : 'id-ID')}</b><small>Total komentar</small></span></div>
             <div><i class="fa-regular fa-calendar"></i><span><b>${v.created_at ? new Date(v.created_at).toLocaleDateString(reviewEN() ? 'en-US' : 'id-ID') : '-'}</b><small>Published</small></span></div>
           </div>
-          <div class="purchase-strip"><div><small>${v.access === 'paid' ? 'HARGA AKSES' : 'AKSES KONTEN'}</small><strong>${v.access === 'paid' ? rp(v.price) : 'Gratis'}</strong><span class="purchase-note">${reviewText('Link postingan asli Telegram dibuka setelah akses gratis atau pembayaran terverifikasi. Untuk media berbayar, akses berlaku 72 jam sejak pembayaran berhasil.','The original Telegram post link is revealed after free access or verified payment. Paid access lasts 72 hours from successful payment.')}</span></div><a class="btn primary purchase-btn" href="/d/${encodeURIComponent(reviewSlug)}"><i class="fa-solid fa-download"></i> ${esc(downloadLabel)}</a></div>
+          <div class="purchase-strip review-price-premium"><div><small>${v.access === 'paid' ? 'HARGA AKSES' : 'AKSES KONTEN'}</small><strong>${v.access === 'paid' ? rp(v.price) : 'Gratis'}</strong><span class="purchase-note">${reviewText('Link postingan asli Telegram dibuka setelah akses gratis atau pembayaran terverifikasi. Untuk media berbayar, akses berlaku 72 jam sejak pembayaran berhasil.','The original Telegram post link is revealed after free access or verified payment. Paid access lasts 72 hours from successful payment.')}</span></div><a class="btn primary purchase-btn" href="/d/${encodeURIComponent(reviewSlug)}"><i class="fa-solid fa-download"></i> ${esc(downloadLabel)}</a></div>
         </section>
         <section class="social-panel" id="reviewSocial"><div class="social-title"><div><span class="review-kicker">COMMUNITY</span><h2>Bagikan pengalamanmu</h2></div><span class="social-subtitle">Bantu pengguna lain menemukan konten menarik.</span></div>
           <div class="social-actions"><button type="button" id="reviewLike" class="social-action"><i class="fa-regular fa-heart"></i><span>Suka</span><b id="reviewLikeCount">${totalLikes}</b></button><button type="button" id="reviewCommentJump" class="social-action"><i class="fa-regular fa-comment"></i><span>Komentar</span></button><button type="button" id="reviewShare" class="social-action"><i class="fa-solid fa-share-nodes"></i><span>Bagikan</span></button></div>
@@ -912,6 +922,21 @@ async function loadMore(id) {
 
   document.head.appendChild(style);
 })();
+
+
+function showOfficialTelegramGroupNotice(){
+ if(document.getElementById('officialReviewTelegramNotice')) return;
+ const lang=(localStorage.getItem('boxcellink_lang')||'id');
+ const isEn=lang==='en';
+ const notice=document.createElement('aside');notice.id='officialReviewTelegramNotice';notice.className='official-review-telegram-notice';notice.setAttribute('role','status');
+ notice.innerHTML=`<button type="button" class="official-review-notice-close" aria-label="${isEn?'Close':'Tutup'}">×</button><div class="official-review-notice-brand"><span><i class="fa-brands fa-telegram"></i></span><small>${isEn?'OFFICIAL COMMUNITY':'KOMUNITAS RESMI'}</small></div><b>${isEn?'Join the Official Telegram Group':'Gabung Group Resmi Telegram'}</b><p>${isEn?'Join the official BoxCellink group for information, assistance, and updates.':'Gabung group resmi BoxCellink untuk informasi, bantuan, dan update.'}</p><a href="https://t.me/+-0qZ2iBc2KkyMGNl" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> ${isEn?'Join Official Group':'Gabung Group Resmi Telegram'} <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`;
+ document.body.appendChild(notice);
+ const dismiss=()=>{notice.classList.add('is-dismissed');setTimeout(()=>notice.remove(),220);};
+ notice.querySelector('.official-review-notice-close').addEventListener('click',dismiss);
+ window.setTimeout(()=>{if(notice.isConnected)notice.classList.add('is-visible')},60);
+ window.setTimeout(()=>{if(notice.isConnected&&!notice.classList.contains('is-dismissed')){notice.classList.add('is-dismissed');setTimeout(()=>notice.remove(),220)}},14000);
+}
+window.setTimeout(showOfficialTelegramGroupNotice,4200);
 
 // Jalankan halaman.
 load();
