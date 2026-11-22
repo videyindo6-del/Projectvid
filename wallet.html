@@ -2,36 +2,112 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Wallet — BoxCellink</title>
-<link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css">
+<meta name="theme-color" content="#f4f7fb">
+<title>Saldo & Wallet — BoxCellink</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-<style>
-:root{--w-ink:#18334e;--w-muted:#718096;--w-line:#e5ebf2;--w-blue:#245b96;--w-gold:#b78325}
-.wallet-page{width:min(1080px,100%);margin:34px auto;padding:0 18px 60px;color:var(--w-ink)}
-.wallet-hero{margin-bottom:22px}.wallet-kicker{font-size:10px;letter-spacing:.16em;font-weight:850;color:#6684a3}.wallet-hero h1{font-size:clamp(26px,4vw,36px);letter-spacing:-.04em;margin:8px 0}.wallet-muted{color:var(--w-muted);font-size:12px;line-height:1.65}
-.wallet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.wallet-card{min-width:0;border:1px solid var(--w-line);border-radius:20px;background:#fff;padding:21px;box-shadow:0 12px 36px rgba(26,54,82,.045)}.wallet-card h2{font-size:16px;margin:0 0 8px;letter-spacing:-.02em}.wallet-card h3{font-size:14px;margin:0 0 9px}.wallet-wide{grid-column:1/-1}.wallet-amount{font-size:clamp(25px,4vw,32px);font-weight:850;letter-spacing:-.04em;color:#173b5d;margin:10px 0}.wallet-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.wallet-form{display:grid;gap:12px;margin-top:15px}.wallet-form label{display:grid;gap:6px;color:#41566c;font-size:12px;font-weight:700}.wallet-form input,.wallet-form select,.wallet-form textarea{width:100%;min-height:44px;padding:11px 12px;border:1px solid #dce5ee;border-radius:11px;background:#fff;color:#18334e;font:inherit;font-size:13px;outline:none}.wallet-form input:focus,.wallet-form select:focus,.wallet-form textarea:focus{border-color:#7fa7ce;box-shadow:0 0 0 3px #2c70b018}.wallet-form button,.wallet-btn{min-height:44px;border:0;border-radius:11px;padding:11px 16px;background:linear-gradient(135deg,#245b96,#3478b9);color:#fff;font-weight:800;font-size:13px;cursor:pointer}.wallet-form button:disabled{opacity:.55;cursor:wait}.wallet-card{overflow:hidden}.wallet-form-grid .full{grid-column:1/-1}.wallet-form>button[type=submit]{width:100%;min-height:48px;box-shadow:0 8px 18px #245b9624}.wallet-summary{border:1px solid #e7edf4}.wallet-fee:last-of-type{border-bottom:0}.wallet-inline input{max-width:100%;min-width:0}.wallet-btn.secondary{background:#f0f5fa;color:#245b96;border:1px solid #dce7f1}.wallet-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:13px 2px;border-bottom:1px solid #edf1f5;font-size:12px}.wallet-row:last-child{border-bottom:0}.wallet-positive{color:#16835d}.wallet-negative{color:#b42318}.wallet-history{display:grid}.wallet-status{display:inline-flex;padding:4px 8px;border-radius:20px;background:#f0f4f8;color:#52677d;font-size:10px;font-weight:800;text-transform:uppercase}.wallet-status.success{background:#e8f7ef;color:#147a50}.wallet-status.rejected{background:#fff0ef;color:#b42318}.wallet-status.processing{background:#fff6e5;color:#996515}.wallet-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:end}.wallet-form-grid>label{align-content:start}.wallet-form-grid>label,.wallet-form-grid>div{min-width:0}.wallet-form-grid input,.wallet-form-grid select{min-width:0;max-width:100%}.wallet-form-grid .full{grid-column:1/-1}.wallet-slide{overflow:hidden;transition:max-height .28s ease,opacity .2s ease}.wallet-slide[hidden]{display:none}.wallet-inline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.wallet-note{padding:12px 14px;border-radius:12px;background:#f5f8fb;color:#63778b;font-size:11px;line-height:1.55}.wallet-address{border:1px solid #e5ebf2;border-radius:13px;padding:0 13px}.wallet-address summary{padding:13px 0;cursor:pointer;font-size:12px;font-weight:800;color:#294967;list-style:none}.wallet-address summary::-webkit-details-marker{display:none}.wallet-address summary:after{content:"+";float:right;color:#245b96;font-size:18px}.wallet-address[open] summary:after{content:"−"}.wallet-address-fields{padding:0 0 13px;animation:walletSlide .22s ease}@keyframes walletSlide{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:translateY(0)}}.wallet-fee{display:flex;justify-content:space-between;gap:10px;padding:8px 0;font-size:12px;border-bottom:1px solid #edf1f5}.wallet-summary{padding:13px;border-radius:13px;background:#f7f9fc}.wallet-summary strong{font-size:17px}.wallet-gold{color:var(--w-gold)}.wallet-withdraw-card{background:linear-gradient(145deg,#fff,#f7faff);border-color:#dce7f2}.wallet-withdraw-card h2 i{color:#2869a8}.wallet-withdraw-card #withdrawForm{max-width:760px}.wallet-withdraw-card .wallet-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wallet-withdraw-card #withdrawForm>button[type=submit]{background:linear-gradient(135deg,#174b7e,#367fc0)}.wallet-withdraw-card .wallet-status{background:#eaf3fc;color:#245b96}
-@media(max-width:820px){.wallet-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.wallet-form-grid{grid-template-columns:1fr}.wallet-page{margin:24px auto;padding:0 13px 42px}.wallet-grid{grid-template-columns:1fr;gap:12px}.wallet-wide{grid-column:auto}.wallet-card{padding:17px;border-radius:17px}.wallet-form-grid{grid-template-columns:1fr}.wallet-form-grid .full{grid-column:auto}.wallet-row{gap:8px}.wallet-amount{font-size:28px}}
-.wallet-pagination{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px}.wallet-pagination button{min-height:36px;padding:7px 12px}.wallet-history .wallet-row{gap:14px}.wallet-status.pending{background:#f1f5f9;color:#52677d}.wallet-status.processing{background:#fff4d6;color:#956300}.wallet-status.success{background:#e6f7ee;color:#147a50}.wallet-status.rejected{background:#fff0ef;color:#b42318}.wallet-deposit-options{display:flex;flex-wrap:wrap;gap:8px}.wallet-page .wallet-form select{width:100%}
-</style><link rel="stylesheet" href="/css/wallet-premium.css?v=20261121-wallet-withdraw-v4">
+<link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css">
+<link rel="stylesheet" href="/css/social-posts.css?v=20261120-posts-premium-v3">
+<link rel="stylesheet" href="/css/wallet-premium.css?v=20261122-wallet-posts-sql-fix">
 </head>
-<body><div data-component="navbar"></div>
-<main class="wallet-page">
- <header class="wallet-hero"><span class="wallet-kicker">BOXCELLINK · FINANCIAL CENTER</span><h1>Wallet & Penghasilan</h1><p class="wallet-muted">Kelola saldo deposit, penghasilan affiliate, rekening pencairan, dan seluruh transaksi dalam satu tempat.</p></header>
- <div class="wallet-grid">
-  <section class="wallet-card"><h2><i class="fa-solid fa-wallet"></i> Saldo Deposit</h2><div id="depositBalance" class="wallet-amount">Rp 0</div><p class="wallet-muted">Saldo untuk membeli VIP, Group VIP Telegram, dan media premium. Pembelian eligible melalui saldo deposit mendapat diskon 20%.</p><form id="topupForm" class="wallet-form"><label>Nominal deposit<select name="amount" required><option value="">Pilih nominal deposit</option><option value="10000">Rp 10.000</option><option value="20000">Rp 20.000</option><option value="30000">Rp 30.000</option><option value="40000">Rp 40.000</option><option value="50000">Rp 50.000</option><option value="60000">Rp 60.000</option><option value="70000">Rp 70.000</option><option value="80000">Rp 80.000</option><option value="90000">Rp 90.000</option><option value="100000">Rp 100.000</option></select></label><button type="submit"><i class="fa-solid fa-qrcode"></i> Lanjut ke pembayaran QRIS</button></form></section>
-  <section class="wallet-card"><h2><i class="fa-solid fa-chart-line"></i> Saldo Afiliasi</h2><div id="affiliateBalance" class="wallet-amount">Rp 0</div><p id="affiliateState" class="wallet-muted">Saldo komisi afiliasi.</p><div class="wallet-note">Saldo afiliasi dapat digunakan untuk pembelian di BoxCellink dan dapat dicairkan melalui halaman Withdraw.</div></section>
-  <section class="wallet-card wallet-wide"><h2>Pengajuan Affiliate</h2><p class="wallet-muted">Lengkapi identitas, alamat domisili, dan rekening tujuan. Formulir akan menampilkan pilihan sesuai metode pencairan.</p>
-   <form id="affiliateForm" class="wallet-form">
-    <div class="wallet-form-grid"><label>Nama lengkap<input name="full_name" required minlength="3" autocomplete="name"></label><label>Nomor WhatsApp (opsional)<input name="phone" inputmode="tel" placeholder="08xxxxxxxxxx"></label><label>Jenis rekening<select name="payout_method" id="applicationMethod"><option value="bank">Bank</option><option value="ewallet">E-wallet</option></select></label></div>
-    <details class="wallet-address"><summary><i class="fa-solid fa-location-dot"></i> Isi alamat domisili lengkap</summary><div class="wallet-address-fields wallet-form-grid"><label>Desa / Kelurahan<input name="village" required></label><label>Kecamatan<input name="district" required></label><label>Kabupaten / Kota<input name="regency" required></label><label>Provinsi<input name="province" required></label></div></details>
-    <div class="wallet-form-grid"><label id="applicationProviderWrap">Nama bank<select name="provider" id="applicationProvider" required></select></label><label id="applicationCustomWrap" hidden>Nama bank / e-wallet lainnya<input name="custom_provider" id="applicationCustom" placeholder="Masukkan nama penyedia"></label><label>Nomor rekening / e-wallet<input name="account_number" required minlength="5" inputmode="numeric"></label><label>Atas nama rekening<input name="account_holder" required minlength="3"></label></div>
-    <div class="wallet-form-grid"><label>Telegram (opsional)<input name="telegram" placeholder="@username atau URL"></label><label>YouTube (opsional)<input name="youtube" placeholder="URL channel"></label><label>Facebook / Instagram (opsional)<input name="facebook" placeholder="URL profil"></label></div>
-    <button type="submit">Kirim pengajuan affiliate</button><small id="affiliateMessage" class="wallet-muted" role="status"></small>
-   </form><div id="affiliateLinkBox" hidden style="margin-top:18px"><h3><i class="fa-solid fa-share-nodes wallet-gold"></i> Link Share to Earn</h3><div class="wallet-inline"><input id="affiliateLink" readonly style="flex:1;min-width:0;padding:11px;border:1px solid var(--w-line);border-radius:10px"><button class="wallet-btn secondary" id="copyAffiliateLink" type="button">Salin link</button></div></div>
-  </section>
-  <section class="wallet-card wallet-wide"><div class="wallet-inline" style="justify-content:space-between"><h2><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Withdraw</h2><div class="wallet-muted">Total berhasil: <b id="totalWithdrawn">Rp 0</b></div></div><div id="withdrawHistory" class="wallet-history">Memuat riwayat...</div><div class="wallet-pagination" id="withdrawPagination" hidden><button type="button" id="withdrawPrev" class="wallet-btn secondary"> <i class="fa-solid fa-chevron-left"></i> </button><span id="withdrawPageLabel">1 / 1</span><button type="button" id="withdrawNext" class="wallet-btn secondary"><i class="fa-solid fa-chevron-right"></i></button></div><a class="wallet-btn" href="/withdraw.html" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;margin-top:14px"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka halaman Withdraw</a></section>
- </div>
-</main><div data-component="footer"></div>
-<script src="/components.js?v=20261116-addmenu-fix"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="/js/config.js"></script><script src="/js/wallet.js"></script>
-<script src="/js/page-i18n.js"></script></body></html>
+<body>
+<div data-component="navbar"></div>
+<main class="bc-social-main wallet-page">
+ <section class="bc-social-page-head wallet-page-head">
+  <div class="wallet-head-icon"><i class="fa-solid fa-wallet"></i></div>
+  <div class="wallet-head-copy">
+   <span class="bc-social-eyebrow" data-w-i18n="eyebrow">BOXCELLINK FINANCIAL CENTER</span>
+   <h1 data-w-i18n="title">Saldo &amp; Wallet</h1>
+   <p data-w-i18n="intro">Pantau saldo deposit, penghasilan affiliate, dan semua aktivitas keuangan akunmu.</p>
+  </div>
+  <span class="wallet-live"><i class="fa-solid fa-circle"></i><span data-w-i18n="live">Wallet aktif</span></span>
+ </section>
+
+ <section class="wallet-balance-grid" aria-label="Ringkasan saldo">
+  <article class="wallet-card wallet-balance-card wallet-deposit-card">
+   <div class="wallet-card-top"><span class="wallet-icon"><i class="fa-solid fa-wallet"></i></span><span class="wallet-chip" data-w-i18n="depositLabel">SALDO DEPOSIT</span></div>
+   <div id="depositBalance" class="wallet-amount">Rp 0</div>
+   <p data-w-i18n="depositDesc">Untuk pembelian VIP, Group VIP Telegram, dan media premium.</p>
+   <span class="wallet-footnote"><i class="fa-solid fa-circle-info"></i><span data-w-i18n="depositFoot">Saldo deposit terpisah dari saldo yang dapat ditarik.</span></span>
+  </article>
+  <article class="wallet-card wallet-balance-card wallet-affiliate-card">
+   <div class="wallet-card-top"><span class="wallet-icon"><i class="fa-solid fa-chart-line"></i></span><span class="wallet-chip" data-w-i18n="affiliateLabel">SALDO AFILIASI</span></div>
+   <div id="affiliateBalance" class="wallet-amount">Rp 0</div>
+   <p id="affiliateState" data-w-i18n="affiliateDesc">Komisi dan bonus dari aktivitas affiliate.</p>
+   <a class="wallet-inline-link" href="/withdraw.html"><span data-w-i18n="withdrawLink">Lihat penarikan</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+  </article>
+ </section>
+
+ <section class="wallet-card wallet-topup-card">
+  <div class="wallet-section-heading"><span class="wallet-section-icon"><i class="fa-solid fa-qrcode"></i></span><div><h2 data-w-i18n="topupTitle">Top Up Saldo</h2><p data-w-i18n="topupDesc">Tambah saldo deposit melalui pembayaran QRIS.</p></div></div>
+  <form id="topupForm" class="wallet-topup-form">
+   <label for="topupAmount" data-w-i18n="topupAmount">Pilih nominal top up</label>
+   <div class="wallet-topup-controls">
+    <select id="topupAmount" name="amount" required>
+     <option value="" data-w-i18n="chooseAmount">Pilih nominal</option>
+     <option value="10000">Rp 10.000</option><option value="20000">Rp 20.000</option><option value="30000">Rp 30.000</option>
+     <option value="40000">Rp 40.000</option><option value="50000">Rp 50.000</option><option value="60000">Rp 60.000</option>
+     <option value="70000">Rp 70.000</option><option value="80000">Rp 80.000</option><option value="90000">Rp 90.000</option><option value="100000">Rp 100.000</option>
+    </select>
+    <button type="submit" id="topupSubmit"><i class="fa-solid fa-qrcode"></i><span data-w-i18n="payQRIS">Lanjut ke pembayaran QRIS</span></button>
+   </div>
+   <small class="wallet-form-hint" data-w-i18n="topupHint">Nominal top up tersedia mulai Rp10.000. Pembayaran diproses melalui Cashi.</small>
+  </form>
+ </section>
+
+ <section class="wallet-card wallet-application-card" id="affiliateApplicationSection">
+  <div class="wallet-section-heading"><span class="wallet-section-icon"><i class="fa-solid fa-user-plus"></i></span><div><h2 data-w-i18n="applicationTitle">Program Affiliate</h2><p data-w-i18n="applicationDesc">Ajukan keanggotaan affiliate untuk mulai mendapatkan komisi.</p></div></div>
+  <div id="affiliateStatusPanel" class="wallet-status-panel" hidden></div>
+  <form id="affiliateForm" class="wallet-form">
+   <div class="wallet-form-grid">
+    <label><span data-w-i18n="fullName">Nama lengkap</span><input name="full_name" required minlength="3" autocomplete="name" data-w-i18n-placeholder="fullNamePlaceholder" placeholder="Nama sesuai identitas"></label>
+    <label><span data-w-i18n="phone">Nomor WhatsApp (opsional)</span><input name="phone" inputmode="tel" data-w-i18n-placeholder="whatsappPlaceholder" placeholder="08xxxxxxxxxx"></label>
+    <label><span data-w-i18n="payoutType">Jenis rekening</span><select name="payout_method" id="applicationMethod"><option value="bank" data-w-i18n="bank">Bank</option><option value="ewallet" data-w-i18n="ewallet">E-wallet</option></select></label>
+   </div>
+   <details class="wallet-address"><summary><i class="fa-solid fa-location-dot"></i><span data-w-i18n="addressDetails">Isi alamat domisili lengkap</span></summary>
+    <div class="wallet-address-fields wallet-form-grid">
+     <label><span data-w-i18n="village">Desa / Kelurahan</span><input name="village" required></label>
+     <label><span data-w-i18n="district">Kecamatan</span><input name="district" required></label>
+     <label><span data-w-i18n="regency">Kabupaten / Kota</span><input name="regency" required></label>
+     <label><span data-w-i18n="province">Provinsi</span><input name="province" required></label>
+    </div>
+   </details>
+   <div class="wallet-form-grid">
+    <label id="applicationProviderWrap"><span data-w-i18n="provider">Nama bank</span><select name="provider" id="applicationProvider" required></select></label>
+    <label id="applicationCustomWrap" hidden><span data-w-i18n="otherProvider">Nama bank / e-wallet lainnya</span><input name="custom_provider" id="applicationCustom" placeholder="Masukkan nama penyedia"></label>
+    <label><span data-w-i18n="accountNumber">Nomor rekening / e-wallet</span><input name="account_number" required minlength="5" inputmode="numeric"></label>
+    <label><span data-w-i18n="accountHolder">Atas nama rekening</span><input name="account_holder" required minlength="3"></label>
+   </div>
+   <div class="wallet-form-grid">
+    <label><span>Telegram (opsional)</span><input name="telegram" data-w-i18n-placeholder="telegramPlaceholder" placeholder="@username atau URL"></label>
+    <label><span>YouTube (opsional)</span><input name="youtube" data-w-i18n-placeholder="youtubePlaceholder" placeholder="URL channel"></label>
+    <label><span>Facebook / Instagram (opsional)</span><input name="facebook" data-w-i18n-placeholder="socialPlaceholder" placeholder="URL profil"></label>
+   </div>
+   <button type="submit" class="wallet-primary-btn" id="affiliateSubmit"><i class="fa-solid fa-paper-plane"></i><span data-w-i18n="submitApplication">Kirim pengajuan affiliate</span></button>
+   <small id="affiliateMessage" class="wallet-form-message" role="status" aria-live="polite"></small>
+  </form>
+  <div id="affiliateLinkBox" class="wallet-referral-box" hidden>
+   <div><strong data-w-i18n="shareEarn">Link Share to Earn</strong><p data-w-i18n="shareEarnDesc">Bagikan link referral untuk mengundang pengguna baru.</p></div>
+   <div class="wallet-copy-row"><input id="affiliateLink" readonly aria-label="Affiliate referral link"><button class="wallet-secondary-btn" id="copyAffiliateLink" type="button"><i class="fa-regular fa-copy"></i><span data-w-i18n="copyLink">Salin link</span></button></div>
+  </div>
+ </section>
+
+ <section class="wallet-card wallet-history-card">
+  <div class="wallet-section-heading"><span class="wallet-section-icon"><i class="fa-solid fa-arrow-right-arrow-left"></i></span><div><h2 data-w-i18n="transactionTitle">Riwayat Transaksi Saldo</h2><p data-w-i18n="transactionDesc">Catatan top up, komisi, pembelian, dan perubahan saldo.</p></div></div>
+  <div id="walletLedgerHistory" class="wallet-history-list" aria-live="polite"><div class="wallet-empty"><i class="fa-solid fa-spinner fa-spin"></i><span data-w-i18n="loading">Memuat data...</span></div></div>
+  <div class="wallet-pagination" id="ledgerPagination" hidden><button type="button" id="ledgerPrev" class="wallet-secondary-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left"></i></button><span id="ledgerPageLabel">1 / 1</span><button type="button" id="ledgerNext" class="wallet-secondary-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right"></i></button></div>
+ </section>
+
+ <section class="wallet-card wallet-history-card">
+  <div class="wallet-history-heading"><div class="wallet-section-heading"><span class="wallet-section-icon"><i class="fa-solid fa-clock-rotate-left"></i></span><div><h2 data-w-i18n="withdrawHistory">Riwayat Withdraw</h2><p data-w-i18n="withdrawHistoryDesc">Pantau status permintaan penarikan saldo.</p></div></div><div class="wallet-withdraw-total"><small data-w-i18n="totalSuccessful">Total berhasil</small><strong id="totalWithdrawn">Rp 0</strong></div></div>
+  <div id="withdrawHistoryList" class="wallet-history-list" aria-live="polite"><div class="wallet-empty"><i class="fa-solid fa-spinner fa-spin"></i><span data-w-i18n="loading">Memuat data...</span></div></div>
+  <div class="wallet-pagination" id="withdrawPagination" hidden><button type="button" id="withdrawPrev" class="wallet-secondary-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left"></i></button><span id="withdrawPageLabel">1 / 1</span><button type="button" id="withdrawNext" class="wallet-secondary-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right"></i></button></div>
+  <a class="wallet-withdraw-link" href="/withdraw.html"><span data-w-i18n="openWithdraw">Buka halaman Withdraw</span><i class="fa-solid fa-arrow-right"></i></a>
+ </section>
+</main>
+<div data-component="footer"></div>
+<script src="/components.js?v=20261116-addmenu-fix"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/js/config.js"></script>
+<script src="/js/wallet.js?v=20261122-wallet-posts-sql-fix"></script>
+<script src="/js/page-i18n.js"></script>
+</body></html>
