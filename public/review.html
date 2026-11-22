@@ -1,1 +1,49 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Watch Review — BoxCellink</title><link rel="stylesheet" href="css/review.css"><link rel="stylesheet" href="/css/shared.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link rel="stylesheet" href="/css/navbar.css"><link rel="stylesheet" href="/css/footer.css"></head><body><div data-component="navbar"></div><main class="container"><section class="watch-card"><span class="eyebrow">REVIEW & DOWNLOAD</span><h1>Watch Review</h1><p>Galeri gambar, deskripsi, dan download konten.</p></section><section id="reviewGrid" class="video-grid">Memuat review...</section><div id="reviewPagination" class="pagination"></div></main><div data-component="footer"></div><script src="components.js?v=20261116-addmenu-fix"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="js/config.js"></script><script src="js/embed-support.js"></script><script src="js/review.js"></script><script src="js/page-i18n.js"></script><script src="/js/community-links-config.js?v=20261118-2"></script><script src="/js/page-community-notice.js?v=20261118-2"></script></body></html>
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f6f8fc">
+  <title>Review Media — BoxCellink</title>
+  <link rel="stylesheet" href="/css/review.css">
+  <link rel="stylesheet" href="/css/shared.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/navbar.css">
+  <link rel="stylesheet" href="/css/footer.css">
+</head>
+<body>
+  <div data-component="navbar"></div>
+  <main class="container review-catalog-page">
+    <section class="review-catalog-hero">
+      <span class="review-catalog-eyebrow"><i class="fa-solid fa-layer-group"></i> BOXCELLINK MEDIA</span>
+      <h1 id="reviewCatalogTitle">Review Media Telegram</h1>
+      <p id="reviewCatalogDescription">Baca informasi, lihat pratinjau media, dan periksa harga akses sebelum melanjutkan.</p>
+      <div class="review-catalog-search-wrap">
+        <label class="review-catalog-search" for="reviewCatalogSearch">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input id="reviewCatalogSearch" type="search" maxlength="80" autocomplete="off" placeholder="Cari judul atau deskripsi review...">
+          <button id="reviewCatalogClear" type="button" aria-label="Hapus pencarian" hidden><i class="fa-solid fa-xmark"></i></button>
+        </label>
+        <small id="reviewCatalogSearchHint">Cari berdasarkan judul atau deskripsi review yang dipublikasikan.</small>
+      </div>
+    </section>
+    <section class="review-catalog-results" aria-label="Daftar review media">
+      <div class="review-catalog-section-head">
+        <div><h2 id="reviewCatalogListTitle">Daftar Review</h2><p id="reviewCatalogCount" aria-live="polite">Memuat review...</p></div>
+        <span class="review-catalog-section-icon"><i class="fa-solid fa-photo-film"></i></span>
+      </div>
+      <section id="reviewGrid" class="video-grid review-catalog-grid" aria-live="polite" aria-busy="true"></section>
+      <div id="reviewPagination" class="pagination" aria-label="Halaman review"></div>
+    </section>
+  </main>
+  <div data-component="footer"></div>
+  <script src="/components.js?v=20261122-review-media"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/embed-support.js"></script>
+  <script src="/js/review.js?v=20261122-review-catalog-fix"></script>
+  <script src="/js/page-i18n.js"></script>
+  <script src="/js/community-links-config.js?v=20261118-2"></script>
+  <script src="/js/page-community-notice.js?v=20261118-2"></script>
+</body>
+</html>
