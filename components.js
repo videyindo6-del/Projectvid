@@ -17,7 +17,7 @@ function isPublicRoute(){
   const page=currentPage();
   const path=(location.pathname||'/').toLowerCase();
   const publicPages=new Set([
-    'index','login','register','forgot-password','watch','review','review-detail','telegram','book-video','nokos','vip','vip-groups','posts','member-profile','go','task1','task2','task3','final','endorse'
+    'index','login','register','forgot-password','help-chat','watch','review','review-detail','telegram','book-video','nokos','vip','vip-groups','posts','member-profile','go','task1','task2','task3','final','endorse'
   ]);
   return publicPages.has(page)||path.startsWith('/v/')||path.startsWith('/r/')||path.startsWith('/x/');
 }
