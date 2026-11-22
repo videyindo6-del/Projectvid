@@ -1,237 +1,215 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f7f8fc">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="#f7f8fc" name="theme-color"/>
 <title>Akun Saya — BoxCellink</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-<link rel="stylesheet" href="css/shared.css">
-<link rel="stylesheet" href="css/member-pages.css">
-<link rel="stylesheet" href="css/upgrade-pages.css">
-<link rel="stylesheet" href="css/account-premium.css?v=20261121-account-premium-v3">
-<link rel="stylesheet" href="css/account-studio.css?v=20261122-account-studio-v1">
-<link rel="stylesheet" href="/css/navbar.css">
-<link rel="stylesheet" href="/css/footer.css"></head>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet"/>
+<link href="css/shared.css" rel="stylesheet"/>
+<link href="css/member-pages.css" rel="stylesheet"/>
+<link href="css/upgrade-pages.css" rel="stylesheet"/>
+<link href="css/account-premium.css?v=20261121-account-premium-v3" rel="stylesheet"/>
+<link href="css/account-studio.css?v=20261122-account-studio-v2" rel="stylesheet"/>
+<link href="/css/navbar.css" rel="stylesheet"/>
+<link href="/css/footer.css" rel="stylesheet"/></head>
 <body>
 <div data-component="navbar"></div>
-<main class="page account-page">
-  <section class="account-hero">
-    <div class="account-hero-copy">
-      <span class="account-kicker"><i class="fa-solid fa-grid-2"></i> BOXCELLINK / ACCOUNT CENTER</span>
-      <h1 data-account-i18n="hero_title">Akun Saya</h1>
-      <p data-account-i18n="hero_desc">Kelola profil, keamanan akun, membership, dan seluruh media yang sudah kamu beli dalam satu tempat.</p>
-      <div class="account-hero-meta">
-        <span data-account-i18n="secure_label"><i class="fa-solid fa-shield-halved"></i> Secure account</span>
-        <span data-account-i18n="instant_label"><i class="fa-solid fa-bolt"></i> Instant access</span>
-      </div>
-    </div>
-    <div class="account-hero-art" aria-hidden="true">
-      <div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
-      <div class="hero-glass"><i class="fa-solid fa-user-astronaut"></i></div>
-      <span class="hero-float float-check"><i class="fa-solid fa-check"></i></span>
-      <span class="hero-float float-lock"><i class="fa-solid fa-lock"></i></span>
-    </div>
-  </section>
-
-  <div id="accountNotice" class="account-notice" hidden></div>
-  <section class="account-overview" aria-label="Account overview">
-    <article class="overview-card overview-identity">
-      <span class="overview-icon"><i class="fa-solid fa-user"></i></span>
-      <div><small data-account-i18n="account">Akun</small><b id="accountName">Memuat...</b><span id="accountEmail" class="overview-muted">—</span></div>
-    </article>
-    <article class="overview-card">
-      <span class="overview-icon membership-icon"><i class="fa-solid fa-crown"></i></span>
-      <div><small data-account-i18n="membership">Membership</small><b id="accountStatus">Memeriksa status...</b><span class="overview-muted" data-account-i18n="membership_desc">Status akses akun saat ini</span></div>
-    </article>
-    <article class="overview-card">
-      <span class="overview-icon secure-icon"><i class="fa-solid fa-fingerprint"></i></span>
-      <div><small data-account-i18n="security">Keamanan</small><b data-account-i18n="protected">Akun terlindungi</b><span class="overview-muted" data-account-i18n="security_desc">Dikelola melalui Supabase Auth</span></div>
-    </article>
-  </section>
-
-  <nav class="account-history-shortcuts" aria-label="Purchase history shortcuts">
-    <a href="#mediaPurchaseSection" data-account-i18n="jump_media"><i class="fa-brands fa-telegram"></i> Histori Media Telegram</a>
-    <a href="#vipGroupPurchaseSection" data-account-i18n="jump_groups"><i class="fa-solid fa-users"></i> Histori Group VIP</a>
-    <a href="#vipPurchaseSection" data-account-i18n="jump_vip"><i class="fa-solid fa-crown"></i> Histori VIP</a>
-  </nav>
-  <section class="account-section account-profile-section">
-    <div class="section-heading">
-      <div><span class="section-eyebrow">PUBLIC PROFILE</span><h2 data-account-i18n="profile_title">Profil Publik</h2><p data-account-i18n="profile_desc">Atur username yang akan dikenali pengguna lain di BoxCellink.</p></div>
-      <span class="section-heading-icon"><i class="fa-solid fa-id-card"></i></span>
-    </div>
-    <article class="account-panel profile-editor-panel">
-      <div class="profile-public-preview">
-        <span class="profile-avatar" id="profileAvatar"><i class="fa-solid fa-user"></i></span>
-        <div><small data-account-i18n="public_identity">Identitas publik</small><b id="publicProfileName">Memuat profil...</b><span id="publicProfileUsername">@username</span></div>
-      </div>
-      <form id="usernameForm" class="account-form-grid">
-        <label for="publicUsername" data-account-i18n="username_label">Username publik</label>
-        <div class="username-input-wrap"><span>@</span><input id="publicUsername" type="text" minlength="3" maxlength="24" pattern="[A-Za-z0-9_.]+" autocomplete="username" placeholder="username" required></div>
-        <small class="account-field-hint" data-account-i18n="username_hint">3–24 karakter. Gunakan huruf, angka, titik, atau garis bawah.</small>
-        <button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="save_username">Simpan username</span></button>
-      </form>
-
-    </article>
-  </section>
-
-  <section class="account-section" id="socialProfileSection">
-    <div class="section-heading">
-      <div><span class="section-eyebrow" data-account-i18n="social_eyebrow">SOCIAL PROFILE</span><h2 data-account-i18n="social_title">Bio & tautan sosial</h2><p data-account-i18n="social_desc">Informasi ini akan terlihat pada halaman profil publikmu.</p></div>
-      <span class="section-heading-icon"><i class="fa-solid fa-share-nodes"></i></span>
-    </div>
-    <article class="account-panel social-profile-panel">
-      <form id="socialProfileForm" class="account-form-grid">
-        <div class="account-field">
-          <label for="profileBio" data-account-i18n="bio_label">Bio</label>
-          <textarea id="profileBio" maxlength="500" rows="4" data-account-placeholder="bio_placeholder" placeholder="Ceritakan sedikit tentang dirimu..."></textarea>
-          <small class="account-field-hint" data-account-i18n="bio_hint">Maksimal 500 karakter.</small>
-        </div>
-        <div class="social-fields-heading">
-          <span data-account-i18n="social_links_title">Tautan sosial</span>
-          <small data-account-i18n="social_links_hint">Opsional. Gunakan tautan lengkap yang diawali https://</small>
-        </div>
-        <div class="bc-social-links-editor">
-          <div class="account-field"><label for="socialInstagram" data-account-i18n="social_instagram">Instagram</label><input id="socialInstagram" type="url" inputmode="url" autocomplete="url" placeholder="https://instagram.com/username"></div>
-          <div class="account-field"><label for="socialFacebook" data-account-i18n="social_facebook">Facebook</label><input id="socialFacebook" type="url" inputmode="url" placeholder="https://facebook.com/username"></div>
-          <div class="account-field"><label for="socialYoutube" data-account-i18n="social_youtube">YouTube</label><input id="socialYoutube" type="url" inputmode="url" placeholder="https://youtube.com/@channel"></div>
-          <div class="account-field"><label for="socialTelegram" data-account-i18n="social_telegram">Telegram</label><input id="socialTelegram" type="url" inputmode="url" placeholder="https://t.me/username"></div>
-          <div class="account-field"><label for="socialWhatsapp" data-account-i18n="social_whatsapp">WhatsApp</label><input id="socialWhatsapp" type="url" inputmode="url" placeholder="https://wa.me/628123456789"></div>
-          <div class="account-field"><label for="socialX" data-account-i18n="social_x">X</label><input id="socialX" type="url" inputmode="url" placeholder="https://x.com/username"></div>
-          <div class="account-field"><label for="socialOther" data-account-i18n="social_other">Link lainnya</label><input id="socialOther" type="url" inputmode="url" placeholder="https://website.com"></div>
-        </div>
-        <button class="account-action social-save-button" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="social_save">Simpan bio & tautan sosial</span></button>
-      </form>
-    </article>
-  </section>
-
-  <section class="account-upgrade">
-    <div class="upgrade-copy"><span class="upgrade-kicker"><i class="fa-solid fa-crown"></i> BOXCELLINK VIP</span>
-      <h2 data-account-i18n="upgrade_title">Upgrade Status Account</h2>
-      <p data-account-i18n="upgrade_desc">Nikmati pengalaman BoxCellink yang lebih nyaman dengan status VIP.</p>
-      <ul><li data-account-i18n="benefit_no_ads">Nonton BoxVidey tanpa iklan</li><li data-account-i18n="benefit_discount">Diskon 20% untuk pembelian Review yang memenuhi syarat</li><li data-account-i18n="benefit_exclusive">Akses video khusus VIP selama masa aktif</li></ul>
-      <a class="account-action upgrade-button" href="/vip.html"><i class="fa-solid fa-arrow-up-right-from-square"></i><span data-account-i18n="upgrade_button">Upgrade ke VIP</span></a>
-    </div><div class="upgrade-emblem"><i class="fa-solid fa-crown"></i><span>VIP</span></div>
-  </section>
-
-
-
-  <section class="account-section payout-section" id="payoutAccountSection" hidden>
-    <div class="section-heading">
-      <div><span class="section-eyebrow" data-account-i18n="payout_eyebrow">WITHDRAWAL SETTINGS</span><h2 data-account-i18n="payout_title">Rekening Saya</h2><p data-account-i18n="payout_desc">Simpan rekening bank atau e-wallet untuk pencairan saldo.</p></div>
-      <span class="section-heading-icon"><i class="fa-solid fa-building-columns"></i></span>
-    </div>
-    <article class="account-panel payout-panel">
-      <div id="payoutEligibilityNote" class="payout-eligibility-note"><i class="fa-solid fa-shield-halved"></i><span data-account-i18n="payout_secure">Informasi rekening hanya digunakan untuk proses pencairan saldo.</span></div>
-      <div id="payoutSavedView" class="payout-saved-view" hidden></div>
-      <form id="payoutForm" class="account-form-grid">
-        <label for="payoutHolder" data-account-i18n="payout_holder">Nama pemilik rekening</label>
-        <input id="payoutHolder" type="text" minlength="3" maxlength="100" autocomplete="name" required placeholder="Nama sesuai rekening">
-        <label for="payoutMethod" data-account-i18n="payout_method">Jenis rekening</label>
-        <select id="payoutMethod" required><option value="bank">Bank</option><option value="ewallet">E-Wallet</option></select>
-        <label for="payoutProvider" data-account-i18n="payout_provider">Pilih bank / e-wallet</label>
-        <select id="payoutProvider" required><option value="">Pilih penyedia</option></select>
-        <div id="payoutCustomWrap" hidden><label for="payoutCustom" data-account-i18n="payout_other">Nama lainnya</label><input id="payoutCustom" type="text" maxlength="80" placeholder="Nama bank / e-wallet"></div>
-        <label for="payoutNumber" data-account-i18n="payout_number">Nomor rekening / e-wallet</label>
-        <input id="payoutNumber" type="text" inputmode="numeric" minlength="5" maxlength="40" required placeholder="Masukkan nomor rekening">
-        <button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="payout_save">Simpan rekening</span></button>
-      </form>
-      <small id="payoutMessage" class="account-field-hint" role="status"></small>
-    </article>
-  </section>
-
-  <section class="account-section">
-    <div class="section-heading">
-      <div><span class="section-eyebrow" data-account-i18n="personal_settings">PERSONAL SETTINGS</span><h2 data-account-i18n="account_settings">Pengaturan Akun</h2><p data-account-i18n="settings_desc">Perbarui informasi login dan jaga keamanan akunmu.</p></div>
-      <span class="section-heading-icon"><i class="fa-solid fa-sliders"></i></span>
-    </div>
-    <div class="account-grid">
-      <article class="account-panel">
-        <div class="panel-heading"><span class="panel-icon"><i class="fa-solid fa-envelope"></i></span><div><h3 data-account-i18n="change_email">Ganti Email</h3><p data-account-i18n="email_desc">Masukkan alamat email baru untuk akunmu.</p></div></div>
-        <div class="account-current-value"><small data-account-i18n="current_email">Email saat ini</small><b id="emailCurrentValue">—</b></div>
-        <form id="emailForm">
-          <label for="newEmail" data-account-i18n="new_email">Email baru</label>
-          <input id="newEmail" type="email" required autocomplete="email" placeholder="email-baru@gmail.com">
-          <button class="account-action" type="submit"><i class="fa-solid fa-envelope-circle-check"></i><span data-account-i18n="change_email_button">Simpan email baru</span></button>
-          <small data-account-i18n="email_hint">Email akun akan diperbarui setelah berhasil diproses.</small>
-        </form>
-      </article>
-      <article class="account-panel">
-        <div class="panel-heading"><span class="panel-icon password-icon"><i class="fa-solid fa-key"></i></span><div><h3 data-account-i18n="change_password">Ganti Kata Sandi</h3><p data-account-i18n="password_desc">Buat kata sandi baru untuk login berikutnya.</p></div></div>
-        <form id="passwordForm">
-          <small id="passwordModeHint" class="account-field-hint" data-account-i18n="password_mode_hint">Kamu dapat memperbarui kata sandi tanpa memasukkan kata sandi lama selama masih login.</small>
-          <label for="newPassword" data-account-i18n="new_password">Kata sandi baru</label>
-          <input id="newPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Minimal 8 karakter">
-          <label for="confirmPassword" data-account-i18n="confirm_password">Konfirmasi kata sandi baru</label>
-          <input id="confirmPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Ulangi kata sandi baru">
-          <button class="account-action" type="submit"><i class="fa-solid fa-shield-halved"></i><span data-account-i18n="update_password">Perbarui kata sandi</span></button>
-          <small data-account-i18n="password_hint">Minimal 8 karakter dan pastikan kedua kolom sama.</small>
-        </form>
-      </article>
-    </div>
-  </section>
-  <section class="account-section media-section" id="mediaPurchaseSection">
-    <div class="section-heading">
-      <div><span class="section-eyebrow" data-account-i18n="your_library">YOUR LIBRARY</span><h2><i class="fa-brands fa-telegram telegram-heading-icon"></i> <span data-account-i18n="telegram_media">Media Telegram Saya</span></h2><p data-account-i18n="library_desc">Semua review yang sudah berhasil kamu beli akan otomatis tersimpan di sini.</p></div>
-      <span class="library-count" id="purchaseCount">0 <span data-account-i18n="items">MEDIA</span></span>
-    </div>
-    <div class="account-reset-warning" data-account-i18n="media_reset_notice"><i class="fa-solid fa-clock"></i> Target masa simpan Review Media: 3 hari setelah pembayaran diproses. Penghapusan otomatis database belum diaktifkan.</div>
-    <div class="library-toolbar">
-      <span><i class="fa-solid fa-circle-check"></i> <span data-account-i18n="verified_purchases">Pembelian terverifikasi</span></span>
-      <span><i class="fa-solid fa-cloud-arrow-down"></i> <span data-account-i18n="access_anytime">Akses dari halaman akun</span></span>
-    </div>
-    <div id="purchaseLinks" class="purchase-list account-library" aria-live="polite">
-      <div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_library">Memuat media Telegram...</span></div>
-    </div>
-  </section>
-
-  <div id="groupPurchaseSuccess" class="group-purchase-success" hidden></div>
-
-  <section class="account-section">
-    <div class="section-heading">
-      <div><span class="section-eyebrow" data-account-i18n="recent_activity">RECENT ACTIVITY</span><h2><i class="fa-solid fa-clock-rotate-left"></i> <span data-account-i18n="watch_history">Riwayat Tonton</span></h2><p data-account-i18n="watch_desc">Lihat kembali video dan durasi tontonanmu.</p></div>
-      <label class="history-sort-label"><span data-account-i18n="sort_history">Urutkan</span><select id="watchHistorySort"><option value="recent">Terbaru ditonton</option><option value="oldest">Terlama ditonton</option><option value="duration">Durasi terpanjang</option></select></label>
-    </div>
-    <div id="watchHistory" class="purchase-list">
-      <div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_history">Memuat riwayat tontonan...</span></div>
-    </div>
-  </section>
-
-  <section class="account-section" id="vipPurchaseSection">
-    <div class="section-heading">
-      <div><span class="section-eyebrow" data-account-i18n="vip_history_eyebrow">PURCHASE HISTORY</span><h2><i class="fa-solid fa-crown"></i> <span data-account-i18n="vip_history_title">Histori Pembelian VIP</span></h2><p data-account-i18n="vip_history_desc">Riwayat transaksi VIP tetap tersimpan meskipun link undangan sudah kedaluwarsa.</p></div>
-    <div class="account-reset-warning" data-account-i18n="vip_expiry_notice"><i class="fa-solid fa-clock"></i> Status VIP otomatis berakhir saat masa aktif habis. Histori transaksi tetap tersimpan.</div>
-    </div>
-    <div id="vipPurchaseHistory" class="purchase-list"><div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_vip_history">Memuat histori pembelian VIP...</span></div></div>
-  </section>
-
-  <section class="account-section" id="vipGroupPurchaseSection">
-    <div class="section-heading">
-      <div><span class="section-eyebrow" data-account-i18n="exclusive_access">EXCLUSIVE ACCESS</span><h2><i class="fa-brands fa-telegram telegram-heading-icon"></i> <span data-account-i18n="vip_groups">Group VIP Telegram</span></h2><p data-account-i18n="groups_desc">Kelola undangan group VIP yang sudah kamu beli.</p></div>
-    </div>
-    <div class="account-reset-warning" data-account-i18n="group_reset_notice"><i class="fa-solid fa-clock"></i> Link undangan Group VIP berlaku 24 jam. Histori transaksi tidak otomatis dihapus oleh UI ini.</div>
-    <div id="groupLinks" class="purchase-list"><div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_groups">Memuat akses group...</span></div></div>
-  </section>
-  <section class="account-section account-security-section">
-    <div class="section-heading">
-      <div><span class="section-eyebrow" data-account-i18n="security_eyebrow">ACCOUNT SECURITY</span><h2 data-account-i18n="login_devices">Perangkat Login</h2><p data-account-i18n="login_devices_desc">Periksa browser dan perangkat yang pernah digunakan untuk masuk ke akun ini.</p></div>
-      <span class="section-heading-icon"><i class="fa-solid fa-shield-halved"></i></span>
-    </div>
-    <article class="account-panel">
-      <div id="loginDevices" class="login-device-list"><div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_devices">Memuat perangkat...</span></div></div>
-      <div class="security-actions">
-        <button id="signOutOtherDevices" class="account-action secondary-action" type="button"><i class="fa-solid fa-laptop-slash"></i><span data-account-i18n="signout_others">Keluar dari perangkat lain</span></button>
-        <button id="signOutCurrent" class="account-action danger-action" type="button"><i class="fa-solid fa-right-from-bracket"></i><span data-account-i18n="signout_current">Keluar dari akun ini</span></button>
-      </div>
-      <small class="account-field-hint" data-account-i18n="security_note">Jika ada perangkat yang tidak kamu kenali, keluarkan semua sesi lain lalu segera ganti kata sandi.</small>
-    </article>
-  </section>
-</main>
+<main class="page account-page"><section class="account-hero">
+<div class="account-hero-copy">
+<span class="account-kicker"><i class="fa-solid fa-grid-2"></i> BOXCELLINK / ACCOUNT CENTER</span>
+<h1 data-account-i18n="hero_title">Akun Saya</h1>
+<p data-account-i18n="hero_desc">Kelola profil, keamanan akun, membership, dan seluruh media yang sudah kamu beli dalam satu tempat.</p>
+<div class="account-hero-meta">
+<span data-account-i18n="secure_label"><i class="fa-solid fa-shield-halved"></i> Secure account</span>
+<span data-account-i18n="instant_label"><i class="fa-solid fa-bolt"></i> Instant access</span>
+</div>
+</div>
+<div aria-hidden="true" class="account-hero-art">
+<div class="hero-orbit orbit-one"></div><div class="hero-orbit orbit-two"></div>
+<div class="hero-glass"><i class="fa-solid fa-user-astronaut"></i></div>
+<span class="hero-float float-check"><i class="fa-solid fa-check"></i></span>
+<span class="hero-float float-lock"><i class="fa-solid fa-lock"></i></span>
+</div>
+</section><div class="account-notice" hidden="" id="accountNotice"></div><section aria-label="Account overview" class="account-overview">
+<article class="overview-card overview-identity">
+<span class="overview-icon"><i class="fa-solid fa-user"></i></span>
+<div><small data-account-i18n="account">Akun</small><b id="accountName">Memuat...</b><span class="overview-muted" id="accountEmail">—</span></div>
+</article>
+<article class="overview-card">
+<span class="overview-icon membership-icon"><i class="fa-solid fa-crown"></i></span>
+<div><small data-account-i18n="membership">Membership</small><b id="accountStatus">Memeriksa status...</b><span class="overview-muted" data-account-i18n="membership_desc">Status akses akun saat ini</span></div>
+</article>
+<article class="overview-card">
+<span class="overview-icon secure-icon"><i class="fa-solid fa-fingerprint"></i></span>
+<div><small data-account-i18n="security">Keamanan</small><b data-account-i18n="protected">Akun terlindungi</b><span class="overview-muted" data-account-i18n="security_desc">Dikelola melalui Supabase Auth</span></div>
+</article>
+</section><nav aria-label="Purchase history shortcuts" class="account-history-shortcuts">
+<a data-account-i18n="jump_media" href="#mediaPurchaseSection"><i class="fa-brands fa-telegram"></i> Histori Media Telegram</a>
+<a data-account-i18n="jump_groups" href="#vipGroupPurchaseSection"><i class="fa-solid fa-users"></i> Histori Group VIP</a>
+<a data-account-i18n="jump_vip" href="#vipPurchaseSection"><i class="fa-solid fa-crown"></i> Histori VIP</a>
+</nav><section class="account-section account-profile-section">
+<div class="section-heading">
+<div><span class="section-eyebrow">PUBLIC PROFILE</span><h2 data-account-i18n="profile_title">Profil Publik</h2><p data-account-i18n="profile_desc">Atur username yang akan dikenali pengguna lain di BoxCellink.</p></div>
+<span class="section-heading-icon"><i class="fa-solid fa-id-card"></i></span>
+</div>
+<article class="account-panel profile-editor-panel">
+<div class="profile-public-preview">
+<span class="profile-avatar" id="profileAvatar"><i class="fa-solid fa-user"></i></span>
+<div><small data-account-i18n="public_identity">Identitas publik</small><b id="publicProfileName">Memuat profil...</b><span id="publicProfileUsername">@username</span></div>
+</div>
+<form class="account-form-grid" id="usernameForm">
+<label data-account-i18n="username_label" for="publicUsername">Username publik</label>
+<div class="username-input-wrap"><span>@</span><input autocomplete="username" id="publicUsername" maxlength="24" minlength="3" pattern="[A-Za-z0-9_.]+" placeholder="username" required="" type="text"/></div>
+<small class="account-field-hint" data-account-i18n="username_hint">3–24 karakter. Gunakan huruf, angka, titik, atau garis bawah.</small>
+<button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="save_username">Simpan username</span></button>
+</form>
+</article>
+</section><section class="account-section" id="socialProfileSection">
+<div class="section-heading">
+<div><span class="section-eyebrow" data-account-i18n="social_eyebrow">SOCIAL PROFILE</span><h2 data-account-i18n="social_title">Bio &amp; tautan sosial</h2><p data-account-i18n="social_desc">Informasi ini akan terlihat pada halaman profil publikmu.</p></div>
+<span class="section-heading-icon"><i class="fa-solid fa-share-nodes"></i></span>
+</div>
+<article class="account-panel social-profile-panel">
+<form class="account-form-grid" id="socialProfileForm">
+<div class="account-field">
+<label data-account-i18n="bio_label" for="profileBio">Bio</label>
+<textarea data-account-placeholder="bio_placeholder" id="profileBio" maxlength="500" placeholder="Ceritakan sedikit tentang dirimu..." rows="4"></textarea>
+<small class="account-field-hint" data-account-i18n="bio_hint">Maksimal 500 karakter.</small>
+</div>
+<div class="social-fields-heading">
+<span data-account-i18n="social_links_title">Tautan sosial</span>
+<small data-account-i18n="social_links_hint">Opsional. Gunakan tautan lengkap yang diawali https://</small>
+</div>
+<div class="bc-social-links-editor">
+<div class="account-field"><label data-account-i18n="social_instagram" for="socialInstagram">Instagram</label><input autocomplete="url" id="socialInstagram" inputmode="url" placeholder="https://instagram.com/username" type="url"/></div>
+<div class="account-field"><label data-account-i18n="social_facebook" for="socialFacebook">Facebook</label><input id="socialFacebook" inputmode="url" placeholder="https://facebook.com/username" type="url"/></div>
+<div class="account-field"><label data-account-i18n="social_youtube" for="socialYoutube">YouTube</label><input id="socialYoutube" inputmode="url" placeholder="https://youtube.com/@channel" type="url"/></div>
+<div class="account-field"><label data-account-i18n="social_telegram" for="socialTelegram">Telegram</label><input id="socialTelegram" inputmode="url" placeholder="https://t.me/username" type="url"/></div>
+<div class="account-field"><label data-account-i18n="social_whatsapp" for="socialWhatsapp">WhatsApp</label><input id="socialWhatsapp" inputmode="url" placeholder="https://wa.me/628123456789" type="url"/></div>
+<div class="account-field"><label data-account-i18n="social_x" for="socialX">X</label><input id="socialX" inputmode="url" placeholder="https://x.com/username" type="url"/></div>
+<div class="account-field"><label data-account-i18n="social_other" for="socialOther">Link lainnya</label><input id="socialOther" inputmode="url" placeholder="https://website.com" type="url"/></div>
+</div>
+<button class="account-action social-save-button" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="social_save">Simpan bio &amp; tautan sosial</span></button>
+</form>
+</article>
+</section><section class="account-section">
+<div class="section-heading">
+<div><span class="section-eyebrow" data-account-i18n="personal_settings">PERSONAL SETTINGS</span><h2 data-account-i18n="account_settings">Pengaturan Akun</h2><p data-account-i18n="settings_desc">Perbarui informasi login dan jaga keamanan akunmu.</p></div>
+<span class="section-heading-icon"><i class="fa-solid fa-sliders"></i></span>
+</div>
+<div class="account-grid">
+<article class="account-panel">
+<div class="panel-heading"><span class="panel-icon"><i class="fa-solid fa-envelope"></i></span><div><h3 data-account-i18n="change_email">Ganti Email</h3><p data-account-i18n="email_desc">Masukkan alamat email baru untuk akunmu.</p></div></div>
+<div class="account-current-value"><small data-account-i18n="current_email">Email saat ini</small><b id="emailCurrentValue">—</b></div>
+<form id="emailForm">
+<label data-account-i18n="new_email" for="newEmail">Email baru</label>
+<input autocomplete="email" id="newEmail" placeholder="email-baru@gmail.com" required="" type="email"/>
+<button class="account-action" type="submit"><i class="fa-solid fa-envelope-circle-check"></i><span data-account-i18n="change_email_button">Simpan email baru</span></button>
+<small data-account-i18n="email_hint">Email akun akan diperbarui setelah berhasil diproses.</small>
+</form>
+</article>
+<article class="account-panel">
+<div class="panel-heading"><span class="panel-icon password-icon"><i class="fa-solid fa-key"></i></span><div><h3 data-account-i18n="change_password">Ganti Kata Sandi</h3><p data-account-i18n="password_desc">Buat kata sandi baru untuk login berikutnya.</p></div></div>
+<form id="passwordForm">
+<small class="account-field-hint" data-account-i18n="password_mode_hint" id="passwordModeHint">Kamu dapat memperbarui kata sandi tanpa memasukkan kata sandi lama selama masih login.</small>
+<label data-account-i18n="new_password" for="newPassword">Kata sandi baru</label>
+<input autocomplete="new-password" id="newPassword" minlength="8" placeholder="Minimal 8 karakter" required="" type="password"/>
+<label data-account-i18n="confirm_password" for="confirmPassword">Konfirmasi kata sandi baru</label>
+<input autocomplete="new-password" id="confirmPassword" minlength="8" placeholder="Ulangi kata sandi baru" required="" type="password"/>
+<button class="account-action" type="submit"><i class="fa-solid fa-shield-halved"></i><span data-account-i18n="update_password">Perbarui kata sandi</span></button>
+<small data-account-i18n="password_hint">Minimal 8 karakter dan pastikan kedua kolom sama.</small>
+</form>
+</article>
+</div>
+</section><section class="account-section payout-section" hidden="" id="payoutAccountSection">
+<div class="section-heading">
+<div><span class="section-eyebrow" data-account-i18n="payout_eyebrow">WITHDRAWAL SETTINGS</span><h2 data-account-i18n="payout_title">Rekening Saya</h2><p data-account-i18n="payout_desc">Simpan rekening bank atau e-wallet untuk pencairan saldo.</p></div>
+<span class="section-heading-icon"><i class="fa-solid fa-building-columns"></i></span>
+</div>
+<article class="account-panel payout-panel">
+<div class="payout-eligibility-note" id="payoutEligibilityNote"><i class="fa-solid fa-shield-halved"></i><span data-account-i18n="payout_secure">Informasi rekening hanya digunakan untuk proses pencairan saldo.</span></div>
+<div class="payout-saved-view" hidden="" id="payoutSavedView"></div>
+<form class="account-form-grid" id="payoutForm">
+<label data-account-i18n="payout_holder" for="payoutHolder">Nama pemilik rekening</label>
+<input autocomplete="name" id="payoutHolder" maxlength="100" minlength="3" placeholder="Nama sesuai rekening" required="" type="text"/>
+<label data-account-i18n="payout_method" for="payoutMethod">Jenis rekening</label>
+<select id="payoutMethod" required=""><option value="bank">Bank</option><option value="ewallet">E-Wallet</option></select>
+<label data-account-i18n="payout_provider" for="payoutProvider">Pilih bank / e-wallet</label>
+<select id="payoutProvider" required=""><option value="">Pilih penyedia</option></select>
+<div hidden="" id="payoutCustomWrap"><label data-account-i18n="payout_other" for="payoutCustom">Nama lainnya</label><input id="payoutCustom" maxlength="80" placeholder="Nama bank / e-wallet" type="text"/></div>
+<label data-account-i18n="payout_number" for="payoutNumber">Nomor rekening / e-wallet</label>
+<input id="payoutNumber" inputmode="numeric" maxlength="40" minlength="5" placeholder="Masukkan nomor rekening" required="" type="text"/>
+<button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="payout_save">Simpan rekening</span></button>
+</form>
+<small class="account-field-hint" id="payoutMessage" role="status"></small>
+</article>
+</section><section class="account-section media-section" id="mediaPurchaseSection">
+<div class="section-heading">
+<div><span class="section-eyebrow" data-account-i18n="your_library">YOUR LIBRARY</span><h2><i class="fa-brands fa-telegram telegram-heading-icon"></i> <span data-account-i18n="telegram_media">Media Telegram Saya</span></h2><p data-account-i18n="library_desc">Semua review yang sudah berhasil kamu beli akan otomatis tersimpan di sini.</p></div>
+<span class="library-count" id="purchaseCount">0 <span data-account-i18n="items">MEDIA</span></span>
+</div>
+<div class="account-reset-warning" data-account-i18n="media_reset_notice"><i class="fa-solid fa-clock"></i> Target masa simpan Review Media: 3 hari setelah pembayaran diproses. Penghapusan otomatis database belum diaktifkan.</div>
+<div class="library-toolbar">
+<span><i class="fa-solid fa-circle-check"></i> <span data-account-i18n="verified_purchases">Pembelian terverifikasi</span></span>
+<span><i class="fa-solid fa-cloud-arrow-down"></i> <span data-account-i18n="access_anytime">Akses dari halaman akun</span></span>
+</div>
+<div aria-live="polite" class="purchase-list account-library" id="purchaseLinks">
+<div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_library">Memuat media Telegram...</span></div>
+</div>
+</section><section class="account-section" id="vipPurchaseSection">
+<div class="section-heading">
+<div><span class="section-eyebrow" data-account-i18n="vip_history_eyebrow">PURCHASE HISTORY</span><h2><i class="fa-solid fa-crown"></i> <span data-account-i18n="vip_history_title">Histori Pembelian VIP</span></h2><p data-account-i18n="vip_history_desc">Riwayat transaksi VIP tetap tersimpan meskipun link undangan sudah kedaluwarsa.</p></div>
+<div class="account-reset-warning" data-account-i18n="vip_expiry_notice"><i class="fa-solid fa-clock"></i> Status VIP otomatis berakhir saat masa aktif habis. Histori transaksi tetap tersimpan.</div>
+</div>
+<div class="purchase-list" id="vipPurchaseHistory"><div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_vip_history">Memuat histori pembelian VIP...</span></div></div>
+</section><div class="group-purchase-success" hidden="" id="groupPurchaseSuccess"></div><section class="account-section" id="vipGroupPurchaseSection">
+<div class="section-heading">
+<div><span class="section-eyebrow" data-account-i18n="exclusive_access">EXCLUSIVE ACCESS</span><h2><i class="fa-brands fa-telegram telegram-heading-icon"></i> <span data-account-i18n="vip_groups">Group VIP Telegram</span></h2><p data-account-i18n="groups_desc">Kelola undangan group VIP yang sudah kamu beli.</p></div>
+</div>
+<div class="account-reset-warning" data-account-i18n="group_reset_notice"><i class="fa-solid fa-clock"></i> Link undangan Group VIP berlaku 24 jam. Histori transaksi tidak otomatis dihapus oleh UI ini.</div>
+<div class="purchase-list" id="groupLinks"><div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_groups">Memuat akses group...</span></div></div>
+</section><section class="account-upgrade">
+<div class="upgrade-copy"><span class="upgrade-kicker"><i class="fa-solid fa-crown"></i> BOXCELLINK VIP</span>
+<h2 data-account-i18n="upgrade_title">Upgrade Status Account</h2>
+<p data-account-i18n="upgrade_desc">Nikmati pengalaman BoxCellink yang lebih nyaman dengan status VIP.</p>
+<ul><li data-account-i18n="benefit_no_ads">Nonton BoxVidey tanpa iklan</li><li data-account-i18n="benefit_discount">Diskon 20% untuk pembelian Review yang memenuhi syarat</li><li data-account-i18n="benefit_exclusive">Akses video khusus VIP selama masa aktif</li></ul>
+<a class="account-action upgrade-button" href="/vip.html"><i class="fa-solid fa-arrow-up-right-from-square"></i><span data-account-i18n="upgrade_button">Upgrade ke VIP</span></a>
+</div><div class="upgrade-emblem"><i class="fa-solid fa-crown"></i><span>VIP</span></div>
+</section><section class="account-section account-security-section">
+<div class="section-heading">
+<div><span class="section-eyebrow" data-account-i18n="security_eyebrow">ACCOUNT SECURITY</span><h2 data-account-i18n="login_devices">Perangkat Login</h2><p data-account-i18n="login_devices_desc">Periksa browser dan perangkat yang pernah digunakan untuk masuk ke akun ini.</p></div>
+<span class="section-heading-icon"><i class="fa-solid fa-shield-halved"></i></span>
+</div>
+<article class="account-panel">
+<div class="login-device-list" id="loginDevices"><div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_devices">Memuat perangkat...</span></div></div>
+<div class="security-actions">
+<button class="account-action secondary-action" id="signOutOtherDevices" type="button"><i class="fa-solid fa-laptop-slash"></i><span data-account-i18n="signout_others">Keluar dari perangkat lain</span></button>
+<button class="account-action danger-action" id="signOutCurrent" type="button"><i class="fa-solid fa-right-from-bracket"></i><span data-account-i18n="signout_current">Keluar dari akun ini</span></button>
+</div>
+<small class="account-field-hint" data-account-i18n="security_note">Jika ada perangkat yang tidak kamu kenali, keluarkan semua sesi lain lalu segera ganti kata sandi.</small>
+</article>
+</section><section class="account-section account-activity-section" id="videoWatchHistorySection">
+<div class="section-heading">
+<div><span class="section-eyebrow" data-account-i18n="video_watch_eyebrow">BOXVIDEY ACTIVITY</span><h2><i class="fa-solid fa-circle-play"></i> <span data-account-i18n="watch_history">Riwayat Tonton BoxVidey</span></h2><p data-account-i18n="watch_desc">Lihat kembali video dan durasi tontonanmu.</p></div>
+<label class="history-sort-label"><span data-account-i18n="sort_history">Urutkan</span><select id="watchHistorySort"><option value="recent">Terbaru ditonton</option><option value="oldest">Terlama ditonton</option><option value="duration">Durasi terpanjang</option></select></label>
+</div>
+<div class="account-history-rail" id="watchHistory">
+<div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_history">Memuat riwayat tontonan...</span></div>
+</div>
+</section><section class="account-section account-activity-section" id="reviewWatchHistorySection">
+<div class="section-heading">
+<div><span class="section-eyebrow" data-account-i18n="telegram_watch_eyebrow">TELEGRAM MEDIA ACTIVITY</span><h2><i class="fa-brands fa-telegram"></i> <span data-account-i18n="telegram_watch_title">Riwayat Lihat Review Media Telegram</span></h2><p data-account-i18n="telegram_watch_desc">Review Telegram yang pernah kamu buka, lengkap dengan thumbnail dan waktu terakhir dilihat.</p></div>
+<span class="section-heading-icon"><i class="fa-solid fa-clock-rotate-left"></i></span>
+</div>
+<div aria-live="polite" class="account-history-rail" id="reviewWatchHistory"><div class="account-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-account-i18n="loading_telegram_watch">Memuat riwayat review Telegram...</span></div></div>
+</section></main>
 <div data-component="footer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="components.js?v=20261115-4"></script>
-<script src="js/account.js?v=20261121-account-premium-v3"></script>
+<script src="js/account.js?v=20261122-account-center-v2"></script>
 <script src="js/page-i18n.js"></script>
 </body>
 </html>
