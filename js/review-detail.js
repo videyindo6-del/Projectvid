@@ -59,7 +59,27 @@ const reviewTranslations = {
  'Temukan koleksi dan konten pilihan lainnya.':'Discover more collections and featured content.',
  'Komentar gagal dikirim. Periksa koneksi atau jalankan migration komentar.':'Comment failed. Check your connection or run the comments migration.',
  'Komentar gagal dihapus. Pastikan policy admin sudah diterapkan.':'Could not delete comment. Make sure the admin policy has been applied.',
- 'Hapus komentar ini?':'Delete this comment?', 'Download':'Download','Download / Beli':'Download / Buy'
+ 'Hapus komentar ini?':'Delete this comment?', 'Download':'Download','Download / Beli':'Download / Buy',
+  'REVIEW & DOWNLOAD':'REVIEW & DOWNLOAD','Watch Review':'Review Media','Galeri gambar, deskripsi, dan download konten.':'Media gallery, descriptions, and content access.',
+ 'Memuat review...':'Loading reviews...','Belum ada review.':'No reviews yet.','Thumbnail belum tersedia · cek komentar':'Thumbnail unavailable · check comments',
+ 'Hapus pencarian':'Clear search','Review Media Telegram':'Telegram Media Reviews','Daftar Review':'Review Catalog',
+ 'MEDIA khusus pengguna Telegram':'Media for Telegram users','Ya, Punya Telegram':'Yes, I Have Telegram','Tidak, Saya Tidak Punya Telegram':'No, I Don’t Have Telegram',
+ 'Media khusus pengguna Telegram':'Media for Telegram users','Akses media tetap mengikuti ketentuan dan izin pembelian.':'Media access remains subject to access and purchase permissions.',
+ 'Preview media produk':'Product media preview','Seluruh media ditampilkan di halaman ini agar bisa diperiksa sebelum membeli.':'All media is displayed here so you can review it before purchasing.',
+ 'Geser ke samping untuk melihat semua media':'Swipe sideways to view all media','Media gagal dimuat':'Media failed to load',
+ 'Baca review terlebih dahulu. Jika Anda berminat, silakan klik tombol Download / Beli di bawah untuk melanjutkan.':'Review the details first. If interested, select Download / Buy below to continue.',
+ 'TENTANG PRODUK':'ABOUT THIS PRODUCT','Informasi produk belum ditambahkan oleh penjual.':'The seller has not added product information yet.',
+ 'HARGA AKSES':'ACCESS PRICE','AKSES KONTEN':'CONTENT ACCESS','Link postingan asli Telegram dibuka setelah akses gratis atau pembayaran terverifikasi.':'The original Telegram post link is revealed after free access or verified payment.',
+ 'Bagikan pengalamanmu':'Share your experience','Bantu pengguna lain menemukan konten menarik.':'Help others discover interesting content.',
+ 'Pengunjung':'Guest','Member BoxCellink':'BoxCellink Member','Username / Nama':'Username / Name','Masukkan nama yang ingin ditampilkan':'Enter a display name',
+ 'Tulis komentar yang sopan dan relevan...':'Write a polite, relevant comment...','Kirim komentar':'Post comment','Komentar':'Comments','Belum ada komentar. Jadilah yang pertama berkomentar.':'No comments yet. Be the first to comment.',
+ 'Suka':'Like','Bagikan':'Share','Review lainnya':'More reviews','Temukan koleksi dan konten pilihan lainnya.':'Discover more collections and featured content.',
+ 'Buka media asli':'Open original media','Provider ini memerlukan kode embed resmi.':'This provider requires its official embed code.',
+ 'Komentar gagal dikirim. Periksa koneksi atau jalankan migration komentar.':'Comment failed. Check your connection or run the comments migration.',
+ 'Komentar gagal dihapus. Pastikan policy admin sudah diterapkan.':'Could not delete comment. Make sure the admin policy is applied.',
+ 'Hapus komentar ini?':'Delete this comment?','Pembayaran dan akses diproses melalui BoxCellink.':'Payment and access are handled through BoxCellink.',
+ 'Terjual':'Sold','Total komentar':'Total comments','Total like':'Total likes','Published':'Published','Free content':'Free content','Premium content':'Premium content',
+ 'Buka sumber asli':'Open original source','Media belum tersedia':'Media is not available','Konten media akan ditampilkan di sini setelah diunggah oleh penjual.':'Media will appear here once uploaded by the seller.'
 };
 function applyReviewTranslations(root = document) {
  if (!reviewEN()) return;
@@ -446,7 +466,7 @@ async function setupReviewSocial(reviewId, title) {
   const loadSocial = async () => {
     const [likes, comments] = await Promise.all([
       sb.from('review_likes').select('id,user_id', { count: 'exact' }).eq('review_id', reviewId),
-      sb.from('review_comments').select('id,content,created_at,user_id,guest_name').eq('review_id', reviewId).eq('is_hidden', false).order('created_at', { ascending: false }).limit(50)
+      sb.from('review_comments').select('id,content,created_at,user_id,guest_name', { count: 'exact' }).eq('review_id', reviewId).eq('is_hidden', false).order('created_at', { ascending: false }).limit(50)
     ]);
     if (!likes.error) {
       const count = document.getElementById('reviewLikeCount');
@@ -464,7 +484,7 @@ async function setupReviewSocial(reviewId, title) {
     const publicIds=[...new Set(rows.map(c=>c.user_id).filter(Boolean))];
     let publicNames=new Map();
     if(publicIds.length){try{const {data}=await sb.rpc('get_public_usernames',{p_user_ids:publicIds});(data||[]).forEach(x=>publicNames.set(x.user_id,x.username));}catch(e){console.warn('Public usernames unavailable:',e.message);}}
-    document.getElementById('commentCount').textContent = `${rows.length} ${reviewText('komentar','comments')}`;
+    document.getElementById('commentCount').textContent = `${Number(comments.count ?? rows.length).toLocaleString(reviewEN() ? 'en-US' : 'id-ID')} ${reviewText('komentar','comments')}`;
     commentBox.innerHTML = rows.length ? rows.map(c => {
       const name = c.guest_name || (c.user_id ? (publicNames.get(c.user_id) ? '@'+publicNames.get(c.user_id) : 'Member BoxCellink') : 'Pengunjung');
       const del = isAdmin ? `<button type="button" class="comment-delete" data-comment-delete="${esc(c.id)}" title="Hapus komentar" aria-label="Hapus komentar"><i class="fa-solid fa-trash-can"></i></button>` : '';
@@ -488,8 +508,21 @@ async function setupReviewSocial(reviewId, title) {
   document.getElementById('reviewCommentJump')?.addEventListener('click', () => commentInput?.focus());
   document.getElementById('reviewShare')?.addEventListener('click', async () => {
     try {
-      if (navigator.share) await navigator.share({ title, url: location.href, text: title });
-      else { await navigator.clipboard.writeText(location.href); reviewToast(reviewText('Link review berhasil disalin.','Review link copied.'),'success'); }
+      if (navigator.share) {
+        try { await navigator.share({ title, url: location.href, text: title }); }
+        catch (shareError) {
+          if (shareError?.name === 'AbortError') return;
+          if (!navigator.clipboard?.writeText) throw shareError;
+          await navigator.clipboard.writeText(location.href);
+          reviewToast(reviewText('Link review berhasil disalin.','Review link copied.'),'success');
+        }
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(location.href);
+        reviewToast(reviewText('Link review berhasil disalin.','Review link copied.'),'success');
+      } else {
+        reviewToast(reviewText('Browser tidak mendukung berbagi atau menyalin link.','This browser cannot share or copy links.'),'error');
+        return;
+      }
       await sb.rpc('increment_review_share', { p_review_id: reviewId });
     } catch (e) { if (e.name !== 'AbortError') reviewToast(reviewText('Tidak dapat membagikan link.','Unable to share the link.'),'error'); }
   });
@@ -522,7 +555,7 @@ async function getPublicReviewStats(reviewId) {
   try {
     const { data, error } = await sb.rpc('get_public_review_stats');
     if (error) throw error;
-    return (data || []).find(row => row.review_id === reviewId) || null;
+    return (data || []).find(row => String(row.review_id) === String(reviewId)) || null;
   } catch (error) { console.warn('Statistik review tidak tersedia:', error); return null; }
 }
 
