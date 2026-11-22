@@ -11,7 +11,7 @@
 <link href="css/member-pages.css" rel="stylesheet"/>
 <link href="css/upgrade-pages.css" rel="stylesheet"/>
 <link href="css/account-premium.css?v=20261121-account-premium-v3" rel="stylesheet"/>
-<link href="css/account-studio.css?v=20261122-account-studio-v2" rel="stylesheet"/>
+<link href="css/account-studio.css?v=20261122-account-studio-v3" rel="stylesheet"/>
 <link href="/css/navbar.css" rel="stylesheet"/>
 <link href="/css/footer.css" rel="stylesheet"/></head>
 <body>
@@ -45,11 +45,26 @@
 <span class="overview-icon secure-icon"><i class="fa-solid fa-fingerprint"></i></span>
 <div><small data-account-i18n="security">Keamanan</small><b data-account-i18n="protected">Akun terlindungi</b><span class="overview-muted" data-account-i18n="security_desc">Dikelola melalui Supabase Auth</span></div>
 </article>
-</section><nav aria-label="Purchase history shortcuts" class="account-history-shortcuts">
-<a data-account-i18n="jump_media" href="#mediaPurchaseSection"><i class="fa-brands fa-telegram"></i> Histori Media Telegram</a>
-<a data-account-i18n="jump_groups" href="#vipGroupPurchaseSection"><i class="fa-solid fa-users"></i> Histori Group VIP</a>
-<a data-account-i18n="jump_vip" href="#vipPurchaseSection"><i class="fa-solid fa-crown"></i> Histori VIP</a>
-</nav><section class="account-section account-profile-section">
+</section><section class="account-hub-nav" aria-label="Account shortcuts">
+ <div class="account-hub-group"><div class="account-hub-title"><i class="fa-solid fa-bag-shopping"></i><span data-account-i18n="hub_history">Histori Pembelian</span></div>
+  <div class="account-hub-actions">
+   <a href="#mediaPurchaseSection"><i class="fa-brands fa-telegram"></i><span data-account-i18n="jump_media">Media Telegram</span></a>
+   <a href="#vipGroupPurchaseSection"><i class="fa-solid fa-users"></i><span data-account-i18n="jump_groups">Group VIP</span></a>
+   <a href="#vipPurchaseSection"><i class="fa-solid fa-crown"></i><span data-account-i18n="jump_vip">VIP Akun</span></a>
+  </div>
+ </div>
+ <div class="account-hub-group"><div class="account-hub-title"><i class="fa-solid fa-sliders"></i><span data-account-i18n="hub_settings">Pengaturan</span></div>
+  <div class="account-hub-actions">
+   <a href="#socialProfileSection"><i class="fa-solid fa-user-pen"></i><span data-account-i18n="hub_bio">Bio & tautan sosial</span></a>
+   <a href="#emailSettings"><i class="fa-solid fa-envelope"></i><span data-account-i18n="change_email">Ganti Gmail</span></a>
+   <a href="#passwordSettings"><i class="fa-solid fa-key"></i><span data-account-i18n="change_password">Ganti kata sandi</span></a>
+   <a href="#payoutAccountSection"><i class="fa-solid fa-building-columns"></i><span data-account-i18n="hub_bank">Ganti rekening</span></a>
+   <a href="/notifications.html"><i class="fa-regular fa-bell"></i><span data-account-i18n="hub_notifications">Notifikasi</span></a>
+   <button type="button" id="accountLanguageShortcut"><i class="fa-solid fa-language"></i><span data-account-i18n="hub_language">Ganti bahasa</span></button>
+   <button type="button" id="accountLogoutShortcut" class="hub-logout"><i class="fa-solid fa-right-from-bracket"></i><span data-account-i18n="hub_logout">Log out</span></button>
+  </div>
+ </div>
+</section><section class="account-section account-profile-section">
 <div class="section-heading">
 <div><span class="section-eyebrow">PUBLIC PROFILE</span><h2 data-account-i18n="profile_title">Profil Publik</h2><p data-account-i18n="profile_desc">Atur username yang akan dikenali pengguna lain di BoxCellink.</p></div>
 <span class="section-heading-icon"><i class="fa-solid fa-id-card"></i></span>
@@ -71,7 +86,7 @@
 <div><span class="section-eyebrow" data-account-i18n="social_eyebrow">SOCIAL PROFILE</span><h2 data-account-i18n="social_title">Bio &amp; tautan sosial</h2><p data-account-i18n="social_desc">Informasi ini akan terlihat pada halaman profil publikmu.</p></div>
 <span class="section-heading-icon"><i class="fa-solid fa-share-nodes"></i></span>
 </div>
-<article class="account-panel social-profile-panel">
+<details class="account-accordion" id="socialProfileAccordion"><summary><span class="accordion-icon"><i class="fa-solid fa-share-nodes"></i></span><span class="accordion-copy"><b data-account-i18n="hub_bio">Bio & tautan sosial</b><small data-account-i18n="accordion_bio_desc">Klik untuk mengubah bio dan tautan sosial.</small></span><i class="fa-solid fa-chevron-down accordion-chevron"></i></summary><div class="accordion-body"><article class="account-panel social-profile-panel">
 <form class="account-form-grid" id="socialProfileForm">
 <div class="account-field">
 <label data-account-i18n="bio_label" for="profileBio">Bio</label>
@@ -93,14 +108,14 @@
 </div>
 <button class="account-action social-save-button" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="social_save">Simpan bio &amp; tautan sosial</span></button>
 </form>
-</article>
-</section><section class="account-section">
+</article></div></details>
+</section><section class="account-section" id="accountSettingsSection">
 <div class="section-heading">
 <div><span class="section-eyebrow" data-account-i18n="personal_settings">PERSONAL SETTINGS</span><h2 data-account-i18n="account_settings">Pengaturan Akun</h2><p data-account-i18n="settings_desc">Perbarui informasi login dan jaga keamanan akunmu.</p></div>
 <span class="section-heading-icon"><i class="fa-solid fa-sliders"></i></span>
 </div>
 <div class="account-grid">
-<article class="account-panel">
+<details class="account-accordion" id="emailSettings"><summary><span class="accordion-icon"><i class="fa-solid fa-envelope"></i></span><span class="accordion-copy"><b data-account-i18n="change_email">Ganti Gmail</b><small data-account-i18n="accordion_email_desc">Perbarui alamat Gmail akun.</small></span><i class="fa-solid fa-chevron-down accordion-chevron"></i></summary><div class="accordion-body"><article class="account-panel">
 <div class="panel-heading"><span class="panel-icon"><i class="fa-solid fa-envelope"></i></span><div><h3 data-account-i18n="change_email">Ganti Email</h3><p data-account-i18n="email_desc">Masukkan alamat email baru untuk akunmu.</p></div></div>
 <div class="account-current-value"><small data-account-i18n="current_email">Email saat ini</small><b id="emailCurrentValue">—</b></div>
 <form id="emailForm">
@@ -109,8 +124,8 @@
 <button class="account-action" type="submit"><i class="fa-solid fa-envelope-circle-check"></i><span data-account-i18n="change_email_button">Simpan email baru</span></button>
 <small data-account-i18n="email_hint">Email akun akan diperbarui setelah berhasil diproses.</small>
 </form>
-</article>
-<article class="account-panel">
+</article></div></details>
+<details class="account-accordion" id="passwordSettings"><summary><span class="accordion-icon"><i class="fa-solid fa-key"></i></span><span class="accordion-copy"><b data-account-i18n="change_password">Ganti kata sandi</b><small data-account-i18n="accordion_password_desc">Perbarui kata sandi login.</small></span><i class="fa-solid fa-chevron-down accordion-chevron"></i></summary><div class="accordion-body"><article class="account-panel">
 <div class="panel-heading"><span class="panel-icon password-icon"><i class="fa-solid fa-key"></i></span><div><h3 data-account-i18n="change_password">Ganti Kata Sandi</h3><p data-account-i18n="password_desc">Buat kata sandi baru untuk login berikutnya.</p></div></div>
 <form id="passwordForm">
 <small class="account-field-hint" data-account-i18n="password_mode_hint" id="passwordModeHint">Kamu dapat memperbarui kata sandi tanpa memasukkan kata sandi lama selama masih login.</small>
@@ -121,14 +136,14 @@
 <button class="account-action" type="submit"><i class="fa-solid fa-shield-halved"></i><span data-account-i18n="update_password">Perbarui kata sandi</span></button>
 <small data-account-i18n="password_hint">Minimal 8 karakter dan pastikan kedua kolom sama.</small>
 </form>
-</article>
+</article></div></details>
 </div>
 </section><section class="account-section payout-section" hidden="" id="payoutAccountSection">
 <div class="section-heading">
 <div><span class="section-eyebrow" data-account-i18n="payout_eyebrow">WITHDRAWAL SETTINGS</span><h2 data-account-i18n="payout_title">Rekening Saya</h2><p data-account-i18n="payout_desc">Simpan rekening bank atau e-wallet untuk pencairan saldo.</p></div>
 <span class="section-heading-icon"><i class="fa-solid fa-building-columns"></i></span>
 </div>
-<article class="account-panel payout-panel">
+<details class="account-accordion" id="payoutSettings"><summary><span class="accordion-icon"><i class="fa-solid fa-building-columns"></i></span><span class="accordion-copy"><b data-account-i18n="hub_bank">Rekening bank / e-wallet</b><small data-account-i18n="accordion_bank_desc">Tambah atau ubah rekening pencairan.</small></span><i class="fa-solid fa-chevron-down accordion-chevron"></i></summary><div class="accordion-body"><article class="account-panel payout-panel">
 <div class="payout-eligibility-note" id="payoutEligibilityNote"><i class="fa-solid fa-shield-halved"></i><span data-account-i18n="payout_secure">Informasi rekening hanya digunakan untuk proses pencairan saldo.</span></div>
 <div class="payout-saved-view" hidden="" id="payoutSavedView"></div>
 <form class="account-form-grid" id="payoutForm">
@@ -144,7 +159,7 @@
 <button class="account-action" type="submit"><i class="fa-solid fa-floppy-disk"></i><span data-account-i18n="payout_save">Simpan rekening</span></button>
 </form>
 <small class="account-field-hint" id="payoutMessage" role="status"></small>
-</article>
+</article></div></details>
 </section><section class="account-section media-section" id="mediaPurchaseSection">
 <div class="section-heading">
 <div><span class="section-eyebrow" data-account-i18n="your_library">YOUR LIBRARY</span><h2><i class="fa-brands fa-telegram telegram-heading-icon"></i> <span data-account-i18n="telegram_media">Media Telegram Saya</span></h2><p data-account-i18n="library_desc">Semua review yang sudah berhasil kamu beli akan otomatis tersimpan di sini.</p></div>
