@@ -87,20 +87,22 @@ Deno.serve(async (req) => {
     if (!isAdmin && !isFree && user) {
       const { data: entitlement, error: entitlementError } = await admin
         .from('review_entitlements')
-        .select('id')
+        .select('id,expires_at')
         .eq('user_id', user.id)
         .eq('review_id', item.id)
+        .gt('expires_at', new Date().toISOString())
         .maybeSingle();
       if (entitlementError) throw entitlementError;
 
       if (!entitlement) {
         const { data: settledOrder, error: settledOrderError } = await admin
           .from('cashi_orders')
-          .select('order_id')
+          .select('order_id,settled_at')
           .eq('user_id', user.id)
           .eq('review_id', item.id)
           .eq('purpose', 'review_download')
           .eq('status', 'SETTLED')
+          .gt('settled_at', new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString())
           .order('settled_at', { ascending: false })
           .limit(1)
           .maybeSingle();
@@ -113,7 +115,9 @@ Deno.serve(async (req) => {
               user_id: user.id,
               review_id: item.id,
               order_id: settledOrder.order_id,
-            }, { onConflict: 'user_id,review_id', ignoreDuplicates: true });
+              created_at: settledOrder.settled_at,
+              expires_at: new Date(new Date(settledOrder.settled_at).getTime() + 72 * 60 * 60 * 1000).toISOString(),
+            }, { onConflict: 'user_id,review_id' });
           if (restoreError) throw restoreError;
         } else {
           return reply({
