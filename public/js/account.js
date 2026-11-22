@@ -435,7 +435,7 @@ async function initAccount(){
   finally{button.disabled=false;}
  });
 }
-document.addEventListener('DOMContentLoaded',()=>{applyAccountLanguage();initAccount().catch(error=>{
+document.addEventListener('DOMContentLoaded',()=>{const payoutTarget=location.hash==='#payoutSettings'?document.getElementById('payoutSettings'):null;if(payoutTarget){payoutTarget.open=true;setTimeout(()=>payoutTarget.scrollIntoView({behavior:'smooth',block:'center'}),180);}applyAccountLanguage();initAccount().catch(error=>{
  console.error('BoxCellink account:',error);
  const notice=$('accountNotice');if(notice){notice.hidden=false;notice.className='account-notice is-error';notice.innerHTML=`<i class="fa-solid fa-circle-exclamation"></i><span>${escA(t('account_error'))}: ${escA(error.message||'Unknown error')}</span>`;}
 });});

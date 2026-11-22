@@ -9,12 +9,17 @@ const safeText=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','
 async function loadAdminActivity(){
  if(!activityBox)return;
  activityBox.innerHTML='<article class="hub-card"><span class="hub-card-copy"><b>Memuat...</b><span>Memeriksa aktivitas member.</span></span></article>';
- const [withdrawals,publisherWithdrawals,support]=await Promise.all([
+ const [withdrawals,publisherWithdrawals,unifiedWithdrawals,support]=await Promise.all([
   sb.from('affiliate_withdrawals').select('id,user_id,amount,status,payout_provider,payout_method,created_at').order('created_at',{ascending:false}).limit(8),
   sb.from('publisher_withdrawals').select('id,publisher_id,amount,status,created_at').order('created_at',{ascending:false}).limit(8),
+  sb.from('withdrawal_requests').select('id,user_id,amount,status,payout_method,payout_provider,payout_account_holder,payout_account_number,created_at').order('created_at',{ascending:false}).limit(8),
   sb.from('support_conversations').select('id,user_id,subject,status,updated_at').order('updated_at',{ascending:false}).limit(8)
  ]);
  const items=[];
+ const unifiedIds=[...new Set((unifiedWithdrawals.data||[]).map(w=>w.user_id).filter(Boolean))];
+ const unifiedProfiles=unifiedIds.length?await sb.from('profiles').select('id,username,full_name').in('id',unifiedIds):{data:[],error:null};
+ const unifiedNames=new Map((unifiedProfiles.data||[]).map(p=>[p.id,p]));
+ if(!unifiedWithdrawals.error)(unifiedWithdrawals.data||[]).forEach(w=>{const m=unifiedNames.get(w.user_id)||{};items.push({time:w.created_at,html:`<a class=\"hub-card\" href=\"admin-publisher-withdraw.html\"><span class=\"hub-card-icon\"><i class=\"fa-solid fa-money-bill-transfer\"></i></span><span class=\"hub-card-copy\"><b>Pengajuan withdrawal · @${safeText(m.username||'member')} · Rp ${Number(w.amount||0).toLocaleString('id-ID')}</b><span>${safeText(m.full_name||'Member')} · ${safeText(w.payout_method==='ewallet'?'E-Wallet':'Bank')} ${safeText(w.payout_provider||'')} · ${safeText(w.payout_account_holder||'')} · ${safeText(w.payout_account_number||'')}<br>Status: ${safeText(w.status)} · ${new Date(w.created_at).toLocaleString('id-ID')}</span></span><i class=\"fa-solid fa-arrow-up-right-from-square hub-arrow\"></i></a>`});});
  if(!withdrawals.error)(withdrawals.data||[]).forEach(w=>items.push({time:w.created_at,html:`<a class="hub-card" href="affiliate-admin.html"><span class="hub-card-icon"><i class="fa-solid fa-wallet"></i></span><span class="hub-card-copy"><b>Pengajuan withdraw · Rp ${Number(w.amount||0).toLocaleString('id-ID')}</b><span>Status: ${safeText(w.status)} · ${safeText(w.payout_provider||w.payout_method||'Metode payout')}<br>${new Date(w.created_at).toLocaleString('id-ID')}</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>`}));
  if(!publisherWithdrawals.error)(publisherWithdrawals.data||[]).forEach(w=>items.push({time:w.created_at,html:`<a class="hub-card" href="admin-publisher-withdraw.html"><span class="hub-card-icon"><i class="fa-solid fa-money-bill-transfer"></i></span><span class="hub-card-copy"><b>Withdraw Publisher · Rp ${Number(w.amount||0).toLocaleString('id-ID')}</b><span>Status: ${safeText(w.status)} · ${new Date(w.created_at).toLocaleString('id-ID')}</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>`}));
  if(!support.error)(support.data||[]).forEach(c=>items.push({time:c.updated_at,html:`<a class="hub-card" href="support-inbox.html"><span class="hub-card-icon"><i class="fa-solid fa-headset"></i></span><span class="hub-card-copy"><b>Support member · ${safeText(c.subject||'Chat Support')}</b><span>Status: ${safeText(c.status)} · ${new Date(c.updated_at).toLocaleString('id-ID')}</span></span><i class="fa-solid fa-arrow-up-right-from-square hub-arrow"></i></a>`}));
@@ -22,6 +27,7 @@ async function loadAdminActivity(){
  activityBox.innerHTML=items.slice(0,10).map(x=>x.html).join('')||'<article class="hub-card"><span class="hub-card-copy"><b>Belum ada aktivitas baru</b><span>Pengajuan withdraw dan percakapan support akan muncul di sini.</span></span></article>';
  if(withdrawals.error)console.warn('Withdraw feed:',withdrawals.error.message);
  if(publisherWithdrawals.error)console.warn('Publisher withdraw feed:',publisherWithdrawals.error.message);
+ if(unifiedWithdrawals.error)console.warn('Unified withdraw feed:',unifiedWithdrawals.error.message);
  if(support.error)console.warn('Support feed:',support.error.message);
 }
 async function loadAdminAnnouncements(){
