@@ -4,6 +4,9 @@
   const searchClear = document.getElementById('telegramSearchClear');
   const categoryRoot = document.getElementById('telegramCategories');
   const top10Root = document.getElementById('telegramTop10');
+  const top10Pager = document.getElementById('telegramTop10Pagination');
+  const top10Title=document.getElementById('telegramTop10Title'),top10Description=document.getElementById('telegramTop10Description'),top10Kicker=document.getElementById('telegramTop10Kicker');
+  const heroTitle=document.getElementById('telegramHeroTitle'),heroDescription=document.getElementById('telegramHeroDescription'),categoryLabel=document.getElementById('telegramCategoryLabel'),categoryHint=document.getElementById('telegramCategoryHint'),boxTop10Title=document.getElementById('boxVideyTop10Title'),boxTop10Description=document.getElementElementById?.('boxVideyTop10Description')||document.getElementById('boxVideyTop10Description'),boxTop10Kicker=document.getElementById('boxVideyTop10Kicker');
   const boxTop10Root = document.getElementById('boxVideyTop10');
   if (!grid) return;
 
@@ -16,7 +19,7 @@
 
   const PAGE_SIZE = 10;
   let allItems = [], visibleItems = [], stats = new Map(), categories = [];
-  let currentPage = 1, selectedCategory = 'all';
+  let currentPage = 1, top10Page = 1, selectedCategory = 'all';
   const lang = () => localStorage.getItem('boxcellink_lang') || 'id';
   const isEN = () => lang() === 'en';
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -73,27 +76,52 @@
   }
   function renderTop10() {
     if (!top10Root) return;
-    const ranked = [...allItems].sort((a,b) => {
-      const x=stats.get(a.id)||{}, y=stats.get(b.id)||{};
-      const score = (s,item) => Number(s.total_sold||0)*1000000 + Number(s.total_likes||0)*1000 + Number(s.total_comments||0)*100 + Number(item.view_count||0);
-      return score(y,b)-score(x,a);
-    }).slice(0,10);
+    if(top10Title)top10Title.textContent=isEN()?'Top 10 Telegram Reviews':'Top 10 Review Telegram';
+    if(top10Description)top10Description.textContent=isEN()?'10 reviews per page, ranked by user activity.':'10 review per halaman, diurutkan berdasarkan aktivitas pengguna.';
+    if(top10Kicker)top10Kicker.textContent=isEN()?'COMMUNITY PICKS':'PILIHAN KOMUNITAS';
+    if(heroTitle)heroTitle.textContent=isEN()?'Telegram Media Reviews':'Review Media Telegram';
+    if(heroDescription)heroDescription.textContent=isEN()?'Read reviews and preview media. Original Telegram links are revealed through the verified access flow.':'Baca review dan lihat preview media. Tautan postingan asli Telegram tersedia melalui alur akses yang terverifikasi.';
+    if(categoryLabel)categoryLabel.textContent=isEN()?'CATEGORIES':'KATEGORI';
+    if(categoryHint)categoryHint.textContent=isEN()?'Select a category to filter reviews':'Pilih kategori untuk menyaring review';
+    if(boxTop10Title)boxTop10Title.textContent=isEN()?'Top 10 BoxVidey':'Top 10 BoxVidey';
+    if(boxTop10Description)boxTop10Description.textContent=isEN()?'Featured BoxVidey videos to explore.':'Video BoxVidey pilihan yang bisa digeser untuk dijelajahi.';
+    if(boxTop10Kicker)boxTop10Kicker.textContent=isEN()?'BOXVIDEY COLLECTION':'KOLEKSI BOXVIDEY';
+    const score = item => {
+      const s = stats.get(String(item.id)) || {};
+      return Number(s.total_sold||0)*1000000 + Number(s.total_likes||0)*1000 + Number(s.total_comments||0)*100 + Number(item.view_count||0);
+    };
+    const ranked = [...allItems].sort((a,b)=>score(b)-score(a));
+    const totalPages=Math.max(1,Math.ceil(ranked.length/PAGE_SIZE));
+    top10Page=Math.min(Math.max(1,top10Page),totalPages);
+    const pageItems=ranked.slice((top10Page-1)*PAGE_SIZE,top10Page*PAGE_SIZE);
     if (!ranked.length) {
-      top10Root.innerHTML='<div class="telegram-top10-empty">Belum ada review yang dapat ditampilkan.</div>';
+      top10Root.innerHTML='<div class="telegram-top10-empty">'+(isEN()?'No reviews to show yet.':'Belum ada review yang dapat ditampilkan.')+'</div>';
+      if(top10Pager)top10Pager.innerHTML='';
       return;
     }
-    top10Root.innerHTML=ranked.map((item,index)=>{
+    top10Root.innerHTML=pageItems.map((item,index)=>{
+      const globalRank=(top10Page-1)*PAGE_SIZE+index+1;
       const thumb=reviewThumbnail(item), href=`/r/${encodeURIComponent(item.slug)}`;
       const price=item.access==='free'?(isEN()?'Free':'Gratis'):money(item.price);
       return `<a class="telegram-top10-card" href="${href}">
-        <span class="telegram-top10-rank">${String(index+1).padStart(2,'0')}</span>
+        <span class="telegram-top10-rank">${String(globalRank).padStart(2,'0')}</span>
         <span class="telegram-top10-thumb${thumb?'':' no-image'}">${reviewPreviewMarkup(item)||'<i class="fa-brands fa-telegram"></i>'}</span>
-        <span class="telegram-top10-info"><strong>${esc(item.title)}</strong><small><i class="fa-solid fa-eye"></i> ${number(item.view_count)} ${isEN()?'views':'views'}</small><b>${esc(price)}</b></span>
+        <span class="telegram-top10-info"><strong>${esc(item.title)}</strong><small><i class="fa-solid fa-eye"></i> ${number(item.view_count)} ${isEN()?'views':'tayangan'}</small><b>${esc(price)}</b></span>
         <i class="fa-solid fa-arrow-up-right-from-square telegram-top10-open"></i>
       </a>`;
     }).join('');
+    if(!top10Pager)return;
+    if(totalPages<=1){top10Pager.innerHTML='';return;}
+    const prev=top10Page-1,next=top10Page+1;
+    let buttons=`<button type="button" class="telegram-page-btn" data-top10page="${prev}" aria-label="${isEN()?'Previous page':'Halaman sebelumnya'}" ${top10Page===1?'disabled':''}><i class="fa-solid fa-chevron-left"></i></button>`;
+    const from=Math.max(1,Math.min(top10Page-2,totalPages-4)),to=Math.min(totalPages,from+4);
+    if(from>1)buttons+=`<button type="button" class="telegram-page-btn" data-top10page="1">1</button><span class="telegram-page-dots">…</span>`;
+    for(let n=from;n<=to;n++)buttons+=`<button type="button" class="telegram-page-btn${n===top10Page?' is-active':''}" data-top10page="${n}" ${n===top10Page?'aria-current="page"':''}>${n}</button>`;
+    if(to<totalPages)buttons+=`<span class="telegram-page-dots">…</span><button type="button" class="telegram-page-btn" data-top10page="${totalPages}">${totalPages}</button>`;
+    buttons+=`<button type="button" class="telegram-page-btn" data-top10page="${next}" aria-label="${isEN()?'Next page':'Halaman berikutnya'}" ${top10Page===totalPages?'disabled':''}><i class="fa-solid fa-chevron-right"></i></button>`;
+    top10Pager.innerHTML=`<nav class="telegram-top10-pager-controls"><span>${isEN()?'Page':'Halaman'} <b>${top10Page}</b> ${isEN()?'of':'dari'} <b>${totalPages}</b></span>${buttons}</nav>`;
+    top10Pager.querySelectorAll('[data-top10page]').forEach(btn=>btn.addEventListener('click',()=>{if(btn.disabled)return;top10Page=Number(btn.dataset.top10page);renderTop10();top10Root.scrollIntoView({behavior:'smooth',block:'start'});}));
   }
-
 
   function renderBoxVideyTop10(items) {
     if(!boxTop10Root)return;
@@ -125,7 +153,7 @@
     currentPage = Math.min(Math.max(1,currentPage),Math.max(1,totalPages));
     const start = (currentPage-1)*PAGE_SIZE;
     const cards = visibleItems.slice(start,start+PAGE_SIZE).map(item => {
-      const s = stats.get(item.id) || {}, thumb = reviewThumbnail(item);
+      const s = stats.get(String(item.id)) || {}, thumb = reviewThumbnail(item);
       const price = item.access === 'free' ? (isEN()?'Free':'Gratis') : money(item.price);
       const href = `/r/${encodeURIComponent(item.slug)}`;
       const categoryName = categories.find(c => c.id === item.category_id)?.name || (isEN() ? 'Telegram media' : 'Media Telegram');
@@ -203,7 +231,7 @@
           stats=new Map(allItems.map(item=>[item.id,{total_sold:sold.get(item.id)||0,total_likes:l.get(item.id)||0,total_comments:c.get(item.id)||0}]));
         }
       }
-      renderTop10();
+      top10Page=1;renderTop10();
       applyFilters();
     } catch(error) {
       console.error('Telegram review listing:',error);
@@ -213,6 +241,7 @@
   }
   searchInput?.addEventListener('input',applyFilters);
   searchClear?.addEventListener('click',()=>{searchInput.value='';applyFilters();searchInput.focus();});
-  window.addEventListener('storage',e=>{if(e.key==='boxcellink_lang'){renderCategories();applyFilters();}});
+  window.addEventListener('storage',e=>{if(e.key==='boxcellink_lang'){renderCategories();renderTop10();applyFilters();}});
+  document.addEventListener('boxcellink:language-change',()=>{renderCategories();renderTop10();applyFilters();});
   load();
 })();
