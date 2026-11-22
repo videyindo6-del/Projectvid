@@ -652,3 +652,12 @@ body.telegram-directory-page{background:#f8f7f2!important;color:#172d49!importan
 @keyframes top10-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes top10-soft{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 @media(prefers-reduced-motion:reduce){.telegram-top10-rank{animation:none!important}}
+/* Top-ranked Telegram review pagination */
+.telegram-top10-pagination{display:flex;justify-content:center;margin:18px 0 4px;}
+.telegram-top10-pager-controls{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;padding:10px 13px;border:1px solid var(--telegram-line,#e2eaf2);border-radius:14px;background:var(--telegram-card,#fff);box-shadow:0 6px 18px rgba(23,52,82,.04);}
+.telegram-top10-pager-controls>span{color:var(--telegram-muted,#7b8ca0);font-size:11px;margin-right:5px;white-space:nowrap;}
+.telegram-top10-pager-controls .telegram-page-btn{min-width:36px;height:36px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--telegram-line,#dce5ef);border-radius:10px;background:var(--telegram-card,#fff);color:var(--telegram-text,#34536f);font:inherit;font-size:11px;font-weight:800;cursor:pointer;}
+.telegram-top10-pager-controls .telegram-page-btn.is-active{background:var(--telegram-primary,#2767a7);border-color:var(--telegram-primary,#2767a7);color:#fff;}
+.telegram-top10-pager-controls .telegram-page-btn:disabled{opacity:.42;cursor:not-allowed;}
+.telegram-top10-pager-controls .telegram-page-dots{padding:0 2px;color:#91a1b2;}
+@media(max-width:520px){.telegram-top10-pager-controls{width:100%;gap:5px;padding:8px}.telegram-top10-pager-controls>span{width:100%;text-align:center;margin:0 0 3px}.telegram-top10-pager-controls .telegram-page-btn{min-width:32px;height:33px;padding:0 7px}}
