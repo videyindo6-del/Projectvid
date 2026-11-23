@@ -9,8 +9,8 @@ const text={
   until:'Berlaku sampai',since:'Aktif sejak',expired:'Membership VIP telah berakhir',choose:'Pilih paket untuk mengaktifkan keuntungan VIP.',
   loginFirst:'Login terlebih dahulu untuk membeli paket VIP.',plansError:'Paket VIP tidak dapat dimuat.',noPlans:'Belum ada paket VIP yang tersedia.',
   planTag:'VIP MEMBERSHIP',days:'hari masa aktif',vipContent:'Konten khusus VIP',discount:'Diskon 20% konten berbayar yang memenuhi syarat',manage:'Kelola masa aktif di halaman Akun Saya',
-  buy:'Beli paket ini',processing:'Membuat pembayaran…',checkoutError:'Gagal membuat pembayaran',successTitle:'Selamat! VIP berhasil diaktifkan',successText:'Upgrade account berhasil ke VIP! Nikmati semua video tanpa iklan dan diskon 20% untuk pembelian media Telegram yang memenuhi syarat.',expiredTitle:'Masa pembayaran berakhir',expiredText:'Pembayaran belum berhasil. Kamu bisa mencoba membeli paket kembali.',
-  pending:'Pembayaran sedang diverifikasi…',checking:'Memeriksa pembayaran…',activeLabel:'STATUS MEMBERSHIP',startLabel:'WAKTU AKTIF',endLabel:'WAKTU EXPIRED',
+  buy:'Beli paket ini',processing:'Membuat pembayaran…',checkoutError:'Gagal membuat pembayaran',successTitle:'VIP berhasil diaktifkan',successText:'VIP aktif mulai {start} sampai {end}.',walletBuy:'Bayar Saldo Deposit · Diskon 20%',walletSuccessTitle:'VIP aktif melalui saldo deposit',couponLabel:'Kode diskon yang sudah di-claim',noCoupon:'Tanpa kode diskon',signInBuy:'Login untuk membeli VIP',expiredTitle:'Masa pembayaran berakhir',expiredText:'Pembayaran belum berhasil. Kamu bisa mencoba membeli paket kembali.',
+  pending:'Pembayaran sedang diverifikasi…',checking:'Memeriksa pembayaran…',activeLabel:'STATUS MEMBERSHIP',startLabel:'MULAI',endLabel:'BERAKHIR',
   daysLeft:'Sisa masa aktif',daysLeftUnit:'hari',account:'Akun',checkout:'Lanjutkan pembayaran',genericError:'Terjadi kesalahan. Silakan coba lagi.'
  },
  en:{
@@ -18,8 +18,8 @@ const text={
   until:'Expires on',since:'Active since',expired:'Your VIP membership has expired',choose:'Choose a plan to activate VIP benefits.',
   loginFirst:'Please sign in before purchasing a VIP plan.',plansError:'Unable to load VIP plans.',noPlans:'No VIP plans are currently available.',
   planTag:'VIP MEMBERSHIP',days:'days of access',vipContent:'VIP-only content',discount:'20% off eligible paid content',manage:'Manage membership in My Account',
-  buy:'Buy this plan',processing:'Creating payment…',checkoutError:'Unable to create payment',successTitle:'Congratulations! VIP is now active',successText:'Your payment has been verified. Your account is now a VIP member.',expiredTitle:'Payment expired',expiredText:'The payment was not completed. You can try purchasing a plan again.',
-  pending:'Payment is being verified…',checking:'Checking payment…',activeLabel:'MEMBERSHIP STATUS',startLabel:'ACTIVATED AT',endLabel:'EXPIRES AT',
+  buy:'Buy this plan',processing:'Creating payment…',checkoutError:'Unable to create payment',successTitle:'VIP membership activated',successText:'VIP is active from {start} until {end}.',walletBuy:'Pay with Deposit Wallet · 20% off',walletSuccessTitle:'VIP activated using deposit wallet',couponLabel:'Claimed discount code',noCoupon:'No discount code',signInBuy:'Sign in to buy VIP',expiredTitle:'Payment expired',expiredText:'Payment was not completed. You can try purchasing a plan again.',
+  pending:'Payment is being verified…',checking:'Checking payment…',activeLabel:'MEMBERSHIP STATUS',startLabel:'STARTS',endLabel:'ENDS',
   daysLeft:'Time remaining',daysLeftUnit:'days',account:'Account',checkout:'Continue to payment',genericError:'Something went wrong. Please try again.'
  }
 };
@@ -27,6 +27,7 @@ const t=k=>text[lang()][k]||text.id[k]||k;
 const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
 const date=v=>v?new Intl.DateTimeFormat(lang()==='en'?'en-US':'id-ID',{dateStyle:'long',timeStyle:'short',timeZone:'Asia/Jakarta'}).format(new Date(v)):'—';
+function membershipRange(profile){const start=profile?.vip_started_at?date(profile.vip_started_at):date(new Date());const end=profile?.vip_expires_at?date(profile.vip_expires_at):'—';return t('successText').replace('{start}',start).replace('{end}',end)}
 let currentUser=null,pollToken=0,vipCoupons=[];
 function notice(title,message,type='success'){
  const box=$('vipNotice');if(!box)return;
@@ -73,19 +74,27 @@ async function refreshMembership(){
 }
 function renderPlans(plans){
  const en=lang()==='en';
- plansBox.innerHTML=(plans||[]).map(v=>{const gold=/premium|gold|emas/i.test(String(v.name||''));return `<article class="plan-card premium-plan ${gold?'is-gold':''}">
+ plansBox.innerHTML=(plans||[]).map(v=>{const gold=/premium|gold|emas/i.test(String(v.name||''));const couponOptions=vipCoupons.filter(c=>['all','vip_account'].includes(c.scope||'all')).map(c=>`<option value="${safe(c.code)}">${safe(c.code)} · ${Number(c.discount_percent)}%</option>`).join('');return `<article class="plan-card premium-plan ${gold?'is-gold':''}">
   <span class="plan-tag"><i class="fa-solid ${gold?'fa-crown':'fa-sparkles'}"></i> ${gold?'GOLD MEMBER':safe(t('planTag'))}</span>
   <div class="premium-plan-icon"><i class="fa-solid fa-crown"></i></div>
   <h3>${safe(v.name)}</h3>
   <div class="plan-price">${safe(money(v.price))}</div>
   <p class="plan-duration"><i class="fa-regular fa-calendar"></i> ${Number(v.duration_days)||0} ${safe(t('days'))}</p>
   <ul><li><i class="fa-solid fa-check"></i> ${safe(t('vipContent'))}</li><li><i class="fa-solid fa-check"></i> ${safe(t('discount'))}</li><li><i class="fa-solid fa-check"></i> ${safe(t('manage'))}</li></ul>
-  <label class="vip-coupon-field" style="display:grid;gap:6px;margin:12px 0;font-size:12px;font-weight:700">Kode diskon yang sudah di-claim<select data-vip-coupon="${safe(v.id)}" style="padding:10px;border:1px solid #dbe4ef;border-radius:10px;background:#fff"><option value="">Tanpa kode diskon</option>${vipCoupons.filter(c=>['all','vip_account'].includes(c.scope||'all')).map(c=>`<option value="${safe(c.code)}">${safe(c.code)} · ${Number(c.discount_percent)}%</option>`).join('')}</select></label><button class="btn primary vip-buy-button" type="button" data-buy-plan="${safe(v.id)}"><i class="fa-solid fa-lock"></i> ${safe(t('buy'))}</button><button class="btn vip-wallet-button" type="button" data-wallet-plan="${safe(v.id)}" style="width:100%;margin-top:8px"><i class="fa-solid fa-wallet"></i> Bayar Saldo Deposit · Diskon 20%</button>
+  ${currentUser?`<label class="vip-coupon-field">${safe(t('couponLabel'))}<select data-vip-coupon="${safe(v.id)}"><option value="">${safe(t('noCoupon'))}</option>${couponOptions}</select></label><button class="btn primary vip-buy-button" type="button" data-buy-plan="${safe(v.id)}"><i class="fa-solid fa-lock"></i> ${safe(t('buy'))}</button><button class="btn vip-wallet-button" type="button" data-wallet-plan="${safe(v.id)}"><i class="fa-solid fa-wallet"></i> ${safe(t('walletBuy'))}</button>`:`<a class="btn primary vip-login-buy" href="/login.html?next=%2Fvip.html"><i class="fa-solid fa-user-lock"></i> ${safe(t('signInBuy'))}</a>`}
  </article>`}).join('')||`<div class="empty-state">${safe(t('noPlans'))}</div>`;
  plansBox.querySelectorAll('[data-buy-plan]').forEach(button=>button.addEventListener('click',()=>buyVip(button.dataset.buyPlan,button)));
- plansBox.querySelectorAll('[data-wallet-plan]').forEach(button=>button.addEventListener('click',async()=>{
-  button.disabled=true;try{const {data,error}=await sb.rpc('buy_with_deposit_wallet',{p_purpose:'vip',p_plan_id:button.dataset.walletPlan,p_review_id:null,p_vip_group_id:null,p_affiliate_code:localStorage.getItem('boxcellink_affiliate_code')||null});if(error)throw error;if(!data?.ok)throw new Error(data?.reason||'Saldo deposit tidak cukup.');notice('Pembelian berhasil','VIP berhasil diaktifkan dengan saldo deposit.');await refreshMembership()}catch(e){notice('Pembelian gagal',e.message||'Saldo deposit tidak cukup.','error')}finally{button.disabled=false}
- }));
+ plansBox.querySelectorAll('[data-wallet-plan]').forEach(button=>button.addEventListener('click',()=>buyWithWallet(button.dataset.walletPlan,button)));
+}
+async function buyWithWallet(planId,button){
+ if(!currentUser){notice(t('signIn'),t('loginFirst'),'error');return}
+ const old=button?.innerHTML;if(button){button.disabled=true;button.innerHTML=`<i class="fa-solid fa-circle-notch fa-spin"></i> ${safe(t('processing'))}`}
+ try{
+  const {data,error}=await sb.rpc('buy_with_deposit_wallet',{p_purpose:'vip',p_plan_id:planId,p_review_id:null,p_vip_group_id:null,p_affiliate_code:localStorage.getItem('boxcellink_affiliate_code')||null});
+  if(error)throw error;if(!data?.ok)throw new Error(data?.reason==='LOGIN_REQUIRED'?t('loginFirst'):data?.reason||t('genericError'));
+  const profile=await refreshMembership();notice(t('walletSuccessTitle'),membershipRange(profile),'success');statusBox?.scrollIntoView({behavior:'smooth',block:'center'});
+ }catch(e){notice(t('checkoutError'),e?.message||t('genericError'),'error')}
+ finally{if(button){button.disabled=false;button.innerHTML=old||safe(t('walletBuy'))}}
 }
 async function loadPlans(){
  if(currentUser){const {data}=await sb.from('admin_discount_claims').select('used_at,admin_discount_codes(code,scope,discount_percent,expires_at)').eq('user_id',currentUser.id);vipCoupons=(data||[]).filter(x=>!x.used_at&&x.admin_discount_codes&&(!x.admin_discount_codes.expires_at||new Date(x.admin_discount_codes.expires_at)>new Date())).map(x=>x.admin_discount_codes)}
@@ -119,8 +128,8 @@ async function verifyPendingPayment(orderId){
    if(state==='SETTLED'){
     localStorage.removeItem('boxcellink_pending_vip');
     await new Promise(resolve=>setTimeout(resolve,450));
-    await refreshMembership();
-    notice(t('successTitle'),t('successText'),'success');
+    const profile=await refreshMembership();
+    notice(t('successTitle'),membershipRange(profile),'success');
     $('vipStatus')?.scrollIntoView({behavior:'smooth',block:'center'});
     return;
    }
