@@ -1,0 +1,28 @@
+/* Notifications: Posts-style compact feed, controls and message cards */
+.notice-page{width:min(100% - 28px,760px)!important;max-width:760px!important;margin:28px auto 42px!important;padding:0 0 42px!important;color:#203247!important}
+.notice-head{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 0 16px;padding:20px 22px!important;border:1px solid #e3eaf2!important;border-radius:18px!important;background:linear-gradient(135deg,#fff 0%,#f5f9fd 100%)!important;box-shadow:0 8px 28px rgba(24,54,84,.05)!important}
+.notice-head .eyebrow{font-size:9px;letter-spacing:.15em;font-weight:900;color:#3976ad}
+.notice-head h1{margin:5px 0;color:#183a5b!important;font-size:24px!important;letter-spacing:-.035em}
+.notice-head p{margin:0;color:#718196;font-size:12px;line-height:1.55}
+.notice-actions{display:flex;gap:7px;flex-wrap:wrap}
+.notice-actions button{min-height:38px;padding:8px 12px!important;border:1px solid #dce5ef!important;border-radius:10px!important;background:#fff!important;color:#42617e!important;font-size:10px;font-weight:850;cursor:pointer;transition:.18s}
+.notice-actions button:hover{background:#f1f6fb!important;transform:translateY(-1px)}
+.notice-actions #markAll{background:#edf5fd!important;border-color:#d6e7f7!important;color:#245f99!important}
+.notice-actions #deleteAll{background:#fff4f4!important;border-color:#f2dada!important;color:#b42318!important}
+.notice-actions button:disabled{opacity:.5;cursor:wait;transform:none}
+.notice-list{display:grid;gap:12px;margin-top:16px}
+.notice-card{padding:16px 18px!important;border:1px solid #e2e9f1!important;border-radius:17px!important;background:#fff!important;box-shadow:0 6px 22px rgba(23,52,82,.045)!important}
+.notice-card h3,.notice-card h2{margin:0 0 7px!important;color:#183a5b!important;font-size:14px!important;line-height:1.4}
+.notice-card p{margin:0!important;color:#52677c!important;font-size:12px!important;line-height:1.65!important;overflow-wrap:anywhere}
+.notice-card.unread{border-color:#b9d3eb!important;background:linear-gradient(135deg,#fff,#f6faff)!important;border-left:4px solid #3478bd!important}
+.notice-card.unread h3{font-weight:900!important;color:#173b5d!important}.notice-card:not(.unread) h3{font-weight:650!important}
+.notice-meta{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px!important;padding-top:10px;border-top:1px solid #edf1f5;color:#8493a3!important;font-size:10px!important}
+.notice-meta button,.notice-meta a{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:6px 10px;border:1px solid #dce7f2;border-radius:9px;background:#f7faff;color:#28669f!important;font-size:10px;font-weight:850;text-decoration:none;cursor:pointer}
+.notice-meta button[data-delete-one]{background:#fff5f5;color:#b42318!important;border-color:#f0d4d4}
+.notice-cannot-delete{font-size:9px;color:#9a6a2c;font-weight:750}
+.notice-feedback{margin:12px 0;padding:11px 13px;border:1px solid #cbdcf0;border-radius:11px;background:#edf5ff;color:#245b96;font-size:11px;font-weight:750;overflow-wrap:anywhere}
+.notice-feedback[data-type="error"]{border-color:#f0caca;background:#fff2f2;color:#a12b2b}.notice-feedback[data-type="success"]{border-color:#bde3ce;background:#effaf3;color:#176b42}
+.notice-empty{padding:28px 18px!important;text-align:center;border:1px dashed #dce5ef;border-radius:15px;background:#fff;color:#8292a3;font-size:12px;line-height:1.6}
+.notice-empty i{display:block;margin-bottom:8px;color:#9aabba;font-size:22px}.notice-empty h3{margin:0 0 6px;color:#52677c;font-size:14px}.notice-empty p{margin:0;color:#8292a3;font-size:11px;line-height:1.6}
+#adminAnnouncementPanel{margin-top:0!important;margin-bottom:14px!important}.notice-page #adminAnnouncements{display:grid;gap:9px}
+@media(max-width:560px){.notice-page{width:calc(100% - 20px)!important;margin:15px auto 32px!important;padding-bottom:28px!important}.notice-head{padding:16px!important;align-items:flex-start}.notice-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.notice-actions button{min-height:40px;font-size:10px}.notice-card{padding:14px!important;border-radius:15px!important}.notice-meta{align-items:flex-start;flex-direction:column;gap:7px}.notice-meta button,.notice-meta a{min-height:34px}}
