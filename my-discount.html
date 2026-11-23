@@ -13,12 +13,21 @@
 <header class="page-head bc-social-page-head">
  <span class="eyebrow"><i class="fa-solid fa-ticket"></i> <span id="eyebrowLabel">PROMO CODE WALLET</span></span>
  <h1 id="pageTitle">Kode Diskon Saya</h1>
- <p id="pageSubtitle">Claim kode promo, cek masa berlaku, dan gunakan saat checkout pembelian yang sesuai.</p>
+ <p id="pageSubtitle">Claim kode promo dari grup, cek masa berlaku, dan gunakan saat checkout yang sesuai.</p>
 </header>
 <section class="discount-claim-section">
  <h2 id="claimHeading">Claim kode promo</h2>
- <form id="claimForm" class="discount-claim-form"><input id="code" autocomplete="off" autocapitalize="characters" placeholder="Kosongkan untuk claim kode tersedia" aria-label="Kode promo (opsional)"><button class="btn primary" id="claimButton"><i class="fa-solid fa-check"></i> <span id="claimLabel">Claim kode</span></button></form>
-
+ <form id="claimForm" class="claim discount-claim-form"><input id="code" autocomplete="off" autocapitalize="characters" placeholder="Kosongkan untuk claim kode tersedia" aria-label="Kode promo (opsional)"><button class="btn primary" id="claimButton"><i class="fa-solid fa-check"></i> <span id="claimLabel">Claim kode</span></button></form>
+ <aside class="discount-promo-info" aria-labelledby="promoInviteTitle">
+  <div class="discount-promo-icon" aria-hidden="true"><i class="fa-brands fa-telegram"></i></div>
+  <div class="discount-promo-content">
+   <span class="discount-promo-kicker" id="promoInviteKicker">PROMO KOMUNITAS</span>
+   <h3 class="discount-promo-heading" id="promoInviteTitle">Dapatkan kode diskon dari komunitas</h3>
+   <p id="promoInviteDescription">Gabung grup Telegram resmi untuk mendapatkan informasi kode diskon terbaru saat promo tersedia. Kode dibagikan langsung di grup dan dapat di-claim melalui halaman ini.</p>
+   <a class="discount-promo-link" href="https://t.me/+-0qZ2iBc2KkyMGNl" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram" aria-hidden="true"></i><span id="promoInviteButton">Gabung Grup Telegram Resmi</span><i class="fa-solid fa-arrow-up-right-from-square discount-promo-external" aria-hidden="true"></i></a>
+   <div class="discount-promo-expiry"><i class="fa-regular fa-clock" aria-hidden="true"></i><span id="promoInviteExpiryText">Kode yang di-claim berlaku selama <strong>2 jam</strong>. Gunakan sebelum kedaluwarsa.</span></div>
+  </div>
+ </aside>
  <div id="message" class="discount-message" role="status" aria-live="polite"></div>
 </section>
 <section class="discount-history-section">
