@@ -21,16 +21,22 @@ update public.admin_discount_claims set expires_at=claimed_at+interval '2 hours'
 -- Restore the 2-hour claim window; the scope/CRUD migration's version omitted claim expiry.
 create or replace function public.claim_admin_discount(p_code text)
 returns jsonb language plpgsql security definer set search_path=public as $$
-declare c public.admin_discount_codes%rowtype; v_id uuid; v_claim_exp timestamptz;
+declare c public.admin_discount_codes%rowtype; v_id uuid; v_claim_exp timestamptz; v_code text:=nullif(upper(trim(coalesce(p_code,''))), '');
 begin
  if auth.uid() is null then return jsonb_build_object('ok',false,'reason','LOGIN_REQUIRED'); end if;
  perform public.cleanup_expired_admin_discount_claims();
- select * into c from public.admin_discount_codes where upper(code)=upper(trim(p_code)) for update;
- if not found then return jsonb_build_object('ok',false,'reason','CODE_NOT_FOUND'); end if;
- if c.expires_at is not null and c.expires_at<=now() then return jsonb_build_object('ok',false,'reason','EXPIRED'); end if;
- if c.claimed_count>=c.claim_limit then return jsonb_build_object('ok',false,'reason','CLAIM_LIMIT'); end if;
- if exists(select 1 from public.admin_discount_claims where code_id=c.id and user_id=auth.uid()) then
-  return jsonb_build_object('ok',false,'reason','ALREADY_CLAIMED');
+ if v_code is null then
+   select d.* into c from public.admin_discount_codes d
+   where (d.expires_at is null or d.expires_at>now()) and d.claimed_count<d.claim_limit
+     and not exists(select 1 from public.admin_discount_claims x where x.code_id=d.id and x.user_id=auth.uid())
+   order by random() limit 1 for update skip locked;
+   if not found then return jsonb_build_object('ok',false,'reason','NO_AVAILABLE_CODE'); end if;
+ else
+   select * into c from public.admin_discount_codes where upper(code)=v_code for update;
+   if not found then return jsonb_build_object('ok',false,'reason','CODE_NOT_FOUND'); end if;
+   if c.expires_at is not null and c.expires_at<=now() then return jsonb_build_object('ok',false,'reason','EXPIRED'); end if;
+   if c.claimed_count>=c.claim_limit then return jsonb_build_object('ok',false,'reason','CLAIM_LIMIT'); end if;
+   if exists(select 1 from public.admin_discount_claims where code_id=c.id and user_id=auth.uid()) then return jsonb_build_object('ok',false,'reason','ALREADY_CLAIMED'); end if;
  end if;
  v_claim_exp:=now()+interval '2 hours';
  insert into public.admin_discount_claims(code_id,user_id,expires_at) values(c.id,auth.uid(),v_claim_exp) returning id into v_id;
