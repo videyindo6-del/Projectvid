@@ -25,3 +25,17 @@
 @media(max-width:560px){.bc-discount-page .discount-claim-form{display:grid;padding:11px}.bc-discount-page .discount-claim-form button{width:100%}.bc-discount-page .discount-coupon-card{grid-template-columns:36px minmax(0,1fr);align-items:start}.bc-discount-page .coupon-icon{width:35px;height:35px}.bc-discount-page .coupon-actions{grid-column:1/-1;justify-content:stretch}.bc-discount-page .coupon-actions button{flex:1}.bc-discount-page .coupon-top{align-items:flex-start}}
 
 .discount-group-note{margin:10px 0 0;color:var(--muted,#667085);font-size:13px;line-height:1.6}.discount-group-note a{color:var(--primary,#2563eb);font-weight:700;text-decoration:none}.discount-group-note a:hover{text-decoration:underline}.discount-load-warning{padding:12px 14px;margin:0 0 12px;border:1px solid #f1d7a4;background:#fff9ed;color:#8a5a12;border-radius:12px;font-size:13px;line-height:1.5}
+
+/* Telegram promo guidance — integrated compact card, matching Posts page */
+.bc-discount-page .discount-promo-info{display:flex;gap:13px;align-items:flex-start;padding:14px 15px;margin:12px 0 0;border:1px solid #dce8f5;border-radius:15px;background:linear-gradient(135deg,#f5f9ff 0%,#fff 78%);box-shadow:0 4px 16px rgba(28,69,110,.035)}
+.bc-discount-page .discount-promo-icon{width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;border-radius:12px;background:#e6f1fc;color:#2877b8;font-size:17px}
+.bc-discount-page .discount-promo-content{display:grid;gap:6px;min-width:0}
+.bc-discount-page .discount-promo-heading{color:#193b5c;font-size:12px;font-weight:850;letter-spacing:-.015em}
+.bc-discount-page .discount-promo-content>p{margin:0;color:#687b90;font-size:11px;line-height:1.55}
+.bc-discount-page .discount-promo-link{display:inline-flex;align-items:center;gap:7px;width:max-content;max-width:100%;margin-top:2px;padding:8px 11px;border:1px solid #d6e6f5;border-radius:9px;background:#fff;color:#246da8;font-size:10px;font-weight:850;text-decoration:none;transition:background .15s,border-color .15s}
+.bc-discount-page .discount-promo-link:hover{background:#eef6ff;border-color:#bdd7ef}
+.bc-discount-page .discount-promo-link .fa-arrow-up-right-from-square{font-size:9px;opacity:.65}
+.bc-discount-page .discount-promo-expiry{display:flex;align-items:flex-start;gap:6px;margin-top:3px;color:#8492a3;font-size:10px;line-height:1.5}
+.bc-discount-page .discount-promo-expiry>i{margin-top:2px;color:#3976ad}
+.bc-discount-page .discount-promo-expiry strong{color:#536b83;font-weight:800}
+@media(max-width:560px){.bc-discount-page .discount-promo-info{padding:12px;gap:10px}.bc-discount-page .discount-promo-icon{width:34px;height:34px;flex-basis:34px;border-radius:10px;font-size:15px}.bc-discount-page .discount-promo-link{width:100%;justify-content:center}}
