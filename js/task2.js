@@ -2,135 +2,35 @@
 const $=id=>document.getElementById(id);
 const code=new URLSearchParams(location.search).get('code')||'';
 let saved=null;try{saved=JSON.parse(sessionStorage.getItem('al_session')||'null')}catch{}
-if(!saved||saved.code!==code){location.replace('/x/'+encodeURIComponent(code));return;}
-const directAccess=$('task2DirectAccess');if(directAccess)directAccess.href='/autolink-payment.html?code='+encodeURIComponent(code);
-const directToast=$('task2DirectToast');
-if(directToast){
-  const toastClose=$('task2ToastClose');
-  toastClose?.addEventListener('click',()=>{
-    directToast.dataset.dismissed='1';
-    directToast.classList.remove('is-visible');
-    setTimeout(()=>{directToast.hidden=true;},220);
-  });
-  // Show the optional direct-access notice shortly after entering Task 2.
-  setTimeout(()=>{
-    if(!directToast.dataset.dismissed){
-      directToast.hidden=false;
-      requestAnimationFrame(()=>directToast.classList.add('is-visible'));
-    }
-  },1400);
-}
-let busy=true,index=Number(saved.progress_index??0);
+if(!saved||saved.code!==code||!saved.id||!saved.token){location.replace('/x/'+encodeURIComponent(code));return;}
+
+let busy=true,index=0;
 const status=text=>{const el=$('task2PageStatus');if(el)el.textContent=text;};
 const setText=(id,text)=>{const el=$(id);if(el)el.textContent=text;};
 const reveal=id=>{const el=$(id);if(el)el.hidden=false;};
 const hide=id=>{const el=$(id);if(el)el.hidden=true;};
 const scrollTo=id=>$(id)?.scrollIntoView({behavior:'smooth',block:'center'});
 const persist=()=>{saved.progress_index=index;try{sessionStorage.setItem('al_session',JSON.stringify(saved));}catch{}};
-
-async function serverStatus(){
-  const response=await fetch('/api/autolink?action=status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({session_id:saved.id,token:saved.token})});
+const api=async(action,payload={})=>{
+  const response=await fetch('/api/autolink?action='+action,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({session_id:saved.id,token:saved.token,...payload})});
   let data={};try{data=await response.json()}catch{}
   if(!response.ok)throw new Error(data.error||'Tidak dapat membaca status sesi AutoLink.');
-  return Number(data.progress_index||0);
-}
+  return data;
+};
 async function advance(next){
-  if(next!==index+1)throw new Error(`Urutan tahap tidak cocok. Tahap saat ini ${index}, tahap berikutnya ${index+1}.`);
-  const response=await fetch('/api/autolink?action=advance',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({session_id:saved.id,token:saved.token,next_index:next})});
-  let data={};try{data=await response.json()}catch{}
-  if(!response.ok)throw new Error(data.error||'Tahap belum dapat diverifikasi. Silakan coba lagi.');
-  index=next;persist();return data;
+  if(next!==index+1)throw new Error(`Urutan Task 2 tidak sesuai. Tahap berikutnya harus ${index+1}.`);
+  const data=await api('advance',{next_index:next});index=Number(data.progress_index??next);persist();return data;
 }
-
-function mountAd(slot){
-  if(!slot||slot.dataset.loaded==='1')return;
-  let key=slot.dataset.adKey,width=Number(slot.dataset.adWidth),height=Number(slot.dataset.adHeight);
-  if(!key||!width||!height)return;
-  if(window.matchMedia('(max-width: 680px)').matches){
-    if(width===728||width===468){key='e48004340d99ba399e04e57dd40239fa';width=320;height=50;}
-  }
-  slot.dataset.loaded='1';
-  const frame=document.createElement('iframe');
-  frame.title='Iklan sponsor';frame.loading='lazy';frame.width=String(width);frame.height=String(height);
-  frame.referrerPolicy='strict-origin-when-cross-origin';
-  frame.style.cssText=`display:block;border:0;width:min(100%,${width}px);height:${height}px;max-width:100%;margin:0 auto;background:transparent`;
-  const src=`https://www.highrevenueformat.com/${encodeURIComponent(key)}/invoke.js`;
-  frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;overflow:hidden"><script>var atOptions={'+`'key':'${key}','format':'iframe','height':${height},'width':${width},'params':{}`+'};<\/script><script src="'+src+'"><\/script></body></html>';
-  slot.replaceChildren(frame);
+function startPageAds(){
+  if(!window.BoxTaskAds)return;
+  window.BoxTaskAds.start();
+  window.BoxTaskAds.initInlineAds('.task1-ad-mount',{max:22,exclude:['#task2AdGate','#task2SlideAd']});
 }
-function reloadAd(slot){
-  if(!slot)return;
-  slot.dataset.loaded='';
-  slot.replaceChildren();
-  mountAd(slot);
-}
-// Popunder: initialize the supplied provider scripts once per Task 2 page load.
-// The ad provider and browser decide when a valid popunder can be shown; repeatedly
-// injecting the same scripts can cause duplicate requests and may be rejected.
-const task2PopunderScripts=[
-  'https://pl32231840.profitableratecpmnetwork.com/6a/04/a4/6a04a4d0015749a46994e2d7d16590df.js',
-  'https://pl32231845.profitableratecpmnetwork.com/63/28/51/6328510ed0ef36d32ce4589c0110531b.js'
-];
-task2PopunderScripts.forEach((src,index)=>{
-  if(document.querySelector(`script[data-task2-popunder="${index}"]`))return;
-  const script=document.createElement('script');
-  script.src=src;
-  script.async=true;
-  script.setAttribute('data-cfasync','false');
-  script.dataset.task2Popunder=String(index);
-  document.body.appendChild(script);
-});
-
- const adSlots=[...document.querySelectorAll('.task1-ad-mount')];
-if('IntersectionObserver' in window){
-  const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){mountAd(entry.target);observer.unobserve(entry.target);}}},{rootMargin:'760px 0px'});
-  adSlots.forEach(slot=>observer.observe(slot));
-}else adSlots.forEach(mountAd);
-
-function countdown(seconds,{countId,statusId,label}={}){
+function countdown(seconds,{countId,statusId}={}){
   return new Promise(resolve=>{
     let left=seconds;const count=$(countId);
-    const phases=['Memproses...','Verifikasi...','Disiapkan...'];
-    const paint=()=>{
-      if(count)count.textContent=String(left);
-      if(statusId){
-        const phase=phases[(seconds-left)%phases.length];
-        setText(statusId,`${phase} ${left} detik`);
-      }
-    };
-    paint();const timer=setInterval(()=>{left=Math.max(0,left-1);paint();if(left===0){clearInterval(timer);resolve();}},1000);
-  });
-}
-let gateTimer=null;
-function showSponsorGate(){
-  return new Promise(resolve=>{
-    const gate=$('task2AdGate'),skip=$('task2AdSkip'),timer=$('task2AdTimer');
-    if(!gate||!skip){resolve();return;}
-    if(gateTimer){clearInterval(gateTimer);gateTimer=null;}
-    gate.hidden=false;
-    mountAd(gate.querySelector('.task1-ad-mount'));
-    const direct=$('task2GateDirectAccess');
-    if(direct)direct.href='/autolink-payment.html?code='+encodeURIComponent(code);
-    let remaining=5;
-    skip.disabled=true;
-    skip.textContent=`Tunggu ${remaining} detik`;
-    if(timer)timer.textContent=`Lewati tersedia dalam ${remaining} detik`;
-    const finish=()=>{
-      if(gateTimer){clearInterval(gateTimer);gateTimer=null;}
-      gate.hidden=true;
-      skip.removeEventListener('click',finish);
-      resolve();
-    };
-    skip.addEventListener('click',finish,{once:true});
-    gateTimer=setInterval(()=>{
-      remaining=Math.max(0,remaining-1);
-      if(timer)timer.textContent=remaining?`Lewati tersedia dalam ${remaining} detik`:'Iklan selesai';
-      if(remaining){skip.textContent=`Tunggu ${remaining} detik`;}
-      else{
-        clearInterval(gateTimer);gateTimer=null;
-        skip.disabled=false;skip.textContent='Lewati iklan';
-      }
-    },1000);
+    const paint=()=>{if(count)count.textContent=String(left);if(statusId)setText(statusId,`Verifikasi berlangsung… ${left} detik`);};
+    paint();const timer=window.setInterval(()=>{left=Math.max(0,left-1);paint();if(left===0){window.clearInterval(timer);resolve();}},1000);
   });
 }
 async function runBusy(button,work){
@@ -140,103 +40,97 @@ async function runBusy(button,work){
   finally{busy=false;}
 }
 async function finishTask2Stages(){
-  // Stage 8 is the visible five-second verification; later Task 2 records are committed in order.
-  for(let next=index+1;next<=12;next++)await advance(next);
-  reveal('task2Task3Result');setText('task2FinalHint','Verifikasi berhasil. Tombol Download Now sudah tersedia untuk membuka Task 3.');
-  status('Task 2 selesai. Kamu dapat melanjutkan ke Task 3.');
+  // Commit the final Task 2 records in server order; these are zero-delay bookkeeping steps.
+  while(index<12)await advance(index+1);
+  reveal('task2Task3Result');
+  setText('task2FinalHint','Verifikasi berhasil. Tombol Download Now sudah tersedia untuk membuka Task 3.');
+  status('Task 2 selesai dan progres 12 sudah tersimpan di server.');
+}
+function restoreProgress(){
+  if(index>=12){location.replace('/task3.html?code='+encodeURIComponent(code));return false;}
+  if(index<6){location.replace('/task1.html?code='+encodeURIComponent(code));return false;}
+  if(index>=7){
+    hide('task2TopLoader');reveal('task2TopResult');
+    $('task2TopVerify').disabled=true;
+    setText('task2TopHint','Tahap pertama sudah tersimpan. Tekan Scroll Down untuk menuju bagian bawah artikel.');
+  }
+  if(index>=8){
+    reveal('task2ActionArea');hide('task2BottomLoader');reveal('task2BottomResult');
+    $('task2BottomVerify').disabled=true;
+    setText('task2DownloadHint','Verifikasi bagian bawah sudah tersimpan. Tekan Up Down untuk menuju tahap tengah.');
+  }
+  if(index>=9){
+    reveal('task2MiddleStage');hide('task2FinalLoader');
+  }
+  if(index===6){$('task2TopVerify').disabled=false;status('Task 2 siap. Tekan Verifikasi tahap pertama untuk memulai.');}
+  else if(index===7)status('Tahap pertama selesai. Lanjutkan ke bagian bawah.');
+  else if(index===8)status('Bagian bawah selesai. Lanjutkan ke verifikasi tengah.');
+  else if(index>=9)status('Melanjutkan penyimpanan progres Task 2…');
+  startPageAds();
+  return true;
 }
 
 $('task2TopVerify')?.addEventListener('click',()=>runBusy($('task2TopVerify'),async()=>{
+  if(index!==6)throw new Error('Tahap pertama tidak sesuai. Muat ulang halaman.');
   hide('task2TopResult');reveal('task2TopLoader');
-  await countdown(10,{countId:'task2TopCount',statusId:'task2TopStatus',label:'Verifikasi tahap pertama'});
-  await showSponsorGate();
-  if(index<7)await advance(7);
+  await countdown(10,{countId:'task2TopCount',statusId:'task2TopStatus'});
+  await advance(7);
   hide('task2TopLoader');reveal('task2TopResult');
   setText('task2TopHint','Selesai. Tekan Scroll Down untuk menuju bagian bawah artikel.');
   status('Verifikasi tahap pertama selesai.');
 }));
 $('task2BottomVerify')?.addEventListener('click',()=>runBusy($('task2BottomVerify'),async()=>{
+  if(index!==7)throw new Error('Selesaikan tahap pertama Task 2 terlebih dahulu.');
   hide('task2BottomResult');reveal('task2BottomLoader');
-  await countdown(10,{countId:'task2BottomCount',statusId:'task2BottomStatus',label:'Verifikasi bagian bawah'});
-  if(index<8)await advance(8);
+  await countdown(10,{countId:'task2BottomCount',statusId:'task2BottomStatus'});
+  await advance(8);
   hide('task2BottomLoader');reveal('task2BottomResult');
   setText('task2DownloadHint','Verifikasi bagian bawah selesai. Tekan Up Down untuk menuju tahap tengah.');
   status('Verifikasi bagian bawah selesai.');
 }));
 $('task2ScrollDown')?.addEventListener('click',()=>{
-  if(busy)return;reveal('task2ActionArea');scrollTo('task2ActionArea');
-  status('Bagian bawah terbuka. Tekan Up Down untuk menuju verifikasi tengah.');
+  if(busy||index<7)return;reveal('task2ActionArea');scrollTo('task2ActionArea');
+  status('Bagian bawah terbuka. Selesaikan verifikasi bagian bawah.');
 });
 $('task2UpDown')?.addEventListener('click',()=>{
-  if(busy)return;reveal('task2MiddleStage');scrollTo('task2MiddleStage');
+  if(busy||index<8)return;reveal('task2MiddleStage');scrollTo('task2MiddleStage');
   status('Bagian tengah terbuka. Verifikasi dapat dilakukan tanpa mengklik iklan.');
 });
 $('task2FinalVerify')?.addEventListener('click',()=>runBusy($('task2FinalVerify'),async()=>{
+  if(index!==8)throw new Error('Selesaikan verifikasi bagian bawah terlebih dahulu.');
   hide('task2Task3Result');reveal('task2FinalLoader');
-  await countdown(10,{countId:'task2FinalCount',statusId:'task2FinalStatus',label:'Verifikasi tahap tengah'});
-  if(index<9)await advance(9);
+  await countdown(10,{countId:'task2FinalCount',statusId:'task2FinalStatus'});
+  await advance(9);
   await finishTask2Stages();hide('task2FinalLoader');
 }));
 $('task2GoTask3')?.addEventListener('click',()=>{if(busy||index!==12)return;location.assign('/task3.html?code='+encodeURIComponent(code));});
 
-// Slide ad: remains visible until the visitor presses X; it returns 7 seconds after closing.
-const slide=$('task2SlideAd');
-let slideReturnTimer=null;
-function showSlide(){
-  if(!slide)return;
-  slide.hidden=false;
-  requestAnimationFrame(()=>slide.classList.add('is-visible'));
-  reloadAd(slide.querySelector('.task1-ad-mount'));
+/* Optional direct-access notice and community reminder. */
+const directAccess=$('task2DirectAccess');if(directAccess)directAccess.href='/autolink-payment.html?code='+encodeURIComponent(code);
+const directToast=$('task2DirectToast');
+if(directToast){
+  $('task2ToastClose')?.addEventListener('click',()=>{directToast.dataset.dismissed='1';directToast.classList.remove('is-visible');window.setTimeout(()=>{directToast.hidden=true;},220);});
+  window.setTimeout(()=>{if(!directToast.dataset.dismissed){directToast.hidden=false;requestAnimationFrame(()=>directToast.classList.add('is-visible'));}},1400);
 }
-function hideSlide(){
-  if(!slide||slide.hidden)return;
-  slide.classList.remove('is-visible');
-  setTimeout(()=>{slide.hidden=true;},260);
-  if(slideReturnTimer)clearTimeout(slideReturnTimer);
-  slideReturnTimer=setTimeout(showSlide,7000);
-}
-$('task2SlideClose')?.addEventListener('click',hideSlide);
-if(slide)setTimeout(showSlide,5000);
-
-// WhatsApp channel invitation appears once after 10 seconds; dismissing it leaves a floating shortcut.
 const waDialog=$('task2WaDialog'),waFloat=$('task2WaFloat');
 const whatsappUrl=window.BOXCELLINK_COMMUNITY_LINKS?.whatsapp?.url||'';
 if($('task2WaJoin')&&whatsappUrl)$('task2WaJoin').href=whatsappUrl;
-function dismissWa(){
-  if(waDialog){waDialog.classList.remove('is-visible');setTimeout(()=>{waDialog.hidden=true;},220);}
-  if(waFloat)waFloat.hidden=false;
-}
+function dismissWa(){if(waDialog){waDialog.classList.remove('is-visible');window.setTimeout(()=>{waDialog.hidden=true;},220);}if(waFloat)waFloat.hidden=false;}
 if(waDialog){
-  setTimeout(()=>{waDialog.hidden=false;requestAnimationFrame(()=>waDialog.classList.add('is-visible'));},10000);
-  $('task2WaOkay')?.addEventListener('click',dismissWa);
-  $('task2WaClose')?.addEventListener('click',dismissWa);
-  $('task2WaJoin')?.addEventListener('click',dismissWa);
+  window.setTimeout(()=>{waDialog.hidden=false;requestAnimationFrame(()=>waDialog.classList.add('is-visible'));},10000);
+  $('task2WaOkay')?.addEventListener('click',dismissWa);$('task2WaClose')?.addEventListener('click',dismissWa);$('task2WaJoin')?.addEventListener('click',dismissWa);
 }
 waFloat?.addEventListener('click',()=>{if(whatsappUrl)window.open(whatsappUrl,'_blank','noopener,noreferrer');});
 
-// Restore backend progress, but require a fresh visible verification action at each stage.
 (async()=>{
   try{
-    index=await serverStatus();persist();
-    if(index>=3&&index<6){
-      status('Menyelaraskan sesi Task 1…');
-      if(index===3)await advance(4);
-      if(index===4){await new Promise(resolve=>setTimeout(resolve,5000));await advance(5);}
-      if(index===5)await advance(6);
-      status('Sesi Task 1 berhasil diselaraskan. Task 2 siap.');
-    }
-    if(index<6)throw new Error('Selesaikan Task 1 terlebih dahulu sebelum membuka Task 2.');
-    // Jangan tampilkan Scroll Down, Up Down, atau hasil akhir sebelum verifikasi di halaman ini diklik.
-    hide('task2TopLoader');hide('task2TopResult');
-    hide('task2ActionArea');hide('task2BottomLoader');hide('task2BottomResult');
-    hide('task2MiddleStage');hide('task2FinalLoader');hide('task2Task3Result');
-    $('task2TopVerify').disabled=false;
-    $('task2BottomVerify').disabled=false;
-    $('task2FinalVerify').disabled=false;
-    status('Task 2 siap. Tekan Verifikasi tahap pertama untuk memulai.');
+    const data=await api('status');index=Number(data.progress_index||0);persist();
+    if(!restoreProgress())return;
+    if(index>=9&&index<12){await finishTask2Stages();}
   }catch(error){
     status(error?.message||'Sesi belum siap. Silakan mulai kembali dari halaman AutoLink.');
-    const button=$('task2TopVerify');if(button)button.disabled=true;
+    $('task2TopVerify').disabled=true;
+    if(/sesi tidak valid|kedaluwarsa/i.test(error?.message||''))location.replace('/x/'+encodeURIComponent(code));
   }finally{busy=false;}
 })();
 })();
