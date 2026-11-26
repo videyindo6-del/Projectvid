@@ -13,3 +13,56 @@
 @media(max-width:600px){.al-page.task3-page{padding:22px 12px 105px}.task3-head{display:block}.task3-secure{width:max-content;margin-top:13px}.task3-stepper{gap:6px;padding:13px 10px}.task3-step{gap:6px}.task3-step-number{width:29px;height:29px;flex-basis:29px;font-size:12px}.task3-step b{font-size:10px}.task3-step small{font-size:9px}.task3-step-line{min-width:5px}.task3-panel{padding:18px}.task3-slide-ad{right:9px;bottom:86px;width:180px;min-height:315px}.task3-telegram-notice{left:10px;right:auto}.task3-whatsapp-notice{right:10px;left:auto}.task3-notice{width:min(300px,calc(100vw - 24px));padding:20px 15px 15px}.task3-float-icon.telegram{left:10px}.task3-float-icon.whatsapp{right:10px}}
 @media(prefers-reduced-motion:reduce){.task3-spinner{animation-duration:2s}.task3-check-row{transition:none}}
 [hidden]{display:none!important}
+
+
+/* AutoLink task ad controller — one animated, non-blocking banner per 10-second cycle. */
+.box-task-ad-suppressed{display:none!important}
+.box-task-ad-motion{position:fixed;z-index:1180;right:14px;bottom:82px;width:min(324px,calc(100vw - 22px));padding:7px;border:1px solid rgba(206,220,236,.96);border-radius:16px;background:rgba(255,255,255,.98);box-shadow:0 18px 55px rgba(12,31,53,.26);opacity:0;pointer-events:none;}
+.box-task-ad-motion[hidden]{display:none!important}
+.box-task-ad-motion.is-entering{pointer-events:auto}
+.box-task-ad-motion-card{overflow:hidden;border-radius:11px;background:#fff}
+.box-task-ad-motion-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:3px 3px 8px;color:#6b7c91;font:800 10px/1.2 Inter,system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.box-task-ad-motion-head span{display:flex;align-items:center;gap:7px}
+.box-task-ad-motion-head span i{font-size:13px;color:#3978b4}
+.box-task-ad-motion-close{display:grid;place-items:center;width:28px;height:28px;border:0;border-radius:50%;background:#edf2f7;color:#4d6076;cursor:pointer;font-size:14px}
+.box-task-ad-motion-mount{display:grid;place-items:center;width:300px;max-width:100%;min-height:250px;margin:0 auto;overflow:hidden;background:transparent}
+.box-task-ad-motion-mount iframe{max-width:100%!important}
+.box-task-ad-motion[data-effect="float"].is-entering{animation:boxTaskFloatIn .55s cubic-bezier(.2,.8,.2,1) both}
+.box-task-ad-motion[data-effect="slide-up"].is-entering{animation:boxTaskSlideUp .65s cubic-bezier(.2,.8,.2,1) both}
+.box-task-ad-motion[data-effect="slide-down"].is-entering{top:78px;bottom:auto;animation:boxTaskSlideDown .65s cubic-bezier(.2,.8,.2,1) both}
+.box-task-ad-motion[data-effect="slide-left"].is-entering{left:14px;right:auto;animation:boxTaskSlideLeft .65s cubic-bezier(.2,.8,.2,1) both}
+.box-task-ad-motion[data-effect="slide-right"].is-entering{left:auto;right:14px;animation:boxTaskSlideRight .65s cubic-bezier(.2,.8,.2,1) both}
+.box-task-ad-motion[data-effect="expand"].is-entering{animation:boxTaskExpand .55s cubic-bezier(.16,1,.3,1) both}
+@keyframes boxTaskFloatIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes boxTaskSlideUp{from{opacity:0;transform:translateY(110vh)}to{opacity:1;transform:translateY(0)}}
+@keyframes boxTaskSlideDown{from{opacity:0;transform:translateY(-110vh)}to{opacity:1;transform:translateY(0)}}
+@keyframes boxTaskSlideLeft{from{opacity:0;transform:translateX(-110vw)}to{opacity:1;transform:translateX(0)}}
+@keyframes boxTaskSlideRight{from{opacity:0;transform:translateX(110vw)}to{opacity:1;transform:translateX(0)}}
+@keyframes boxTaskExpand{from{opacity:0;transform:scale(.15)}to{opacity:1;transform:scale(1)}}
+.box-task-ad-tools{position:fixed;z-index:2500;right:12px;top:12px;width:min(590px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;padding:15px;border:1px solid #dce5ef;border-radius:17px;background:#fff;box-shadow:0 20px 70px rgba(15,34,56,.24);color:#1d344d;font-family:Inter,system-ui,sans-serif}
+.box-task-ad-tools-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.box-task-ad-tools-head strong{display:block;font-size:14px}
+.box-task-ad-tools-head strong i{color:#3477b4;margin-right:6px}
+.box-task-ad-tools-head small{display:block;margin-top:4px;color:#718399;font-size:11px}
+.box-task-ad-tools-close{width:30px;height:30px;border:0;border-radius:50%;background:#eef2f6;color:#53677d;cursor:pointer}
+.box-task-ad-tools-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.box-task-ad-tools-item{display:grid;grid-template-columns:27px minmax(0,1fr);align-items:center;gap:8px;padding:10px;border:1px solid #e5ebf2;border-radius:12px;background:#fbfcfe}
+.box-task-ad-tools-item>i{display:grid;place-items:center;width:27px;height:27px;border-radius:8px;background:#eaf2fb;color:#2d6fae;font-size:13px}
+.box-task-ad-tools-item>span{min-width:0}
+.box-task-ad-tools-item strong,.box-task-ad-tools-item small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.box-task-ad-tools-item strong{font-size:11px}
+.box-task-ad-tools-item small{margin-top:3px;color:#8291a3;font-size:9px}
+.box-task-ad-tools-item button{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:7px;min-height:32px;border:1px solid #dce5ef;border-radius:9px;background:#fff;color:#285f96;font-size:10px;font-weight:800;cursor:pointer}
+.box-task-ad-tools-item button:hover{background:#edf5fd}
+.box-task-ad-tools-note{margin:10px 0 0;color:#718399;font-size:10px;line-height:1.5}
+@media(max-width:600px){.box-task-ad-motion{right:8px;bottom:78px;width:min(310px,calc(100vw - 16px));}.box-task-ad-motion[data-effect="slide-left"].is-entering{left:8px}.box-task-ad-motion[data-effect="slide-right"].is-entering{right:8px}.box-task-ad-tools-grid{grid-template-columns:1fr}.box-task-ad-tools{right:8px;top:8px;width:calc(100vw - 16px);max-height:calc(100vh - 16px)}}
+@media(prefers-reduced-motion:reduce){.box-task-ad-motion.is-entering{animation:none!important;opacity:1}}
+
+
+.task3-ad-placement{display:grid;gap:8px;margin:15px 0;padding:12px 14px;border:1px solid #e3ebf4;border-radius:15px;background:rgba(255,255,255,.9);box-shadow:0 8px 24px rgba(27,54,84,.04)}
+.task3-ad-placement-label{display:flex;align-items:center;gap:7px;color:#8091a5;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.task3-ad-placement-label i{color:#3778b4;font-size:12px}
+.task3-ad-banner-placement .task3-ad-mount{min-height:50px;display:grid;place-items:center;overflow:hidden}
+.task3-ad-banner-placement iframe{display:block;max-width:100%;border:0}
+.task3-ad-native-placement .task3-native-mount{display:grid;place-items:center;min-height:250px;overflow:hidden}
+.task3-ad-native-placement iframe{display:block;width:100%;min-height:250px;border:0;background:transparent}
