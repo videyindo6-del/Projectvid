@@ -113,6 +113,7 @@ $('task3Done')?.addEventListener('click',()=>safeRun(async()=>{
 
 /* Ads and animated banners start only after the server confirms this is a valid Task 3 session. */
 function startPageAds(){
+  window.BoxVideoAdGate?.showTask3();
   window.BoxTaskAds?.start();
   window.BoxTaskAds?.mountBanner($('task3BannerMount'),'e48004340d99ba399e04e57dd40239fa',320,50);
   window.BoxTaskAds?.mountNative($('task3NativeMount'));
